@@ -59,17 +59,81 @@ TEST(Multiprecision, SmallStringInitialization) {
 }
 
 TEST(Multiprecision, HugeStringInitialization) {
+    using namespace std::string_literals;
     using namespace std::string_view_literals;
 
     Multiprecision huge = "8683317618811886495518194401279999999", negativeHuge = "-8683317618811886495518194401279999999";
     std::stringstream ss1 {}; ss1 << huge << negativeHuge;
-    EXPECT_EQ(ss1.str(), "8683317618811886495518194401279999999-8683317618811886495518194401279999999"sv);
+    EXPECT_EQ(ss1.str(), "8683317618811886495518194401279999999-8683317618811886495518194401279999999");
 
     Multiprecision hugeHexLC = "0x688589cc0e9505e2f2fee557fffffff", hugeHexHC = "0x688589CC0E9505E2F2FEE557FFFFFFF";
     std::stringstream ss2 {}; ss2 << hugeHexLC << hugeHexHC;
-    EXPECT_EQ(ss2.str(), "0x688589cc0e9505e2f2fee557fffffff0x688589CC0E9505E2F2FEE557FFFFFFF"sv);
+    EXPECT_EQ(ss2.str(), "0x688589cc0e9505e2f2fee557fffffff0x688589CC0E9505E2F2FEE557FFFFFFF");
 
     Multiprecision hugeNegativeHexLC = "-0x688589cc0e9505e2f2fee557fffffff", hugeNegativeHexHC = "-0x688589CC0E9505E2F2FEE557FFFFFFF";
     std::stringstream ss3 {}; ss3 << hugeNegativeHexLC << hugeNegativeHexHC;
-    EXPECT_EQ(ss3.str(), "-0x688589cc0e9505e2f2fee557fffffff-0x688589CC0E9505E2F2FEE557FFFFFFF"sv);
+    EXPECT_EQ(ss3.str(), "-0x688589cc0e9505e2f2fee557fffffff-0x688589CC0E9505E2F2FEE557FFFFFFF");
+
+    Multiprecision str2 = "8683317618811886495518194401279999999"sv, str3 = "8683317618811886495518194401279999999"s;
+    std::stringstream ss4 {}; ss4 << str2 << str3;
+    EXPECT_EQ(ss4.str(), "86833176188118864955181944012799999998683317618811886495518194401279999999");
+}
+
+TEST(Multiprecision, Addition) {
+    Multiprecision huge = "8683317618811886495518194401279999999", negativeHuge = "-8683317618811886495518194401279999999";
+    EXPECT_EQ(huge + negativeHuge, 0);
+    EXPECT_EQ(huge + huge + huge, "26049952856435659486554583203839999997");
+
+    Multiprecision huge2 = "26049952856435659486554583203839999997";
+    huge += huge2;
+    EXPECT_EQ(huge, "34733270475247545982072777605119999996");
+}
+
+TEST(Multiprecision, Subtraction) {
+    Multiprecision huge = "34733270475247545982072777605119999996", greater = "34733270475247545982072777605119999997";
+    EXPECT_EQ(huge - greater, 0);
+
+    Multiprecision mega = "8683317618811886495518194401279999999";
+    EXPECT_EQ(mega - huge - huge, "-60783223331683205468627360808959999993");
+
+    mega -= huge;
+    EXPECT_EQ(mega, "-26049952856435659486554583203839999997");
+}
+
+TEST(Multiprecision, Complex) {
+    Multiprecision a("123456789012345678901234567890");
+    Multiprecision b("987654321098765432109876543210");
+    EXPECT_EQ(a + b, "111111111011111111011111111100");
+    EXPECT_EQ(a - b, "-86419753108641975310864197520");
+    EXPECT_EQ(a * b, "12193263112862162186216216216919326311286216216216");
+    EXPECT_EQ(a / b, "124");
+
+    Multiprecision c("123");
+    Multiprecision d("123456789012345678901234567890");
+    EXPECT_EQ(d / c, "1003712536650411410484961790650");
+
+    Multiprecision e("123456789012345678901234567890");
+    Multiprecision f("987");
+    EXPECT_EQ(e * f, "121932631128621621862162162170");
+
+    Multiprecision g("-123456789012345678901234567890");
+    Multiprecision h("-987654321098765432109876543210");
+    EXPECT_EQ(g + h, "-111111111011111111011111111100");
+    EXPECT_EQ(g - h, "86419753108641975310864197520");
+
+    Multiprecision result_negative_multiplication = g * h;
+    EXPECT_EQ(result_negative_multiplication, "12193263112862162186216216216919326311286216216216");
+    EXPECT_EQ(g / h, "124");
+
+    Multiprecision i("0");
+    Multiprecision j("123456789012345678901234567890");
+    EXPECT_EQ(j / i, "0");
+
+    Multiprecision r("987654321098765432109876543210");
+    Multiprecision s("123456789012345678901234567890");
+    EXPECT_EQ(r % s, "987654321098765432109876543210");
+
+    Multiprecision t("-987654321098765432109876543210");
+    Multiprecision u("123456789012345678901234567890");
+    EXPECT_EQ(t % u, "-987654321098765432109876543210");
 }

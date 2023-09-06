@@ -36,7 +36,7 @@ public:
     constexpr Multiprecision(const Multiprecision& copy) noexcept = default;
     constexpr Multiprecision(Multiprecision&& move) noexcept = default;
 
-    template <typename String> requires (std::convertible_to<String&&, std::string>)
+    template <typename String> requires (std::convertible_to<String&&, std::string> or std::convertible_to<String&&, std::string_view>)
     constexpr Multiprecision(String&& from) noexcept {
         unsigned position = 0;
         if(from[0] == '-') {
@@ -50,37 +50,6 @@ public:
     constexpr Multiprecision(Integral value) noexcept {};
     /* ----------------------------------------------------------------------- */
 
-    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
-    constexpr Multiprecision operator+(Object&& value) const noexcept {
-        Multiprecision result = *this; result += value; return result;
-    }
-
-    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
-    constexpr Multiprecision& operator+=(Object&& value) noexcept {
-        return *this;
-    }
-
-    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
-    constexpr Multiprecision operator-(Object&& other) const noexcept {
-        Multiprecision result(this); result -= other; return result;
-    }
-
-    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
-    constexpr Multiprecision& operator-=(Object&& value) noexcept {
-        return *this;
-    }
-
-    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
-    constexpr Multiprecision& operator=(Object&& other) noexcept {
-        for(uint8_t i = 0; i < getCapacity(); ++i)
-            blocks[i] = (i < other.getCapacity()) ? other.blocks[i] : 0;
-        setSign(other.getSign());
-        return *this;
-    }
-
-    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
-    constexpr bool operator==(Object&& value) const noexcept { return true; }
-
     constexpr Multiprecision operator+() const noexcept {
         return Multiprecision(*this);
     }
@@ -89,6 +58,49 @@ public:
         result.setSign(result.getSign() == Positive ? Negative : Positive);
         return result;
     }
+
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision operator+(Object&& value) const noexcept {
+        Multiprecision result = *this; result += value; return result;
+    }
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision& operator+=(Object&& value) noexcept {
+        return *this;
+    }
+
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision operator-(Object&& value) const noexcept {
+        Multiprecision result = *this; result -= value; return result;
+    }
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision& operator-=(Object&& value) noexcept {
+        return *this;
+    }
+
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision operator*(Object&& value) const noexcept {}
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision& operator*=(Object&& value) noexcept {}
+
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision operator/(Object&& value) const noexcept {}
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision& operator/=(Object&& value) noexcept {}
+
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision operator%(Object&& value) const noexcept {}
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision& operator%=(Object&& value) noexcept {}
+
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr Multiprecision& operator=(Object&& other) noexcept {
+        for(uint8_t i = 0; i < getCapacity(); ++i)
+            blocks[i] = (i < other.getCapacity()) ? other.blocks[i] : 0;
+        setSign(other.getSign());
+        return *this;
+    }
+    template <typename Object> requires (std::convertible_to<Object&&, Multiprecision>)
+    constexpr bool operator==(Object&& value) const noexcept { return true; }
 };
 
 template <typename Object> requires (std::convertible_to<Object&&, Multiprecision<>>)

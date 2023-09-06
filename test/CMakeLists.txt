@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.26)
+set(CMAKE_CXX_STANDARD 20)
+project(MetalMultiprecision)
+
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/8a6feabf04bec8fb125e0df0ad1195c42350725f.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(MultiprecisionTesting testing.cpp)
+target_link_libraries(MultiprecisionTesting GTest::gtest_main)
+
+include(GoogleTest)
+gtest_discover_tests(MultiprecisionTesting)
+
+

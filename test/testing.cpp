@@ -58,6 +58,24 @@ TEST(Multiprecision, SmallStringInitialization) {
     EXPECT_EQ(negativeHexTenHC, -10);
 }
 
+TEST(Multiprecision, StringInitializationDifferentNotations) {
+    Multiprecision binPositive = "0b1010101010101010101010101", binNegative = "-0b10101001100010101001";
+    std::stringstream dec1 {}; dec1 << binPositive << binNegative;
+    EXPECT_EQ(dec1.str(), "79538861190790864407636279553-75854164851665715335169");
+
+    Multiprecision octPositive = "010627417627317461303153040000001", octNegative = "-064205423460164520274274577345257777777777";
+    std::stringstream dec2 {}; dec2 << octPositive << octNegative;
+    EXPECT_EQ(dec2.str(), "10888869450418352160768000001-8683317618811886495518194401279999999");
+
+    Multiprecision hexPositive = "0x19134702400093278081449423917", hexNegative = "-0x1066340417491710595814572169";
+    std::stringstream dec3 {}; dec3 << hexPositive << hexNegative;
+    EXPECT_EQ(dec3.str(), "8137400821357660739694305225095447-332615924401058380969667861094761");
+
+    Multiprecision complex = "";
+    std::stringstream notations {}; notations << std::oct << complex << std::dec << complex << std::hex << complex;
+    EXPECT_EQ(notations.str(), "");
+}
+
 TEST(Multiprecision, HugeStringInitialization) {
     using namespace std::string_literals;
     using namespace std::string_view_literals;
@@ -120,9 +138,7 @@ TEST(Multiprecision, Complex) {
     Multiprecision h("-987654321098765432109876543210");
     EXPECT_EQ(g + h, "-111111111011111111011111111100");
     EXPECT_EQ(g - h, "86419753108641975310864197520");
-
-    Multiprecision result_negative_multiplication = g * h;
-    EXPECT_EQ(result_negative_multiplication, "12193263112862162186216216216919326311286216216216");
+    EXPECT_EQ(g * h, "12193263112862162186216216216919326311286216216216");
     EXPECT_EQ(g / h, "124");
 
     Multiprecision i("0");

@@ -7,6 +7,7 @@ template <uint8_t blocksCount = 8>
 class Multiprecision {
     static constexpr auto Positive = 1, Negative = 0;
     using block = unsigned;
+    static constexpr auto blockBase = 1ULL << (sizeof(block) * 8);
 
     /* ---------------------------- Class members. --------------------------- */
     std::array<block, blocksCount> blocks {};
@@ -47,7 +48,15 @@ public:
     }
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    constexpr Multiprecision(Integral value) noexcept {};
+    constexpr Multiprecision(Integral value) noexcept {
+        setSign(value < 0 ? Negative : Positive);
+
+        auto tValue = static_cast<unsigned long long>(abs(value));
+        for(unsigned i = 0; i < blocksCount; ++i) {
+            blocks[i] = static_cast<unsigned>(tValue % blockBase);
+            tValue /= blockBase;
+        }
+    };
     /* ----------------------------------------------------------------------- */
 
     constexpr Multiprecision operator+() const noexcept {

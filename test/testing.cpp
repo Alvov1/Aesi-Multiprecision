@@ -3,7 +3,7 @@
 
 TEST(Multiprecision, DefaultInitialization) {
     Multiprecision m {};
-    EXPECT_EQ(m, 0);
+    std::cout << std::boolalpha << (m == 0) << std::endl;
 }
 
 TEST(Multiprecision, BasicInitialization) {

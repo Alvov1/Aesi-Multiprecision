@@ -3,7 +3,7 @@
 
 #include <array>
 
-template <uint8_t blocksCount = 8>
+template <unsigned blocksCount = 8>
 class Multiprecision {
     static constexpr auto Positive = 1, Negative = 0;
     using block = unsigned;
@@ -15,6 +15,14 @@ class Multiprecision {
     uint8_t sign { Positive }, capacity { blocksCount };
     /* ----------------------------------------------------------------------- */
 
+    /* ------------------------ Static helper functions. --------------------- */
+    template <typename Char>
+    static constexpr size_t strlen(const Char *str) noexcept {
+        const char *s = str;
+        for (; *s; ++s);
+        return(s - str);
+    }
+    /* ----------------------------------------------------------------------- */
 
     /* -------------------------- Useful operators. -------------------------- */
     [[nodiscard]]
@@ -50,48 +58,18 @@ public:
     constexpr Multiprecision(const Multiprecision& copy) noexcept = default;
     constexpr Multiprecision(Multiprecision&& move) noexcept = default;
 
-/**/template <typename String> requires (std::convertible_to<String&&, std::string> or std::convertible_to<String&&, std::string_view>)
-    constexpr Multiprecision(String&& from) noexcept {
-        unsigned position = 0;
-        if(from[position] == '-') {
-            setSign(Negative);
-            ++position;
-        }
-        uint8_t base = 10;
-        if(from[position] == '0') {
-            base = 8;
-            ++position;
-            if(from[position] == 'x') {
-                base = 16;
-                ++position;
-            } else if(from[position] == 'b') {
-                base = 2;
-                ++position;
-            }
-        }
-
-        const unsigned charactersPerDigit = sizeof(block) * 8 / 4;
-        const unsigned digits = (from.size() + charactersPerDigit - 1) / charactersPerDigit;
-
-        bool allZeros = true;
-        for(unsigned i = 0; i < digits; ++i) {
-            const unsigned shift = from.size() - (i + 1) * charactersPerDigit;
-            const unsigned tPosition = position + (shift > 0 ? shift : 0);
-            blocks[i] = strtoul(from.data() + tPosition, nullptr, base);
-            allZeros = allZeros && (blocks[i] == 0);
-        }
-
-        if(allZeros)
-            setSign(Positive);
-    }
+    template <typename String>
+    requires (std::is_same<std::string, typename std::decay<String>::type>::value or std::is_same<std::string_view, typename std::decay<String>::type>::value)
+    constexpr Multiprecision(String&& value) noexcept {};
 
 /**/template <typename Char, std::size_t arrayLength>
-    constexpr Multiprecision(const Char (&from)[arrayLength]) {
+    constexpr Multiprecision(const Char (&from)[arrayLength]) noexcept {
         unsigned position = 0;
         if(from[position] == '-') {
             setSign(Negative);
             ++position;
         }
+
         uint8_t base = 10;
         if(from[position] == '0') {
             base = 8;
@@ -105,14 +83,27 @@ public:
             }
         }
 
-        const unsigned charactersPerDigit = sizeof(block) * 8 / 4;
-        const unsigned digits = (arrayLength + charactersPerDigit - 1) / charactersPerDigit;
+        const unsigned charactersPerDigit = [] (uint8_t base) {
+            switch(base) {
+                case 2: return 32;
+                case 8: return 11;
+                case 10: return 10;
+                case 16: return 8;
+                default: return 10;
+            }
+        } (base);
+        std::array<Char, 33> buffer {};
 
+        const unsigned blocksTotal = (arrayLength - 1 - position + charactersPerDigit - 1) / charactersPerDigit;
         bool allZeros = true;
-        for(unsigned i = 0; i < digits; ++i) {
-            const unsigned shift = arrayLength - (i + 1) * charactersPerDigit;
-            const unsigned tPosition = position + (shift > 0 ? shift : 0);
-            blocks[i] = strtoul(from + tPosition, nullptr, base);
+        for(unsigned i = 0; i < blocksTotal; ++i) {
+            long shift = arrayLength - 1 - (i + 1) * charactersPerDigit;
+            if(shift < position) shift = position;
+
+            for(unsigned j = 0; j < charactersPerDigit; ++j)
+                buffer[j] = (shift + j < arrayLength ? from[shift + j] : '\0');
+
+            blocks[i] = strtoul(buffer.data(), nullptr, base);
             allZeros = allZeros && (blocks[i] == 0);
         }
 

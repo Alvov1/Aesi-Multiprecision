@@ -29,3 +29,14 @@ TEST(Addition, Huge) {
     huge2 += huge3;
     EXPECT_EQ(huge2, "26049952856435659486065449920967562718");
 }
+
+TEST(Addition, DifferentPrecision) {
+    Multiprecision<8> first = 89789787987;
+    Multiprecision<10> second = 243242342342432;
+
+    Multiprecision result = first + second;
+    EXPECT_EQ(result, 243332132130419);
+
+    second += first;
+    EXPECT_EQ(second, 243332132130419);
+}

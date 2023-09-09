@@ -1,18 +1,19 @@
 #ifndef METALMULTIPRECISION_MULTIPRECISION_H
 #define METALMULTIPRECISION_MULTIPRECISION_H
 
+#include <iostream>
 #include <array>
 
-template <unsigned blocksCount = 8>
+template <std::size_t blocksCount = 8>
 class Multiprecision {
     static constexpr auto Positive = 1, Negative = 0;
     using block = unsigned;
-    using blockLine = std::array<unsigned, blocksCount>;
+    using blockLine = std::array<block, blocksCount>;
     static constexpr auto blockBase = 1ULL << (sizeof(block) * 8);
 
     /* ---------------------------- Class members. --------------------------- */
     blockLine blocks {};
-    uint8_t sign { Positive }, capacity { blocksCount };
+    uint8_t sign { Positive };
     /* ----------------------------------------------------------------------- */
 
     /* ------------------------ Static helper functions. --------------------- */
@@ -22,33 +23,6 @@ class Multiprecision {
         for (; *s; ++s);
         return(s - str);
     }
-    /* ----------------------------------------------------------------------- */
-
-    /* -------------------------- Useful operators. -------------------------- */
-    [[nodiscard]]
-    constexpr auto getSign() const noexcept -> uint8_t { return sign; };
-    constexpr auto setSign(uint8_t newSign) noexcept -> void { sign = newSign; }
-    [[nodiscard]]
-    constexpr auto getCapacity() const noexcept -> uint8_t { return capacity; }
-    constexpr auto setCapacity(uint8_t newCapacity) noexcept -> void { capacity = newCapacity; }
-    [[nodiscard]]
-    constexpr auto emptyCapacity() const -> bool { return getCapacity() == 0; }
-    constexpr auto negate() noexcept -> void {
-        if(emptyCapacity()) setSign(Positive);
-            else setSign((getSign() == Negative) ? Positive : Negative);
-    }
-
-    constexpr auto blocksAdd(const blockLine& from) noexcept -> block {
-        block carryOut {};
-        for(uint8_t i = 0; i < blocksCount; ++i) {
-            block a = blocks[i];
-            block b = (i < from.size()) ? from[i] : 0;
-        }
-        return block();
-    };
-    constexpr auto blocksComplement() noexcept -> void {
-
-    };
     /* ----------------------------------------------------------------------- */
 
 
@@ -66,7 +40,7 @@ public:
     constexpr Multiprecision(const Char (&from)[arrayLength]) noexcept {
         unsigned position = 0;
         if(from[position] == '-') {
-            setSign(Negative);
+            sign = Negative;
             ++position;
         }
 
@@ -108,14 +82,14 @@ public:
         }
 
         if(allZeros)
-            setSign(Positive);
+            sign = Positive;
     }
 
 /**/template <typename Integral> requires (std::is_integral_v<Integral>)
     constexpr Multiprecision(Integral value) noexcept {
         unsigned long long tValue {};
         if(value < 0) {
-            setSign(Negative);
+            sign = Negative;
             tValue = static_cast<unsigned long long>(value * -1);
         } else
             tValue = static_cast<unsigned long long>(value);
@@ -132,7 +106,7 @@ public:
     }
     constexpr Multiprecision operator-() const noexcept {
         Multiprecision result = *this;
-        result.setSign(result.getSign() == Positive ? Negative : Positive);
+        result.setSign(result.sign == Positive ? Negative : Positive);
         return result;
     }
 
@@ -140,23 +114,7 @@ public:
         Multiprecision result = *this; result += value; return result;
     }
     constexpr Multiprecision& operator+=(const Multiprecision& value) noexcept {
-        /*if(getSign() != Negative || value.getSign() != Negative) {
-            if(getSign() == Negative) blocksComplement();
-                else value.blocksComplement();
 
-            uint8_t newSign {};
-            if(blocksAdd(value.blocks) == 0 && (getSign() == Negative || value.getSign() == Negative)) {
-                blocksComplement();
-                newSign = Negative;
-            } else
-                newSign = Positive;
-
-            if(getSign() == Negative) blocksComplement();
-            if(value.getSign()) value.blocksComplement();
-            setSign(newSign);
-        } else
-            if(blocksAdd(value.blocks) != 0)
-                std::cerr << "Attention: overflow!!!" << std::endl;*/
         return *this;
     }
 
@@ -181,58 +139,48 @@ public:
     constexpr Multiprecision& operator%=(const Multiprecision& value) noexcept { return *this; }
 
 /**/constexpr bool operator==(const Multiprecision& value) const noexcept {
-        return getSign() == value.getSign() && getCapacity() == value.getCapacity() && blocks == value.blocks;
+        return sign == value.sign && blocks == value.blocks;
     }
 /**/constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {
-        for(uint8_t i = 0; i < getCapacity(); ++i)
+        for(uint8_t i = 0; i < blocks.size(); ++i)
             blocks[i] = (i < other.getCapacity()) ? other.blocks[i] : 0;
-        setSign(other.getSign());
+        setSign(other.sign);
         return *this;
     }
 
-/**/friend std::ostream& operator<<(std::ostream& stream, const Multiprecision<>& value) noexcept {
-        if (value.getSign() == Negative)
-            stream << '-';
+    auto outputDecimal(std::ostream& toStream) const noexcept -> void {}
+    auto outputOctal(std::ostream& toStream) const noexcept -> void {}
+    auto outputHexadecimal(std::ostream& toStream) const noexcept -> void {}
 
-        int print_zeroes = 0; // don't print leading 0s
-        for (int i = value.capacity - 1; i >= 0; i--) {
-            unsigned digit = value.blocks[i];
+/**/friend std::ostream& operator<<(std::ostream& stream, const Multiprecision<>& value) noexcept;
 
-            static constexpr auto hexDigits = "0123456789abcdef";
-            if (digit != 0 || print_zeroes) {
-                if (!print_zeroes) {
-                    char buffer[9] = {'0', '0', '0', '0', '0', '0', '0', '0', '\0'};
-                    uint8_t bufferPosition = 0;
+    template<std::size_t length>
+    Multiprecision(const std::array<block, length>& data) {
+        for(std::size_t i = 0; i < blocksCount && i < length; ++i) blocks[i] = data[i];
+    }
 
-                    while(digit > 0 && bufferPosition < 8) {
-                        buffer[bufferPosition++] = hexDigits[digit % 16];
-                        digit /= 16;
-                    }
-
-                    for(uint8_t j = 0; j < bufferPosition; ++j)
-                        stream << buffer[bufferPosition - j - 1];
-                } else {
-                    char buffer[9] {};
-                    uint8_t bufferPosition = 0;
-
-                    while(digit > 0 && bufferPosition < 8) {
-                        buffer[bufferPosition++] = hexDigits[digit % 16];
-                        digit /= 16;
-                    }
-
-                    for(uint8_t j = 0; j < 8; ++j)
-                        stream << buffer[7 - j];
-                }
-                print_zeroes = 1;
-            }
-        }
-
-        /* the number is zero */
-        if (print_zeroes == 0)
-            stream << '0';
-        return stream;
-    };
+    template <std::size_t toLength> requires (toLength > blocksCount)
+    constexpr auto reduce() const noexcept -> Multiprecision<toLength> {
+        Multiprecision<toLength> result(blocks);
+        if(sign == Negative) result *= -1;
+        return result;
+    }
 };
+
+template <std::size_t tFirst, std::size_t tSecond> requires (tFirst != tSecond)
+auto operator+(const Multiprecision<tFirst>& first, const Multiprecision<tSecond>& second)
+-> typename std::conditional<(tFirst > tSecond), Multiprecision<tFirst>, Multiprecision<tSecond>>::type {
+    if constexpr (tFirst > tSecond) {
+        return first + second.template reduce<tFirst>();
+    } else {
+        return first.template reduce<tSecond>() + second;
+    }
+}
+
+template <std::size_t lFirst, std::size_t lSecond> requires (lFirst > lSecond)
+auto operator+=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
+    return first.operator+=(second.template reduce<lFirst>());
+}
 
 
 #endif //METALMULTIPRECISION_MULTIPRECISION_H

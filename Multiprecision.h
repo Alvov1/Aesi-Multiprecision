@@ -9,19 +9,38 @@ class Multiprecision {
     static constexpr auto Positive = 1, Negative = 0;
     using block = unsigned;
     using blockLine = std::array<block, blocksCount>;
-    static constexpr auto blockBase = 1ULL << (sizeof(block) * 8);
+    static constexpr unsigned long long blockBase = 1ULL << (sizeof(block) * 8);
+    static constexpr unsigned long long blockMax = std::numeric_limits<block>::max();
 
     /* ---------------------------- Class members. --------------------------- */
     blockLine blocks {};
     uint8_t sign { Positive };
     /* ----------------------------------------------------------------------- */
 
-    /* ------------------------ Static helper functions. --------------------- */
+    /* --------------------------- Helper functions. ------------------------- */
     template <typename Char>
     static constexpr size_t strlen(const Char *str) noexcept {
         const char *s = str;
         for (; *s; ++s);
         return(s - str);
+    }
+
+    constexpr auto addAcross(blockLine& line, block carryOut) const noexcept -> block {
+        for(std::size_t i = 0; i < line.size() && carryOut != 0; ++i) {
+            const auto sum = static_cast<unsigned long long>(line[i])
+                             + static_cast<unsigned long long>(0)
+                             + static_cast<unsigned long long>(carryOut);
+            carryOut = static_cast<block>(sum / blockBase);
+            line[i] = static_cast<block>(sum % blockBase);
+        }
+        return carryOut;
+    }
+    constexpr auto complement() const noexcept -> blockLine {
+        blockLine result {};
+        for(std::size_t i = 0; i < blocksCount; ++i)
+            result[i] = blockBase - 1 - blocks[i];
+        addAcross(result, 1);
+        return result;
     }
     /* ----------------------------------------------------------------------- */
 
@@ -101,20 +120,45 @@ public:
     }
     /* ----------------------------------------------------------------------- */
 
-    constexpr Multiprecision operator+() const noexcept {
+/**/constexpr Multiprecision operator+() const noexcept {
         return Multiprecision(*this);
     }
-    constexpr Multiprecision operator-() const noexcept {
+/**/constexpr Multiprecision operator-() const noexcept {
         Multiprecision result = *this;
-        result.setSign(result.sign == Positive ? Negative : Positive);
+        result.sign = (result.sign == Positive ? Negative : Positive);
         return result;
     }
 
 /**/constexpr Multiprecision operator+(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result += value; return result;
     }
-    constexpr Multiprecision& operator+=(const Multiprecision& value) noexcept {
+/**/constexpr Multiprecision& operator+=(const Multiprecision& value) noexcept {
+        if((value.sign + sign) % 2 == 0) {
+            unsigned long long carryOut = 0;
+            for (std::size_t i = 0; i < blocksCount; ++i) {
+                unsigned long long sum = static_cast<unsigned long long>(blocks[i])
+                        + static_cast<unsigned long long>(value.blocks[i]) + carryOut;
+                carryOut = sum / blockBase;
+                blocks[i] = sum % blockBase;
+            }
+        } else {
+            blockLine left = (sign == Negative ? complement() : blocks);
+            blockLine right = (value.sign == Negative ? value.complement(): value.blocks);
 
+            unsigned long long carryOut = 0;
+            for (std::size_t i = 0; i < blocksCount; ++i) {
+                unsigned long long sum = static_cast<unsigned long long>(left[i])
+                        + static_cast<unsigned long long>(right[i])
+                        + static_cast<unsigned long long>(carryOut);
+                carryOut = sum / blockBase;
+                blocks[i] = sum % blockBase;
+            }
+
+            if(carryOut == 0) {
+                blocks = complement();
+                sign = Negative;
+            } else sign = Positive;
+        }
         return *this;
     }
 
@@ -143,16 +187,24 @@ public:
     }
 /**/constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {
         for(uint8_t i = 0; i < blocks.size(); ++i)
-            blocks[i] = (i < other.getCapacity()) ? other.blocks[i] : 0;
-        setSign(other.sign);
+            blocks[i] = (i < blocksCount) ? other.blocks[i] : 0;
+        sign = other.sign;
         return *this;
     }
 
     auto outputDecimal(std::ostream& toStream) const noexcept -> void {}
     auto outputOctal(std::ostream& toStream) const noexcept -> void {}
-    auto outputHexadecimal(std::ostream& toStream) const noexcept -> void {}
+    auto outputHexadecimal(std::ostream& toStream) const noexcept -> void {
+        if(sign == Negative) toStream.write("-0x", 3);
+            else toStream.write("0x", 2);
+        for(auto iter = blocks.rbegin(); iter != blocks.rend(); ++iter)
+            toStream << std::hex << *iter;
+    }
 
-/**/friend std::ostream& operator<<(std::ostream& stream, const Multiprecision<>& value) noexcept;
+/**/friend std::ostream& operator<<(std::ostream& stream, const Multiprecision& value) noexcept {
+        value.outputHexadecimal(stream);
+        return stream;
+    }
 
     template<std::size_t length>
     Multiprecision(const std::array<block, length>& data) {
@@ -162,7 +214,7 @@ public:
     template <std::size_t toLength> requires (toLength > blocksCount)
     constexpr auto reduce() const noexcept -> Multiprecision<toLength> {
         Multiprecision<toLength> result(blocks);
-        if(sign == Negative) result *= -1;
+        if(sign == Negative) result = -result;
         return result;
     }
 };
@@ -171,9 +223,11 @@ template <std::size_t tFirst, std::size_t tSecond> requires (tFirst != tSecond)
 auto operator+(const Multiprecision<tFirst>& first, const Multiprecision<tSecond>& second)
 -> typename std::conditional<(tFirst > tSecond), Multiprecision<tFirst>, Multiprecision<tSecond>>::type {
     if constexpr (tFirst > tSecond) {
-        return first + second.template reduce<tFirst>();
+        Multiprecision<tFirst> reducedSecond = second.template reduce<tFirst>();
+        return first + reducedSecond;
     } else {
-        return first.template reduce<tSecond>() + second;
+        Multiprecision<tSecond> reducedFirst = first.template reduce<tSecond>();
+        return reducedFirst + second;
     }
 }
 

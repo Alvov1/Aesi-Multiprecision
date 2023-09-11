@@ -1,17 +1,73 @@
 #include <gtest/gtest.h>
 #include "../Multiprecision.h"
 
+TEST(Subtraction, Zero) {
+    Multiprecision zero = 0;
+    Multiprecision m0 = 14377898;
+    EXPECT_EQ(m0 - 0, 14377898);
+    EXPECT_EQ(0 - m0, -14377898);
+    EXPECT_EQ(m0 + 0, 14377898);
+    EXPECT_EQ(m0 + zero, 14377898);
+    EXPECT_EQ(m0 - zero, 14377898);
+    EXPECT_EQ(m0 + -zero, 14377898);
+    EXPECT_EQ(m0 + +zero, 14377898);
+    EXPECT_EQ(m0 - +zero, 14377898);
+    EXPECT_EQ(m0 - -zero, 14377898);
+    EXPECT_EQ(zero - m0, -14377898);
+    EXPECT_EQ(+zero - m0, -14377898);
+    EXPECT_EQ(-zero - m0, -14377898);
+    m0 -= 0; EXPECT_EQ(m0, 14377898);
+    m0 -= zero; EXPECT_EQ(m0, 14377898);
+    m0 -= -zero; EXPECT_EQ(m0, 14377898);
+    m0 -= +zero; EXPECT_EQ(m0, 14377898);
+
+    Multiprecision m1 = 42824647;
+    EXPECT_EQ(m1 - 0, 42824647);
+    EXPECT_EQ(0 - m1, -42824647);
+    EXPECT_EQ(m1 + 0, 42824647);
+    EXPECT_EQ(m1 + zero, 42824647);
+    EXPECT_EQ(m1 - zero, 42824647);
+    EXPECT_EQ(m1 + -zero, 42824647);
+    EXPECT_EQ(m1 + +zero, 42824647);
+    EXPECT_EQ(m1 - +zero, 42824647);
+    EXPECT_EQ(m1 - -zero, 42824647);
+    EXPECT_EQ(zero - m1, -42824647);
+    EXPECT_EQ(+zero - m1, -42824647);
+    EXPECT_EQ(-zero - m1, -42824647);
+    m1 -= 0; EXPECT_EQ(m1, 42824647);
+    m1 -= zero; EXPECT_EQ(m1, 42824647);
+    m1 -= -zero; EXPECT_EQ(m1, 42824647);
+    m1 -= +zero; EXPECT_EQ(m1, 42824647);
+
+    Multiprecision m2 = 56407773;
+    EXPECT_EQ(m2 - 0, 56407773);
+    EXPECT_EQ(0 - m2, -56407773);
+    EXPECT_EQ(m2 + 0, 56407773);
+    EXPECT_EQ(m2 + zero, 56407773);
+    EXPECT_EQ(m2 - zero, 56407773);
+    EXPECT_EQ(m2 + -zero, 56407773);
+    EXPECT_EQ(m2 + +zero, 56407773);
+    EXPECT_EQ(m2 - +zero, 56407773);
+    EXPECT_EQ(m2 - -zero, 56407773);
+    EXPECT_EQ(zero - m2, -56407773);
+    EXPECT_EQ(+zero - m2, -56407773);
+    EXPECT_EQ(-zero - m2, -56407773);
+    m2 -= 0; EXPECT_EQ(m2, 56407773);
+    m2 -= zero; EXPECT_EQ(m2, 56407773);
+    m2 -= -zero; EXPECT_EQ(m2, 56407773);
+    m2 -= +zero; EXPECT_EQ(m2, 56407773);
+}
+
 TEST(Subtraction, SmallPositive) {
-    Multiprecision small1 = "-8492", small2 = "4243", small3 = "-678", small4 = "2323";
+    Multiprecision small1 = -8492, small2 = 4243, small3 = -678, small4 = 2323;
     EXPECT_EQ(small2 - small4, 1920);
     EXPECT_EQ(small3 - small1, 7814);
     EXPECT_EQ(small2 - small1, 12735);
     EXPECT_EQ(small2 - small3, 4921);
-
 }
 
 TEST(Subtraction, SmallNegative) {
-    Multiprecision small1 = "-8492", small2 = "4243", small3 = "-678", small4 = "2323";
+    Multiprecision small1 = -8492, small2 = 4243, small3 = -678, small4 = 2323;
     EXPECT_EQ(small1 - small2, -12735);
     EXPECT_EQ(small3 - small2, -4921);
     EXPECT_EQ(small4 - small2, -1920);

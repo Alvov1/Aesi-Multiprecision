@@ -1,6 +1,31 @@
 #include <gtest/gtest.h>
 #include "../Multiprecision.h"
 
+TEST(Display, Zero) {
+    Multiprecision m = 0;
+
+    std::stringstream ss1 {};
+    ss1 << m << -m << +m;
+    EXPECT_EQ(ss1.str(), "000");
+
+    std::stringstream ss2 {};
+    ss2 << std::dec << m << std::dec << -m << std::dec << +m;
+    EXPECT_EQ(ss2.str(), "000");
+
+    std::stringstream ss3 {};
+    ss3 << std::oct << m << std::oct << -m << std::oct << +m;
+    EXPECT_EQ(ss3.str(), "000");
+
+    std::stringstream ss4 {};
+    ss4 << std::hex << m << std::hex << -m << std::hex << +m;
+    EXPECT_EQ(ss4.str(), "000");
+
+    std::stringstream ss5 {};
+    m = 8; ss5 << m - 8 << -(m - 8) << +(m - 8); m -= 8; ss5 << m;
+    EXPECT_EQ(ss5.str(), "0000");
+
+}
+
 TEST(Display, Decimal) {
     Multiprecision m0 = "340282366920938463463374607435256044433";
     std::stringstream ss0 {}; ss0 << std::dec << m0;

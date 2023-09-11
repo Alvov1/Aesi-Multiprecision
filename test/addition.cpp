@@ -1,6 +1,66 @@
 #include <gtest/gtest.h>
 #include "../Multiprecision.h"
 
+TEST(Addition, Zero) {
+    Multiprecision zero = 0;
+    Multiprecision m0 = -26359343;
+    EXPECT_EQ(m0 + 0, -26359343);
+    EXPECT_EQ(0 + m0, -26359343);
+    EXPECT_EQ(m0 - 0, -26359343);
+    EXPECT_EQ(m0 + zero, -26359343);
+    EXPECT_EQ(m0 - zero, -26359343);
+
+    EXPECT_EQ(m0 + -zero, -26359343);
+    EXPECT_EQ(m0 + +zero, -26359343);
+    EXPECT_EQ(m0 - +zero, -26359343);
+    EXPECT_EQ(m0 - -zero, -26359343);
+
+    EXPECT_EQ(zero + m0, -26359343);
+    EXPECT_EQ(+zero + m0, -26359343);
+    EXPECT_EQ(-zero + m0, -26359343);
+
+    m0 += 0; EXPECT_EQ(m0, -26359343);
+    m0 += zero; EXPECT_EQ(m0, -26359343);
+    m0 += -zero; EXPECT_EQ(m0, -26359343);
+    m0 += +zero; EXPECT_EQ(m0, -26359343);
+
+    Multiprecision m1 = 14670384;
+    EXPECT_EQ(m1 + 0, 14670384);
+    EXPECT_EQ(0 + m1, 14670384);
+    EXPECT_EQ(m1 - 0, 14670384);
+    EXPECT_EQ(m1 + zero, 14670384);
+    EXPECT_EQ(m1 - zero, 14670384);
+    EXPECT_EQ(m1 + -zero, 14670384);
+    EXPECT_EQ(m1 + +zero, 14670384);
+    EXPECT_EQ(m1 - +zero, 14670384);
+    EXPECT_EQ(m1 + +zero, 14670384);
+    EXPECT_EQ(zero + m1, 14670384);
+    EXPECT_EQ(+zero + m1, 14670384);
+    EXPECT_EQ(-zero + m1, 14670384);
+    m1 += 0; EXPECT_EQ(m1, 14670384);
+    m1 += zero; EXPECT_EQ(m1, 14670384);
+    m1 += -zero; EXPECT_EQ(m1, 14670384);
+    m1 += +zero; EXPECT_EQ(m1, 14670384);
+
+    Multiprecision m2 = 55908622;
+    EXPECT_EQ(m2 + 0, 55908622);
+    EXPECT_EQ(0 + m2, 55908622);
+    EXPECT_EQ(m2 - 0, 55908622);
+    EXPECT_EQ(m2 + zero, 55908622);
+    EXPECT_EQ(m2 - zero, 55908622);
+    EXPECT_EQ(m2 + -zero, 55908622);
+    EXPECT_EQ(m2 + +zero, 55908622);
+    EXPECT_EQ(m2 - +zero, 55908622);
+    EXPECT_EQ(m2 + +zero, 55908622);
+    EXPECT_EQ(zero + m2, 55908622);
+    EXPECT_EQ(+zero + m2, 55908622);
+    EXPECT_EQ(-zero + m2, 55908622);
+    m2 += 0; EXPECT_EQ(m2, 55908622);
+    m2 += zero; EXPECT_EQ(m2, 55908622);
+    m2 += -zero; EXPECT_EQ(m2, 55908622);
+    m2 += +zero; EXPECT_EQ(m2, 55908622);
+}
+
 TEST(Addition, SmallPositive) {
     Multiprecision s1 = 0x24DFBE889, s2 = 0x193E161C, s3 = 0x51CDFC6, s4 = 0x1706808355;
     EXPECT_EQ(s1 + s1, 0x49BF7D112);

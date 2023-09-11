@@ -12,7 +12,9 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 file(GLOB Tests *.cpp)
-add_executable(MultiprecisionTesting ${Tests} ../Multiprecision.h ../Multiprecision.cpp)
+add_executable(MultiprecisionTesting ${Tests} ../Multiprecision.h ../Multiprecision.cpp
+        modulo.cpp
+)
 target_link_libraries(MultiprecisionTesting GTest::gtest_main)
 
 include(GoogleTest)

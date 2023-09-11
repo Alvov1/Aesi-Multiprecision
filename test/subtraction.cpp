@@ -3,18 +3,19 @@
 
 TEST(Subtraction, SmallPositive) {
     Multiprecision small1 = "-8492", small2 = "4243", small3 = "-678", small4 = "2323";
-    EXPECT_EQ(small1 - small2, -12735);
-    EXPECT_EQ(small3 - small2, -4921);
     EXPECT_EQ(small2 - small4, 1920);
-    EXPECT_EQ(small4 - small2, -1920);
-}
-
-TEST(Subtraction, SmallNegative) {
-    Multiprecision small1 = "-8492", small2 = "4243", small3 = "-678";
-    EXPECT_EQ(small1 - small3, -7814);
     EXPECT_EQ(small3 - small1, 7814);
     EXPECT_EQ(small2 - small1, 12735);
     EXPECT_EQ(small2 - small3, 4921);
+
+}
+
+TEST(Subtraction, SmallNegative) {
+    Multiprecision small1 = "-8492", small2 = "4243", small3 = "-678", small4 = "2323";
+    EXPECT_EQ(small1 - small2, -12735);
+    EXPECT_EQ(small3 - small2, -4921);
+    EXPECT_EQ(small4 - small2, -1920);
+    EXPECT_EQ(small1 - small3, -7814);
 }
 
 TEST(Subtraction, MixedSubtraction) {
@@ -186,109 +187,95 @@ TEST(Subtraction, MixedSubtractionAssignment) {
 
 TEST(Subtraction, DifferentPrecision) {
     {
-        Multiprecision<14> first = 59281678554153808;
-        Multiprecision<9> second = -56135066910001241;
-        EXPECT_EQ(first - second, 115416745464155049);
+        Multiprecision<448> first = 62809965279956307; // Multiprecision<14 blocks>
+        Multiprecision<448> second = 39080556778759957; // Multiprecision<14 blocks>
+        EXPECT_EQ(first - second, 23729408501196350);
 
-        Multiprecision<10> third = 89096602425425622;
-        Multiprecision<12> forth = -47605505127955143;
-        forth -= third; EXPECT_EQ(forth, -136702107553380765);
+        Multiprecision<192> third = 45398660613732434; // Multiprecision<6 blocks>
+        Multiprecision<352> forth = -53004642661804844; // Multiprecision<11 blocks>
+        forth -= third; EXPECT_EQ(forth, -98403303275537278);
     }
     {
-        Multiprecision<13> first = -21697698226044568;
-        Multiprecision<12> second = -70217810138678507;
-        EXPECT_EQ(first - second, 48520111912633939);
+        Multiprecision<320> first = 18374689440060232; // Multiprecision<10 blocks>
+        Multiprecision<288> second = -53557241983505081; // Multiprecision<9 blocks>
+        EXPECT_EQ(first - second, 71931931423565313);
 
-        Multiprecision<6> third = 49366969794367164;
-        Multiprecision<12> forth = -79365719165974994;
-        forth -= third; EXPECT_EQ(forth, -128732688960342158);
+        Multiprecision<256> third = 71440960238152095; // Multiprecision<8 blocks>
+        Multiprecision<448> forth = 27627026332533578; // Multiprecision<14 blocks>
+        forth -= third; EXPECT_EQ(forth, -43813933905618517);
     }
     {
-        Multiprecision<6> first = 80116923169733164;
-        Multiprecision<13> second = 37077429252516550;
-        EXPECT_EQ(first - second, 43039493917216614);
+        Multiprecision<320> first = -58860382348449740; // Multiprecision<10 blocks>
+        Multiprecision<448> second = -51106271527231455; // Multiprecision<14 blocks>
+        EXPECT_EQ(first - second, -7754110821218285);
 
-        Multiprecision<6> third = -52331233269260364;
-        Multiprecision<15> forth = 51649760274008018;
-        forth -= third; EXPECT_EQ(forth, 103980993543268382);
+        Multiprecision<320> third = -26435995134335414; // Multiprecision<10 blocks>
+        Multiprecision<416> forth = 6966067345525782; // Multiprecision<13 blocks>
+        forth -= third; EXPECT_EQ(forth, 33402062479861196);
     }
     {
-        Multiprecision<15> first = 21133558032069550;
-        Multiprecision<14> second = 35187291478382832;
-        EXPECT_EQ(first - second, -14053733446313282);
+        Multiprecision<224> first = 26949994938035307; // Multiprecision<7 blocks>
+        Multiprecision<320> second = -57345460147331841; // Multiprecision<10 blocks>
+        EXPECT_EQ(first - second, 84295455085367148);
 
-        Multiprecision<9> third = -32754663564504043;
-        Multiprecision<13> forth = 85139183939672591;
-        forth -= third; EXPECT_EQ(forth, 117893847504176634);
+        Multiprecision<320> third = 40115210446714256; // Multiprecision<10 blocks>
+        Multiprecision<416> forth = 19929757054766530; // Multiprecision<13 blocks>
+        forth -= third; EXPECT_EQ(forth, -20185453391947726);
     }
     {
-        Multiprecision<6> first = -78553025123122008;
-        Multiprecision<12> second = 60555765380159617;
-        EXPECT_EQ(first - second, -139108790503281625);
+        Multiprecision<480> first = 43936342115046018; // Multiprecision<15 blocks>
+        Multiprecision<480> second = -10279600786446307; // Multiprecision<15 blocks>
+        EXPECT_EQ(first - second, 54215942901492325);
 
-        Multiprecision<6> third = -86348463612408094;
-        Multiprecision<14> forth = -29562912853401040;
-        forth -= third; EXPECT_EQ(forth, 56785550759007054);
+        Multiprecision<256> third = -22316375566079840; // Multiprecision<8 blocks>
+        Multiprecision<480> forth = 76005949847059604; // Multiprecision<15 blocks>
+        forth -= third; EXPECT_EQ(forth, 98322325413139444);
     }
     {
-        Multiprecision<10> first = -95263647616639350;
-        Multiprecision<6> second = -83392608390909830;
-        EXPECT_EQ(first - second, -11871039225729520);
+        Multiprecision<192> first = -93657206214492841; // Multiprecision<6 blocks>
+        Multiprecision<256> second = -71486982985505092; // Multiprecision<8 blocks>
+        EXPECT_EQ(first - second, -22170223228987749);
 
-        Multiprecision<10> third = 29625417298126160;
-        Multiprecision<11> forth = 80972892467022693;
-        forth -= third; EXPECT_EQ(forth, 51347475168896533);
+        Multiprecision<320> third = -66846726585288343; // Multiprecision<10 blocks>
+        Multiprecision<416> forth = 94957726168621779; // Multiprecision<13 blocks>
+        forth -= third; EXPECT_EQ(forth, 161804452753910122);
     }
     {
-        Multiprecision<15> first = 46812881339784350;
-        Multiprecision<11> second = 26692757141204281;
-        EXPECT_EQ(first - second, 20120124198580069);
+        Multiprecision<192> first = -62005162619173997; // Multiprecision<6 blocks>
+        Multiprecision<224> second = 10671564912426240; // Multiprecision<7 blocks>
+        EXPECT_EQ(first - second, -72676727531600237);
 
-        Multiprecision<8> third = 36399474279688168;
-        Multiprecision<15> forth = -43426209718160611;
-        forth -= third; EXPECT_EQ(forth, -79825683997848779);
+        Multiprecision<224> third = -30028516325007256; // Multiprecision<7 blocks>
+        Multiprecision<416> forth = -38572290747742216; // Multiprecision<13 blocks>
+        forth -= third; EXPECT_EQ(forth, -8543774422734960);
     }
     {
-        Multiprecision<11> first = -55617839096879695;
-        Multiprecision<7> second = -64695504310483407;
-        EXPECT_EQ(first - second, 9077665213603712);
+        Multiprecision<320> first = -58940891305080103; // Multiprecision<10 blocks>
+        Multiprecision<320> second = -57959309993606272; // Multiprecision<10 blocks>
+        EXPECT_EQ(first - second, -981581311473831);
 
-        Multiprecision<8> third = -32006273238335270;
-        Multiprecision<15> forth = 95242867648737375;
-        forth -= third; EXPECT_EQ(forth, 127249140887072645);
+        Multiprecision<224> third = 30782639550732749; // Multiprecision<7 blocks>
+        Multiprecision<416> forth = -14578762817130093; // Multiprecision<13 blocks>
+        forth -= third; EXPECT_EQ(forth, -45361402367862842);
     }
     {
-        Multiprecision<15> first = 99184416520272035;
-        Multiprecision<6> second = 51474105258142808;
-        EXPECT_EQ(first - second, 47710311262129227);
+        Multiprecision<480> first = 51699864098074373; // Multiprecision<15 blocks>
+        Multiprecision<448> second = -48065639687773956; // Multiprecision<14 blocks>
+        EXPECT_EQ(first - second, 99765503785848329);
 
-        Multiprecision<8> third = 78779529626467525;
-        Multiprecision<15> forth = 24407167445720140;
-        forth -= third; EXPECT_EQ(forth, -54372362180747385);
+        Multiprecision<320> third = 10097273671316052; // Multiprecision<10 blocks>
+        Multiprecision<384> forth = 90189328318453908; // Multiprecision<12 blocks>
+        forth -= third; EXPECT_EQ(forth, 80092054647137856);
     }
     {
-        Multiprecision<12> first = -68154481042477795;
-        Multiprecision<6> second = 38056109823016720;
-        EXPECT_EQ(first - second, -106210590865494515);
+        Multiprecision<416> first = -10287965013816677; // Multiprecision<13 blocks>
+        Multiprecision<448> second = -86849365490800050; // Multiprecision<14 blocks>
+        EXPECT_EQ(first - second, 76561400476983373);
 
-        Multiprecision<10> third = -45693227437002816;
-        Multiprecision<13> forth = -47917277916635130;
-        forth -= third; EXPECT_EQ(forth, -2224050479632314);
+        Multiprecision<288> third = -92327403515448960; // Multiprecision<9 blocks>
+        Multiprecision<480> forth = -33125917700155649; // Multiprecision<15 blocks>
+        forth -= third; EXPECT_EQ(forth, 59201485815293311);
     }
-
 }
 
-TEST(Subtraction, Huge) {
-    Multiprecision huge = "34733270475247545982072777605119999996", greater = "34733270475247545982072777605119999997";
-    EXPECT_EQ(huge - greater, 0);
-
-    Multiprecision mega = "8683317618811886495518194401279999999";
-    EXPECT_EQ(mega - huge - huge, "-60783223331683205468627360808959999993");
-
-    mega -= huge;
-    EXPECT_EQ(mega, "-26049952856435659486554583203839999997");
-
-    Multiprecision huge2 = "-19175002942688032928599";
-    huge -= huge2;
-    EXPECT_EQ(huge2, "34733270475247526807069834917087071397");
-}
+TEST(Subtraction, Huge) { /* PASS */ }

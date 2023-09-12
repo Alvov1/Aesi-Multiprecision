@@ -90,57 +90,16 @@ public:
         }
     }
 
-    template <typename String>
-    requires (std::is_same<std::string, typename std::decay<String>::type>::value or std::is_same<std::string_view, typename std::decay<String>::type>::value)
-    constexpr Multiprecision(String&& value) noexcept {};
+    template <typename String, typename Char = typename String::value_type>
+    requires (std::is_same_v<std::basic_string<Char>, typename std::decay<String>::type>)
+    constexpr Multiprecision(String&& string) noexcept {};
 
-    template <typename Char, std::size_t arrayLength>
-    constexpr Multiprecision(const Char (&from)[arrayLength]) noexcept {
-//        unsigned position = 0;
-//        if(from[position] == '-') {
-//            sign = Negative;
-//            ++position;
-//        } else sign = Positive;
-//
-//        uint8_t base = 10;
-//        if(from[position] == '0') {
-//            base = 8;
-//            ++position;
-//            if(from[position] == 'x') {
-//                base = 16;
-//                ++position;
-//            } else if(from[position] == 'b') {
-//                base = 2;
-//                ++position;
-//            }
-//        }
-//
-//        const unsigned charactersPerDigit = [] (uint8_t base) {
-//            switch(base) {
-//                case 2: return 32;
-//                case 8: return 11;
-//                case 10: return 10;
-//                case 16: return 8;
-//                default: return 10;
-//            }
-//        } (base);
-//        std::array<Char, blockBitLength + 1> buffer {};
-//
-//        const unsigned blocksTotal = (arrayLength - 1 - position + charactersPerDigit - 1) / charactersPerDigit;
-//        bool allZeros = true;
-//        for(unsigned i = 0; i < blocksTotal; ++i) {
-//            long shift = arrayLength - 1 - (i + 1) * charactersPerDigit;
-//            if(shift < position) shift = position;
-//
-//            for(unsigned j = 0; j < charactersPerDigit; ++j)
-//                buffer[j] = (shift + j < arrayLength ? from[shift + j] : '\0');
-//
-//            blocks[i] = strtoul(buffer.data(), nullptr, base);
-//            allZeros = allZeros && (blocks[i] == 0);
-//        }
-//
-//        if(allZeros) sign = Zero;
-    }
+    template <typename StringView, typename Char = typename StringView::value_type>
+    requires (std::is_same_v<std::basic_string_view<Char>, typename std::decay<StringView>::type>)
+    constexpr Multiprecision(StringView&& stringView) noexcept {}
+
+    template <typename Char, std::size_t arrayLength> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
+    constexpr Multiprecision(const Char (&array)[arrayLength]) noexcept {}
     /* ----------------------------------------------------------------------- */
 
     constexpr Multiprecision operator+() const noexcept { return *this; }

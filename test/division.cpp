@@ -276,4 +276,4 @@ TEST(Division, DifferentPrecision) {
     }
 }
 
-TEST(Division, Huge) { /* PASS */ }
+TEST(Division, Huge) { EXPECT_TRUE(false); }

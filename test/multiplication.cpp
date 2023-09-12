@@ -1,9 +1,178 @@
 #include <gtest/gtest.h>
 #include "../Multiprecision.h"
 
+TEST(Multiplication, ZeroOne) {
+    Multiprecision zero = 0, one = 1;
+    Multiprecision m0 = 10919396;
+    EXPECT_EQ(m0 * 0, 0);
+    EXPECT_EQ(0 * m0, 0);
+    EXPECT_EQ(m0 * 1, 10919396);
+    EXPECT_EQ(1 * m0, 10919396);
+    EXPECT_EQ(m0 * -1, -10919396);
+    EXPECT_EQ(-1 * m0, -10919396);
+
+    EXPECT_EQ(m0 * zero, 0);
+    EXPECT_EQ(m0 * -zero, 0);
+    EXPECT_EQ(m0 * +zero, 0);
+    EXPECT_EQ(m0 * one, 10919396);
+    EXPECT_EQ(m0 * -one, -10919396);
+    EXPECT_EQ(m0 * +one, 10919396);
+
+    EXPECT_EQ(zero * m0, 0);
+    EXPECT_EQ(zero * -m0, 0);
+    EXPECT_EQ(zero * +m0, 0);
+    EXPECT_EQ(one * m0, 10919396);
+    EXPECT_EQ(one * -m0, -10919396);
+    EXPECT_EQ(one * +m0, 10919396);
+
+    EXPECT_EQ(+zero * m0, 0);
+    EXPECT_EQ(+zero * -m0, 0);
+    EXPECT_EQ(+zero * +m0, 0);
+    EXPECT_EQ(+one * m0, 10919396);
+    EXPECT_EQ(+one * -m0, -10919396);
+    EXPECT_EQ(+one * +m0, 10919396);
+
+    EXPECT_EQ(-zero * m0, 0);
+    EXPECT_EQ(-zero * -m0, 0);
+    EXPECT_EQ(-zero * +m0, 0);
+    EXPECT_EQ(-one * m0, -10919396);
+    EXPECT_EQ(-one * -m0, 10919396);
+    EXPECT_EQ(-one * +m0, -10919396);
+
+    m0 *= 0; EXPECT_EQ(m0, 0); m0 = 10919396;
+    m0 *= zero; EXPECT_EQ(m0, 0); m0 = 10919396;
+    m0 *= -zero; EXPECT_EQ(m0, 0); m0 = 10919396;
+    m0 *= +zero; EXPECT_EQ(m0, 0); m0 = 10919396;
+    zero *= m0; EXPECT_EQ(zero, 0);
+    zero *= +m0; EXPECT_EQ(zero, 0);
+    zero *= -m0; EXPECT_EQ(zero, 0);
+
+    m0 *= 1; EXPECT_EQ(m0, 10919396);
+    m0 *= -1; EXPECT_EQ(m0, -10919396); m0 *= -1;
+
+    m0 *= one; EXPECT_EQ(m0, 10919396);
+    m0 *= -one; EXPECT_EQ(m0, -10919396); m0 *= -1;
+    m0 *= +one; EXPECT_EQ(m0, 10919396);
+    one *= m0; EXPECT_EQ(one, 10919396); one = 1;
+    one *= +m0; EXPECT_EQ(one, 10919396); one = 1;
+    one *= -m0; EXPECT_EQ(one, -10919396); one = 1;
+
+
+
+    Multiprecision m1 = -14144694;
+    EXPECT_EQ(m1 * 0, 0);
+    EXPECT_EQ(0 * m1, 0);
+    EXPECT_EQ(m1 * 1, -14144694);
+    EXPECT_EQ(1 * m1, -14144694);
+    EXPECT_EQ(m1 * -1, 14144694);
+    EXPECT_EQ(-1 * m1, 14144694);
+
+    EXPECT_EQ(m1 * zero, 0);
+    EXPECT_EQ(m1 * -zero, 0);
+    EXPECT_EQ(m1 * +zero, 0);
+    EXPECT_EQ(m1 * one, -14144694);
+    EXPECT_EQ(m1 * -one, 14144694);
+    EXPECT_EQ(m1 * +one, -14144694);
+
+    EXPECT_EQ(zero * m1, 0);
+    EXPECT_EQ(zero * -m1, 0);
+    EXPECT_EQ(zero * +m1, 0);
+    EXPECT_EQ(one * m1, -14144694);
+    EXPECT_EQ(one * -m1, 14144694);
+    EXPECT_EQ(one * +m1, -14144694);
+
+    EXPECT_EQ(+zero * m1, 0);
+    EXPECT_EQ(+zero * -m1, 0);
+    EXPECT_EQ(+zero * +m1, 0);
+    EXPECT_EQ(+one * m1, -14144694);
+    EXPECT_EQ(+one * -m1, 14144694);
+    EXPECT_EQ(+one * +m1, -14144694);
+
+    EXPECT_EQ(-zero * m1, 0);
+    EXPECT_EQ(-zero * -m1, 0);
+    EXPECT_EQ(-zero * +m1, 0);
+    EXPECT_EQ(-one * m1, 14144694);
+    EXPECT_EQ(-one * -m1, -14144694);
+    EXPECT_EQ(-one * +m1, 14144694);
+
+    m1 *= 0; EXPECT_EQ(m1, 0); m1 = -14144694;
+    m1 *= zero; EXPECT_EQ(m1, 0); m1 = -14144694;
+    m1 *= -zero; EXPECT_EQ(m1, 0); m1 = -14144694;
+    m1 *= +zero; EXPECT_EQ(m1, 0); m1 = -14144694;
+    zero *= m1; EXPECT_EQ(zero, 0);
+    zero *= +m1; EXPECT_EQ(zero, 0);
+    zero *= -m1; EXPECT_EQ(zero, 0);
+
+    m1 *= 1; EXPECT_EQ(m1, -14144694);
+    m1 *= -1; EXPECT_EQ(m1, 14144694); m1 *= -1;
+
+    m1 *= one; EXPECT_EQ(m1, -14144694);
+    m1 *= -one; EXPECT_EQ(m1, 14144694); m1 *= -1;
+    m1 *= +one; EXPECT_EQ(m1, -14144694);
+    one *= m1; EXPECT_EQ(one, -14144694); one = 1;
+    one *= +m1; EXPECT_EQ(one, -14144694); one = 1;
+    one *= -m1; EXPECT_EQ(one, 14144694); one = 1;
+
+
+
+    Multiprecision m2 = -49285963;
+    EXPECT_EQ(m2 * 0, 0);
+    EXPECT_EQ(0 * m2, 0);
+    EXPECT_EQ(m2 * 1, -49285963);
+    EXPECT_EQ(1 * m2, -49285963);
+    EXPECT_EQ(m2 * -1, 49285963);
+    EXPECT_EQ(-1 * m2, 49285963);
+
+    EXPECT_EQ(m2 * zero, 0);
+    EXPECT_EQ(m2 * -zero, 0);
+    EXPECT_EQ(m2 * +zero, 0);
+    EXPECT_EQ(m2 * one, -49285963);
+    EXPECT_EQ(m2 * -one, 49285963);
+    EXPECT_EQ(m2 * +one, -49285963);
+
+    EXPECT_EQ(zero * m2, 0);
+    EXPECT_EQ(zero * -m2, 0);
+    EXPECT_EQ(zero * +m2, 0);
+    EXPECT_EQ(one * m2, -49285963);
+    EXPECT_EQ(one * -m2, 49285963);
+    EXPECT_EQ(one * +m2, -49285963);
+
+    EXPECT_EQ(+zero * m2, 0);
+    EXPECT_EQ(+zero * -m2, 0);
+    EXPECT_EQ(+zero * +m2, 0);
+    EXPECT_EQ(+one * m2, -49285963);
+    EXPECT_EQ(+one * -m2, 49285963);
+    EXPECT_EQ(+one * +m2, -49285963);
+
+    EXPECT_EQ(-zero * m2, 0);
+    EXPECT_EQ(-zero * -m2, 0);
+    EXPECT_EQ(-zero * +m2, 0);
+    EXPECT_EQ(-one * m2, 49285963);
+    EXPECT_EQ(-one * -m2, -49285963);
+    EXPECT_EQ(-one * +m2, 49285963);
+
+    m2 *= 0; EXPECT_EQ(m2, 0); m2 = -49285963;
+    m2 *= zero; EXPECT_EQ(m2, 0); m2 = -49285963;
+    m2 *= -zero; EXPECT_EQ(m2, 0); m2 = -49285963;
+    m2 *= +zero; EXPECT_EQ(m2, 0); m2 = -49285963;
+    zero *= m2; EXPECT_EQ(zero, 0);
+    zero *= +m2; EXPECT_EQ(zero, 0);
+    zero *= -m2; EXPECT_EQ(zero, 0);
+
+    m2 *= 1; EXPECT_EQ(m2, -49285963);
+    m2 *= -1; EXPECT_EQ(m2, 49285963); m2 *= -1;
+
+    m2 *= one; EXPECT_EQ(m2, -49285963);
+    m2 *= -one; EXPECT_EQ(m2, 49285963); m2 *= -1;
+    m2 *= +one; EXPECT_EQ(m2, -49285963);
+    one *= m2; EXPECT_EQ(one, -49285963); one = 1;
+    one *= +m2; EXPECT_EQ(one, -49285963); one = 1;
+    one *= -m2; EXPECT_EQ(one, 49285963); one = 1;
+}
+
 TEST(Multiplication, SmallPositive) {
     Multiprecision small1 = -8492, small2 = 4243, small3 = -678, small4 = 2323;
-    EXPECT_EQ(small1 * small3, 5757576);
+    EXPECT_EQ(small1 * small3, 5757576); //5766068
     EXPECT_EQ(small3 * small1, 5757576);
     EXPECT_EQ(small2 * small4, 9856489);
     EXPECT_EQ(small4 * small2, 9856489);
@@ -276,10 +445,4 @@ TEST(Multiplication, DifferentPrecision) {
     }
 }
 
-TEST(Multiplication, Huge) {
-    Multiprecision m1 = "347332704752475459", m2 = "2777605119999997", m3 = "-86833176188118864", m4 = "-18194401279999999";
-    EXPECT_EQ(m1 * m2, "964753099063923125594635822573623");
-    EXPECT_EQ(m2 * m3, "-241188274765980779315455115643408");
-    EXPECT_EQ(m3 * m1, "-30160001947667571815110868534958576");
-    EXPECT_EQ(m3 * m4, "1579877651983575293120569731881136");
-}
+TEST(Multiplication, Huge) { EXPECT_TRUE(false); }

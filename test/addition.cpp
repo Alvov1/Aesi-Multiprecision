@@ -305,4 +305,4 @@ TEST(Addition, DifferentPrecision) {
     }
 }
 
-TEST(Addition, Huge) { /* PASS */ }
+TEST(Addition, Huge) { EXPECT_TRUE(false); }

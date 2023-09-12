@@ -260,4 +260,4 @@ TEST(Modulo, DifferentPrecision) {
     }
 }
 
-TEST(Modulo, Huge) { /* PASS */ }
+TEST(Modulo, Huge) { EXPECT_TRUE(false); }

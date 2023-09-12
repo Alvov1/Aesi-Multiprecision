@@ -5,16 +5,16 @@
 #include <array>
 
 namespace {
-    using block = unsigned;
+    using block = uint32_t;
     constexpr auto blockBitLength = sizeof(block) * 8;
-    constexpr unsigned long long blockBase = 1ULL << blockBitLength;
-    constexpr unsigned long long blockMax = std::numeric_limits<block>::max();
+    constexpr uint64_t blockBase = 1ULL << blockBitLength;
+    constexpr uint64_t blockMax = std::numeric_limits<block>::max();
 }
 
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
-class Multiprecision {
-    static constexpr std::size_t blocksCount = bitness / blockBitLength;
-    using blockLine = std::array<block, blocksCount>;
+struct Multiprecision {
+    static constexpr std::size_t blocksNumber = bitness / blockBitLength;
+    using blockLine = std::array<block, blocksNumber>;
     enum Sign { Zero = 0, Positive = 1, Negative = 2 };
 
     /* ---------------------------- Class members. --------------------------- */
@@ -29,11 +29,11 @@ class Multiprecision {
     }
 
     /* ----------------------------------------------------------------------- */
-    static constexpr auto sumLines(blockLine& dst, const blockLine& src) noexcept -> unsigned long long {
-        unsigned long long carryOut = 0;
-        for (std::size_t i = 0; i < blocksCount; ++i) {
-            unsigned long long sum = static_cast<unsigned long long>(dst[i])
-                                     + static_cast<unsigned long long>(src[i]) + carryOut;
+    static constexpr auto sumLines(blockLine& dst, const blockLine& src) noexcept -> uint64_t {
+        uint64_t carryOut = 0;
+        for (std::size_t i = 0; i < blocksNumber; ++i) {
+            uint64_t sum = static_cast<uint64_t>(dst[i])
+                                     + static_cast<uint64_t>(src[i]) + carryOut;
             carryOut = sum / blockBase;
             dst[i] = sum % blockBase;
         }
@@ -42,18 +42,23 @@ class Multiprecision {
     static constexpr auto complement(const blockLine& line) noexcept -> blockLine {
         blockLine result {};
 
-        unsigned long long carryOut = 1;
-        for(std::size_t i = 0; i < blocksCount; ++i) {
-            const unsigned long long sum = blockBase - 1ULL - static_cast<unsigned long long>(line[i]) + carryOut;
+        uint64_t carryOut = 1;
+        for(std::size_t i = 0; i < blocksNumber; ++i) {
+            const uint64_t sum = blockBase - 1ULL - static_cast<uint64_t>(line[i]) + carryOut;
             carryOut = sum / blockBase; result[i] = sum % blockBase;
         }
 
         return result;
     }
     static constexpr auto emptyLine(const blockLine& line) noexcept -> bool {
-        for(std::size_t i = 0; i < line.size(); ++i)
+        for(std::size_t i = 0; i < blocksNumber; ++i)
             if(line[i] != 0) return false;
         return true;
+    }
+    static constexpr auto longerLineLength(const blockLine& first, const blockLine& second) noexcept -> std::size_t {
+        for(long long i = blocksNumber - 1; i >= 0; --i)
+            if(first[i] || second[i]) return i + 1;
+        return 0;
     }
     /* ----------------------------------------------------------------------- */
 
@@ -66,7 +71,7 @@ public:
 
     template<std::size_t length>
     constexpr explicit Multiprecision(const std::array<block, length>& data) noexcept {
-        for(std::size_t i = 0; i < blocksCount && i < length; ++i)
+        for(std::size_t i = 0; i < blocksNumber && i < length; ++i)
             blocks[i] = data[i];
         sign = Positive;
     }
@@ -74,17 +79,17 @@ public:
     template <typename Integral> requires (std::is_integral_v<Integral>)
     constexpr Multiprecision(Integral value) noexcept {
         if(value != 0) {
-            unsigned long long tValue {};
+            uint64_t tValue {};
             if (value < 0) {
                 sign = Negative;
-                tValue = static_cast<unsigned long long>(value * -1);
+                tValue = static_cast<uint64_t>(value * -1);
             } else {
                 sign = Positive;
-                tValue = static_cast<unsigned long long>(value);
+                tValue = static_cast<uint64_t>(value);
             }
 
-            for (std::size_t i = 0; i < blocksCount; ++i) {
-                blocks[i] = static_cast<unsigned>(tValue % blockBase);
+            for (std::size_t i = 0; i < blocksNumber; ++i) {
+                blocks[i] = static_cast<block>(tValue % blockBase);
                 tValue /= blockBase;
             }
         }
@@ -119,7 +124,7 @@ public:
         if (sign != value.sign) {
             if (sign == Negative)
                 blocks = complement(blocks);
-            const unsigned long long carryOut = (value.sign != Negative ?
+            const uint64_t carryOut = (value.sign != Negative ?
                          sumLines(blocks, value.blocks) : sumLines(blocks, complement(value.blocks)));
             if (carryOut == 0) {
                 blocks = complement(blocks);
@@ -144,7 +149,29 @@ public:
     constexpr Multiprecision operator*(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result *= value; return result;
     }
-    constexpr Multiprecision& operator*=(const Multiprecision& value) noexcept { return *this;}
+    constexpr Multiprecision& operator*=(const Multiprecision& value) noexcept { 
+        if(sign == Zero) return *this;
+        if(value.sign == Zero)
+            return this->operator=(Multiprecision());
+        sign = (sign != value.sign ? Negative : Positive);
+        
+        const auto longerLength = longerLineLength(blocks, value.blocks);
+        blockLine buffer {};
+        for(std::size_t i = 0; i < longerLength; ++i) {
+            uint64_t carryOut = 0;
+            for(std::size_t j = 0; j < longerLength; ++j) {
+                auto multiplication = static_cast<uint64_t>(blocks[j]) * static_cast<uint64_t>(value.blocks[i]) + carryOut;
+                auto tBlock = static_cast<uint64_t>(buffer[i + j]) + (multiplication % blockBase);
+                carryOut = multiplication / blockBase + tBlock / blockBase;
+                buffer[i + j] = tBlock % blockBase;
+            }
+            if(longerLength < blocksNumber)
+                buffer[longerLength + i] += carryOut;
+        }
+        blocks = buffer;
+
+        return *this;
+    }
 
     constexpr Multiprecision operator/(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result /= value; return result;
@@ -168,8 +195,13 @@ public:
     auto outputHexadecimal(std::ostream& toStream) const noexcept -> void {
         if(sign == Negative) toStream.write("-0x", 3);
             else toStream.write("0x", 2);
-        for(auto iter = blocks.rbegin(); iter != blocks.rend(); ++iter)
-            toStream << std::hex << *iter;
+
+        bool firstFilledBlockWritten = false;
+        for(auto iter = blocks.rbegin(); iter != blocks.rend(); ++iter) {
+            firstFilledBlockWritten = firstFilledBlockWritten || *iter;
+            if(*iter || firstFilledBlockWritten)
+                toStream << std::hex << *iter;
+        }
     }
 
     friend std::ostream& operator<<(std::ostream& stream, const Multiprecision& value) noexcept {
@@ -177,7 +209,7 @@ public:
         return stream;
     }
 
-    template <std::size_t toPrecision> requires (toPrecision > blocksCount * blockBitLength)
+    template <std::size_t toPrecision> requires (toPrecision > blocksNumber * blockBitLength)
     constexpr auto precisionCast() const noexcept -> Multiprecision<toPrecision> {
         Multiprecision<toPrecision> result(blocks); if(sign == Negative) result = -result; return result;
     }

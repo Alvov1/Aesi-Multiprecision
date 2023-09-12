@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../Multiprecision.h"
+#include "../../Multiprecision.h"
 
 TEST(Multiplication, ZeroOne) {
     Multiprecision zero = 0, one = 1;

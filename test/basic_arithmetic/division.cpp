@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../Multiprecision.h"
+#include "../../Multiprecision.h"
 
 TEST(Division, SmallPositive) {
     Multiprecision small1 = -8492, small2 = 4243, small3 = -678, small4 = 2323;

@@ -20,16 +20,16 @@ struct Multiprecision {
     /* ---------------------------- Class members. --------------------------- */
     blockLine blocks {};
     Sign sign { Zero };
+    /* ----------------------------------------------------------------------- */
+
     /* --------------------------- Helper functions. ------------------------- */
     template <typename Char>
-    static constexpr size_t strlen(const Char *str) noexcept {
+    static constexpr auto strlen(const Char *str) noexcept -> std::size_t {
         const char *s = str;
         for (; *s; ++s);
         return(s - str);
     }
-
-    /* ----------------------------------------------------------------------- */
-    static constexpr auto sumLines(blockLine& dst, const blockLine& src) noexcept -> uint64_t {
+    static constexpr auto addLine(blockLine& dst, const blockLine& src) noexcept -> uint64_t {
         uint64_t carryOut = 0;
         for (std::size_t i = 0; i < blocksNumber; ++i) {
             uint64_t sum = static_cast<uint64_t>(dst[i])
@@ -39,7 +39,7 @@ struct Multiprecision {
         }
         return carryOut;
     }
-    static constexpr auto complement(const blockLine& line) noexcept -> blockLine {
+    static constexpr auto makeComplement(const blockLine& line) noexcept -> blockLine {
         blockLine result {};
 
         uint64_t carryOut = 1;
@@ -50,7 +50,7 @@ struct Multiprecision {
 
         return result;
     }
-    static constexpr auto emptyLine(const blockLine& line) noexcept -> bool {
+    static constexpr auto isLineEmpty(const blockLine& line) noexcept -> bool {
         for(std::size_t i = 0; i < blocksNumber; ++i)
             if(line[i] != 0) return false;
         return true;
@@ -62,19 +62,11 @@ struct Multiprecision {
     }
     /* ----------------------------------------------------------------------- */
 
-
 public:
     /* ----------------------- Different constructors. ----------------------- */
     constexpr Multiprecision() noexcept = default;
     constexpr Multiprecision(const Multiprecision& copy) noexcept = default;
     constexpr Multiprecision(Multiprecision&& move) noexcept = default;
-
-    template<std::size_t length>
-    constexpr explicit Multiprecision(const std::array<block, length>& data) noexcept {
-        for(std::size_t i = 0; i < blocksNumber && i < length; ++i)
-            blocks[i] = data[i];
-        sign = Positive;
-    }
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
     constexpr Multiprecision(Integral value) noexcept {
@@ -105,7 +97,19 @@ public:
 
     template <typename Char, std::size_t arrayLength> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
     constexpr Multiprecision(const Char (&array)[arrayLength]) noexcept {}
+
+    template <std::size_t length>
+    constexpr explicit Multiprecision(const std::array<block, length>& data) noexcept {
+        for(std::size_t i = 0; i < blocksNumber && i < length; ++i)
+            blocks[i] = data[i];
+        sign = Positive;
+    }
     /* ----------------------------------------------------------------------- */
+
+    constexpr Multiprecision& operator++() noexcept { return this->operator+=(1); }
+    constexpr Multiprecision operator++(int) noexcept { return this->operator+(1); }
+    constexpr Multiprecision& operator--() noexcept { return this->operator-=(1); }
+    constexpr Multiprecision operator--(int) noexcept { return this->operator-(1); }
 
     constexpr Multiprecision operator+() const noexcept { return *this; }
     constexpr Multiprecision operator-() const noexcept {
@@ -123,17 +127,17 @@ public:
 
         if (sign != value.sign) {
             if (sign == Negative)
-                blocks = complement(blocks);
+                blocks = makeComplement(blocks);
             const uint64_t carryOut = (value.sign != Negative ?
-                         sumLines(blocks, value.blocks) : sumLines(blocks, complement(value.blocks)));
+                                       addLine(blocks, value.blocks) : addLine(blocks, makeComplement(value.blocks)));
             if (carryOut == 0) {
-                blocks = complement(blocks);
+                blocks = makeComplement(blocks);
                 sign = Negative;
             } else sign = Positive;
         } else
-            sumLines(blocks, value.blocks);
+            addLine(blocks, value.blocks);
 
-        if (emptyLine(blocks))
+        if (isLineEmpty(blocks))
             sign = Zero;
 
         return *this;
@@ -176,7 +180,9 @@ public:
     constexpr Multiprecision operator/(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result /= value; return result;
     }
-    constexpr Multiprecision& operator/=(const Multiprecision& value) noexcept { return *this; }
+    constexpr Multiprecision& operator/=(const Multiprecision& value) noexcept {
+        return *this;
+    }
 
     constexpr Multiprecision operator%(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result %= value; return result;

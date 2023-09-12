@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../Multiprecision.h"
+#include "../../Multiprecision.h"
 
 TEST(Addition, Zero) {
     Multiprecision zero = 0;
@@ -105,6 +105,19 @@ TEST(Addition, SmallNegative) {
     EXPECT_EQ(s4 + s2, -0x171fbe9971);
     EXPECT_EQ(s4 + s3, -0x170b9d631b);
     EXPECT_EQ(s4 + s4, -0x2e0d0106aa);
+}
+
+TEST(Addition, Increment) {
+    Multiprecision m0 = -72621951;
+    EXPECT_EQ((++(++(((++(++(((++((++(++(++(++(++(++((++m0)++)))))))++))++)++)))++)++))), -72621933);
+    Multiprecision m1 = -90054126;
+    EXPECT_EQ(((((((++(((++(((((++m1)++)++)++)++))++)++))++)++)++)++)++), -90054112);
+    Multiprecision m2 = 10291634;
+    EXPECT_EQ((++(++((++(((++(++((++((++(++(++(++(++(m2++))))))++))++)))++)++))++))), 10291651);
+    Multiprecision m3 = -63598709;
+    EXPECT_EQ((++(++((++(++(++(++(((++(++(++(++(++(((++((++(++m3))++))++)++))))))++)++)))))++))), -63598689);
+    Multiprecision m4 = -86753380;
+    EXPECT_EQ((((++(++((++(++m4))++)))++)++), -86753373);
 }
 
 TEST(Addition, MixedAddition) {

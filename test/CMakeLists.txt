@@ -11,10 +11,15 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-file(GLOB Tests *.cpp)
 add_executable(MultiprecisionTesting ${Tests} ../Multiprecision.h ../Multiprecision.cpp
-        modulo.cpp
-)
+        extended_arithmetic/bitshift.cpp
+        extended_arithmetic/boolean.cpp
+        extended_arithmetic/bitvise.cpp
+        extended_arithmetic/comparison.cpp
+        assignment.cpp)
+add_subdirectory(basic_arithmetic)
+add_subdirectory(extended_arithmetic)
+
 target_link_libraries(MultiprecisionTesting GTest::gtest_main)
 
 include(GoogleTest)

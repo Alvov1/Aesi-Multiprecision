@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../Multiprecision.h"
+#include "../../Multiprecision.h"
 
 TEST(Modulo, MixedModulo) {
     Multiprecision m0 = -4825285950739, m1 = -26462400;

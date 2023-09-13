@@ -106,16 +106,22 @@ public:
     }
     /* ----------------------------------------------------------------------- */
 
-    constexpr Multiprecision& operator++() noexcept { return this->operator+=(1); }
-    constexpr Multiprecision operator++(int) noexcept { return this->operator+(1); }
-    constexpr Multiprecision& operator--() noexcept { return this->operator-=(1); }
-    constexpr Multiprecision operator--(int) noexcept { return this->operator-(1); }
 
+    /* ------------------------ Arithmetic operators. ------------------------ */
     constexpr Multiprecision operator+() const noexcept { return *this; }
     constexpr Multiprecision operator-() const noexcept {
         if(sign == Zero) return Multiprecision();
         Multiprecision result = *this;
         result.sign = (result.sign == Positive ? Negative : Positive); return result;
+    }
+
+    constexpr Multiprecision& operator++() noexcept { return this->operator+=(1); }
+    constexpr Multiprecision operator++(int) & noexcept {
+        Multiprecision old = *this; operator++(); return old;
+    }
+    constexpr Multiprecision& operator--() noexcept { return this->operator-=(1); }
+    constexpr Multiprecision operator--(int) & noexcept {
+        Multiprecision old = *this; operator--(); return old;
     }
 
     constexpr Multiprecision operator+(const Multiprecision& value) const noexcept {
@@ -188,10 +194,42 @@ public:
         Multiprecision result = *this; result %= value; return result;
     }
     constexpr Multiprecision& operator%=(const Multiprecision& value) noexcept { return *this; }
+    /* ----------------------------------------------------------------------- */
 
-    constexpr bool operator==(const Multiprecision& value) const noexcept {
-        return sign == value.sign && blocks == value.blocks;
+
+    /* ------------------------- Bitwise operators. -------------------------- */
+    constexpr Multiprecision operator~() const noexcept {}
+
+    constexpr Multiprecision operator^(const Multiprecision& value) const noexcept {
+        Multiprecision result = *this; result ^= value; return result;
     }
+    constexpr Multiprecision& operator^=(const Multiprecision& value) noexcept { return *this; }
+
+    constexpr Multiprecision operator&(const Multiprecision& value) const noexcept {
+        Multiprecision result = *this; result &= value; return result;
+    }
+    constexpr Multiprecision& operator&=(const Multiprecision& value) noexcept { return *this; }
+
+    constexpr Multiprecision operator|(const Multiprecision& value) const noexcept {
+        Multiprecision result = *this; result |= value; return result;
+    }
+    constexpr Multiprecision& operator|=(const Multiprecision& value) noexcept { return *this; }
+
+    constexpr Multiprecision operator<<(const Multiprecision& value) const noexcept {
+        Multiprecision result = *this; result <<= value; return result;
+    }
+    constexpr Multiprecision& operator<<=(const Multiprecision& value) noexcept { return *this; }
+
+    constexpr Multiprecision operator>>(const Multiprecision& value) const noexcept {
+        Multiprecision result = *this; result >>= value; return result;
+    }
+    constexpr Multiprecision& operator>>=(const Multiprecision& value) noexcept { return *this; }
+    /* ----------------------------------------------------------------------- */
+
+    /* ------------------------ Comparing operators. ------------------------- */
+    constexpr auto operator<=>(const Multiprecision& value) const noexcept = default;
+    /* ----------------------------------------------------------------------- */
+
     constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {
         blocks = other.blocks; sign = other.sign; return *this;
     }

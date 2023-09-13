@@ -108,16 +108,35 @@ TEST(Addition, SmallNegative) {
 }
 
 TEST(Addition, Increment) {
-    Multiprecision m0 = -72621951;
-    EXPECT_EQ((++(++(((++(++(((++((++(++(++(++(++(++((++m0)++)))))))++))++)++)))++)++))), -72621933);
-    Multiprecision m1 = -90054126;
-    EXPECT_EQ(((((((++(((++(((((++m1)++)++)++)++))++)++))++)++)++)++)++), -90054112);
-    Multiprecision m2 = 10291634;
-    EXPECT_EQ((++(++((++(((++(++((++((++(++(++(++(++(m2++))))))++))++)))++)++))++))), 10291651);
-    Multiprecision m3 = -63598709;
-    EXPECT_EQ((++(++((++(++(++(++(((++(++(++(++(++(((++((++(++m3))++))++)++))))))++)++)))))++))), -63598689);
-    Multiprecision m4 = -86753380;
-    EXPECT_EQ((((++(++((++(++m4))++)))++)++), -86753373);
+    Multiprecision m0 = 62492992;
+    ++m0; ++m0; m0++; ++m0; m0++; ++m0; m0++; ++m0; m0++; ++m0;
+    EXPECT_EQ(m0, 62493002);
+    Multiprecision t0 = m0++, u0 = ++m0;
+    EXPECT_EQ(t0, 62493002); EXPECT_EQ(u0, 62493004); EXPECT_EQ(m0, 62493004);
+
+    Multiprecision m1 = -10775863;
+    m1++; ++m1; m1++; ++m1; m1++; ++m1; m1++; ++m1; ++m1; ++m1; m1++; ++m1; ++m1;
+    EXPECT_EQ(m1, -10775850);
+    Multiprecision t1 = m1++, u1 = ++m1;
+    EXPECT_EQ(t1, -10775850); EXPECT_EQ(u1, -10775848); EXPECT_EQ(m1, -10775848);
+
+    Multiprecision m2 = 77428594;
+    m2++; m2++; ++m2; m2++; m2++; m2++; ++m2; m2++; m2++; m2++; ++m2; m2++; ++m2; ++m2;
+    EXPECT_EQ(m2, 77428608);
+    Multiprecision t2 = m2++, u2 = ++m2;
+    EXPECT_EQ(t2, 77428608); EXPECT_EQ(u2, 77428610); EXPECT_EQ(m2, 77428610);
+
+    Multiprecision m3 = 77677795;
+    ++m3; ++m3; ++m3; m3++; ++m3; m3++; ++m3; ++m3; m3++; ++m3; m3++; ++m3; m3++; m3++; m3++; m3++; m3++; ++m3;
+    EXPECT_EQ(m3, 77677813);
+    Multiprecision t3 = m3++, u3 = ++m3;
+    EXPECT_EQ(t3, 77677813); EXPECT_EQ(u3, 77677815); EXPECT_EQ(m3, 77677815);
+
+    Multiprecision m4 = -11780979;
+    m4++; ++m4; m4++; ++m4; m4++; ++m4; m4++; ++m4; m4++; ++m4; ++m4; ++m4; m4++; ++m4; m4++; ++m4; ++m4; ++m4; ++m4;
+    EXPECT_EQ(m4, -11780960);
+    Multiprecision t4 = m4++, u4 = ++m4;
+    EXPECT_EQ(t4, -11780960); EXPECT_EQ(u4, -11780958); EXPECT_EQ(m4, -11780958);
 }
 
 TEST(Addition, MixedAddition) {

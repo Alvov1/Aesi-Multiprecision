@@ -75,16 +75,35 @@ TEST(Subtraction, SmallNegative) {
 }
 
 TEST(Subtraction, Decrement) {
-    Multiprecision m0 = -25019009;
-    EXPECT_EQ((--((--((--(((--(--(--(--((--((m0--)--))--)))))--)--))--))--)), -25019024);
-    Multiprecision m1 = 55762378;
-    EXPECT_EQ(((--(((--(--((((--(--(((((--(--((--(m1--))--)))--)--)--)--)))--)--)--)))--)--))--), 55762358);
-    Multiprecision m2 = 64305228;
-    EXPECT_EQ(((--((--((--(--(((--(((--(--m2))--)--))--)--)))--))--))--), 64305214);
-    Multiprecision m3 = 66638824;
-    EXPECT_EQ((--((--((m3--)--))--)), 66638819);
-    Multiprecision m4 = -22464156;
-    EXPECT_EQ((--(--(--(--(--(--(--(--((--(--m4))--))))))))), -22464167);
+    Multiprecision m0 = -33924914;
+    --m0; m0--; m0--; --m0; m0--; m0--;
+    EXPECT_EQ(m0, -33924920);
+    Multiprecision t0 = m0--, u0 = --m0;
+    EXPECT_EQ(t0, -33924920); EXPECT_EQ(u0, -33924922); EXPECT_EQ(m0, -33924922);
+
+    Multiprecision m1 = 28310193;
+    --m1; --m1; --m1; m1--; --m1; m1--; --m1; m1--; --m1; --m1; --m1;
+    EXPECT_EQ(m1, 28310182);
+    Multiprecision t1 = m1--, u1 = --m1;
+    EXPECT_EQ(t1, 28310182); EXPECT_EQ(u1, 28310180); EXPECT_EQ(m1, 28310180);
+
+    Multiprecision m2 = 57075809;
+    --m2; m2--; m2--; m2--; m2--; --m2; --m2; --m2; --m2;
+    EXPECT_EQ(m2, 57075800);
+    Multiprecision t2 = m2--, u2 = --m2;
+    EXPECT_EQ(t2, 57075800); EXPECT_EQ(u2, 57075798); EXPECT_EQ(m2, 57075798);
+
+    Multiprecision m3 = -2900339;
+    m3--; --m3; m3--; m3--; m3--; m3--; --m3; m3--; m3--; m3--; m3--; --m3; --m3; m3--;
+    EXPECT_EQ(m3, -2900353);
+    Multiprecision t3 = m3--, u3 = --m3;
+    EXPECT_EQ(t3, -2900353); EXPECT_EQ(u3, -2900355); EXPECT_EQ(m3, -2900355);
+
+    Multiprecision m4 = -12687358;
+    --m4; --m4; --m4; --m4; --m4; m4--; m4--; --m4; --m4; m4--; m4--; m4--; m4--;
+    EXPECT_EQ(m4, -12687371);
+    Multiprecision t4 = m4--, u4 = --m4;
+    EXPECT_EQ(t4, -12687371); EXPECT_EQ(u4, -12687373); EXPECT_EQ(m4, -12687373);
 }
 
 TEST(Subtraction, MixedSubtraction) {

@@ -388,7 +388,49 @@ public:
     /* ----------------------------------------------------------------------- */
 
     /* ----------------------- Comparison operators. ------------------------- */
-    constexpr auto operator<=>(const Multiprecision& value) const noexcept = default;
+    constexpr bool operator==(const Multiprecision& value) const noexcept = default;
+    constexpr std::strong_ordering operator<=>(const Multiprecision& value) const noexcept {
+        switch (sign) {
+            case Zero:
+                switch (value.sign) {
+                    case Zero: return std::strong_ordering::equal;
+                    case Positive: return std::strong_ordering::less;
+                    case Negative: return std::strong_ordering::greater;
+                    default: return std::strong_ordering::equivalent;
+                }
+            case Positive:
+                switch (value.sign) {
+                    case Positive: {
+                        const auto thisLength = lineLength(blocks), valueLength = lineLength(value.blocks);
+                        if(thisLength != valueLength) return thisLength <=> valueLength;
+
+                        for(long long i = thisLength; i >= 0; --i)
+                            if(blocks[i] != value.blocks[i]) return blocks[i] <=> value.blocks[i];
+
+                        return std::strong_ordering::equal;
+                    }
+                    case Zero:
+                    case Negative: return std::strong_ordering::greater;
+                    default: return std::strong_ordering::equivalent;
+                }
+            case Negative:
+                switch (value.sign) {
+                    case Negative: {
+                        const auto thisLength = lineLength(blocks), valueLength = lineLength(value.blocks);
+                        if(thisLength != valueLength) return (static_cast<long long>(thisLength) * -1) <=> (static_cast<long long>(valueLength) * -1);
+
+                        for(long long i = thisLength; i >= 0; --i)
+                            if(blocks[i] != value.blocks[i]) return (static_cast<long>(blocks[i]) * -1) <=> (static_cast<long>(value.blocks[i]) * -1);
+
+                        return std::strong_ordering::equal;
+                    }
+                    case Zero:
+                    case Positive: return std::strong_ordering::less;
+                    default: return std::strong_ordering::equivalent;
+                }
+            default: return std::strong_ordering::equivalent;
+        }
+    };
     /* ----------------------------------------------------------------------- */
 
     constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {

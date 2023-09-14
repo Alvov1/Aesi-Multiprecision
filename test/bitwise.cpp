@@ -157,7 +157,7 @@ TEST(Bitwise, LeftShift) {
     EXPECT_EQ(r10 << 473, 8665745177991139082);
 }
 
-TEST(Multiplication, RightShift) {
+TEST(Bitwise, RightShift) {
     Multiprecision m0 = 8127453382154628290;
     EXPECT_EQ(m0 >> 0, 8127453382154628290);
     Multiprecision m1 = -8144722340665737661;

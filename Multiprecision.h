@@ -12,7 +12,7 @@ namespace {
 }
 
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
-struct Multiprecision {
+class Multiprecision {
     static constexpr std::size_t blocksNumber = bitness / blockBitLength;
     using blockLine = std::array<block, blocksNumber>;
     enum Sign { Zero = 0, Positive = 1, Negative = 2 };
@@ -55,9 +55,9 @@ struct Multiprecision {
             if(line[i] != 0) return false;
         return true;
     }
-    static constexpr auto longerLineLength(const blockLine& first, const blockLine& second) noexcept -> std::size_t {
+    static constexpr auto lineLength(const blockLine& line) noexcept -> std::size_t {
         for(long long i = blocksNumber - 1; i >= 0; --i)
-            if(first[i] || second[i]) return i + 1;
+            if(line[i]) return i + 1;
         return 0;
     }
     /* ----------------------------------------------------------------------- */
@@ -87,22 +87,153 @@ public:
         }
     }
 
-    template <typename String, typename Char = typename String::value_type>
-    requires (std::is_same_v<std::basic_string<Char>, typename std::decay<String>::type>)
-    constexpr Multiprecision(String&& string) noexcept {};
-
-    template <typename StringView, typename Char = typename StringView::value_type>
-    requires (std::is_same_v<std::basic_string_view<Char>, typename std::decay<StringView>::type>)
-    constexpr Multiprecision(StringView&& stringView) noexcept {}
-
     template <typename Char, std::size_t arrayLength> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    constexpr Multiprecision(const Char (&array)[arrayLength]) noexcept {}
+    constexpr Multiprecision(const Char (&array)[arrayLength]) noexcept : Multiprecision(std::basic_string_view<Char>(array)) {}
 
-    template <std::size_t length>
-    constexpr explicit Multiprecision(const std::array<block, length>& data) noexcept {
-        for(std::size_t i = 0; i < blocksNumber && i < length; ++i)
-            blocks[i] = data[i];
-        sign = Positive;
+    template <typename String, typename Char = typename String::value_type>
+    requires (std::is_same_v<std::basic_string<Char>, typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
+    constexpr Multiprecision(String&& stringView) noexcept {
+        if(stringView.size() == 0) return;
+
+        constexpr struct {
+            Char minus = [] {
+                if constexpr (std::is_same_v<char, Char>)
+                    return '-';
+                if constexpr (std::is_same_v<wchar_t, Char>)
+                    return L'-';
+                if constexpr (std::is_same_v<char8_t, Char>)
+                    return u8'-';
+                if constexpr (std::is_same_v<char16_t, Char>)
+                    return u'-';
+                if constexpr (std::is_same_v<char32_t, Char>)
+                    return U'-';
+            } ();
+            Char zero = [] {
+                if constexpr (std::is_same_v<char, Char>)
+                    return '0';
+                if constexpr (std::is_same_v<wchar_t, Char>)
+                    return L'0';
+                if constexpr (std::is_same_v<char8_t, Char>)
+                    return u8'0';
+                if constexpr (std::is_same_v<char16_t, Char>)
+                    return u'0';
+                if constexpr (std::is_same_v<char32_t, Char>)
+                    return U'0';
+            } ();
+            Char nine = [] {
+                if constexpr (std::is_same_v<char, Char>)
+                    return '9';
+                if constexpr (std::is_same_v<wchar_t, Char>)
+                    return L'9';
+                if constexpr (std::is_same_v<char8_t, Char>)
+                    return u8'9';
+                if constexpr (std::is_same_v<char16_t, Char>)
+                    return u'9';
+                if constexpr (std::is_same_v<char32_t, Char>)
+                    return U'9';
+            } ();
+            std::pair<Char, Char> a = [] {
+                if constexpr (std::is_same_v<char, Char>)
+                    return std::pair { 'a', 'A' };
+                if constexpr (std::is_same_v<wchar_t, Char>)
+                    return std::pair { L'a', L'A' };
+                if constexpr (std::is_same_v<char8_t, Char>)
+                    return std::pair { u8'a', u8'A' };
+                if constexpr (std::is_same_v<char16_t, Char>)
+                    return std::pair { u'a', u'A' };
+                if constexpr (std::is_same_v<char32_t, Char>)
+                    return std::pair { U'a', U'A' };
+            } ();
+            std::pair<Char, Char> f = [] {
+                if constexpr (std::is_same_v<char, Char>)
+                    return std::pair { 'f', 'F' };
+                if constexpr (std::is_same_v<wchar_t, Char>)
+                    return std::pair { L'f', L'F' };
+                if constexpr (std::is_same_v<char8_t, Char>)
+                    return std::pair { u8'f', u8'F' };
+                if constexpr (std::is_same_v<char16_t, Char>)
+                    return std::pair { u'f', u'F' };
+                if constexpr (std::is_same_v<char32_t, Char>)
+                    return std::pair { U'f', U'F' };
+            } ();
+            std::pair<Char, Char> octal = [] {
+                if constexpr (std::is_same_v<char, Char>)
+                    return std::pair { 'o', 'O' };
+                if constexpr (std::is_same_v<wchar_t, Char>)
+                    return std::pair { L'o', L'O' };
+                if constexpr (std::is_same_v<char8_t, Char>)
+                    return std::pair { u8'o', u8'O' };
+                if constexpr (std::is_same_v<char16_t, Char>)
+                    return std::pair { u'o', u'O' };
+                if constexpr (std::is_same_v<char32_t, Char>)
+                    return std::pair { U'o', U'O' };
+            } ();
+            std::pair<Char, Char> binary = [] {
+                if constexpr (std::is_same_v<char, Char>)
+                    return std::pair { 'b', 'B' };
+                if constexpr (std::is_same_v<wchar_t, Char>)
+                    return std::pair { L'b', L'B' };
+                if constexpr (std::is_same_v<char8_t, Char>)
+                    return std::pair { u8'b', u8'B' };
+                if constexpr (std::is_same_v<char16_t, Char>)
+                    return std::pair { u'b', u'B' };
+                if constexpr (std::is_same_v<char32_t, Char>)
+                    return std::pair { U'b', U'B' };
+            } ();
+            std::pair<Char, Char> hexadecimal = [] {
+                if constexpr (std::is_same_v<char, Char>)
+                    return std::pair { 'x', 'X' };
+                if constexpr (std::is_same_v<wchar_t, Char>)
+                    return std::pair { L'x', L'X' };
+                if constexpr (std::is_same_v<char8_t, Char>)
+                    return std::pair { u8'x', u8'X' };
+                if constexpr (std::is_same_v<char16_t, Char>)
+                    return std::pair { u'x', u'X' };
+                if constexpr (std::is_same_v<char32_t, Char>)
+                    return std::pair { U'x', u'X' };
+            } ();
+        } characters;
+        std::size_t position = 0;
+
+        bool negative = false;
+        if(stringView[position] == characters.minus) {
+            negative = true; ++position;
+        }
+
+        const auto base = [&stringView, &position, &characters] {
+            if (stringView[position] == characters.zero) {
+                switch (stringView[++position]) {
+                    case characters.binary.first:
+                    case characters.binary.second:
+                        ++position;
+                        return 2;
+                    case characters.octal.first:
+                    case characters.octal.second:
+                        ++position;
+                        return 8;
+                    case characters.hexadecimal.first:
+                    case characters.hexadecimal.second:
+                        ++position;
+                        return 16;
+                    default:
+                        return 10;
+                }
+            } else return 10;
+        } ();
+        for(; position < stringView.size(); ++position) {
+            const auto digit = [&characters] (Char ch) {
+                if(characters.zero <= ch && ch <= characters.nine)
+                    return static_cast<int>(ch) - static_cast<int>(characters.zero);
+                if(characters.a.first <= ch && ch <= characters.f.first)
+                    return static_cast<int>(ch) - static_cast<int>(characters.a.first) + 10;
+                if(characters.a.second <= ch && ch <= characters.f.second)
+                    return static_cast<int>(ch) - static_cast<int>(characters.a.second) + 10;
+                return 99;
+            } (stringView[position]);
+            this->operator*=(base); this->operator+=(digit);
+        }
+
+        if(negative) sign = Negative;
     }
     /* ----------------------------------------------------------------------- */
 
@@ -159,26 +290,36 @@ public:
     constexpr Multiprecision operator*(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result *= value; return result;
     }
-    constexpr Multiprecision& operator*=(const Multiprecision& value) noexcept { 
+    constexpr Multiprecision& operator*=(const Multiprecision& value) noexcept {
         if(sign == Zero) return *this;
         if(value.sign == Zero)
             return this->operator=(Multiprecision());
         sign = (sign != value.sign ? Negative : Positive);
-        
-        const auto longerLength = longerLineLength(blocks, value.blocks);
-        blockLine buffer {};
-        for(std::size_t i = 0; i < longerLength; ++i) {
-            uint64_t carryOut = 0;
-            for(std::size_t j = 0; j < longerLength; ++j) {
-                auto multiplication = static_cast<uint64_t>(blocks[j]) * static_cast<uint64_t>(value.blocks[i]) + carryOut;
-                auto tBlock = static_cast<uint64_t>(buffer[i + j]) + (multiplication % blockBase);
-                carryOut = multiplication / blockBase + tBlock / blockBase;
-                buffer[i + j] = tBlock % blockBase;
+
+        constexpr auto multiplyLines = [] (const blockLine& longerLine, std::size_t longerLength,
+                const blockLine& smallerLine, std::size_t smallerLength) {
+            blockLine buffer {};
+
+            for(std::size_t i = 0; i < longerLength; ++i) {
+                uint64_t tBlock = longerLine[i], carryOut = 0;
+                for(std::size_t j = 0; j < smallerLength; ++j) {
+                    const auto product = tBlock * static_cast<uint64_t>(smallerLine[j]) + carryOut;
+                    const auto block = static_cast<uint64_t>(buffer[i + j]) + (product % blockBase);
+                    carryOut = product / blockBase + block / blockBase;
+                    buffer[i + j] = block % blockBase;
+                }
+                if(smallerLength < blocksNumber)
+                    buffer[smallerLength + i] += carryOut;
             }
-            if(longerLength < blocksNumber)
-                buffer[longerLength + i] += carryOut;
-        }
-        blocks = buffer;
+
+            return buffer;
+        };
+
+        const auto thisLength = lineLength(blocks), valueLength = lineLength(value.blocks);
+        if(thisLength > valueLength)
+            blocks = multiplyLines(blocks, thisLength, value.blocks, valueLength);
+        else
+            blocks = multiplyLines(value.blocks, valueLength, blocks, thisLength);
 
         return *this;
     }
@@ -215,10 +356,30 @@ public:
     }
     constexpr Multiprecision& operator|=(const Multiprecision& value) noexcept { return *this; }
 
-    constexpr Multiprecision operator<<(const Multiprecision& value) const noexcept {
-        Multiprecision result = *this; result <<= value; return result;
+    constexpr Multiprecision operator<<(const Multiprecision& bitShift) const noexcept {
+        Multiprecision result = *this; result <<= bitShift; return result;
     }
-    constexpr Multiprecision& operator<<=(const Multiprecision& value) noexcept { return *this; }
+    constexpr Multiprecision& operator<<=(const Multiprecision& bitShift) noexcept {
+//        if(bitShift >= bitness) return *this;
+
+//        const std::size_t blockShift = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
+//        const block stamp = [] (std::size_t remainder) {
+//            block value {};
+//            for(uint8_t i = 0; i < remainder; ++i) {
+//                value <<= 1;
+//                value |= 1;
+//            }
+//            return value;
+//        } (remainder);
+//        for(long long i = blocksNumber - 1; i >= 0; --i);
+
+//        if(bitShift != blockBitLength) {
+//        } else
+//            for(auto iter = blocks.rbegin(); iter != (blocks.rend() - 1); ++iter)
+//                *iter = *(iter + 1);
+
+        return *this;
+    }
 
     constexpr Multiprecision operator>>(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result >>= value; return result;
@@ -226,7 +387,7 @@ public:
     constexpr Multiprecision& operator>>=(const Multiprecision& value) noexcept { return *this; }
     /* ----------------------------------------------------------------------- */
 
-    /* ------------------------ Comparing operators. ------------------------- */
+    /* ----------------------- Comparison operators. ------------------------- */
     constexpr auto operator<=>(const Multiprecision& value) const noexcept = default;
     /* ----------------------------------------------------------------------- */
 
@@ -253,9 +414,18 @@ public:
         return stream;
     }
 
-    template <std::size_t toPrecision> requires (toPrecision > blocksNumber * blockBitLength)
-    constexpr auto precisionCast() const noexcept -> Multiprecision<toPrecision> {
-        Multiprecision<toPrecision> result(blocks); if(sign == Negative) result = -result; return result;
+    template <std::size_t length>
+    constexpr explicit Multiprecision(const std::array<block, length>& data) noexcept {
+        /* FIXME: Remove this function, change precision cast to use bitness. */
+        for(std::size_t i = 0; i < blocksNumber && i < length; ++i)
+            blocks[i] = data[i]; sign = Positive;
+        /* FIXME */
+    }
+
+    template <std::size_t newBitness> requires (newBitness > bitness)
+    constexpr auto precisionCast() const noexcept -> Multiprecision<newBitness> {
+        Multiprecision<newBitness> result (blocks);
+        if(sign == Negative) result = -result; return result;
     }
 };
 

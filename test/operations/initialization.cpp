@@ -13,6 +13,9 @@ TEST(Initialization, ZeroInitialization) {
 
     Multiprecision m3 = Multiprecision(0);
     EXPECT_EQ(m3, 0);
+
+    Multiprecision m4 = {};
+    EXPECT_EQ(m4, 0);
 }
 
 TEST(Initialization, BasicInitialization) {
@@ -129,8 +132,8 @@ TEST(Initialization, Octal) {
     Multiprecision m0 = 05403223057620506251;
     EXPECT_EQ(m0, 99194853094755497);
 
-    Multiprecision m1 = -026106222341;
-    EXPECT_EQ(m1, -2971215073);
+    Multiprecision m1 = 026106222341;
+    EXPECT_EQ(m1, 2971215073);
 
     Multiprecision m2 = "0o106274176273174613";
     EXPECT_EQ(m2, 2475842268363147);

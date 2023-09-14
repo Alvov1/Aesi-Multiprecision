@@ -11,6 +11,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+file(GLOB Tests *.cpp)
 add_executable(Multiprecision ${Tests} ../Multiprecision.h ../Multiprecision.cpp)
 add_subdirectory(arithmetic)
 add_subdirectory(operations)

@@ -23,12 +23,6 @@ class Multiprecision {
     /* ----------------------------------------------------------------------- */
 
     /* --------------------------- Helper functions. ------------------------- */
-    template <typename Char>
-    static constexpr auto strlen(const Char *str) noexcept -> std::size_t {
-        const char *s = str;
-        for (; *s; ++s);
-        return(s - str);
-    }
     static constexpr auto addLine(blockLine& dst, const blockLine& src) noexcept -> uint64_t {
         uint64_t carryOut = 0;
         for (std::size_t i = 0; i < blocksNumber; ++i) {
@@ -87,11 +81,11 @@ public:
         }
     }
 
-    template <typename Char, std::size_t arrayLength> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
+    template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
     constexpr Multiprecision(const Char (&array)[arrayLength]) noexcept : Multiprecision(std::basic_string_view<Char>(array)) {}
 
-    template <typename String, typename Char = typename String::value_type>
-    requires (std::is_same_v<std::basic_string<Char>, typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
+    template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
+            typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
     constexpr Multiprecision(String&& stringView) noexcept {
         if(stringView.size() == 0) return;
 
@@ -230,7 +224,11 @@ public:
                     return static_cast<int>(ch) - static_cast<int>(characters.a.second) + 10;
                 return 99;
             } (stringView[position]);
-            this->operator*=(base); this->operator+=(digit);
+
+            if(digit < base) {
+                this->operator*=(base);
+                this->operator+=(digit);
+            }
         }
 
         if(negative) sign = Negative;
@@ -328,6 +326,14 @@ public:
         Multiprecision result = *this; result /= value; return result;
     }
     constexpr Multiprecision& operator/=(const Multiprecision& value) noexcept {
+//        const auto ratio = this->operator<=>(value);
+//        if(ratio == std::strong_ordering::greater) {
+//            const auto bitsUsed = lineLength(blocks) * blockBitLength;
+//            for(long long i = bitsUsed - 1; i >= 0; --i) {
+//
+//            }
+//        } else if(ratio == std::strong_ordering::less)
+//            this->operator=(0); else this->operator=(1);
         return *this;
     }
 
@@ -356,28 +362,41 @@ public:
     }
     constexpr Multiprecision& operator|=(const Multiprecision& value) noexcept { return *this; }
 
-    constexpr Multiprecision operator<<(const Multiprecision& bitShift) const noexcept {
+    template <typename Integral> requires (std::is_integral_v<Integral>)
+    constexpr Multiprecision operator<<(Integral bitShift) const noexcept {
         Multiprecision result = *this; result <<= bitShift; return result;
     }
-    constexpr Multiprecision& operator<<=(const Multiprecision& bitShift) noexcept {
-//        if(bitShift >= bitness) return *this;
+    template <typename Integral> requires (std::is_integral_v<Integral>)
+    constexpr Multiprecision& operator<<=(Integral bitShift) noexcept {
+        //                    3                                               2                                     1                                     0
+        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0011 0010 0110 0100 0011 0110 || 0010 0001 0001 1011 1011 0110 1001 0111 << 48
+        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0110 0100 0011 0110 0010 0001 0001 1011 || 1011 0110 1001 0111 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000
+        //  Правая половина 2   Левая половина 1   || Правая половина 1    Левая половина 0   || Правая половина 0   ---- ---- ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
+        // 3992422065038923586049945894912 = 0x( 0000 0032 || 6436 211B || B697 0000 || 0000 0000 )
 
-//        const std::size_t blockShift = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
-//        const block stamp = [] (std::size_t remainder) {
-//            block value {};
-//            for(uint8_t i = 0; i < remainder; ++i) {
-//                value <<= 1;
-//                value |= 1;
-//            }
-//            return value;
-//        } (remainder);
-//        for(long long i = blocksNumber - 1; i >= 0; --i);
+        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 1011 1000 0011 0110 1010 1101 || 1101 1100 0110 0101 0010 0110 1110 0100 << 40
+        // ---- ---- ---- ---- ---- ---- 0000 0000 || 1011 1000 0011 0110 1010 1101 1101 1100 || 0110 0101 0010 0110 1110 0100 ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
+        //     Правые 6 октетов 2       2 Окт-та 1 ||     Правые 6 октетов 1       2 Окт-та 0 ||      Правые 6 октетов 0       ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
+        // -57011344836360679021114032128 = -0x( 0000 0000 || B836 ADDC || 6526 E400 || 0000 0000)
 
-//        if(bitShift != blockBitLength) {
-//        } else
-//            for(auto iter = blocks.rbegin(); iter != (blocks.rend() - 1); ++iter)
-//                *iter = *(iter + 1);
+        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000
+        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 << 32
+        // 2852520100991549003783995392 = 0x( 0000 0000 || 0937 8CA0 || 8716 1000 || 0000 0000 )
+        // 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 << 64
+        // 12251480544941320143633640456854700032 = 0x( 0937 8CA0 || 8716 1000 || 0000 0000 || 0000 0000 )
 
+        if(bitShift < bitness && bitShift != 0) {
+            const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
+            const block stamp = (1UL << (blockBitLength - remainder)) - 1;
+
+            for (long long i = blocksNumber - 1; i >= (quotient + (remainder ? 1 : 0)); --i)
+                blocks[i] = ((blocks[i - quotient] & stamp) << remainder) | ((blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> (blockBitLength - remainder));
+
+            blocks[quotient] = (blocks[0] & stamp) << remainder;
+
+            for (std::size_t i = 0; i < quotient; ++i)
+                blocks[i] = 0;
+        }
         return *this;
     }
 

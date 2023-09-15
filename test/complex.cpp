@@ -44,5 +44,5 @@ TEST(Arithmetic, Complex) {
     Multiprecision t("-987654321098765432109876543210"), u("123456789012345678901234567890");
 
     Multiprecision complex = ((((a + b) * c / d % e) - f * 4096) / 2) + (g * h - j) % ((r + s + t + u) / 40);
-    EXPECT_EQ(complex, "");
+    EXPECT_EQ(complex, "0");
 }

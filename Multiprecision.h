@@ -342,7 +342,14 @@ public:
 
 
     /* ------------------------- Bitwise operators. -------------------------- */
-    constexpr Multiprecision operator~() const noexcept {}
+    constexpr Multiprecision operator~() const noexcept {
+        Multiprecision result {};
+        for(std::size_t i = 0; i < blocksNumber; ++i)
+            result.blocks[i] = ~blocks[i];
+        if(isLineEmpty(result.blocks))
+            result.sign = Zero; else result.sign = sign;
+        return result;
+    }
 
     constexpr Multiprecision operator^(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result ^= value; return result;
@@ -534,6 +541,22 @@ public:
         Multiprecision<newBitness> result (blocks);
         if(sign == Negative) result = -result; return result;
     }
+
+    /*  TODO: Fixed version of precision cast
+        template <std::size_t newBitness> requires (newBitness > bitness)
+        constexpr auto precisionCast() const noexcept -> Multiprecision<newBitness> {
+            Multiprecision<newBitness> result;
+            for(block block: blocks) {
+                result <<= blockBitLength;
+                result |= block;
+            }
+
+            if(sign == Negative)
+                return -result;
+            return result;
+        }
+    */
+
 };
 
 template <std::size_t length, typename Integral> requires (std::is_integral_v<Integral>)

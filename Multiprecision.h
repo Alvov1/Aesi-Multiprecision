@@ -8,7 +8,6 @@ namespace {
     using block = uint32_t;
     constexpr auto blockBitLength = sizeof(block) * 8;
     constexpr uint64_t blockBase = 1ULL << blockBitLength;
-    constexpr uint64_t blockMax = std::numeric_limits<block>::max();
 }
 
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
@@ -45,9 +44,7 @@ class Multiprecision {
         return result;
     }
     static constexpr auto isLineEmpty(const blockLine& line) noexcept -> bool {
-        for(std::size_t i = 0; i < blocksNumber; ++i)
-            if(line[i] != 0) return false;
-        return true;
+        return lineLength(line) == 0;
     }
     static constexpr auto lineLength(const blockLine& line) noexcept -> std::size_t {
         for(long long i = blocksNumber - 1; i >= 0; --i)
@@ -195,19 +192,19 @@ public:
         }
 
         const auto base = [&stringView, &position, &characters] {
-            if (stringView[position] == characters.zero) {
-                switch (stringView[++position]) {
+            if (stringView[position] == characters.zero && stringView.size() > position + 1) {
+                switch (stringView[position + 1]) {
                     case characters.binary.first:
                     case characters.binary.second:
-                        ++position;
+                        position += 2;
                         return 2;
                     case characters.octal.first:
                     case characters.octal.second:
-                        ++position;
+                        position += 2;
                         return 8;
                     case characters.hexadecimal.first:
                     case characters.hexadecimal.second:
-                        ++position;
+                        position += 2;
                         return 16;
                     default:
                         return 10;
@@ -368,24 +365,29 @@ public:
     }
     template <typename Integral> requires (std::is_integral_v<Integral>)
     constexpr Multiprecision& operator<<=(Integral bitShift) noexcept {
-        //                    3                                               2                                     1                                     0
-        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0011 0010 0110 0100 0011 0110 || 0010 0001 0001 1011 1011 0110 1001 0111 << 48
-        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0110 0100 0011 0110 0010 0001 0001 1011 || 1011 0110 1001 0111 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000
-        //  Правая половина 2   Левая половина 1   || Правая половина 1    Левая половина 0   || Правая половина 0   ---- ---- ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
-        // 3992422065038923586049945894912 = 0x( 0000 0032 || 6436 211B || B697 0000 || 0000 0000 )
+        /*                    3                                               2                                     1                                     0
+           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0011 0010 0110 0100 0011 0110 || 0010 0001 0001 1011 1011 0110 1001 0111 << 48
+           0000 0000 0000 0000|0000 0000 0011 0010 || 0110 0100 0011 0110|0010 0001 0001 1011 || 1011 0110 1001 0111|0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000
+            Правая половина 2   Левая половина 1   || Правая половина 1    Левая половина 0   || Правая половина 0   ---- ---- ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
+           3992422065038923586049945894912 = 0x( 0000 0032 || 6436 211B || B697 0000 || 0000 0000 )
 
-        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 1011 1000 0011 0110 1010 1101 || 1101 1100 0110 0101 0010 0110 1110 0100 << 40
-        // ---- ---- ---- ---- ---- ---- 0000 0000 || 1011 1000 0011 0110 1010 1101 1101 1100 || 0110 0101 0010 0110 1110 0100 ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
-        //     Правые 6 октетов 2       2 Окт-та 1 ||     Правые 6 октетов 1       2 Окт-та 0 ||      Правые 6 октетов 0       ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
-        // -57011344836360679021114032128 = -0x( 0000 0000 || B836 ADDC || 6526 E400 || 0000 0000)
+           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 1011 1000 0011 0110 1010 1101 || 1101 1100 0110 0101 0010 0110 1110 0100 << 40
+           ---- ---- ---- ---- ---- ----|0000 0000 || 1011 1000 0011 0110 1010 1101|1101 1100 || 0110 0101 0010 0110 1110 0100|---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
+                      Право 2              Лево 1  ||            Право 1              Лево 0  ||            Право 0            ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
+           -57011344836360679021114032128 = -0x( 0000 0000 || B836 ADDC || 6526 E400 || 0000 0000)
 
-        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000
-        // 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 << 32
-        // 2852520100991549003783995392 = 0x( 0000 0000 || 0937 8CA0 || 8716 1000 || 0000 0000 )
-        // 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 << 64
-        // 12251480544941320143633640456854700032 = 0x( 0937 8CA0 || 8716 1000 || 0000 0000 || 0000 0000 )
+           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000
+           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 << 32
+           2852520100991549003783995392 = 0x( 0000 0000 || 0937 8CA0 || 8716 1000 || 0000 0000 )
 
-        if(bitShift < bitness && bitShift != 0) {
+           0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 << 64
+           12251480544941320143633640456854700032 = 0x( 0937 8CA0 || 8716 1000 || 0000 0000 || 0000 0000 )
+        */
+
+        if(bitShift < 0)
+            return this->operator>>=(-bitShift);
+
+        if(bitShift < bitness && bitShift > 0) {
             const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
             const block stamp = (1UL << (blockBitLength - remainder)) - 1;
 
@@ -396,14 +398,58 @@ public:
 
             for (std::size_t i = 0; i < quotient; ++i)
                 blocks[i] = 0;
+
+            if(isLineEmpty(blocks)) sign = Zero;
         }
+
         return *this;
     }
 
-    constexpr Multiprecision operator>>(const Multiprecision& value) const noexcept {
-        Multiprecision result = *this; result >>= value; return result;
+    template <typename Integral> requires (std::is_integral_v<Integral>)
+    constexpr Multiprecision operator>>(Integral bitShift) const noexcept {
+        Multiprecision result = *this; result >>= bitShift; return result;
     }
-    constexpr Multiprecision& operator>>=(const Multiprecision& value) noexcept { return *this; }
+    template <typename Integral> requires (std::is_integral_v<Integral>)
+    constexpr Multiprecision& operator>>=(Integral bitShift) noexcept {
+        /*                    3                                               2                                     1                                     0
+           0000 0000 0000 0000 0000 0000 0011 0010 || 0110 0100 0011 0110 0010 0001 0001 1011 || 1011 0110 1001 0111 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 >> 48
+           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0011 0010|0110 0100 0011 0110 || 0010 0001 0001 1011|1011 0110 1001 0111
+           ---- ---- ---- ---- ---- ---- ---- ---- || ---- ---- ---- ----    Левая часть 3    ||    Правая часть 3      Левая часть 2    ||    Правая часть 2       Левая часть 1
+           14183932482008727 = 0x( 0000 0000 || 0000 0000 || 0032 6436 || 211B B697 )
+
+           0000 0000 0000 0000 0000 0000 0000 0000 || 1011 1000 0011 0110 1010 1101 1101 1100 || 0110 0101 0010 0110 1110 0100 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 >> 40
+           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000|1011 1000 0011 0110 1010 1101 || 1101 1100|0110 0101 0010 0110 1110 0100
+           ---- ---- ---- ---- ---- ---- ---- ---- || ---- ---- ---- ---- ---- ---- ---- ---- ||  Право 3             Лево 2             ||  Право 2             Лево 1
+           51851516069619428 = 0x( 0000 0000 || 0000 0000 || 00B8 36AD || DC65 26E4 )
+
+           0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000
+           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 >> 32
+           2852520100991549003783995392 = 0x( 0000 0000 || 0937 8CA0 || 8716 1000 || 0000 0000 )
+
+           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 >> 64
+           664154091149463552 = 0x( 0000 0000 || 0000 0000 || 0937 8CA0 || 8716 1000 )
+        */
+
+        if(bitShift < 0)
+            return this->operator<<=(-bitShift);
+
+        if(bitShift < bitness && bitShift > 0) {
+            const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
+            const block stamp = (1UL << remainder) - 1;
+
+            for(std::size_t i = 0; i < blocksNumber - (quotient + (remainder ? 1 : 0)); ++i)
+                blocks[i] = ((blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << (blockBitLength - remainder)) | ((blocks[i + quotient] & ~stamp) >> remainder);
+
+            blocks[blocksNumber - 1 - quotient] = (blocks[blocksNumber - 1] & ~stamp) >> remainder;
+
+            for(long long i = blocksNumber - quotient; i < blocksNumber; ++i)
+                blocks[i] = 0;
+
+            if(isLineEmpty(blocks)) sign = Zero;
+        }
+
+        return *this;
+    }
     /* ----------------------------------------------------------------------- */
 
     /* ----------------------- Comparison operators. ------------------------- */

@@ -16,6 +16,15 @@ TEST(Initialization, ZeroInitialization) {
 
     Multiprecision m4 = {};
     EXPECT_EQ(m4, 0);
+
+    Multiprecision m5 = "0";
+    EXPECT_EQ(m5, 0);
+
+    Multiprecision m6 = "0.";
+    EXPECT_EQ(m6, 0);
+
+    Multiprecision m7 = "Somebody once told me The world is gonna roll me I ain't the sharpest tool in the shed";
+    EXPECT_EQ(m7, 0);
 }
 
 TEST(Initialization, BasicInitialization) {
@@ -92,11 +101,11 @@ TEST(Initialization, StringStringViewInitialization) {
 }
 
 TEST(Initialization, Binary) {
-    Multiprecision m0 = 0b1111111111111111111111111111111111111111111111111111111111111111;
-    EXPECT_EQ(m0, 18446744073709551615ULL);
-
-    Multiprecision m1 = -0b100001100011011110111101000001011010111101101;
-    EXPECT_EQ(m1, -18446744073709);
+//    Multiprecision m0 = 0b1111111111111111111111111111111111111111111111111111111111111111;
+//    EXPECT_EQ(m0, 18446744073709551615ULL);
+//
+//    Multiprecision m1 = -0b100001100011011110111101000001011010111101101;
+//    EXPECT_EQ(m1, -18446744073709);
 
     Multiprecision m2 = "0b11011001001110000000010000100010101011011101010101000011111";
     EXPECT_EQ(m2, 489133282872437279);

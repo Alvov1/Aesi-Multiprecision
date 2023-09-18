@@ -354,17 +354,29 @@ public:
     constexpr Multiprecision operator^(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result ^= value; return result;
     }
-    constexpr Multiprecision& operator^=(const Multiprecision& value) noexcept { return *this; }
+    constexpr Multiprecision& operator^=(const Multiprecision& value) noexcept {
+        for(std::size_t i = 0; i < blocksNumber; ++i)
+            blocks[i] ^= value.blocks[i];
+        return *this;
+    }
 
     constexpr Multiprecision operator&(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result &= value; return result;
     }
-    constexpr Multiprecision& operator&=(const Multiprecision& value) noexcept { return *this; }
+    constexpr Multiprecision& operator&=(const Multiprecision& value) noexcept {
+        for(std::size_t i = 0; i < blocksNumber; ++i)
+            blocks[i] &= value.blocks[i];
+        return *this;
+    }
 
     constexpr Multiprecision operator|(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result |= value; return result;
     }
-    constexpr Multiprecision& operator|=(const Multiprecision& value) noexcept { return *this; }
+    constexpr Multiprecision& operator|=(const Multiprecision& value) noexcept {
+        for(std::size_t i = 0; i < blocksNumber; ++i)
+            blocks[i] |= value.blocks[i];
+        return *this;
+    }
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
     constexpr Multiprecision operator<<(Integral bitShift) const noexcept {

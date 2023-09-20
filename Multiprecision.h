@@ -319,25 +319,46 @@ public:
         return *this;
     }
 
-    constexpr Multiprecision operator/(const Multiprecision& value) const noexcept {
-        Multiprecision result = *this; result /= value; return result;
-    }
-    constexpr Multiprecision& operator/=(const Multiprecision& value) noexcept {
-//        const auto ratio = this->operator<=>(value);
-//        if(ratio == std::strong_ordering::greater) {
-//            const auto bitsUsed = lineLength(blocks) * blockBitLength;
-//            for(long long i = bitsUsed - 1; i >= 0; --i) {
-//
-//            }
-//        } else if(ratio == std::strong_ordering::less)
-//            this->operator=(0); else this->operator=(1);
-        return *this;
+    constexpr static auto makeDivision(const Multiprecision& number, const Multiprecision& divisor) noexcept -> std::pair<Multiprecision, Multiprecision> {
+        const Multiprecision divAbs = divisor.abs();
+        const auto ratio = number.abs().operator<=>(divAbs);
+
+        std::pair<Multiprecision, Multiprecision> results = { 0, 0 };
+        auto& [quotient, remainder] = results;
+
+        if(ratio == std::strong_ordering::greater) {
+            const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
+            for(long long i = bitsUsed - 1; i >= 0; --i) {
+                remainder <<= 1;
+                remainder.setBit(0, number.getBit(i));
+
+                if(remainder >= divAbs) {
+                    remainder -= divAbs;
+                    quotient.setBit(i, true);
+                }
+            }
+
+            if(isLineEmpty(quotient.blocks))
+                quotient.sign = Zero; else if(number.sign != divisor.sign) quotient = -quotient;
+        } else if(ratio == std::strong_ordering::less)
+            remainder = number; else quotient = 1;
+
+        return results;
     }
 
-    constexpr Multiprecision operator%(const Multiprecision& value) const noexcept {
-        Multiprecision result = *this; result %= value; return result;
+    constexpr Multiprecision operator/(const Multiprecision& divisor) const noexcept {
+        return makeDivision(*this, divisor).first;
     }
-    constexpr Multiprecision& operator%=(const Multiprecision& value) noexcept { return *this; }
+    constexpr Multiprecision& operator/=(const Multiprecision& divisor) noexcept {
+        return this->operator=(makeDivision(*this, divisor).first);
+    }
+
+    constexpr Multiprecision operator%(const Multiprecision& divisor) const noexcept {
+        return makeDivision(*this, divisor).second;
+    }
+    constexpr Multiprecision& operator%=(const Multiprecision& divisor) noexcept {
+        return this->operator=(makeDivision(*this, divisor).second);
+    }
     /* ----------------------------------------------------------------------- */
 
 
@@ -357,6 +378,7 @@ public:
     constexpr Multiprecision& operator^=(const Multiprecision& value) noexcept {
         for(std::size_t i = 0; i < blocksNumber; ++i)
             blocks[i] ^= value.blocks[i];
+        if(isLineEmpty(blocks)) sign = Zero;
         return *this;
     }
 
@@ -366,6 +388,7 @@ public:
     constexpr Multiprecision& operator&=(const Multiprecision& value) noexcept {
         for(std::size_t i = 0; i < blocksNumber; ++i)
             blocks[i] &= value.blocks[i];
+        if(isLineEmpty(blocks)) sign = Zero;
         return *this;
     }
 
@@ -517,6 +540,33 @@ public:
     };
     /* ----------------------------------------------------------------------- */
 
+
+    /* ------------------------ Arithmetic methods. -------------------------- */
+    [[nodiscard]] constexpr auto getBit(std::size_t index) const noexcept -> bool {
+        if(index >= bitness) return false;
+        const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
+        return blocks[blockNumber] & (1U << bitNumber);
+    }
+    constexpr auto setBit(std::size_t index, bool value) noexcept -> void {
+        if(index >= bitness) return;
+        const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
+        if(value) {
+            blocks[blockNumber] |= (1U << bitNumber);
+            if(sign == Zero && !isLineEmpty(blocks))
+                sign = Positive;
+        } else {
+            blocks[blockNumber] &= (~(1U << bitNumber));
+            if(sign != Zero && isLineEmpty(blocks))
+                sign = Zero;
+        }
+    }
+    [[nodiscard]] constexpr auto abs() const noexcept -> Multiprecision {
+        if(sign == Zero)
+            return *this;
+        Multiprecision result = *this; result.sign = Positive; return result;
+    }
+    /* ----------------------------------------------------------------------- */
+
     constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {
         blocks = other.blocks; sign = other.sign; return *this;
     }
@@ -568,15 +618,36 @@ public:
             return result;
         }
     */
-
 };
 
+template <std::size_t lFirst, std::size_t lSecond> requires (lFirst != lSecond)
+constexpr bool operator==(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) noexcept {
+    if constexpr (lFirst > lSecond) {
+        Multiprecision<lFirst> reducedSecond = second.template precisionCast<lFirst>();
+        return (first == reducedSecond);
+    } else {
+        Multiprecision<lSecond> reducedFirst = first.template precisionCast<lSecond>();
+        return (reducedFirst == second);
+    }
+}
+template <std::size_t lFirst, std::size_t lSecond> requires (lFirst != lSecond)
+constexpr std::strong_ordering operator<=>(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) noexcept {
+    if constexpr (lFirst > lSecond) {
+        Multiprecision<lFirst> reducedSecond = second.template precisionCast<lFirst>();
+        return (first <=> reducedSecond);
+    } else {
+        Multiprecision<lSecond> reducedFirst = first.template precisionCast<lSecond>();
+        return (reducedFirst <=> second);
+    }
+}
+
+
 template <std::size_t length, typename Integral> requires (std::is_integral_v<Integral>)
-auto operator+(Integral number, const Multiprecision<length>& value) noexcept {
+constexpr auto operator+(Integral number, const Multiprecision<length>& value) noexcept {
     return Multiprecision<length>(number) + value;
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst != lSecond)
-auto operator+(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) noexcept
+constexpr auto operator+(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) noexcept
 -> typename std::conditional<(lFirst > lSecond), Multiprecision<lFirst>, Multiprecision<lSecond>>::type {
     if constexpr (lFirst > lSecond) {
         Multiprecision<lFirst> reducedSecond = second.template precisionCast<lFirst>();
@@ -587,17 +658,17 @@ auto operator+(const Multiprecision<lFirst>& first, const Multiprecision<lSecond
     }
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst > lSecond)
-auto operator+=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
+constexpr auto operator+=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
     return first.operator+=(second.template precisionCast<lFirst>());
 }
 
 
 template <std::size_t length, typename Integral> requires (std::is_integral_v<Integral>)
-auto operator-(Integral number, const Multiprecision<length>& value) noexcept {
+constexpr auto operator-(Integral number, const Multiprecision<length>& value) noexcept {
     return Multiprecision<length>(number) - value;
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst != lSecond)
-auto operator-(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second)
+constexpr auto operator-(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second)
 -> typename std::conditional<(lFirst > lSecond), Multiprecision<lFirst>, Multiprecision<lSecond>>::type {
     if constexpr (lFirst > lSecond) {
         return first - second.template precisionCast<lFirst>();
@@ -606,17 +677,17 @@ auto operator-(const Multiprecision<lFirst>& first, const Multiprecision<lSecond
     }
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst > lSecond)
-auto operator-=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
+constexpr auto operator-=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
     return first.operator-=(second.template precisionCast<lFirst>());
 }
 
 
 template <std::size_t length, typename Integral> requires (std::is_integral_v<Integral>)
-auto operator*(Integral number, const Multiprecision<length>& value) noexcept {
+constexpr auto operator*(Integral number, const Multiprecision<length>& value) noexcept {
     return Multiprecision<length>(number) * value;
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst != lSecond)
-auto operator*(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second)
+constexpr auto operator*(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second)
 -> typename std::conditional<(lFirst > lSecond), Multiprecision<lFirst>, Multiprecision<lSecond>>::type {
     if constexpr (lFirst > lSecond) {
         return first * second.template precisionCast<lFirst>();
@@ -625,17 +696,17 @@ auto operator*(const Multiprecision<lFirst>& first, const Multiprecision<lSecond
     }
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst > lSecond)
-auto operator*=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
+constexpr auto operator*=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
     return first.operator*=(second.template precisionCast<lFirst>());
 }
 
 
 template <std::size_t length, typename Integral> requires (std::is_integral_v<Integral>)
-auto operator/(Integral number, const Multiprecision<length>& value) noexcept {
+constexpr auto operator/(Integral number, const Multiprecision<length>& value) noexcept {
     return Multiprecision<length>(number) / value;
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst != lSecond)
-auto operator/(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second)
+constexpr auto operator/(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second)
 -> typename std::conditional<(lFirst > lSecond), Multiprecision<lFirst>, Multiprecision<lSecond>>::type {
     if constexpr (lFirst > lSecond) {
         return first / second.template precisionCast<lFirst>();
@@ -644,17 +715,17 @@ auto operator/(const Multiprecision<lFirst>& first, const Multiprecision<lSecond
     }
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst > lSecond)
-auto operator/=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
+constexpr auto operator/=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
     return first.operator/=(second.template precisionCast<lFirst>());
 }
 
 
 template <std::size_t length, typename Integral> requires (std::is_integral_v<Integral>)
-auto operator%(Integral number, const Multiprecision<length>& value) noexcept {
+constexpr auto operator%(Integral number, const Multiprecision<length>& value) noexcept {
     return Multiprecision<length>(number) % value;
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst != lSecond)
-auto operator%(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second)
+constexpr auto operator%(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second)
 -> typename std::conditional<(lFirst > lSecond), Multiprecision<lFirst>, Multiprecision<lSecond>>::type {
     if constexpr (lFirst > lSecond) {
         return first / second.template precisionCast<lFirst>();
@@ -663,7 +734,7 @@ auto operator%(const Multiprecision<lFirst>& first, const Multiprecision<lSecond
     }
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst > lSecond)
-auto operator%=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
+constexpr auto operator%=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
     return first.operator/=(second.template precisionCast<lFirst>());
 }
 

@@ -411,6 +411,37 @@ TEST(Bitwise, OR) {
     r36 |= r37; EXPECT_EQ(r36, 8277369822149327358);
     Multiprecision<64> r38 = 2440620310881118278ULL, r39 = 5365949614884060230ULL;
     r38 |= r39; EXPECT_EQ(r38, 7782219880780987462);
+
+    Multiprecision y0 = -7379608232792186683; EXPECT_EQ(y0 | 0, -7379608232792186683); Multiprecision y1 = 2970120816951561012; EXPECT_EQ(y1 | 0, 2970120816951561012);
+    Multiprecision y2 = -5696220288572448165; EXPECT_EQ(y2 | 0, -5696220288572448165); Multiprecision y3 = 7900362436724175479; EXPECT_EQ(y3 | 0, 7900362436724175479);
+    Multiprecision y4 = -777376026862911334; EXPECT_EQ(y4 | 0, -777376026862911334); Multiprecision y5 = -2069419668651330974; EXPECT_EQ(y5 | 0, -2069419668651330974);
+    Multiprecision y6 = 1259778954916885065; EXPECT_EQ(y6 | 0, 1259778954916885065); Multiprecision y7 = -2905725874441331650; EXPECT_EQ(y7 | 0, -2905725874441331650);
+    Multiprecision y8 = 4879706157249442504; EXPECT_EQ(y8 | 0, 4879706157249442504); Multiprecision y9 = 8027626211878286429; EXPECT_EQ(y9 | 0, 8027626211878286429);
+    Multiprecision y10 = 570797157455018920; EXPECT_EQ(y10 | 0, 570797157455018920); Multiprecision y11 = -427390551710800597; EXPECT_EQ(y11 | 0, -427390551710800597);
+    Multiprecision y12 = -2642894643427682157; EXPECT_EQ(y12 | 0, -2642894643427682157); Multiprecision y13 = -2738503629311636134; EXPECT_EQ(y13 | 0, -2738503629311636134);
+    Multiprecision y14 = 6337689599550252319; EXPECT_EQ(y14 | 0, 6337689599550252319); Multiprecision y15 = -5586759305152622746; EXPECT_EQ(y15 | 0, -5586759305152622746);
+    Multiprecision y16 = 5456108041498276808; EXPECT_EQ(y16 | 0, 5456108041498276808); Multiprecision y17 = 5452584994720316618; EXPECT_EQ(y17 | 0, 5452584994720316618);
+    Multiprecision y18 = -2316362324001525966; EXPECT_EQ(y18 | 0, -2316362324001525966); Multiprecision y19 = 7325722336685152086; EXPECT_EQ(y19 | 0, 7325722336685152086);
+    Multiprecision y20 = 377998544433893902; EXPECT_EQ(y20 | 0, 377998544433893902); Multiprecision y21 = -2465288838779088870; EXPECT_EQ(y21 | 0, -2465288838779088870);
+    Multiprecision y22 = -5468006971160031732; EXPECT_EQ(y22 | 0, -5468006971160031732); Multiprecision y23 = 3506965552698968660; EXPECT_EQ(y23 | 0, 3506965552698968660);
+    Multiprecision y24 = -7300963666391738798; EXPECT_EQ(y24 | 0, -7300963666391738798); Multiprecision y25 = 3103134765104197354; EXPECT_EQ(y25 | 0, 3103134765104197354);
+    Multiprecision y26 = 3165186477704156988; EXPECT_EQ(y26 | 0, 3165186477704156988); Multiprecision y27 = 1709646565921426320; EXPECT_EQ(y27 | 0, 1709646565921426320);
+    Multiprecision y28 = 1097774869699502254; EXPECT_EQ(y28 | 0, 1097774869699502254); Multiprecision y29 = 2491211643943272387; EXPECT_EQ(y29 | 0, 2491211643943272387);
+    Multiprecision y30 = -8927353262635906157; EXPECT_EQ(y30 | 0, -8927353262635906157); Multiprecision y31 = -38766286252702324; EXPECT_EQ(y31 | 0, -38766286252702324);
+    Multiprecision y32 = 5514084479833422753; EXPECT_EQ(y32 | 0, 5514084479833422753); Multiprecision y33 = 2194479717102096810; EXPECT_EQ(y33 | 0, 2194479717102096810);
+    Multiprecision y34 = 2751242616132452994; EXPECT_EQ(y34 | 0, 2751242616132452994); Multiprecision y35 = -2390446791466101241; EXPECT_EQ(y35 | 0, -2390446791466101241);
+    Multiprecision y36 = 8822853861241688997; EXPECT_EQ(y36 | 0, 8822853861241688997); Multiprecision y37 = -4950353505985954258; EXPECT_EQ(y37 | 0, -4950353505985954258);
+    Multiprecision y38 = -8136431100828633976; EXPECT_EQ(y38 | 0, -8136431100828633976); Multiprecision y39 = 8055314313686600301; EXPECT_EQ(y39 | 0, 8055314313686600301);
+    Multiprecision y40 = 3365309689234796764; EXPECT_EQ(y40 | 0, 3365309689234796764); Multiprecision y41 = 8794773495649163247; EXPECT_EQ(y41 | 0, 8794773495649163247);
+    Multiprecision y42 = -515275048992317636; EXPECT_EQ(y42 | 0, -515275048992317636); Multiprecision y43 = 3929495410971836324; EXPECT_EQ(y43 | 0, 3929495410971836324);
+    Multiprecision y44 = 5301875904659701242; EXPECT_EQ(y44 | 0, 5301875904659701242); Multiprecision y45 = -3342985643104422805; EXPECT_EQ(y45 | 0, -3342985643104422805);
+    Multiprecision y46 = -8770275292430445047; EXPECT_EQ(y46 | 0, -8770275292430445047); Multiprecision y47 = -7256290758481884326; EXPECT_EQ(y47 | 0, -7256290758481884326);
+    Multiprecision y48 = -6395402439121471762; EXPECT_EQ(y48 | 0, -6395402439121471762); Multiprecision y49 = 8481418200485971540; EXPECT_EQ(y49 | 0, 8481418200485971540);
+    Multiprecision y50 = -6826837351772736686; EXPECT_EQ(y50 | 0, -6826837351772736686); Multiprecision y51 = 5378333528058019140; EXPECT_EQ(y51 | 0, 5378333528058019140);
+    Multiprecision y52 = 7949354112667923489; EXPECT_EQ(y52 | 0, 7949354112667923489); Multiprecision y53 = 758475868520796204; EXPECT_EQ(y53 | 0, 758475868520796204);
+    Multiprecision y54 = -6506001218570206180; EXPECT_EQ(y54 | 0, -6506001218570206180); Multiprecision y55 = -7151596374648398466; EXPECT_EQ(y55 | 0, -7151596374648398466);
+    Multiprecision y56 = -2312960319391550338; EXPECT_EQ(y56 | 0, -2312960319391550338); Multiprecision y57 = -205899936757631221; EXPECT_EQ(y57 | 0, -205899936757631221);
+    Multiprecision y58 = -8988800751555513056; EXPECT_EQ(y58 | 0, -8988800751555513056); Multiprecision y59 = -5137089545283585480; EXPECT_EQ(y59 | 0, -5137089545283585480);
 }
 
 TEST(Bitwise, AND) {
@@ -495,6 +526,37 @@ TEST(Bitwise, AND) {
     r36 &= r37; EXPECT_EQ(r36, 1663121155613002248);
     Multiprecision<64> r38 = 8415579626477377023ULL, r39 = 1758383484602008231ULL;
     r38 &= r39; EXPECT_EQ(r38, 1171498939003748519);
+
+    Multiprecision y0 = 4889091353405609314; EXPECT_EQ(y0 & 0, 0); Multiprecision y1 = -5651070512456491307; EXPECT_EQ(y1 & 0, 0);
+    Multiprecision y2 = 8716999149386587222; EXPECT_EQ(y2 & 0, 0); Multiprecision y3 = 3990093180733831391; EXPECT_EQ(y3 & 0, 0);
+    Multiprecision y4 = -600115849107061037; EXPECT_EQ(y4 & 0, 0); Multiprecision y5 = 5971190278122453016; EXPECT_EQ(y5 & 0, 0);
+    Multiprecision y6 = 3882719951867855839; EXPECT_EQ(y6 & 0, 0); Multiprecision y7 = 3455443969755678518; EXPECT_EQ(y7 & 0, 0);
+    Multiprecision y8 = -3766894349432610843; EXPECT_EQ(y8 & 0, 0); Multiprecision y9 = -5791857218894865903; EXPECT_EQ(y9 & 0, 0);
+    Multiprecision y10 = -338534766738000611; EXPECT_EQ(y10 & 0, 0); Multiprecision y11 = 5102817375810074387; EXPECT_EQ(y11 & 0, 0);
+    Multiprecision y12 = 5476206818927814191; EXPECT_EQ(y12 & 0, 0); Multiprecision y13 = -947360454527944509; EXPECT_EQ(y13 & 0, 0);
+    Multiprecision y14 = 7367263158822837235; EXPECT_EQ(y14 & 0, 0); Multiprecision y15 = 7983868794538809353; EXPECT_EQ(y15 & 0, 0);
+    Multiprecision y16 = 4964001329143328906; EXPECT_EQ(y16 & 0, 0); Multiprecision y17 = -2083543087607023197; EXPECT_EQ(y17 & 0, 0);
+    Multiprecision y18 = 4767057428498046618; EXPECT_EQ(y18 & 0, 0); Multiprecision y19 = 7093268892832568583; EXPECT_EQ(y19 & 0, 0);
+    Multiprecision y20 = 4932144590764335822; EXPECT_EQ(y20 & 0, 0); Multiprecision y21 = 2129523306274277923; EXPECT_EQ(y21 & 0, 0);
+    Multiprecision y22 = 8744895838014776233; EXPECT_EQ(y22 & 0, 0); Multiprecision y23 = 6357409700796211810; EXPECT_EQ(y23 & 0, 0);
+    Multiprecision y24 = -1568025427859683472; EXPECT_EQ(y24 & 0, 0); Multiprecision y25 = 1955290413378850634; EXPECT_EQ(y25 & 0, 0);
+    Multiprecision y26 = -3467502238642711691; EXPECT_EQ(y26 & 0, 0); Multiprecision y27 = -3814588671259119772; EXPECT_EQ(y27 & 0, 0);
+    Multiprecision y28 = 4824738721222873185; EXPECT_EQ(y28 & 0, 0); Multiprecision y29 = -1835318120755538411; EXPECT_EQ(y29 & 0, 0);
+    Multiprecision y30 = 2147927829914714909; EXPECT_EQ(y30 & 0, 0); Multiprecision y31 = 3200786312241374990; EXPECT_EQ(y31 & 0, 0);
+    Multiprecision y32 = -483873791020330186; EXPECT_EQ(y32 & 0, 0); Multiprecision y33 = -7999797217494852664; EXPECT_EQ(y33 & 0, 0);
+    Multiprecision y34 = 5436292966102924275; EXPECT_EQ(y34 & 0, 0); Multiprecision y35 = 607615924805583424; EXPECT_EQ(y35 & 0, 0);
+    Multiprecision y36 = 2856731699000776584; EXPECT_EQ(y36 & 0, 0); Multiprecision y37 = -2976940612831152377; EXPECT_EQ(y37 & 0, 0);
+    Multiprecision y38 = -4552915678136467928; EXPECT_EQ(y38 & 0, 0); Multiprecision y39 = -5371039465969672271; EXPECT_EQ(y39 & 0, 0);
+    Multiprecision y40 = 1530606965224422562; EXPECT_EQ(y40 & 0, 0); Multiprecision y41 = -995241498352202847; EXPECT_EQ(y41 & 0, 0);
+    Multiprecision y42 = -1895238691991552268; EXPECT_EQ(y42 & 0, 0); Multiprecision y43 = -2386612473149815406; EXPECT_EQ(y43 & 0, 0);
+    Multiprecision y44 = -7381958681118134228; EXPECT_EQ(y44 & 0, 0); Multiprecision y45 = 4752526470796438865; EXPECT_EQ(y45 & 0, 0);
+    Multiprecision y46 = 3193989889132937698; EXPECT_EQ(y46 & 0, 0); Multiprecision y47 = 8118840548867685223; EXPECT_EQ(y47 & 0, 0);
+    Multiprecision y48 = -1634236269771840043; EXPECT_EQ(y48 & 0, 0); Multiprecision y49 = 5152688280230008107; EXPECT_EQ(y49 & 0, 0);
+    Multiprecision y50 = 4740142746211585342; EXPECT_EQ(y50 & 0, 0); Multiprecision y51 = 3445462967643173198; EXPECT_EQ(y51 & 0, 0);
+    Multiprecision y52 = 7794992459357947569; EXPECT_EQ(y52 & 0, 0); Multiprecision y53 = 2683466666324270632; EXPECT_EQ(y53 & 0, 0);
+    Multiprecision y54 = 531129792006888313; EXPECT_EQ(y54 & 0, 0); Multiprecision y55 = -1866077217373908775; EXPECT_EQ(y55 & 0, 0);
+    Multiprecision y56 = 6039725184101265805; EXPECT_EQ(y56 & 0, 0); Multiprecision y57 = 2310906701521457706; EXPECT_EQ(y57 & 0, 0);
+    Multiprecision y58 = 5729261014028876522; EXPECT_EQ(y58 & 0, 0); Multiprecision y59 = -7400848010369953160; EXPECT_EQ(y59 & 0, 0);
 }
 
 TEST(Bitwise, XOR) {
@@ -579,6 +641,68 @@ TEST(Bitwise, XOR) {
     r36 ^= r37; EXPECT_EQ(r36, 3261017439913281802);
     Multiprecision<64> r38 = 934443020163735547ULL, r39 = 1299518146827248963ULL;
     r38 ^= r39; EXPECT_EQ(r38, 2233537094250937016);
+
+    Multiprecision y0 = -6652583106797519413; EXPECT_EQ(y0 ^ 0, -6652583106797519413); Multiprecision y1 = 7735878406530979626; EXPECT_EQ(y1 ^ 0, 7735878406530979626);
+    Multiprecision y2 = 2162627523902914222; EXPECT_EQ(y2 ^ 0, 2162627523902914222); Multiprecision y3 = 1171815049526031649; EXPECT_EQ(y3 ^ 0, 1171815049526031649);
+    Multiprecision y4 = 8557217326701597875; EXPECT_EQ(y4 ^ 0, 8557217326701597875); Multiprecision y5 = 5888932561581891950; EXPECT_EQ(y5 ^ 0, 5888932561581891950);
+    Multiprecision y6 = 5043879029109165922; EXPECT_EQ(y6 ^ 0, 5043879029109165922); Multiprecision y7 = -1454113503148561589; EXPECT_EQ(y7 ^ 0, -1454113503148561589);
+    Multiprecision y8 = -1459088315943265714; EXPECT_EQ(y8 ^ 0, -1459088315943265714); Multiprecision y9 = 1762258331777406157; EXPECT_EQ(y9 ^ 0, 1762258331777406157);
+    Multiprecision y10 = -770974676523450011; EXPECT_EQ(y10 ^ 0, -770974676523450011); Multiprecision y11 = -4999307849436956084; EXPECT_EQ(y11 ^ 0, -4999307849436956084);
+    Multiprecision y12 = 4354598598581085920; EXPECT_EQ(y12 ^ 0, 4354598598581085920); Multiprecision y13 = 148678106723966883; EXPECT_EQ(y13 ^ 0, 148678106723966883);
+    Multiprecision y14 = -3422048039334349806; EXPECT_EQ(y14 ^ 0, -3422048039334349806); Multiprecision y15 = -3846906216831977821; EXPECT_EQ(y15 ^ 0, -3846906216831977821);
+    Multiprecision y16 = 1187216367367166461; EXPECT_EQ(y16 ^ 0, 1187216367367166461); Multiprecision y17 = 5696250726926076608; EXPECT_EQ(y17 ^ 0, 5696250726926076608);
+    Multiprecision y18 = 5163734250655534484; EXPECT_EQ(y18 ^ 0, 5163734250655534484); Multiprecision y19 = -3439774873613818458; EXPECT_EQ(y19 ^ 0, -3439774873613818458);
+    Multiprecision y20 = -3004398981146302089; EXPECT_EQ(y20 ^ 0, -3004398981146302089); Multiprecision y21 = -2849073514542617295; EXPECT_EQ(y21 ^ 0, -2849073514542617295);
+    Multiprecision y22 = 4351504996019293703; EXPECT_EQ(y22 ^ 0, 4351504996019293703); Multiprecision y23 = 8648251167683573561; EXPECT_EQ(y23 ^ 0, 8648251167683573561);
+    Multiprecision y24 = -5738482727104124346; EXPECT_EQ(y24 ^ 0, -5738482727104124346); Multiprecision y25 = -3907626487262575028; EXPECT_EQ(y25 ^ 0, -3907626487262575028);
+    Multiprecision y26 = 2705074888495144170; EXPECT_EQ(y26 ^ 0, 2705074888495144170); Multiprecision y27 = 4499344126070650797; EXPECT_EQ(y27 ^ 0, 4499344126070650797);
+    Multiprecision y28 = 3165840682768100164; EXPECT_EQ(y28 ^ 0, 3165840682768100164); Multiprecision y29 = -591438519799156109; EXPECT_EQ(y29 ^ 0, -591438519799156109);
+    Multiprecision y30 = 1539497900613426651; EXPECT_EQ(y30 ^ 0, 1539497900613426651); Multiprecision y31 = -3815268260161607160; EXPECT_EQ(y31 ^ 0, -3815268260161607160);
+    Multiprecision y32 = 7440782379717764332; EXPECT_EQ(y32 ^ 0, 7440782379717764332); Multiprecision y33 = -7556059161534389080; EXPECT_EQ(y33 ^ 0, -7556059161534389080);
+    Multiprecision y34 = -5614644988445039641; EXPECT_EQ(y34 ^ 0, -5614644988445039641); Multiprecision y35 = 3954451072551111104; EXPECT_EQ(y35 ^ 0, 3954451072551111104);
+    Multiprecision y36 = -1242416396248218622; EXPECT_EQ(y36 ^ 0, -1242416396248218622); Multiprecision y37 = 5680201312284594976; EXPECT_EQ(y37 ^ 0, 5680201312284594976);
+    Multiprecision y38 = -5454609604686326633; EXPECT_EQ(y38 ^ 0, -5454609604686326633); Multiprecision y39 = -4622311989677889067; EXPECT_EQ(y39 ^ 0, -4622311989677889067);
+    Multiprecision y40 = -2474115385712135834; EXPECT_EQ(y40 ^ 0, -2474115385712135834); Multiprecision y41 = -8506743866264905679; EXPECT_EQ(y41 ^ 0, -8506743866264905679);
+    Multiprecision y42 = -7866936034851706220; EXPECT_EQ(y42 ^ 0, -7866936034851706220); Multiprecision y43 = -8806792467525009614; EXPECT_EQ(y43 ^ 0, -8806792467525009614);
+    Multiprecision y44 = 7503015719520133947; EXPECT_EQ(y44 ^ 0, 7503015719520133947); Multiprecision y45 = 6038827430243272660; EXPECT_EQ(y45 ^ 0, 6038827430243272660);
+    Multiprecision y46 = -1030896399084174952; EXPECT_EQ(y46 ^ 0, -1030896399084174952); Multiprecision y47 = 5815047418117056630; EXPECT_EQ(y47 ^ 0, 5815047418117056630);
+    Multiprecision y48 = -5829737776573732504; EXPECT_EQ(y48 ^ 0, -5829737776573732504); Multiprecision y49 = -3908082412208505143; EXPECT_EQ(y49 ^ 0, -3908082412208505143);
+    Multiprecision y50 = 8241705532620992109; EXPECT_EQ(y50 ^ 0, 8241705532620992109); Multiprecision y51 = 1789725445496298122; EXPECT_EQ(y51 ^ 0, 1789725445496298122);
+    Multiprecision y52 = 3547088116508155647; EXPECT_EQ(y52 ^ 0, 3547088116508155647); Multiprecision y53 = -845481703297730061; EXPECT_EQ(y53 ^ 0, -845481703297730061);
+    Multiprecision y54 = 2934222797803673249; EXPECT_EQ(y54 ^ 0, 2934222797803673249); Multiprecision y55 = -2543088764666443823; EXPECT_EQ(y55 ^ 0, -2543088764666443823);
+    Multiprecision y56 = 2217818106922620497; EXPECT_EQ(y56 ^ 0, 2217818106922620497); Multiprecision y57 = -4137323814594963163; EXPECT_EQ(y57 ^ 0, -4137323814594963163);
+    Multiprecision y58 = 4814566605532490742; EXPECT_EQ(y58 ^ 0, 4814566605532490742); Multiprecision y59 = -6428660675943912762; EXPECT_EQ(y59 ^ 0, -6428660675943912762);
+
+    Multiprecision e0 = -872399371349274581; EXPECT_EQ(e0 ^ e0, 0); Multiprecision e1 = 4655876137305428030; EXPECT_EQ(e1 ^ e1, 0);
+    Multiprecision e2 = 4225124115658427348; EXPECT_EQ(e2 ^ e2, 0); Multiprecision e3 = 7088320902054361636; EXPECT_EQ(e3 ^ e3, 0);
+    Multiprecision e4 = -3418738210646662755; EXPECT_EQ(e4 ^ e4, 0); Multiprecision e5 = 2970064323217158776; EXPECT_EQ(e5 ^ e5, 0);
+    Multiprecision e6 = -6554273501984264009; EXPECT_EQ(e6 ^ e6, 0); Multiprecision e7 = 3560049859667286910; EXPECT_EQ(e7 ^ e7, 0);
+    Multiprecision e8 = 2796596525801380326; EXPECT_EQ(e8 ^ e8, 0); Multiprecision e9 = -3680962316551344967; EXPECT_EQ(e9 ^ e9, 0);
+    Multiprecision e10 = -2275148996157343394; EXPECT_EQ(e10 ^ e10, 0); Multiprecision e11 = 1510963602371676019; EXPECT_EQ(e11 ^ e11, 0);
+    Multiprecision e12 = 2615335576808209499; EXPECT_EQ(e12 ^ e12, 0); Multiprecision e13 = -5483836872589866918; EXPECT_EQ(e13 ^ e13, 0);
+    Multiprecision e14 = 7478822047765580133; EXPECT_EQ(e14 ^ e14, 0); Multiprecision e15 = -2123741133112998366; EXPECT_EQ(e15 ^ e15, 0);
+    Multiprecision e16 = 2660392548653021630; EXPECT_EQ(e16 ^ e16, 0); Multiprecision e17 = -8445326165875817619; EXPECT_EQ(e17 ^ e17, 0);
+    Multiprecision e18 = 4876777829330614480; EXPECT_EQ(e18 ^ e18, 0); Multiprecision e19 = 8798348075196592505; EXPECT_EQ(e19 ^ e19, 0);
+    Multiprecision e20 = 3759335478943361691; EXPECT_EQ(e20 ^ e20, 0); Multiprecision e21 = 7476161062704668043; EXPECT_EQ(e21 ^ e21, 0);
+    Multiprecision e22 = 2878822222492835562; EXPECT_EQ(e22 ^ e22, 0); Multiprecision e23 = -2096225550442118875; EXPECT_EQ(e23 ^ e23, 0);
+    Multiprecision e24 = 2389137150982677634; EXPECT_EQ(e24 ^ e24, 0); Multiprecision e25 = 977195684750857383; EXPECT_EQ(e25 ^ e25, 0);
+    Multiprecision e26 = -181765273376632167; EXPECT_EQ(e26 ^ e26, 0); Multiprecision e27 = -6774299673585191159; EXPECT_EQ(e27 ^ e27, 0);
+    Multiprecision e28 = -4359446246755790347; EXPECT_EQ(e28 ^ e28, 0); Multiprecision e29 = -6889367208525652850; EXPECT_EQ(e29 ^ e29, 0);
+    Multiprecision e30 = 2532841348560638083; EXPECT_EQ(e30 ^ e30, 0); Multiprecision e31 = -6551650670623996088; EXPECT_EQ(e31 ^ e31, 0);
+    Multiprecision e32 = -8074970477546236102; EXPECT_EQ(e32 ^ e32, 0); Multiprecision e33 = 6621774932800906521; EXPECT_EQ(e33 ^ e33, 0);
+    Multiprecision e34 = -203051090539507323; EXPECT_EQ(e34 ^ e34, 0); Multiprecision e35 = -8523904323010071395; EXPECT_EQ(e35 ^ e35, 0);
+    Multiprecision e36 = -5588016298856232703; EXPECT_EQ(e36 ^ e36, 0); Multiprecision e37 = -3072159085675554861; EXPECT_EQ(e37 ^ e37, 0);
+    Multiprecision e38 = 4538407123913009898; EXPECT_EQ(e38 ^ e38, 0); Multiprecision e39 = -8678267948539782427; EXPECT_EQ(e39 ^ e39, 0);
+    Multiprecision e40 = 5580103516555131807; EXPECT_EQ(e40 ^ e40, 0); Multiprecision e41 = -4252781619698947210; EXPECT_EQ(e41 ^ e41, 0);
+    Multiprecision e42 = -6872747642310508664; EXPECT_EQ(e42 ^ e42, 0); Multiprecision e43 = -7143038148456854072; EXPECT_EQ(e43 ^ e43, 0);
+    Multiprecision e44 = 7718402901465646931; EXPECT_EQ(e44 ^ e44, 0); Multiprecision e45 = -2283146554465274577; EXPECT_EQ(e45 ^ e45, 0);
+    Multiprecision e46 = 8271372903316036199; EXPECT_EQ(e46 ^ e46, 0); Multiprecision e47 = 1349821174167213479; EXPECT_EQ(e47 ^ e47, 0);
+    Multiprecision e48 = 5657399588981528159; EXPECT_EQ(e48 ^ e48, 0); Multiprecision e49 = -2336213843584333446; EXPECT_EQ(e49 ^ e49, 0);
+    Multiprecision e50 = 7796780472781494262; EXPECT_EQ(e50 ^ e50, 0); Multiprecision e51 = 712989842011531055; EXPECT_EQ(e51 ^ e51, 0);
+    Multiprecision e52 = 3333140542037539605; EXPECT_EQ(e52 ^ e52, 0); Multiprecision e53 = 8775266287560378042; EXPECT_EQ(e53 ^ e53, 0);
+    Multiprecision e54 = -2531547591749992014; EXPECT_EQ(e54 ^ e54, 0); Multiprecision e55 = -4358331220058001262; EXPECT_EQ(e55 ^ e55, 0);
+    Multiprecision e56 = 627142671780653697; EXPECT_EQ(e56 ^ e56, 0); Multiprecision e57 = -478975383411509354; EXPECT_EQ(e57 ^ e57, 0);
+    Multiprecision e58 = 779413273234111004; EXPECT_EQ(e58 ^ e58, 0); Multiprecision e59 = 2987880071363343624; EXPECT_EQ(e59 ^ e59, 0);
 }
 
 TEST(Bitwise, NOT) {
@@ -782,4 +906,342 @@ TEST(Bitwise, NOT) {
     EXPECT_EQ(~m98, 17582911168485756834ULL);
     Multiprecision<64> m99 = 6699082571331459220ULL;
     EXPECT_EQ(~m99, 11747661502378092395ULL);
+}
+
+TEST(Bitwise, GetSetBit) {
+    Multiprecision m0 = "72705387953193747615171521307121358171.";
+    m0.setBit(126, true); EXPECT_EQ(m0, "157775979683428363481015173165063411035.");
+    Multiprecision m1 = "245785293645359766049968031280770229918.";
+    m1.setBit(73, false); EXPECT_EQ(m1, "245785293645359766049968031280770229918.");
+    Multiprecision m2 = "40858198912689051933487804650601349382.";
+    m2.setBit(50, true); EXPECT_EQ(m2, "40858198912689051933487804650601349382.");
+    Multiprecision m3 = "54847862086374059183251323410557990283.";
+    m3.setBit(121, false); EXPECT_EQ(m3, "54847862086374059183251323410557990283.");
+    Multiprecision m4 = "110865429160911119237136997258727998569.";
+    m4.setBit(31, true); EXPECT_EQ(m4, "110865429160911119237136997258727998569.");
+    Multiprecision m5 = "187782640071050878679583809146823278321.";
+    m5.setBit(128, true); EXPECT_EQ(m5, "528065006991989342142958416578591489777.");
+    Multiprecision m6 = "295314379921377398364225673808278353050.";
+    m6.setBit(15, true); EXPECT_EQ(m6, "295314379921377398364225673808278385818.");
+    Multiprecision m7 = "3178747094108352161326739593823524879.";
+    m7.setBit(71, false); EXPECT_EQ(m7, "3178747094108352161326739593823524879.");
+    Multiprecision m8 = "86494165169548119678449182549238377356.";
+    m8.setBit(76, true); EXPECT_EQ(m8, "86494165169548119678449182549238377356.");
+    Multiprecision m9 = "32567167322927313851856437531751981177.";
+    m9.setBit(40, true); EXPECT_EQ(m9, "32567167322927313851856437531751981177.");
+    Multiprecision m10 = "172530118786257976509377267953319712204.";
+    m10.setBit(20, true); EXPECT_EQ(m10, "172530118786257976509377267953319712204.");
+    Multiprecision m11 = "172559365867210208688264944029949150686.";
+    m11.setBit(99, true); EXPECT_EQ(m11, "172559365867210208688264944029949150686.");
+    Multiprecision m12 = "78529106901055941434084997135871639427.";
+    m12.setBit(10, true); EXPECT_EQ(m12, "78529106901055941434084997135871639427.");
+    Multiprecision m13 = "207303494278178530702609902345571888268.";
+    m13.setBit(69, true); EXPECT_EQ(m13, "207303494278178530702609902345571888268.");
+    Multiprecision m14 = "75647073125004035230985916463405072523.";
+    m14.setBit(3, false); EXPECT_EQ(m14, "75647073125004035230985916463405072515.");
+    Multiprecision m15 = "222723315237755082168376048193872639645.";
+    m15.setBit(107, true); EXPECT_EQ(m15, "222723477497031911381739439771882927773.");
+    Multiprecision m16 = "193675621579885645481372969626118961567.";
+    m16.setBit(33, false); EXPECT_EQ(m16, "193675621579885645481372969617529026975.");
+    Multiprecision m17 = "184830840876535640520166369784004708864.";
+    m17.setBit(94, true); EXPECT_EQ(m17, "184830840896342681148732454182390696448.");
+    Multiprecision m18 = "184781425874546653782780922198149710463.";
+    m18.setBit(123, true); EXPECT_EQ(m18, "184781425874546653782780922198149710463.");
+    Multiprecision m19 = "143111532682479361522938570020545208955.";
+    m19.setBit(47, false); EXPECT_EQ(m19, "143111532682479361522938429283056853627.");
+    Multiprecision m20 = "271575289760478049691481842232695651446.";
+    m20.setBit(11, false); EXPECT_EQ(m20, "271575289760478049691481842232695649398.");
+    Multiprecision m21 = "187912626417229430413829117802893310299.";
+    m21.setBit(68, false); EXPECT_EQ(m21, "187912626417229430413829117802893310299.");
+    Multiprecision m22 = "158932010648066253535888104656448665002.";
+    m22.setBit(79, true); EXPECT_EQ(m22, "158932010648066253535888104656448665002.");
+    Multiprecision m23 = "109487819811077581867635815837691548334.";
+    m23.setBit(113, true); EXPECT_EQ(m23, "109487819811077581867635815837691548334.");
+    Multiprecision m24 = "47379343172205350263905530302298557228.";
+    m24.setBit(61, false); EXPECT_EQ(m24, "47379343172205350263905530302298557228.");
+    Multiprecision m25 = "158911198835109948520770291433578090947.";
+    m25.setBit(50, false); EXPECT_EQ(m25, "158911198835109948520770291433578090947.");
+    Multiprecision m26 = "248326728370153648748027863303163864728.";
+    m26.setBit(91, false); EXPECT_EQ(m26, "248326728367677768669457102753365616280.");
+    Multiprecision m27 = "176392199758157475536173991226043128119.";
+    m27.setBit(42, true); EXPECT_EQ(m27, "176392199758157475536173991226043128119.");
+    Multiprecision m28 = "238588105982679173784425043462049184726.";
+    m28.setBit(105, false); EXPECT_EQ(m28, "238588105982679173784425043462049184726.");
+    Multiprecision m29 = "150346354478535467451721603451021909402.";
+    m29.setBit(107, true); EXPECT_EQ(m29, "150346516737812296665084995029032197530.");
+    Multiprecision m30 = "273819485712316995631595319491380561223.";
+    m30.setBit(114, false); EXPECT_EQ(m30, "273798716524882856321081197506063680839.");
+    Multiprecision m31 = "9465809177493504473582186962123883962.";
+    m31.setBit(52, false); EXPECT_EQ(m31, "9465809177493504473582186962123883962.");
+    Multiprecision m32 = "328749017563933875762256624294091022769.";
+    m32.setBit(82, false); EXPECT_EQ(m32, "328749017563929040058978165777392198065.");
+    Multiprecision m33 = "187349705948370703926994252284122213259.";
+    m33.setBit(21, false); EXPECT_EQ(m33, "187349705948370703926994252284122213259.");
+    Multiprecision m34 = "95199700526301209891562846305547693713.";
+    m34.setBit(46, false); EXPECT_EQ(m34, "95199700526301209891562846305547693713.");
+    Multiprecision m35 = "103655044468308507172810437786291934566.";
+    m35.setBit(51, true); EXPECT_EQ(m35, "103655044468308507172810437786291934566.");
+    Multiprecision m36 = "62548752160102009726032985107282388037.";
+    m36.setBit(71, true); EXPECT_EQ(m36, "62548752160102009726032985107282388037.");
+    Multiprecision m37 = "114713660827724670972157050548957340052.";
+    m37.setBit(82, true); EXPECT_EQ(m37, "114713660827724670972157050548957340052.");
+    Multiprecision m38 = "298233052050341589489614113949082900217.";
+    m38.setBit(77, false); EXPECT_EQ(m38, "298233052050341589489614113949082900217.");
+    Multiprecision m39 = "244677446963714695792063603125629139705.";
+    m39.setBit(52, true); EXPECT_EQ(m39, "244677446963714695792063603125629139705.");
+    Multiprecision u0 = "183266889657794562429184270028014133994.";
+    EXPECT_EQ(u0.getBit(0), false);
+    EXPECT_EQ(u0.getBit(1), true); EXPECT_EQ(u0.getBit(2), false); EXPECT_EQ(u0.getBit(3), true); EXPECT_EQ(u0.getBit(4), false); EXPECT_EQ(u0.getBit(5), true); EXPECT_EQ(u0.getBit(6), true); EXPECT_EQ(u0.getBit(7), true); EXPECT_EQ(u0.getBit(8), false); EXPECT_EQ(u0.getBit(9), true);
+    EXPECT_EQ(u0.getBit(10), false); EXPECT_EQ(u0.getBit(11), false); EXPECT_EQ(u0.getBit(12), false); EXPECT_EQ(u0.getBit(13), true); EXPECT_EQ(u0.getBit(14), false); EXPECT_EQ(u0.getBit(15), true); EXPECT_EQ(u0.getBit(16), false); EXPECT_EQ(u0.getBit(17), false); EXPECT_EQ(u0.getBit(18), true);
+    EXPECT_EQ(u0.getBit(19), true); EXPECT_EQ(u0.getBit(20), true); EXPECT_EQ(u0.getBit(21), false); EXPECT_EQ(u0.getBit(22), true); EXPECT_EQ(u0.getBit(23), false); EXPECT_EQ(u0.getBit(24), false); EXPECT_EQ(u0.getBit(25), true); EXPECT_EQ(u0.getBit(26), false); EXPECT_EQ(u0.getBit(27), true);
+    EXPECT_EQ(u0.getBit(28), true); EXPECT_EQ(u0.getBit(29), true); EXPECT_EQ(u0.getBit(30), true); EXPECT_EQ(u0.getBit(31), false); EXPECT_EQ(u0.getBit(32), false); EXPECT_EQ(u0.getBit(33), false); EXPECT_EQ(u0.getBit(34), false); EXPECT_EQ(u0.getBit(35), false); EXPECT_EQ(u0.getBit(36), true);
+    EXPECT_EQ(u0.getBit(37), true); EXPECT_EQ(u0.getBit(38), false); EXPECT_EQ(u0.getBit(39), true); EXPECT_EQ(u0.getBit(40), false); EXPECT_EQ(u0.getBit(41), false); EXPECT_EQ(u0.getBit(42), true); EXPECT_EQ(u0.getBit(43), false); EXPECT_EQ(u0.getBit(44), false); EXPECT_EQ(u0.getBit(45), false);
+    EXPECT_EQ(u0.getBit(46), false); EXPECT_EQ(u0.getBit(47), true); EXPECT_EQ(u0.getBit(48), false); EXPECT_EQ(u0.getBit(49), true); EXPECT_EQ(u0.getBit(50), true); EXPECT_EQ(u0.getBit(51), false); EXPECT_EQ(u0.getBit(52), false); EXPECT_EQ(u0.getBit(53), true); EXPECT_EQ(u0.getBit(54), true);
+    EXPECT_EQ(u0.getBit(55), false); EXPECT_EQ(u0.getBit(56), false); EXPECT_EQ(u0.getBit(57), true); EXPECT_EQ(u0.getBit(58), true); EXPECT_EQ(u0.getBit(59), true); EXPECT_EQ(u0.getBit(60), false); EXPECT_EQ(u0.getBit(61), false); EXPECT_EQ(u0.getBit(62), false); EXPECT_EQ(u0.getBit(63), true);
+    EXPECT_EQ(u0.getBit(64), false); EXPECT_EQ(u0.getBit(65), true); EXPECT_EQ(u0.getBit(66), false); EXPECT_EQ(u0.getBit(67), true); EXPECT_EQ(u0.getBit(68), true); EXPECT_EQ(u0.getBit(69), true); EXPECT_EQ(u0.getBit(70), true); EXPECT_EQ(u0.getBit(71), false); EXPECT_EQ(u0.getBit(72), true);
+    EXPECT_EQ(u0.getBit(73), true); EXPECT_EQ(u0.getBit(74), false); EXPECT_EQ(u0.getBit(75), false); EXPECT_EQ(u0.getBit(76), false); EXPECT_EQ(u0.getBit(77), true); EXPECT_EQ(u0.getBit(78), false); EXPECT_EQ(u0.getBit(79), true); EXPECT_EQ(u0.getBit(80), false); EXPECT_EQ(u0.getBit(81), true);
+    EXPECT_EQ(u0.getBit(82), true); EXPECT_EQ(u0.getBit(83), true); EXPECT_EQ(u0.getBit(84), false); EXPECT_EQ(u0.getBit(85), false); EXPECT_EQ(u0.getBit(86), true); EXPECT_EQ(u0.getBit(87), false); EXPECT_EQ(u0.getBit(88), true); EXPECT_EQ(u0.getBit(89), true); EXPECT_EQ(u0.getBit(90), true);
+    EXPECT_EQ(u0.getBit(91), true); EXPECT_EQ(u0.getBit(92), false); EXPECT_EQ(u0.getBit(93), false); EXPECT_EQ(u0.getBit(94), false); EXPECT_EQ(u0.getBit(95), true); EXPECT_EQ(u0.getBit(96), true); EXPECT_EQ(u0.getBit(97), true); EXPECT_EQ(u0.getBit(98), true); EXPECT_EQ(u0.getBit(99), false);
+    EXPECT_EQ(u0.getBit(100), false); EXPECT_EQ(u0.getBit(101), false); EXPECT_EQ(u0.getBit(102), true); EXPECT_EQ(u0.getBit(103), false); EXPECT_EQ(u0.getBit(104), true); EXPECT_EQ(u0.getBit(105), true); EXPECT_EQ(u0.getBit(106), false); EXPECT_EQ(u0.getBit(107), true); EXPECT_EQ(u0.getBit(108), false);
+    EXPECT_EQ(u0.getBit(109), true); EXPECT_EQ(u0.getBit(110), true); EXPECT_EQ(u0.getBit(111), true); EXPECT_EQ(u0.getBit(112), true); EXPECT_EQ(u0.getBit(113), true); EXPECT_EQ(u0.getBit(114), true); EXPECT_EQ(u0.getBit(115), true); EXPECT_EQ(u0.getBit(116), true); EXPECT_EQ(u0.getBit(117), false);
+    EXPECT_EQ(u0.getBit(118), true); EXPECT_EQ(u0.getBit(119), true); EXPECT_EQ(u0.getBit(120), true); EXPECT_EQ(u0.getBit(121), false); EXPECT_EQ(u0.getBit(122), false); EXPECT_EQ(u0.getBit(123), true); EXPECT_EQ(u0.getBit(124), false); EXPECT_EQ(u0.getBit(125), false); EXPECT_EQ(u0.getBit(126), false);
+    EXPECT_EQ(u0.getBit(127), true);
+
+    Multiprecision u1 = "28532736677951985108511975536651973171.";
+    EXPECT_EQ(u1.getBit(0), true);
+    EXPECT_EQ(u1.getBit(1), true); EXPECT_EQ(u1.getBit(2), false); EXPECT_EQ(u1.getBit(3), false); EXPECT_EQ(u1.getBit(4), true); EXPECT_EQ(u1.getBit(5), true); EXPECT_EQ(u1.getBit(6), false); EXPECT_EQ(u1.getBit(7), false); EXPECT_EQ(u1.getBit(8), false); EXPECT_EQ(u1.getBit(9), true);
+    EXPECT_EQ(u1.getBit(10), false); EXPECT_EQ(u1.getBit(11), false); EXPECT_EQ(u1.getBit(12), true); EXPECT_EQ(u1.getBit(13), true); EXPECT_EQ(u1.getBit(14), false); EXPECT_EQ(u1.getBit(15), true); EXPECT_EQ(u1.getBit(16), false); EXPECT_EQ(u1.getBit(17), false); EXPECT_EQ(u1.getBit(18), true);
+    EXPECT_EQ(u1.getBit(19), false); EXPECT_EQ(u1.getBit(20), false); EXPECT_EQ(u1.getBit(21), true); EXPECT_EQ(u1.getBit(22), false); EXPECT_EQ(u1.getBit(23), true); EXPECT_EQ(u1.getBit(24), false); EXPECT_EQ(u1.getBit(25), true); EXPECT_EQ(u1.getBit(26), true); EXPECT_EQ(u1.getBit(27), true);
+    EXPECT_EQ(u1.getBit(28), false); EXPECT_EQ(u1.getBit(29), false); EXPECT_EQ(u1.getBit(30), false); EXPECT_EQ(u1.getBit(31), true); EXPECT_EQ(u1.getBit(32), false); EXPECT_EQ(u1.getBit(33), false); EXPECT_EQ(u1.getBit(34), true); EXPECT_EQ(u1.getBit(35), true); EXPECT_EQ(u1.getBit(36), true);
+    EXPECT_EQ(u1.getBit(37), true); EXPECT_EQ(u1.getBit(38), true); EXPECT_EQ(u1.getBit(39), true); EXPECT_EQ(u1.getBit(40), false); EXPECT_EQ(u1.getBit(41), false); EXPECT_EQ(u1.getBit(42), false); EXPECT_EQ(u1.getBit(43), true); EXPECT_EQ(u1.getBit(44), true); EXPECT_EQ(u1.getBit(45), false);
+    EXPECT_EQ(u1.getBit(46), false); EXPECT_EQ(u1.getBit(47), true); EXPECT_EQ(u1.getBit(48), false); EXPECT_EQ(u1.getBit(49), true); EXPECT_EQ(u1.getBit(50), true); EXPECT_EQ(u1.getBit(51), false); EXPECT_EQ(u1.getBit(52), false); EXPECT_EQ(u1.getBit(53), false); EXPECT_EQ(u1.getBit(54), true);
+    EXPECT_EQ(u1.getBit(55), true); EXPECT_EQ(u1.getBit(56), false); EXPECT_EQ(u1.getBit(57), false); EXPECT_EQ(u1.getBit(58), true); EXPECT_EQ(u1.getBit(59), false); EXPECT_EQ(u1.getBit(60), false); EXPECT_EQ(u1.getBit(61), true); EXPECT_EQ(u1.getBit(62), true); EXPECT_EQ(u1.getBit(63), true);
+    EXPECT_EQ(u1.getBit(64), false); EXPECT_EQ(u1.getBit(65), true); EXPECT_EQ(u1.getBit(66), true); EXPECT_EQ(u1.getBit(67), true); EXPECT_EQ(u1.getBit(68), true); EXPECT_EQ(u1.getBit(69), false); EXPECT_EQ(u1.getBit(70), false); EXPECT_EQ(u1.getBit(71), false); EXPECT_EQ(u1.getBit(72), false);
+    EXPECT_EQ(u1.getBit(73), false); EXPECT_EQ(u1.getBit(74), false); EXPECT_EQ(u1.getBit(75), false); EXPECT_EQ(u1.getBit(76), true); EXPECT_EQ(u1.getBit(77), false); EXPECT_EQ(u1.getBit(78), false); EXPECT_EQ(u1.getBit(79), true); EXPECT_EQ(u1.getBit(80), false); EXPECT_EQ(u1.getBit(81), true);
+    EXPECT_EQ(u1.getBit(82), false); EXPECT_EQ(u1.getBit(83), true); EXPECT_EQ(u1.getBit(84), false); EXPECT_EQ(u1.getBit(85), false); EXPECT_EQ(u1.getBit(86), true); EXPECT_EQ(u1.getBit(87), false); EXPECT_EQ(u1.getBit(88), true); EXPECT_EQ(u1.getBit(89), true); EXPECT_EQ(u1.getBit(90), true);
+    EXPECT_EQ(u1.getBit(91), true); EXPECT_EQ(u1.getBit(92), true); EXPECT_EQ(u1.getBit(93), true); EXPECT_EQ(u1.getBit(94), false); EXPECT_EQ(u1.getBit(95), true); EXPECT_EQ(u1.getBit(96), true); EXPECT_EQ(u1.getBit(97), true); EXPECT_EQ(u1.getBit(98), true); EXPECT_EQ(u1.getBit(99), false);
+    EXPECT_EQ(u1.getBit(100), false); EXPECT_EQ(u1.getBit(101), false); EXPECT_EQ(u1.getBit(102), false); EXPECT_EQ(u1.getBit(103), true); EXPECT_EQ(u1.getBit(104), false); EXPECT_EQ(u1.getBit(105), false); EXPECT_EQ(u1.getBit(106), true); EXPECT_EQ(u1.getBit(107), false); EXPECT_EQ(u1.getBit(108), true);
+    EXPECT_EQ(u1.getBit(109), true); EXPECT_EQ(u1.getBit(110), false); EXPECT_EQ(u1.getBit(111), false); EXPECT_EQ(u1.getBit(112), true); EXPECT_EQ(u1.getBit(113), true); EXPECT_EQ(u1.getBit(114), true); EXPECT_EQ(u1.getBit(115), false); EXPECT_EQ(u1.getBit(116), true); EXPECT_EQ(u1.getBit(117), true);
+    EXPECT_EQ(u1.getBit(118), true); EXPECT_EQ(u1.getBit(119), false); EXPECT_EQ(u1.getBit(120), true); EXPECT_EQ(u1.getBit(121), false); EXPECT_EQ(u1.getBit(122), true); EXPECT_EQ(u1.getBit(123), false); EXPECT_EQ(u1.getBit(124), true);
+
+    Multiprecision u2 = "202963489620510457840756855970746955719.";
+    EXPECT_EQ(u2.getBit(0), true);
+    EXPECT_EQ(u2.getBit(1), true); EXPECT_EQ(u2.getBit(2), true); EXPECT_EQ(u2.getBit(3), false); EXPECT_EQ(u2.getBit(4), false); EXPECT_EQ(u2.getBit(5), false); EXPECT_EQ(u2.getBit(6), true); EXPECT_EQ(u2.getBit(7), true); EXPECT_EQ(u2.getBit(8), true); EXPECT_EQ(u2.getBit(9), true);
+    EXPECT_EQ(u2.getBit(10), true); EXPECT_EQ(u2.getBit(11), false); EXPECT_EQ(u2.getBit(12), true); EXPECT_EQ(u2.getBit(13), true); EXPECT_EQ(u2.getBit(14), true); EXPECT_EQ(u2.getBit(15), false); EXPECT_EQ(u2.getBit(16), true); EXPECT_EQ(u2.getBit(17), false); EXPECT_EQ(u2.getBit(18), false);
+    EXPECT_EQ(u2.getBit(19), false); EXPECT_EQ(u2.getBit(20), false); EXPECT_EQ(u2.getBit(21), false); EXPECT_EQ(u2.getBit(22), true); EXPECT_EQ(u2.getBit(23), false); EXPECT_EQ(u2.getBit(24), false); EXPECT_EQ(u2.getBit(25), false); EXPECT_EQ(u2.getBit(26), true); EXPECT_EQ(u2.getBit(27), true);
+    EXPECT_EQ(u2.getBit(28), true); EXPECT_EQ(u2.getBit(29), false); EXPECT_EQ(u2.getBit(30), true); EXPECT_EQ(u2.getBit(31), false); EXPECT_EQ(u2.getBit(32), true); EXPECT_EQ(u2.getBit(33), false); EXPECT_EQ(u2.getBit(34), false); EXPECT_EQ(u2.getBit(35), false); EXPECT_EQ(u2.getBit(36), true);
+    EXPECT_EQ(u2.getBit(37), false); EXPECT_EQ(u2.getBit(38), true); EXPECT_EQ(u2.getBit(39), true); EXPECT_EQ(u2.getBit(40), false); EXPECT_EQ(u2.getBit(41), true); EXPECT_EQ(u2.getBit(42), false); EXPECT_EQ(u2.getBit(43), true); EXPECT_EQ(u2.getBit(44), true); EXPECT_EQ(u2.getBit(45), false);
+    EXPECT_EQ(u2.getBit(46), true); EXPECT_EQ(u2.getBit(47), true); EXPECT_EQ(u2.getBit(48), true); EXPECT_EQ(u2.getBit(49), false); EXPECT_EQ(u2.getBit(50), false); EXPECT_EQ(u2.getBit(51), false); EXPECT_EQ(u2.getBit(52), true); EXPECT_EQ(u2.getBit(53), true); EXPECT_EQ(u2.getBit(54), false);
+    EXPECT_EQ(u2.getBit(55), false); EXPECT_EQ(u2.getBit(56), false); EXPECT_EQ(u2.getBit(57), true); EXPECT_EQ(u2.getBit(58), false); EXPECT_EQ(u2.getBit(59), true); EXPECT_EQ(u2.getBit(60), true); EXPECT_EQ(u2.getBit(61), false); EXPECT_EQ(u2.getBit(62), false); EXPECT_EQ(u2.getBit(63), true);
+    EXPECT_EQ(u2.getBit(64), false); EXPECT_EQ(u2.getBit(65), true); EXPECT_EQ(u2.getBit(66), true); EXPECT_EQ(u2.getBit(67), true); EXPECT_EQ(u2.getBit(68), true); EXPECT_EQ(u2.getBit(69), true); EXPECT_EQ(u2.getBit(70), false); EXPECT_EQ(u2.getBit(71), false); EXPECT_EQ(u2.getBit(72), false);
+    EXPECT_EQ(u2.getBit(73), true); EXPECT_EQ(u2.getBit(74), false); EXPECT_EQ(u2.getBit(75), true); EXPECT_EQ(u2.getBit(76), false); EXPECT_EQ(u2.getBit(77), true); EXPECT_EQ(u2.getBit(78), true); EXPECT_EQ(u2.getBit(79), true); EXPECT_EQ(u2.getBit(80), true); EXPECT_EQ(u2.getBit(81), false);
+    EXPECT_EQ(u2.getBit(82), false); EXPECT_EQ(u2.getBit(83), false); EXPECT_EQ(u2.getBit(84), true); EXPECT_EQ(u2.getBit(85), true); EXPECT_EQ(u2.getBit(86), false); EXPECT_EQ(u2.getBit(87), true); EXPECT_EQ(u2.getBit(88), true); EXPECT_EQ(u2.getBit(89), false); EXPECT_EQ(u2.getBit(90), false);
+    EXPECT_EQ(u2.getBit(91), false); EXPECT_EQ(u2.getBit(92), false); EXPECT_EQ(u2.getBit(93), true); EXPECT_EQ(u2.getBit(94), true); EXPECT_EQ(u2.getBit(95), false); EXPECT_EQ(u2.getBit(96), false); EXPECT_EQ(u2.getBit(97), true); EXPECT_EQ(u2.getBit(98), false); EXPECT_EQ(u2.getBit(99), false);
+    EXPECT_EQ(u2.getBit(100), false); EXPECT_EQ(u2.getBit(101), true); EXPECT_EQ(u2.getBit(102), false); EXPECT_EQ(u2.getBit(103), true); EXPECT_EQ(u2.getBit(104), false); EXPECT_EQ(u2.getBit(105), false); EXPECT_EQ(u2.getBit(106), false); EXPECT_EQ(u2.getBit(107), true); EXPECT_EQ(u2.getBit(108), true);
+    EXPECT_EQ(u2.getBit(109), false); EXPECT_EQ(u2.getBit(110), true); EXPECT_EQ(u2.getBit(111), false); EXPECT_EQ(u2.getBit(112), true); EXPECT_EQ(u2.getBit(113), false); EXPECT_EQ(u2.getBit(114), false); EXPECT_EQ(u2.getBit(115), false); EXPECT_EQ(u2.getBit(116), true); EXPECT_EQ(u2.getBit(117), true);
+    EXPECT_EQ(u2.getBit(118), false); EXPECT_EQ(u2.getBit(119), true); EXPECT_EQ(u2.getBit(120), false); EXPECT_EQ(u2.getBit(121), false); EXPECT_EQ(u2.getBit(122), false); EXPECT_EQ(u2.getBit(123), true); EXPECT_EQ(u2.getBit(124), true); EXPECT_EQ(u2.getBit(125), false); EXPECT_EQ(u2.getBit(126), false);
+    EXPECT_EQ(u2.getBit(127), true);
+
+    Multiprecision u3 = "99039543241645718481744753772010007488.";
+    EXPECT_EQ(u3.getBit(0), false);
+    EXPECT_EQ(u3.getBit(1), false); EXPECT_EQ(u3.getBit(2), false); EXPECT_EQ(u3.getBit(3), false); EXPECT_EQ(u3.getBit(4), false); EXPECT_EQ(u3.getBit(5), false); EXPECT_EQ(u3.getBit(6), true); EXPECT_EQ(u3.getBit(7), true); EXPECT_EQ(u3.getBit(8), true); EXPECT_EQ(u3.getBit(9), true);
+    EXPECT_EQ(u3.getBit(10), false); EXPECT_EQ(u3.getBit(11), true); EXPECT_EQ(u3.getBit(12), false); EXPECT_EQ(u3.getBit(13), true); EXPECT_EQ(u3.getBit(14), true); EXPECT_EQ(u3.getBit(15), true); EXPECT_EQ(u3.getBit(16), true); EXPECT_EQ(u3.getBit(17), false); EXPECT_EQ(u3.getBit(18), true);
+    EXPECT_EQ(u3.getBit(19), true); EXPECT_EQ(u3.getBit(20), false); EXPECT_EQ(u3.getBit(21), true); EXPECT_EQ(u3.getBit(22), true); EXPECT_EQ(u3.getBit(23), false); EXPECT_EQ(u3.getBit(24), false); EXPECT_EQ(u3.getBit(25), true); EXPECT_EQ(u3.getBit(26), true); EXPECT_EQ(u3.getBit(27), true);
+    EXPECT_EQ(u3.getBit(28), false); EXPECT_EQ(u3.getBit(29), false); EXPECT_EQ(u3.getBit(30), true); EXPECT_EQ(u3.getBit(31), true); EXPECT_EQ(u3.getBit(32), false); EXPECT_EQ(u3.getBit(33), false); EXPECT_EQ(u3.getBit(34), false); EXPECT_EQ(u3.getBit(35), false); EXPECT_EQ(u3.getBit(36), false);
+    EXPECT_EQ(u3.getBit(37), false); EXPECT_EQ(u3.getBit(38), true); EXPECT_EQ(u3.getBit(39), true); EXPECT_EQ(u3.getBit(40), true); EXPECT_EQ(u3.getBit(41), true); EXPECT_EQ(u3.getBit(42), true); EXPECT_EQ(u3.getBit(43), true); EXPECT_EQ(u3.getBit(44), true); EXPECT_EQ(u3.getBit(45), false);
+    EXPECT_EQ(u3.getBit(46), false); EXPECT_EQ(u3.getBit(47), true); EXPECT_EQ(u3.getBit(48), true); EXPECT_EQ(u3.getBit(49), false); EXPECT_EQ(u3.getBit(50), true); EXPECT_EQ(u3.getBit(51), true); EXPECT_EQ(u3.getBit(52), true); EXPECT_EQ(u3.getBit(53), true); EXPECT_EQ(u3.getBit(54), false);
+    EXPECT_EQ(u3.getBit(55), false); EXPECT_EQ(u3.getBit(56), false); EXPECT_EQ(u3.getBit(57), true); EXPECT_EQ(u3.getBit(58), false); EXPECT_EQ(u3.getBit(59), true); EXPECT_EQ(u3.getBit(60), false); EXPECT_EQ(u3.getBit(61), true); EXPECT_EQ(u3.getBit(62), true); EXPECT_EQ(u3.getBit(63), true);
+    EXPECT_EQ(u3.getBit(64), false); EXPECT_EQ(u3.getBit(65), true); EXPECT_EQ(u3.getBit(66), true); EXPECT_EQ(u3.getBit(67), true); EXPECT_EQ(u3.getBit(68), true); EXPECT_EQ(u3.getBit(69), false); EXPECT_EQ(u3.getBit(70), true); EXPECT_EQ(u3.getBit(71), true); EXPECT_EQ(u3.getBit(72), true);
+    EXPECT_EQ(u3.getBit(73), true); EXPECT_EQ(u3.getBit(74), false); EXPECT_EQ(u3.getBit(75), false); EXPECT_EQ(u3.getBit(76), true); EXPECT_EQ(u3.getBit(77), false); EXPECT_EQ(u3.getBit(78), false); EXPECT_EQ(u3.getBit(79), true); EXPECT_EQ(u3.getBit(80), false); EXPECT_EQ(u3.getBit(81), false);
+    EXPECT_EQ(u3.getBit(82), true); EXPECT_EQ(u3.getBit(83), true); EXPECT_EQ(u3.getBit(84), true); EXPECT_EQ(u3.getBit(85), false); EXPECT_EQ(u3.getBit(86), false); EXPECT_EQ(u3.getBit(87), true); EXPECT_EQ(u3.getBit(88), true); EXPECT_EQ(u3.getBit(89), true); EXPECT_EQ(u3.getBit(90), true);
+    EXPECT_EQ(u3.getBit(91), true); EXPECT_EQ(u3.getBit(92), true); EXPECT_EQ(u3.getBit(93), true); EXPECT_EQ(u3.getBit(94), false); EXPECT_EQ(u3.getBit(95), true); EXPECT_EQ(u3.getBit(96), true); EXPECT_EQ(u3.getBit(97), true); EXPECT_EQ(u3.getBit(98), false); EXPECT_EQ(u3.getBit(99), true);
+    EXPECT_EQ(u3.getBit(100), true); EXPECT_EQ(u3.getBit(101), true); EXPECT_EQ(u3.getBit(102), true); EXPECT_EQ(u3.getBit(103), false); EXPECT_EQ(u3.getBit(104), false); EXPECT_EQ(u3.getBit(105), true); EXPECT_EQ(u3.getBit(106), false); EXPECT_EQ(u3.getBit(107), false); EXPECT_EQ(u3.getBit(108), true);
+    EXPECT_EQ(u3.getBit(109), false); EXPECT_EQ(u3.getBit(110), true); EXPECT_EQ(u3.getBit(111), false); EXPECT_EQ(u3.getBit(112), false); EXPECT_EQ(u3.getBit(113), true); EXPECT_EQ(u3.getBit(114), false); EXPECT_EQ(u3.getBit(115), false); EXPECT_EQ(u3.getBit(116), false); EXPECT_EQ(u3.getBit(117), false);
+    EXPECT_EQ(u3.getBit(118), false); EXPECT_EQ(u3.getBit(119), true); EXPECT_EQ(u3.getBit(120), false); EXPECT_EQ(u3.getBit(121), true); EXPECT_EQ(u3.getBit(122), false); EXPECT_EQ(u3.getBit(123), true); EXPECT_EQ(u3.getBit(124), false); EXPECT_EQ(u3.getBit(125), false); EXPECT_EQ(u3.getBit(126), true);
+
+
+    Multiprecision u4 = "185521423754314153400893953240556219688.";
+    EXPECT_EQ(u4.getBit(0), false);
+    EXPECT_EQ(u4.getBit(1), false); EXPECT_EQ(u4.getBit(2), false); EXPECT_EQ(u4.getBit(3), true); EXPECT_EQ(u4.getBit(4), false); EXPECT_EQ(u4.getBit(5), true); EXPECT_EQ(u4.getBit(6), false); EXPECT_EQ(u4.getBit(7), false); EXPECT_EQ(u4.getBit(8), true); EXPECT_EQ(u4.getBit(9), false);
+    EXPECT_EQ(u4.getBit(10), true); EXPECT_EQ(u4.getBit(11), true); EXPECT_EQ(u4.getBit(12), false); EXPECT_EQ(u4.getBit(13), true); EXPECT_EQ(u4.getBit(14), false); EXPECT_EQ(u4.getBit(15), true); EXPECT_EQ(u4.getBit(16), true); EXPECT_EQ(u4.getBit(17), false); EXPECT_EQ(u4.getBit(18), false);
+    EXPECT_EQ(u4.getBit(19), true); EXPECT_EQ(u4.getBit(20), false); EXPECT_EQ(u4.getBit(21), false); EXPECT_EQ(u4.getBit(22), false); EXPECT_EQ(u4.getBit(23), false); EXPECT_EQ(u4.getBit(24), true); EXPECT_EQ(u4.getBit(25), false); EXPECT_EQ(u4.getBit(26), false); EXPECT_EQ(u4.getBit(27), true);
+    EXPECT_EQ(u4.getBit(28), false); EXPECT_EQ(u4.getBit(29), false); EXPECT_EQ(u4.getBit(30), false); EXPECT_EQ(u4.getBit(31), true); EXPECT_EQ(u4.getBit(32), false); EXPECT_EQ(u4.getBit(33), false); EXPECT_EQ(u4.getBit(34), false); EXPECT_EQ(u4.getBit(35), true); EXPECT_EQ(u4.getBit(36), false);
+    EXPECT_EQ(u4.getBit(37), false); EXPECT_EQ(u4.getBit(38), false); EXPECT_EQ(u4.getBit(39), true); EXPECT_EQ(u4.getBit(40), false); EXPECT_EQ(u4.getBit(41), false); EXPECT_EQ(u4.getBit(42), false); EXPECT_EQ(u4.getBit(43), false); EXPECT_EQ(u4.getBit(44), true); EXPECT_EQ(u4.getBit(45), true);
+    EXPECT_EQ(u4.getBit(46), false); EXPECT_EQ(u4.getBit(47), true); EXPECT_EQ(u4.getBit(48), false); EXPECT_EQ(u4.getBit(49), false); EXPECT_EQ(u4.getBit(50), true); EXPECT_EQ(u4.getBit(51), true); EXPECT_EQ(u4.getBit(52), false); EXPECT_EQ(u4.getBit(53), true); EXPECT_EQ(u4.getBit(54), false);
+    EXPECT_EQ(u4.getBit(55), false); EXPECT_EQ(u4.getBit(56), true); EXPECT_EQ(u4.getBit(57), true); EXPECT_EQ(u4.getBit(58), true); EXPECT_EQ(u4.getBit(59), true); EXPECT_EQ(u4.getBit(60), false); EXPECT_EQ(u4.getBit(61), true); EXPECT_EQ(u4.getBit(62), false); EXPECT_EQ(u4.getBit(63), false);
+    EXPECT_EQ(u4.getBit(64), false); EXPECT_EQ(u4.getBit(65), true); EXPECT_EQ(u4.getBit(66), false); EXPECT_EQ(u4.getBit(67), false); EXPECT_EQ(u4.getBit(68), true); EXPECT_EQ(u4.getBit(69), false); EXPECT_EQ(u4.getBit(70), false); EXPECT_EQ(u4.getBit(71), true); EXPECT_EQ(u4.getBit(72), false);
+    EXPECT_EQ(u4.getBit(73), true); EXPECT_EQ(u4.getBit(74), true); EXPECT_EQ(u4.getBit(75), false); EXPECT_EQ(u4.getBit(76), false); EXPECT_EQ(u4.getBit(77), true); EXPECT_EQ(u4.getBit(78), true); EXPECT_EQ(u4.getBit(79), false); EXPECT_EQ(u4.getBit(80), true); EXPECT_EQ(u4.getBit(81), true);
+    EXPECT_EQ(u4.getBit(82), false); EXPECT_EQ(u4.getBit(83), false); EXPECT_EQ(u4.getBit(84), true); EXPECT_EQ(u4.getBit(85), false); EXPECT_EQ(u4.getBit(86), true); EXPECT_EQ(u4.getBit(87), true); EXPECT_EQ(u4.getBit(88), true); EXPECT_EQ(u4.getBit(89), false); EXPECT_EQ(u4.getBit(90), true);
+    EXPECT_EQ(u4.getBit(91), true); EXPECT_EQ(u4.getBit(92), true); EXPECT_EQ(u4.getBit(93), true); EXPECT_EQ(u4.getBit(94), true); EXPECT_EQ(u4.getBit(95), false); EXPECT_EQ(u4.getBit(96), false); EXPECT_EQ(u4.getBit(97), false); EXPECT_EQ(u4.getBit(98), true); EXPECT_EQ(u4.getBit(99), false);
+    EXPECT_EQ(u4.getBit(100), false); EXPECT_EQ(u4.getBit(101), true); EXPECT_EQ(u4.getBit(102), true); EXPECT_EQ(u4.getBit(103), false); EXPECT_EQ(u4.getBit(104), false); EXPECT_EQ(u4.getBit(105), false); EXPECT_EQ(u4.getBit(106), false); EXPECT_EQ(u4.getBit(107), false); EXPECT_EQ(u4.getBit(108), false);
+    EXPECT_EQ(u4.getBit(109), true); EXPECT_EQ(u4.getBit(110), false); EXPECT_EQ(u4.getBit(111), false); EXPECT_EQ(u4.getBit(112), false); EXPECT_EQ(u4.getBit(113), true); EXPECT_EQ(u4.getBit(114), false); EXPECT_EQ(u4.getBit(115), false); EXPECT_EQ(u4.getBit(116), true); EXPECT_EQ(u4.getBit(117), false);
+    EXPECT_EQ(u4.getBit(118), false); EXPECT_EQ(u4.getBit(119), true); EXPECT_EQ(u4.getBit(120), true); EXPECT_EQ(u4.getBit(121), true); EXPECT_EQ(u4.getBit(122), false); EXPECT_EQ(u4.getBit(123), true); EXPECT_EQ(u4.getBit(124), false); EXPECT_EQ(u4.getBit(125), false); EXPECT_EQ(u4.getBit(126), false);
+    EXPECT_EQ(u4.getBit(127), true);
+
+    Multiprecision u5 = "212276592061158741188353364055816027621.";
+    EXPECT_EQ(u5.getBit(0), true);
+    EXPECT_EQ(u5.getBit(1), false); EXPECT_EQ(u5.getBit(2), true); EXPECT_EQ(u5.getBit(3), false); EXPECT_EQ(u5.getBit(4), false); EXPECT_EQ(u5.getBit(5), true); EXPECT_EQ(u5.getBit(6), true); EXPECT_EQ(u5.getBit(7), true); EXPECT_EQ(u5.getBit(8), true); EXPECT_EQ(u5.getBit(9), false);
+    EXPECT_EQ(u5.getBit(10), true); EXPECT_EQ(u5.getBit(11), true); EXPECT_EQ(u5.getBit(12), true); EXPECT_EQ(u5.getBit(13), true); EXPECT_EQ(u5.getBit(14), false); EXPECT_EQ(u5.getBit(15), false); EXPECT_EQ(u5.getBit(16), false); EXPECT_EQ(u5.getBit(17), true); EXPECT_EQ(u5.getBit(18), true);
+    EXPECT_EQ(u5.getBit(19), true); EXPECT_EQ(u5.getBit(20), true); EXPECT_EQ(u5.getBit(21), false); EXPECT_EQ(u5.getBit(22), true); EXPECT_EQ(u5.getBit(23), true); EXPECT_EQ(u5.getBit(24), true); EXPECT_EQ(u5.getBit(25), true); EXPECT_EQ(u5.getBit(26), true); EXPECT_EQ(u5.getBit(27), false);
+    EXPECT_EQ(u5.getBit(28), false); EXPECT_EQ(u5.getBit(29), false); EXPECT_EQ(u5.getBit(30), false); EXPECT_EQ(u5.getBit(31), true); EXPECT_EQ(u5.getBit(32), true); EXPECT_EQ(u5.getBit(33), false); EXPECT_EQ(u5.getBit(34), false); EXPECT_EQ(u5.getBit(35), false); EXPECT_EQ(u5.getBit(36), true);
+    EXPECT_EQ(u5.getBit(37), false); EXPECT_EQ(u5.getBit(38), true); EXPECT_EQ(u5.getBit(39), false); EXPECT_EQ(u5.getBit(40), true); EXPECT_EQ(u5.getBit(41), true); EXPECT_EQ(u5.getBit(42), true); EXPECT_EQ(u5.getBit(43), false); EXPECT_EQ(u5.getBit(44), false); EXPECT_EQ(u5.getBit(45), true);
+    EXPECT_EQ(u5.getBit(46), false); EXPECT_EQ(u5.getBit(47), true); EXPECT_EQ(u5.getBit(48), false); EXPECT_EQ(u5.getBit(49), true); EXPECT_EQ(u5.getBit(50), true); EXPECT_EQ(u5.getBit(51), true); EXPECT_EQ(u5.getBit(52), true); EXPECT_EQ(u5.getBit(53), true); EXPECT_EQ(u5.getBit(54), true);
+    EXPECT_EQ(u5.getBit(55), false); EXPECT_EQ(u5.getBit(56), false); EXPECT_EQ(u5.getBit(57), true); EXPECT_EQ(u5.getBit(58), true); EXPECT_EQ(u5.getBit(59), true); EXPECT_EQ(u5.getBit(60), true); EXPECT_EQ(u5.getBit(61), true); EXPECT_EQ(u5.getBit(62), false); EXPECT_EQ(u5.getBit(63), true);
+    EXPECT_EQ(u5.getBit(64), true); EXPECT_EQ(u5.getBit(65), true); EXPECT_EQ(u5.getBit(66), true); EXPECT_EQ(u5.getBit(67), false); EXPECT_EQ(u5.getBit(68), false); EXPECT_EQ(u5.getBit(69), false); EXPECT_EQ(u5.getBit(70), false); EXPECT_EQ(u5.getBit(71), true); EXPECT_EQ(u5.getBit(72), true);
+    EXPECT_EQ(u5.getBit(73), false); EXPECT_EQ(u5.getBit(74), true); EXPECT_EQ(u5.getBit(75), false); EXPECT_EQ(u5.getBit(76), true); EXPECT_EQ(u5.getBit(77), true); EXPECT_EQ(u5.getBit(78), true); EXPECT_EQ(u5.getBit(79), false); EXPECT_EQ(u5.getBit(80), false); EXPECT_EQ(u5.getBit(81), true);
+    EXPECT_EQ(u5.getBit(82), false); EXPECT_EQ(u5.getBit(83), true); EXPECT_EQ(u5.getBit(84), false); EXPECT_EQ(u5.getBit(85), true); EXPECT_EQ(u5.getBit(86), false); EXPECT_EQ(u5.getBit(87), false); EXPECT_EQ(u5.getBit(88), true); EXPECT_EQ(u5.getBit(89), false); EXPECT_EQ(u5.getBit(90), false);
+    EXPECT_EQ(u5.getBit(91), false); EXPECT_EQ(u5.getBit(92), false); EXPECT_EQ(u5.getBit(93), true); EXPECT_EQ(u5.getBit(94), false); EXPECT_EQ(u5.getBit(95), false); EXPECT_EQ(u5.getBit(96), true); EXPECT_EQ(u5.getBit(97), false); EXPECT_EQ(u5.getBit(98), false); EXPECT_EQ(u5.getBit(99), true);
+    EXPECT_EQ(u5.getBit(100), false); EXPECT_EQ(u5.getBit(101), false); EXPECT_EQ(u5.getBit(102), false); EXPECT_EQ(u5.getBit(103), false); EXPECT_EQ(u5.getBit(104), false); EXPECT_EQ(u5.getBit(105), false); EXPECT_EQ(u5.getBit(106), true); EXPECT_EQ(u5.getBit(107), true); EXPECT_EQ(u5.getBit(108), true);
+    EXPECT_EQ(u5.getBit(109), true); EXPECT_EQ(u5.getBit(110), true); EXPECT_EQ(u5.getBit(111), true); EXPECT_EQ(u5.getBit(112), false); EXPECT_EQ(u5.getBit(113), true); EXPECT_EQ(u5.getBit(114), false); EXPECT_EQ(u5.getBit(115), false); EXPECT_EQ(u5.getBit(116), true); EXPECT_EQ(u5.getBit(117), true);
+    EXPECT_EQ(u5.getBit(118), false); EXPECT_EQ(u5.getBit(119), true); EXPECT_EQ(u5.getBit(120), true); EXPECT_EQ(u5.getBit(121), true); EXPECT_EQ(u5.getBit(122), true); EXPECT_EQ(u5.getBit(123), true); EXPECT_EQ(u5.getBit(124), true); EXPECT_EQ(u5.getBit(125), false); EXPECT_EQ(u5.getBit(126), false);
+    EXPECT_EQ(u5.getBit(127), true);
+
+    Multiprecision u6 = "29771602601962196722470093116016540190.";
+    EXPECT_EQ(u6.getBit(0), false);
+    EXPECT_EQ(u6.getBit(1), true); EXPECT_EQ(u6.getBit(2), true); EXPECT_EQ(u6.getBit(3), true); EXPECT_EQ(u6.getBit(4), true); EXPECT_EQ(u6.getBit(5), false); EXPECT_EQ(u6.getBit(6), false); EXPECT_EQ(u6.getBit(7), false); EXPECT_EQ(u6.getBit(8), false); EXPECT_EQ(u6.getBit(9), true);
+    EXPECT_EQ(u6.getBit(10), false); EXPECT_EQ(u6.getBit(11), true); EXPECT_EQ(u6.getBit(12), true); EXPECT_EQ(u6.getBit(13), true); EXPECT_EQ(u6.getBit(14), false); EXPECT_EQ(u6.getBit(15), true); EXPECT_EQ(u6.getBit(16), true); EXPECT_EQ(u6.getBit(17), false); EXPECT_EQ(u6.getBit(18), true);
+    EXPECT_EQ(u6.getBit(19), true); EXPECT_EQ(u6.getBit(20), false); EXPECT_EQ(u6.getBit(21), false); EXPECT_EQ(u6.getBit(22), false); EXPECT_EQ(u6.getBit(23), false); EXPECT_EQ(u6.getBit(24), false); EXPECT_EQ(u6.getBit(25), false); EXPECT_EQ(u6.getBit(26), true); EXPECT_EQ(u6.getBit(27), true);
+    EXPECT_EQ(u6.getBit(28), true); EXPECT_EQ(u6.getBit(29), true); EXPECT_EQ(u6.getBit(30), true); EXPECT_EQ(u6.getBit(31), false); EXPECT_EQ(u6.getBit(32), true); EXPECT_EQ(u6.getBit(33), true); EXPECT_EQ(u6.getBit(34), false); EXPECT_EQ(u6.getBit(35), true); EXPECT_EQ(u6.getBit(36), true);
+    EXPECT_EQ(u6.getBit(37), false); EXPECT_EQ(u6.getBit(38), false); EXPECT_EQ(u6.getBit(39), false); EXPECT_EQ(u6.getBit(40), false); EXPECT_EQ(u6.getBit(41), true); EXPECT_EQ(u6.getBit(42), true); EXPECT_EQ(u6.getBit(43), true); EXPECT_EQ(u6.getBit(44), true); EXPECT_EQ(u6.getBit(45), true);
+    EXPECT_EQ(u6.getBit(46), false); EXPECT_EQ(u6.getBit(47), false); EXPECT_EQ(u6.getBit(48), true); EXPECT_EQ(u6.getBit(49), true); EXPECT_EQ(u6.getBit(50), false); EXPECT_EQ(u6.getBit(51), true); EXPECT_EQ(u6.getBit(52), false); EXPECT_EQ(u6.getBit(53), true); EXPECT_EQ(u6.getBit(54), false);
+    EXPECT_EQ(u6.getBit(55), false); EXPECT_EQ(u6.getBit(56), true); EXPECT_EQ(u6.getBit(57), false); EXPECT_EQ(u6.getBit(58), true); EXPECT_EQ(u6.getBit(59), false); EXPECT_EQ(u6.getBit(60), true); EXPECT_EQ(u6.getBit(61), true); EXPECT_EQ(u6.getBit(62), true); EXPECT_EQ(u6.getBit(63), true);
+    EXPECT_EQ(u6.getBit(64), false); EXPECT_EQ(u6.getBit(65), true); EXPECT_EQ(u6.getBit(66), true); EXPECT_EQ(u6.getBit(67), false); EXPECT_EQ(u6.getBit(68), false); EXPECT_EQ(u6.getBit(69), false); EXPECT_EQ(u6.getBit(70), false); EXPECT_EQ(u6.getBit(71), false); EXPECT_EQ(u6.getBit(72), true);
+    EXPECT_EQ(u6.getBit(73), true); EXPECT_EQ(u6.getBit(74), true); EXPECT_EQ(u6.getBit(75), false); EXPECT_EQ(u6.getBit(76), false); EXPECT_EQ(u6.getBit(77), true); EXPECT_EQ(u6.getBit(78), true); EXPECT_EQ(u6.getBit(79), false); EXPECT_EQ(u6.getBit(80), false); EXPECT_EQ(u6.getBit(81), false);
+    EXPECT_EQ(u6.getBit(82), false); EXPECT_EQ(u6.getBit(83), false); EXPECT_EQ(u6.getBit(84), true); EXPECT_EQ(u6.getBit(85), true); EXPECT_EQ(u6.getBit(86), false); EXPECT_EQ(u6.getBit(87), false); EXPECT_EQ(u6.getBit(88), false); EXPECT_EQ(u6.getBit(89), true); EXPECT_EQ(u6.getBit(90), true);
+    EXPECT_EQ(u6.getBit(91), true); EXPECT_EQ(u6.getBit(92), false); EXPECT_EQ(u6.getBit(93), false); EXPECT_EQ(u6.getBit(94), false); EXPECT_EQ(u6.getBit(95), false); EXPECT_EQ(u6.getBit(96), false); EXPECT_EQ(u6.getBit(97), true); EXPECT_EQ(u6.getBit(98), true); EXPECT_EQ(u6.getBit(99), false);
+    EXPECT_EQ(u6.getBit(100), true); EXPECT_EQ(u6.getBit(101), false); EXPECT_EQ(u6.getBit(102), true); EXPECT_EQ(u6.getBit(103), false); EXPECT_EQ(u6.getBit(104), true); EXPECT_EQ(u6.getBit(105), false); EXPECT_EQ(u6.getBit(106), true); EXPECT_EQ(u6.getBit(107), true); EXPECT_EQ(u6.getBit(108), false);
+    EXPECT_EQ(u6.getBit(109), false); EXPECT_EQ(u6.getBit(110), true); EXPECT_EQ(u6.getBit(111), true); EXPECT_EQ(u6.getBit(112), true); EXPECT_EQ(u6.getBit(113), false); EXPECT_EQ(u6.getBit(114), true); EXPECT_EQ(u6.getBit(115), false); EXPECT_EQ(u6.getBit(116), false); EXPECT_EQ(u6.getBit(117), true);
+    EXPECT_EQ(u6.getBit(118), true); EXPECT_EQ(u6.getBit(119), false); EXPECT_EQ(u6.getBit(120), false); EXPECT_EQ(u6.getBit(121), true); EXPECT_EQ(u6.getBit(122), true); EXPECT_EQ(u6.getBit(123), false); EXPECT_EQ(u6.getBit(124), true);
+
+    Multiprecision u7 = "37894586767282899313108693355181559199.";
+    EXPECT_EQ(u7.getBit(0), true);
+    EXPECT_EQ(u7.getBit(1), true); EXPECT_EQ(u7.getBit(2), true); EXPECT_EQ(u7.getBit(3), true); EXPECT_EQ(u7.getBit(4), true); EXPECT_EQ(u7.getBit(5), false); EXPECT_EQ(u7.getBit(6), false); EXPECT_EQ(u7.getBit(7), true); EXPECT_EQ(u7.getBit(8), true); EXPECT_EQ(u7.getBit(9), false);
+    EXPECT_EQ(u7.getBit(10), true); EXPECT_EQ(u7.getBit(11), true); EXPECT_EQ(u7.getBit(12), false); EXPECT_EQ(u7.getBit(13), false); EXPECT_EQ(u7.getBit(14), true); EXPECT_EQ(u7.getBit(15), true); EXPECT_EQ(u7.getBit(16), false); EXPECT_EQ(u7.getBit(17), true); EXPECT_EQ(u7.getBit(18), true);
+    EXPECT_EQ(u7.getBit(19), true); EXPECT_EQ(u7.getBit(20), false); EXPECT_EQ(u7.getBit(21), true); EXPECT_EQ(u7.getBit(22), false); EXPECT_EQ(u7.getBit(23), false); EXPECT_EQ(u7.getBit(24), false); EXPECT_EQ(u7.getBit(25), false); EXPECT_EQ(u7.getBit(26), false); EXPECT_EQ(u7.getBit(27), false);
+    EXPECT_EQ(u7.getBit(28), false); EXPECT_EQ(u7.getBit(29), false); EXPECT_EQ(u7.getBit(30), true); EXPECT_EQ(u7.getBit(31), false); EXPECT_EQ(u7.getBit(32), true); EXPECT_EQ(u7.getBit(33), false); EXPECT_EQ(u7.getBit(34), true); EXPECT_EQ(u7.getBit(35), true); EXPECT_EQ(u7.getBit(36), true);
+    EXPECT_EQ(u7.getBit(37), true); EXPECT_EQ(u7.getBit(38), false); EXPECT_EQ(u7.getBit(39), false); EXPECT_EQ(u7.getBit(40), false); EXPECT_EQ(u7.getBit(41), false); EXPECT_EQ(u7.getBit(42), false); EXPECT_EQ(u7.getBit(43), false); EXPECT_EQ(u7.getBit(44), false); EXPECT_EQ(u7.getBit(45), false);
+    EXPECT_EQ(u7.getBit(46), true); EXPECT_EQ(u7.getBit(47), false); EXPECT_EQ(u7.getBit(48), true); EXPECT_EQ(u7.getBit(49), true); EXPECT_EQ(u7.getBit(50), true); EXPECT_EQ(u7.getBit(51), true); EXPECT_EQ(u7.getBit(52), false); EXPECT_EQ(u7.getBit(53), false); EXPECT_EQ(u7.getBit(54), true);
+    EXPECT_EQ(u7.getBit(55), true); EXPECT_EQ(u7.getBit(56), false); EXPECT_EQ(u7.getBit(57), false); EXPECT_EQ(u7.getBit(58), true); EXPECT_EQ(u7.getBit(59), false); EXPECT_EQ(u7.getBit(60), true); EXPECT_EQ(u7.getBit(61), true); EXPECT_EQ(u7.getBit(62), false); EXPECT_EQ(u7.getBit(63), true);
+    EXPECT_EQ(u7.getBit(64), true); EXPECT_EQ(u7.getBit(65), false); EXPECT_EQ(u7.getBit(66), false); EXPECT_EQ(u7.getBit(67), true); EXPECT_EQ(u7.getBit(68), false); EXPECT_EQ(u7.getBit(69), true); EXPECT_EQ(u7.getBit(70), true); EXPECT_EQ(u7.getBit(71), true); EXPECT_EQ(u7.getBit(72), false);
+    EXPECT_EQ(u7.getBit(73), false); EXPECT_EQ(u7.getBit(74), true); EXPECT_EQ(u7.getBit(75), true); EXPECT_EQ(u7.getBit(76), false); EXPECT_EQ(u7.getBit(77), true); EXPECT_EQ(u7.getBit(78), true); EXPECT_EQ(u7.getBit(79), true); EXPECT_EQ(u7.getBit(80), false); EXPECT_EQ(u7.getBit(81), false);
+    EXPECT_EQ(u7.getBit(82), true); EXPECT_EQ(u7.getBit(83), true); EXPECT_EQ(u7.getBit(84), false); EXPECT_EQ(u7.getBit(85), false); EXPECT_EQ(u7.getBit(86), true); EXPECT_EQ(u7.getBit(87), true); EXPECT_EQ(u7.getBit(88), false); EXPECT_EQ(u7.getBit(89), true); EXPECT_EQ(u7.getBit(90), false);
+    EXPECT_EQ(u7.getBit(91), false); EXPECT_EQ(u7.getBit(92), true); EXPECT_EQ(u7.getBit(93), false); EXPECT_EQ(u7.getBit(94), true); EXPECT_EQ(u7.getBit(95), false); EXPECT_EQ(u7.getBit(96), false); EXPECT_EQ(u7.getBit(97), false); EXPECT_EQ(u7.getBit(98), false); EXPECT_EQ(u7.getBit(99), false);
+    EXPECT_EQ(u7.getBit(100), false); EXPECT_EQ(u7.getBit(101), true); EXPECT_EQ(u7.getBit(102), true); EXPECT_EQ(u7.getBit(103), false); EXPECT_EQ(u7.getBit(104), true); EXPECT_EQ(u7.getBit(105), true); EXPECT_EQ(u7.getBit(106), false); EXPECT_EQ(u7.getBit(107), true); EXPECT_EQ(u7.getBit(108), true);
+    EXPECT_EQ(u7.getBit(109), true); EXPECT_EQ(u7.getBit(110), false); EXPECT_EQ(u7.getBit(111), false); EXPECT_EQ(u7.getBit(112), false); EXPECT_EQ(u7.getBit(113), true); EXPECT_EQ(u7.getBit(114), false); EXPECT_EQ(u7.getBit(115), false); EXPECT_EQ(u7.getBit(116), false); EXPECT_EQ(u7.getBit(117), false);
+    EXPECT_EQ(u7.getBit(118), false); EXPECT_EQ(u7.getBit(119), true); EXPECT_EQ(u7.getBit(120), false); EXPECT_EQ(u7.getBit(121), false); EXPECT_EQ(u7.getBit(122), true); EXPECT_EQ(u7.getBit(123), true); EXPECT_EQ(u7.getBit(124), true);
+
+    Multiprecision u8 = "132933768221848679423944309756035959186.";
+    EXPECT_EQ(u8.getBit(0), false);
+    EXPECT_EQ(u8.getBit(1), true); EXPECT_EQ(u8.getBit(2), false); EXPECT_EQ(u8.getBit(3), false); EXPECT_EQ(u8.getBit(4), true); EXPECT_EQ(u8.getBit(5), false); EXPECT_EQ(u8.getBit(6), false); EXPECT_EQ(u8.getBit(7), true); EXPECT_EQ(u8.getBit(8), true); EXPECT_EQ(u8.getBit(9), false);
+    EXPECT_EQ(u8.getBit(10), false); EXPECT_EQ(u8.getBit(11), true); EXPECT_EQ(u8.getBit(12), false); EXPECT_EQ(u8.getBit(13), false); EXPECT_EQ(u8.getBit(14), false); EXPECT_EQ(u8.getBit(15), true); EXPECT_EQ(u8.getBit(16), true); EXPECT_EQ(u8.getBit(17), false); EXPECT_EQ(u8.getBit(18), false);
+    EXPECT_EQ(u8.getBit(19), false); EXPECT_EQ(u8.getBit(20), true); EXPECT_EQ(u8.getBit(21), false); EXPECT_EQ(u8.getBit(22), false); EXPECT_EQ(u8.getBit(23), false); EXPECT_EQ(u8.getBit(24), true); EXPECT_EQ(u8.getBit(25), true); EXPECT_EQ(u8.getBit(26), true); EXPECT_EQ(u8.getBit(27), false);
+    EXPECT_EQ(u8.getBit(28), true); EXPECT_EQ(u8.getBit(29), true); EXPECT_EQ(u8.getBit(30), true); EXPECT_EQ(u8.getBit(31), true); EXPECT_EQ(u8.getBit(32), false); EXPECT_EQ(u8.getBit(33), true); EXPECT_EQ(u8.getBit(34), true); EXPECT_EQ(u8.getBit(35), true); EXPECT_EQ(u8.getBit(36), false);
+    EXPECT_EQ(u8.getBit(37), false); EXPECT_EQ(u8.getBit(38), false); EXPECT_EQ(u8.getBit(39), true); EXPECT_EQ(u8.getBit(40), true); EXPECT_EQ(u8.getBit(41), false); EXPECT_EQ(u8.getBit(42), true); EXPECT_EQ(u8.getBit(43), true); EXPECT_EQ(u8.getBit(44), true); EXPECT_EQ(u8.getBit(45), true);
+    EXPECT_EQ(u8.getBit(46), false); EXPECT_EQ(u8.getBit(47), true); EXPECT_EQ(u8.getBit(48), false); EXPECT_EQ(u8.getBit(49), true); EXPECT_EQ(u8.getBit(50), false); EXPECT_EQ(u8.getBit(51), false); EXPECT_EQ(u8.getBit(52), true); EXPECT_EQ(u8.getBit(53), false); EXPECT_EQ(u8.getBit(54), true);
+    EXPECT_EQ(u8.getBit(55), true); EXPECT_EQ(u8.getBit(56), true); EXPECT_EQ(u8.getBit(57), true); EXPECT_EQ(u8.getBit(58), false); EXPECT_EQ(u8.getBit(59), false); EXPECT_EQ(u8.getBit(60), false); EXPECT_EQ(u8.getBit(61), true); EXPECT_EQ(u8.getBit(62), true); EXPECT_EQ(u8.getBit(63), false);
+    EXPECT_EQ(u8.getBit(64), true); EXPECT_EQ(u8.getBit(65), true); EXPECT_EQ(u8.getBit(66), false); EXPECT_EQ(u8.getBit(67), false); EXPECT_EQ(u8.getBit(68), false); EXPECT_EQ(u8.getBit(69), false); EXPECT_EQ(u8.getBit(70), true); EXPECT_EQ(u8.getBit(71), true); EXPECT_EQ(u8.getBit(72), false);
+    EXPECT_EQ(u8.getBit(73), true); EXPECT_EQ(u8.getBit(74), true); EXPECT_EQ(u8.getBit(75), true); EXPECT_EQ(u8.getBit(76), true); EXPECT_EQ(u8.getBit(77), true); EXPECT_EQ(u8.getBit(78), true); EXPECT_EQ(u8.getBit(79), true); EXPECT_EQ(u8.getBit(80), false); EXPECT_EQ(u8.getBit(81), true);
+    EXPECT_EQ(u8.getBit(82), false); EXPECT_EQ(u8.getBit(83), true); EXPECT_EQ(u8.getBit(84), false); EXPECT_EQ(u8.getBit(85), true); EXPECT_EQ(u8.getBit(86), false); EXPECT_EQ(u8.getBit(87), false); EXPECT_EQ(u8.getBit(88), false); EXPECT_EQ(u8.getBit(89), true); EXPECT_EQ(u8.getBit(90), true);
+    EXPECT_EQ(u8.getBit(91), true); EXPECT_EQ(u8.getBit(92), true); EXPECT_EQ(u8.getBit(93), true); EXPECT_EQ(u8.getBit(94), false); EXPECT_EQ(u8.getBit(95), true); EXPECT_EQ(u8.getBit(96), true); EXPECT_EQ(u8.getBit(97), true); EXPECT_EQ(u8.getBit(98), false); EXPECT_EQ(u8.getBit(99), true);
+    EXPECT_EQ(u8.getBit(100), false); EXPECT_EQ(u8.getBit(101), false); EXPECT_EQ(u8.getBit(102), true); EXPECT_EQ(u8.getBit(103), true); EXPECT_EQ(u8.getBit(104), false); EXPECT_EQ(u8.getBit(105), false); EXPECT_EQ(u8.getBit(106), true); EXPECT_EQ(u8.getBit(107), true); EXPECT_EQ(u8.getBit(108), true);
+    EXPECT_EQ(u8.getBit(109), false); EXPECT_EQ(u8.getBit(110), false); EXPECT_EQ(u8.getBit(111), false); EXPECT_EQ(u8.getBit(112), false); EXPECT_EQ(u8.getBit(113), true); EXPECT_EQ(u8.getBit(114), false); EXPECT_EQ(u8.getBit(115), false); EXPECT_EQ(u8.getBit(116), false); EXPECT_EQ(u8.getBit(117), false);
+    EXPECT_EQ(u8.getBit(118), false); EXPECT_EQ(u8.getBit(119), false); EXPECT_EQ(u8.getBit(120), false); EXPECT_EQ(u8.getBit(121), false); EXPECT_EQ(u8.getBit(122), true); EXPECT_EQ(u8.getBit(123), false); EXPECT_EQ(u8.getBit(124), false); EXPECT_EQ(u8.getBit(125), true); EXPECT_EQ(u8.getBit(126), true);
+
+
+    Multiprecision u9 = "112312108742573550610800981189693677283.";
+    EXPECT_EQ(u9.getBit(0), true);
+    EXPECT_EQ(u9.getBit(1), true); EXPECT_EQ(u9.getBit(2), false); EXPECT_EQ(u9.getBit(3), false); EXPECT_EQ(u9.getBit(4), false); EXPECT_EQ(u9.getBit(5), true); EXPECT_EQ(u9.getBit(6), true); EXPECT_EQ(u9.getBit(7), true); EXPECT_EQ(u9.getBit(8), false); EXPECT_EQ(u9.getBit(9), true);
+    EXPECT_EQ(u9.getBit(10), true); EXPECT_EQ(u9.getBit(11), true); EXPECT_EQ(u9.getBit(12), true); EXPECT_EQ(u9.getBit(13), false); EXPECT_EQ(u9.getBit(14), false); EXPECT_EQ(u9.getBit(15), false); EXPECT_EQ(u9.getBit(16), false); EXPECT_EQ(u9.getBit(17), true); EXPECT_EQ(u9.getBit(18), true);
+    EXPECT_EQ(u9.getBit(19), true); EXPECT_EQ(u9.getBit(20), true); EXPECT_EQ(u9.getBit(21), true); EXPECT_EQ(u9.getBit(22), true); EXPECT_EQ(u9.getBit(23), false); EXPECT_EQ(u9.getBit(24), false); EXPECT_EQ(u9.getBit(25), false); EXPECT_EQ(u9.getBit(26), false); EXPECT_EQ(u9.getBit(27), true);
+    EXPECT_EQ(u9.getBit(28), false); EXPECT_EQ(u9.getBit(29), true); EXPECT_EQ(u9.getBit(30), true); EXPECT_EQ(u9.getBit(31), true); EXPECT_EQ(u9.getBit(32), true); EXPECT_EQ(u9.getBit(33), true); EXPECT_EQ(u9.getBit(34), false); EXPECT_EQ(u9.getBit(35), false); EXPECT_EQ(u9.getBit(36), false);
+    EXPECT_EQ(u9.getBit(37), false); EXPECT_EQ(u9.getBit(38), true); EXPECT_EQ(u9.getBit(39), true); EXPECT_EQ(u9.getBit(40), true); EXPECT_EQ(u9.getBit(41), false); EXPECT_EQ(u9.getBit(42), false); EXPECT_EQ(u9.getBit(43), false); EXPECT_EQ(u9.getBit(44), false); EXPECT_EQ(u9.getBit(45), true);
+    EXPECT_EQ(u9.getBit(46), false); EXPECT_EQ(u9.getBit(47), true); EXPECT_EQ(u9.getBit(48), true); EXPECT_EQ(u9.getBit(49), false); EXPECT_EQ(u9.getBit(50), false); EXPECT_EQ(u9.getBit(51), false); EXPECT_EQ(u9.getBit(52), false); EXPECT_EQ(u9.getBit(53), true); EXPECT_EQ(u9.getBit(54), false);
+    EXPECT_EQ(u9.getBit(55), false); EXPECT_EQ(u9.getBit(56), false); EXPECT_EQ(u9.getBit(57), true); EXPECT_EQ(u9.getBit(58), true); EXPECT_EQ(u9.getBit(59), false); EXPECT_EQ(u9.getBit(60), true); EXPECT_EQ(u9.getBit(61), true); EXPECT_EQ(u9.getBit(62), true); EXPECT_EQ(u9.getBit(63), false);
+    EXPECT_EQ(u9.getBit(64), true); EXPECT_EQ(u9.getBit(65), false); EXPECT_EQ(u9.getBit(66), false); EXPECT_EQ(u9.getBit(67), false); EXPECT_EQ(u9.getBit(68), true); EXPECT_EQ(u9.getBit(69), false); EXPECT_EQ(u9.getBit(70), false); EXPECT_EQ(u9.getBit(71), true); EXPECT_EQ(u9.getBit(72), false);
+    EXPECT_EQ(u9.getBit(73), true); EXPECT_EQ(u9.getBit(74), true); EXPECT_EQ(u9.getBit(75), true); EXPECT_EQ(u9.getBit(76), true); EXPECT_EQ(u9.getBit(77), true); EXPECT_EQ(u9.getBit(78), false); EXPECT_EQ(u9.getBit(79), false); EXPECT_EQ(u9.getBit(80), false); EXPECT_EQ(u9.getBit(81), false);
+    EXPECT_EQ(u9.getBit(82), true); EXPECT_EQ(u9.getBit(83), false); EXPECT_EQ(u9.getBit(84), true); EXPECT_EQ(u9.getBit(85), true); EXPECT_EQ(u9.getBit(86), false); EXPECT_EQ(u9.getBit(87), true); EXPECT_EQ(u9.getBit(88), true); EXPECT_EQ(u9.getBit(89), false); EXPECT_EQ(u9.getBit(90), false);
+    EXPECT_EQ(u9.getBit(91), false); EXPECT_EQ(u9.getBit(92), true); EXPECT_EQ(u9.getBit(93), false); EXPECT_EQ(u9.getBit(94), true); EXPECT_EQ(u9.getBit(95), false); EXPECT_EQ(u9.getBit(96), false); EXPECT_EQ(u9.getBit(97), false); EXPECT_EQ(u9.getBit(98), true); EXPECT_EQ(u9.getBit(99), true);
+    EXPECT_EQ(u9.getBit(100), true); EXPECT_EQ(u9.getBit(101), true); EXPECT_EQ(u9.getBit(102), true); EXPECT_EQ(u9.getBit(103), false); EXPECT_EQ(u9.getBit(104), false); EXPECT_EQ(u9.getBit(105), true); EXPECT_EQ(u9.getBit(106), true); EXPECT_EQ(u9.getBit(107), false); EXPECT_EQ(u9.getBit(108), false);
+    EXPECT_EQ(u9.getBit(109), false); EXPECT_EQ(u9.getBit(110), false); EXPECT_EQ(u9.getBit(111), true); EXPECT_EQ(u9.getBit(112), false); EXPECT_EQ(u9.getBit(113), true); EXPECT_EQ(u9.getBit(114), true); EXPECT_EQ(u9.getBit(115), true); EXPECT_EQ(u9.getBit(116), true); EXPECT_EQ(u9.getBit(117), true);
+    EXPECT_EQ(u9.getBit(118), true); EXPECT_EQ(u9.getBit(119), false); EXPECT_EQ(u9.getBit(120), false); EXPECT_EQ(u9.getBit(121), false); EXPECT_EQ(u9.getBit(122), true); EXPECT_EQ(u9.getBit(123), false); EXPECT_EQ(u9.getBit(124), true); EXPECT_EQ(u9.getBit(125), false); EXPECT_EQ(u9.getBit(126), true);
+
+    Multiprecision<512> o0{}; o0.setBit(36, true); o0.setBit(233, true); o0.setBit(68, true);
+    EXPECT_EQ(o0, "13803492693581127574869511724554050904902217944341068258230296519901184.");
+    o0.setBit(36, false); o0.setBit(233, false); o0.setBit(68, false); EXPECT_EQ(o0, 0);
+
+    Multiprecision<512> o1{}; o1.setBit(40, true); o1.setBit(43, true); o1.setBit(101, true);
+    EXPECT_EQ(o1, "2535301200456458812889011060736.");
+    o1.setBit(40, false); o1.setBit(43, false); o1.setBit(101, false); EXPECT_EQ(o1, 0);
+
+    Multiprecision<512> o2{}; o2.setBit(467, true); o2.setBit(34, true); o2.setBit(143, true);
+    EXPECT_EQ(o2, "381072821083495145432323880589986121307201921712032611188861933548019011086397170424842053596617683411093660193217652664276125542861053624320.");
+    o2.setBit(467, false); o2.setBit(34, false); o2.setBit(143, false); EXPECT_EQ(o2, 0);
+
+    Multiprecision<512> o3{}; o3.setBit(50, true); o3.setBit(122, true); o3.setBit(142, true);
+    EXPECT_EQ(o3, "5575191616544638925047421184516231404716032.");
+    o3.setBit(50, false); o3.setBit(122, false); o3.setBit(142, false); EXPECT_EQ(o3, 0);
+
+    Multiprecision<512> o4{}; o4.setBit(82, true); o4.setBit(393, true); o4.setBit(263, true);
+    EXPECT_EQ(o4, "20173827172553973356686868531273530268215647893900685167003743309054921599211790391081306314702963082124464928329826304.");
+    o4.setBit(82, false); o4.setBit(393, false); o4.setBit(263, false); EXPECT_EQ(o4, 0);
+
+    Multiprecision<512> o5{}; o5.setBit(15, true); o5.setBit(95, true); o5.setBit(300, true);
+    EXPECT_EQ(o5, "2037035976334486086268445688409378161051468393665936250636140488968462556895505502955405312.");
+    o5.setBit(15, false); o5.setBit(95, false); o5.setBit(300, false); EXPECT_EQ(o5, 0);
+
+    Multiprecision<512> o6{}; o6.setBit(372, true); o6.setBit(454, true); o6.setBit(95, true);
+    EXPECT_EQ(o6, "46517678354918840995156733324462709240253948519300880307139836878356634767735657509940046641609035065324985849726214028890990919808974848.");
+    o6.setBit(372, false); o6.setBit(454, false); o6.setBit(95, false); EXPECT_EQ(o6, 0);
+
+    Multiprecision<512> o7{}; o7.setBit(207, true); o7.setBit(117, true); o7.setBit(413, true);
+    EXPECT_EQ(o7, "21153791001287955166461289857048673274508949854856999017108761654469054984712718335777202719893201711079386101974112919355392.");
+    o7.setBit(207, false); o7.setBit(117, false); o7.setBit(413, false); EXPECT_EQ(o7, 0);
+
+    Multiprecision<512> o8{}; o8.setBit(467, true); o8.setBit(453, true); o8.setBit(159, true);
+    EXPECT_EQ(o8, "381096079922672604852821458951838537452301238235574605366790941234392791543616799158388491710971263513484456787699324830469003835743202705408.");
+    o8.setBit(467, false); o8.setBit(453, false); o8.setBit(159, false); EXPECT_EQ(o8, 0);
+
+    Multiprecision<512> o9{}; o9.setBit(58, true); o9.setBit(299, true); o9.setBit(348, true);
+    EXPECT_EQ(o9, "573374653997518896420693391068564869421985451981150806668594042814856037092345879208154808176260665049088.");
+    o9.setBit(58, false); o9.setBit(299, false); o9.setBit(348, false); EXPECT_EQ(o9, 0);
+
+    Multiprecision<512> o10{}; o10.setBit(19, true); o10.setBit(138, true); o10.setBit(475, true);
+    EXPECT_EQ(o10, "97554642197374757230674913431036447054643691958280348464348654988292866838117675628759565720734124099093040741270997952069244837987889564876800.");
+    o10.setBit(19, false); o10.setBit(138, false); o10.setBit(475, false); EXPECT_EQ(o10, 0);
+
+    Multiprecision<512> o11{}; o11.setBit(77, true); o11.setBit(12, true); o11.setBit(475, true);
+    EXPECT_EQ(o11, "97554642197374757230674913431036447054643691958280348464348654988292866838117675628759565720734124098744591597543956965633864967429587562663936.");
+    o11.setBit(77, false); o11.setBit(12, false); o11.setBit(475, false); EXPECT_EQ(o11, 0);
+
+    Multiprecision<512> o12{}; o12.setBit(381, true); o12.setBit(286, true); o12.setBit(43, true);
+    EXPECT_EQ(o12, "4925250774549309901534880012642282534737414069347026395530241885555829259136488255786899276083904329362757935693824.");
+    o12.setBit(381, false); o12.setBit(286, false); o12.setBit(43, false); EXPECT_EQ(o12, 0);
+
+    Multiprecision<512> o13{}; o13.setBit(337, true); o13.setBit(97, true); o13.setBit(201, true);
+    EXPECT_EQ(o13, "279968092772225526319680285071055534765208901030419709843049721544658666381181487607125927431709392896.");
+    o13.setBit(337, false); o13.setBit(97, false); o13.setBit(201, false); EXPECT_EQ(o13, 0);
+
+    Multiprecision<512> o14{}; o14.setBit(194, true); o14.setBit(425, true); o14.setBit(218, true);
+    EXPECT_EQ(o14, "86645927941275464361825443254471365732388658605494267974077487315456107651561489058394366268593783921789521354162084493037404160.");
+    o14.setBit(194, false); o14.setBit(425, false); o14.setBit(218, false); EXPECT_EQ(o14, 0);
+
+    Multiprecision<512> o15{}; o15.setBit(344, true); o15.setBit(130, true); o15.setBit(455, true);
+    EXPECT_EQ(o15, "93035356709837681990313447409664616233181969012844080635107234590230278824842889940145012891187353173577009331931050723030751081249374208.");
+    o15.setBit(344, false); o15.setBit(130, false); o15.setBit(455, false); EXPECT_EQ(o15, 0);
+
+    Multiprecision<512> o16{}; o16.setBit(361, true); o16.setBit(305, true); o16.setBit(498, true);
+    EXPECT_EQ(o16, "818347651974035467503297424206899788054165208595931745037343806136469731329983980347944439822371100858262045409960603463570581736060544575336064483328.");
+    o16.setBit(361, false); o16.setBit(305, false); o16.setBit(498, false); EXPECT_EQ(o16, 0);
+
+    Multiprecision<512> o17{}; o17.setBit(239, true); o17.setBit(143, true); o17.setBit(338, true);
+    EXPECT_EQ(o17, "559936185544451052639360570142994493062800566473454032475379884871460975055048813683416500599301079040.");
+    o17.setBit(239, false); o17.setBit(143, false); o17.setBit(338, false); EXPECT_EQ(o17, 0);
+
+    Multiprecision<512> o18{}; o18.setBit(429, true); o18.setBit(244, true); o18.setBit(150, true);
+    EXPECT_EQ(o18, "1386334847060407429789207092071541851718218537687908287613509343343764803176145571533301146998015491279763794780096980271551741952.");
+    o18.setBit(429, false); o18.setBit(244, false); o18.setBit(150, false); EXPECT_EQ(o18, 0);
+
+    Multiprecision<512> o19{}; o19.setBit(342, true); o19.setBit(286, true); o19.setBit(46, true);
+    EXPECT_EQ(o19, "8958978968711216966560578224720437651332144025643808164713994103192096844836638004813384296588516524032.");
+    o19.setBit(342, false); o19.setBit(286, false); o19.setBit(46, false); EXPECT_EQ(o19, 0);
 }

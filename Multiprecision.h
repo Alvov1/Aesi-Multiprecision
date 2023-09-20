@@ -51,6 +51,34 @@ class Multiprecision {
             if(line[i]) return i + 1;
         return 0;
     }
+    static constexpr auto makeDivision(const Multiprecision& number, const Multiprecision& divisor) noexcept -> std::pair<Multiprecision, Multiprecision> {
+        const Multiprecision divAbs = divisor.abs();
+        const auto ratio = number.abs().operator<=>(divAbs);
+
+        std::pair<Multiprecision, Multiprecision> results = { 0, 0 };
+        auto& [quotient, remainder] = results;
+
+        if(ratio == std::strong_ordering::greater) {
+            const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
+            for(long long i = bitsUsed - 1; i >= 0; --i) {
+                remainder <<= 1;
+                remainder.setBit(0, number.getBit(i));
+
+                if(remainder >= divAbs) {
+                    remainder -= divAbs;
+                    quotient.setBit(i, true);
+                }
+            }
+
+            if(isLineEmpty(quotient.blocks))
+                quotient.sign = Zero; else if(number.sign != divisor.sign) quotient = -quotient;
+            if(isLineEmpty(remainder.blocks))
+                remainder.sign = Zero; else if(number.sign == Negative) remainder = -remainder;
+        } else if(ratio == std::strong_ordering::less)
+            remainder = number; else quotient = 1;
+
+        return results;
+    }
     /* ----------------------------------------------------------------------- */
 
 public:
@@ -317,33 +345,6 @@ public:
             blocks = multiplyLines(value.blocks, valueLength, blocks, thisLength);
 
         return *this;
-    }
-
-    constexpr static auto makeDivision(const Multiprecision& number, const Multiprecision& divisor) noexcept -> std::pair<Multiprecision, Multiprecision> {
-        const Multiprecision divAbs = divisor.abs();
-        const auto ratio = number.abs().operator<=>(divAbs);
-
-        std::pair<Multiprecision, Multiprecision> results = { 0, 0 };
-        auto& [quotient, remainder] = results;
-
-        if(ratio == std::strong_ordering::greater) {
-            const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
-            for(long long i = bitsUsed - 1; i >= 0; --i) {
-                remainder <<= 1;
-                remainder.setBit(0, number.getBit(i));
-
-                if(remainder >= divAbs) {
-                    remainder -= divAbs;
-                    quotient.setBit(i, true);
-                }
-            }
-
-            if(isLineEmpty(quotient.blocks))
-                quotient.sign = Zero; else if(number.sign != divisor.sign) quotient = -quotient;
-        } else if(ratio == std::strong_ordering::less)
-            remainder = number; else quotient = 1;
-
-        return results;
     }
 
     constexpr Multiprecision operator/(const Multiprecision& divisor) const noexcept {
@@ -728,14 +729,14 @@ template <std::size_t lFirst, std::size_t lSecond> requires (lFirst != lSecond)
 constexpr auto operator%(const Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second)
 -> typename std::conditional<(lFirst > lSecond), Multiprecision<lFirst>, Multiprecision<lSecond>>::type {
     if constexpr (lFirst > lSecond) {
-        return first / second.template precisionCast<lFirst>();
+        return first % second.template precisionCast<lFirst>();
     } else {
-        return first.template precisionCast<lSecond>() / second;
+        return first.template precisionCast<lSecond>() % second;
     }
 }
 template <std::size_t lFirst, std::size_t lSecond> requires (lFirst > lSecond)
 constexpr auto operator%=(Multiprecision<lFirst>& first, const Multiprecision<lSecond>& second) -> Multiprecision<lFirst>& {
-    return first.operator/=(second.template precisionCast<lFirst>());
+    return first.operator%=(second.template precisionCast<lFirst>());
 }
 
 #endif //METALMULTIPRECISION_MULTIPRECISION_H

@@ -188,7 +188,7 @@ TEST(Initialization, Hexadecimal) {
 
 TEST(Multiplication, DifferentPrecisions) {
     long long iValue0 = 3218136187561313218;
-    Multiprecision<64> o00 = iValue0;
+    Multiprecision<96> o00 = iValue0;
     Multiprecision<96> o01 = iValue0; Multiprecision<128> o02 = iValue0; Multiprecision<160> o03 = iValue0; Multiprecision<192> o04 = iValue0; Multiprecision<224> o05 = iValue0; Multiprecision<256> o06 = iValue0; Multiprecision<288> o07 = iValue0; Multiprecision<320> o08 = iValue0; Multiprecision<352> o09 = iValue0;
     Multiprecision<384> o010 = iValue0; Multiprecision<416> o011 = iValue0; Multiprecision<448> o012 = iValue0; Multiprecision<480> o013 = iValue0; Multiprecision<512> o014 = iValue0; Multiprecision<544> o015 = iValue0; Multiprecision<576> o016 = iValue0; Multiprecision<608> o017 = iValue0; Multiprecision<640> o018 = iValue0;
     Multiprecision<672> o019 = iValue0; Multiprecision<704> o020 = iValue0; Multiprecision<736> o021 = iValue0; Multiprecision<768> o022 = iValue0; Multiprecision<800> o023 = iValue0; Multiprecision<832> o024 = iValue0; Multiprecision<864> o025 = iValue0; Multiprecision<896> o026 = iValue0; Multiprecision<928> o027 = iValue0;
@@ -202,7 +202,7 @@ TEST(Multiplication, DifferentPrecisions) {
     EXPECT_EQ(o037, iValue0); EXPECT_EQ(o038, iValue0); EXPECT_EQ(o039, iValue0);
 
     long long iValue2 = -380464553884730375;
-    Multiprecision<64> o20 = iValue2;
+    Multiprecision<96> o20 = iValue2;
     Multiprecision<96> o21 = iValue2; Multiprecision<128> o22 = iValue2; Multiprecision<160> o23 = iValue2; Multiprecision<192> o24 = iValue2; Multiprecision<224> o25 = iValue2; Multiprecision<256> o26 = iValue2; Multiprecision<288> o27 = iValue2; Multiprecision<320> o28 = iValue2; Multiprecision<352> o29 = iValue2;
     Multiprecision<384> o210 = iValue2; Multiprecision<416> o211 = iValue2; Multiprecision<448> o212 = iValue2; Multiprecision<480> o213 = iValue2; Multiprecision<512> o214 = iValue2; Multiprecision<544> o215 = iValue2; Multiprecision<576> o216 = iValue2; Multiprecision<608> o217 = iValue2; Multiprecision<640> o218 = iValue2;
     Multiprecision<672> o219 = iValue2; Multiprecision<704> o220 = iValue2; Multiprecision<736> o221 = iValue2; Multiprecision<768> o222 = iValue2; Multiprecision<800> o223 = iValue2; Multiprecision<832> o224 = iValue2; Multiprecision<864> o225 = iValue2; Multiprecision<896> o226 = iValue2; Multiprecision<928> o227 = iValue2;
@@ -216,7 +216,7 @@ TEST(Multiplication, DifferentPrecisions) {
     EXPECT_EQ(o237, iValue2); EXPECT_EQ(o238, iValue2); EXPECT_EQ(o239, iValue2);
 
     long long iValue4 = -2577490965723039550;
-    Multiprecision<64> o40 = iValue4;
+    Multiprecision<96> o40 = iValue4;
     Multiprecision<96> o41 = iValue4; Multiprecision<128> o42 = iValue4; Multiprecision<160> o43 = iValue4; Multiprecision<192> o44 = iValue4; Multiprecision<224> o45 = iValue4; Multiprecision<256> o46 = iValue4; Multiprecision<288> o47 = iValue4; Multiprecision<320> o48 = iValue4; Multiprecision<352> o49 = iValue4;
     Multiprecision<384> o410 = iValue4; Multiprecision<416> o411 = iValue4; Multiprecision<448> o412 = iValue4; Multiprecision<480> o413 = iValue4; Multiprecision<512> o414 = iValue4; Multiprecision<544> o415 = iValue4; Multiprecision<576> o416 = iValue4; Multiprecision<608> o417 = iValue4; Multiprecision<640> o418 = iValue4;
     Multiprecision<672> o419 = iValue4; Multiprecision<704> o420 = iValue4; Multiprecision<736> o421 = iValue4; Multiprecision<768> o422 = iValue4; Multiprecision<800> o423 = iValue4; Multiprecision<832> o424 = iValue4; Multiprecision<864> o425 = iValue4; Multiprecision<896> o426 = iValue4; Multiprecision<928> o427 = iValue4;
@@ -230,7 +230,7 @@ TEST(Multiplication, DifferentPrecisions) {
     EXPECT_EQ(o437, iValue4); EXPECT_EQ(o438, iValue4); EXPECT_EQ(o439, iValue4);
 
     long long iValue6 = -7225109388162562138;
-    Multiprecision<64> o60 = iValue6;
+    Multiprecision<96> o60 = iValue6;
     Multiprecision<96> o61 = iValue6; Multiprecision<128> o62 = iValue6; Multiprecision<160> o63 = iValue6; Multiprecision<192> o64 = iValue6; Multiprecision<224> o65 = iValue6; Multiprecision<256> o66 = iValue6; Multiprecision<288> o67 = iValue6; Multiprecision<320> o68 = iValue6; Multiprecision<352> o69 = iValue6;
     Multiprecision<384> o610 = iValue6; Multiprecision<416> o611 = iValue6; Multiprecision<448> o612 = iValue6; Multiprecision<480> o613 = iValue6; Multiprecision<512> o614 = iValue6; Multiprecision<544> o615 = iValue6; Multiprecision<576> o616 = iValue6; Multiprecision<608> o617 = iValue6; Multiprecision<640> o618 = iValue6;
     Multiprecision<672> o619 = iValue6; Multiprecision<704> o620 = iValue6; Multiprecision<736> o621 = iValue6; Multiprecision<768> o622 = iValue6; Multiprecision<800> o623 = iValue6; Multiprecision<832> o624 = iValue6; Multiprecision<864> o625 = iValue6; Multiprecision<896> o626 = iValue6; Multiprecision<928> o627 = iValue6;
@@ -244,7 +244,7 @@ TEST(Multiplication, DifferentPrecisions) {
     EXPECT_EQ(o637, iValue6); EXPECT_EQ(o638, iValue6); EXPECT_EQ(o639, iValue6);
 
     long long iValue8 = -2599822390419074042;
-    Multiprecision<64> o80 = iValue8;
+    Multiprecision<96> o80 = iValue8;
     Multiprecision<96> o81 = iValue8; Multiprecision<128> o82 = iValue8; Multiprecision<160> o83 = iValue8; Multiprecision<192> o84 = iValue8; Multiprecision<224> o85 = iValue8; Multiprecision<256> o86 = iValue8; Multiprecision<288> o87 = iValue8; Multiprecision<320> o88 = iValue8; Multiprecision<352> o89 = iValue8;
     Multiprecision<384> o810 = iValue8; Multiprecision<416> o811 = iValue8; Multiprecision<448> o812 = iValue8; Multiprecision<480> o813 = iValue8; Multiprecision<512> o814 = iValue8; Multiprecision<544> o815 = iValue8; Multiprecision<576> o816 = iValue8; Multiprecision<608> o817 = iValue8; Multiprecision<640> o818 = iValue8;
     Multiprecision<672> o819 = iValue8; Multiprecision<704> o820 = iValue8; Multiprecision<736> o821 = iValue8; Multiprecision<768> o822 = iValue8; Multiprecision<800> o823 = iValue8; Multiprecision<832> o824 = iValue8; Multiprecision<864> o825 = iValue8; Multiprecision<896> o826 = iValue8; Multiprecision<928> o827 = iValue8;

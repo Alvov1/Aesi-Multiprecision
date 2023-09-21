@@ -12,6 +12,8 @@ namespace {
 
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Multiprecision {
+    static_assert(bitness > 64, "Use built-in types for numbers 64-bit or less.");
+
     static constexpr std::size_t blocksNumber = bitness / blockBitLength;
     using blockLine = std::array<block, blocksNumber>;
     enum Sign { Zero = 0, Positive = 1, Negative = 2 };
@@ -258,6 +260,10 @@ public:
 
         if(negative) sign = Negative;
     }
+
+    constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {
+        blocks = other.blocks; sign = other.sign; return *this;
+    }
     /* ----------------------------------------------------------------------- */
 
 
@@ -495,6 +501,7 @@ public:
     }
     /* ----------------------------------------------------------------------- */
 
+
     /* ----------------------- Comparison operators. ------------------------- */
     constexpr bool operator==(const Multiprecision& value) const noexcept = default;
     constexpr std::strong_ordering operator<=>(const Multiprecision& value) const noexcept {
@@ -568,27 +575,36 @@ public:
     }
     /* ----------------------------------------------------------------------- */
 
-    constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {
-        blocks = other.blocks; sign = other.sign; return *this;
-    }
+    constexpr friend std::ostream& operator<<(std::ostream& ss, const Multiprecision& value) noexcept {
+        const auto flags = ss.flags();
 
-    auto outputDecimal(std::ostream& toStream) const noexcept -> void {}
-    auto outputOctal(std::ostream& toStream) const noexcept -> void {}
-    auto outputHexadecimal(std::ostream& toStream) const noexcept -> void {
-        if(sign == Negative) toStream.write("-0x", 3);
-            else toStream.write("0x", 2);
+        if(value.sign != Zero) {
+            if (value.sign == Negative) ss.write("-", 1);
 
-        bool firstFilledBlockWritten = false;
-        for(auto iter = blocks.rbegin(); iter != blocks.rend(); ++iter) {
-            firstFilledBlockWritten = firstFilledBlockWritten || *iter;
-            if(*iter || firstFilledBlockWritten)
-                toStream << std::hex << *iter;
-        }
-    }
+            const auto base = [] (long baseField, std::ostream& ss, bool showbase) {
+                auto base = (baseField == std::ios::hex ? 16 : (baseField == std::ios::oct ? 8 : 10));
+                if(showbase && base != 10) ss.write(base == 8 ? "0o" : "0x", 2);
+                return base;
+            } (flags & std::ios::basefield, ss, flags & std::ios::showbase);
 
-    friend std::ostream& operator<<(std::ostream& stream, const Multiprecision& value) noexcept {
-        value.outputHexadecimal(stream);
-        return stream;
+
+            auto iter = value.blocks.rbegin();
+            for(; *iter == 0 && iter != value.blocks.rend(); ++iter);
+
+            if(base == 16) {
+                ss << *iter++ << std::right;
+                auto tWidth = ss.width(); ss.width(8);
+                auto tFill = ss.fill(); ss.fill('0');
+
+                for (; iter != value.blocks.rend(); ++iter)ss << *iter;
+                ss.width(tWidth); ss.fill(tFill);
+            } else {
+                std::array<unsigned long, static_cast<std::size_t>(static_cast<double>(bitness) / 3.2)> buffer {};
+
+            }
+        } else ss.write("0", 1);
+
+        return ss;
     }
 
     template <std::size_t length>
@@ -603,6 +619,13 @@ public:
     constexpr auto precisionCast() const noexcept -> Multiprecision<newBitness> {
         Multiprecision<newBitness> result (blocks);
         if(sign == Negative) result = -result; return result;
+    }
+
+    template <typename Integral> requires (std::is_integral_v<Integral>)
+    constexpr auto integralCast() const noexcept -> Integral {
+        const uint64_t value = (static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0]);
+        if constexpr (std::is_signed_v<Integral>)
+            return static_cast<Integral>(value) * (sign == Negative ? -1 : 1); else return static_cast<Integral>(value);
     }
 
     /*  TODO: Fixed version of precision cast

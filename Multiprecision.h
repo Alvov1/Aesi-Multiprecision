@@ -53,7 +53,7 @@ class Multiprecision {
             if(line[i]) return i + 1;
         return 0;
     }
-    static constexpr auto makeDivision(const Multiprecision& number, const Multiprecision& divisor) noexcept -> std::pair<Multiprecision, Multiprecision> {
+    static constexpr auto divide(const Multiprecision& number, const Multiprecision& divisor) noexcept -> std::pair<Multiprecision, Multiprecision> {
         const Multiprecision divAbs = divisor.abs();
         const auto ratio = number.abs().operator<=>(divAbs);
 
@@ -354,17 +354,17 @@ public:
     }
 
     constexpr Multiprecision operator/(const Multiprecision& divisor) const noexcept {
-        return makeDivision(*this, divisor).first;
+        return divide(*this, divisor).first;
     }
     constexpr Multiprecision& operator/=(const Multiprecision& divisor) noexcept {
-        return this->operator=(makeDivision(*this, divisor).first);
+        return this->operator=(divide(*this, divisor).first);
     }
 
     constexpr Multiprecision operator%(const Multiprecision& divisor) const noexcept {
-        return makeDivision(*this, divisor).second;
+        return divide(*this, divisor).second;
     }
     constexpr Multiprecision& operator%=(const Multiprecision& divisor) noexcept {
-        return this->operator=(makeDivision(*this, divisor).second);
+        return this->operator=(divide(*this, divisor).second);
     }
     /* ----------------------------------------------------------------------- */
 
@@ -576,7 +576,7 @@ public:
     /* ----------------------------------------------------------------------- */
 
     constexpr friend std::ostream& operator<<(std::ostream& ss, const Multiprecision& value) noexcept {
-        const auto flags = ss.flags();
+        auto flags = ss.flags();
 
         if(value.sign != Zero) {
             if (value.sign == Negative) ss.write("-", 1);
@@ -592,15 +592,25 @@ public:
             for(; *iter == 0 && iter != value.blocks.rend(); ++iter);
 
             if(base == 16) {
-                ss << *iter++ << std::right;
-                auto tWidth = ss.width(); ss.width(8);
-                auto tFill = ss.fill(); ss.fill('0');
-
-                for (; iter != value.blocks.rend(); ++iter)ss << *iter;
-                ss.width(tWidth); ss.fill(tFill);
+                ss << *iter++;
+                for (; iter != value.blocks.rend(); ++iter) {
+                    ss.fill('0'); ss.width(8); ss << std::right << *iter;
+                }
             } else {
-                std::array<unsigned long, static_cast<std::size_t>(static_cast<double>(bitness) / 3.2)> buffer {};
+                /* Well, here we use a pre-calculated magic number to ratio the lengths of numbers in decimal or octal notation according to bitness.
+                 * It is 2.95-98 for octal and 3.2 for decimal. */
+                constexpr auto bufferSize = static_cast<std::size_t>(static_cast<double>(bitness) / 2.95);
+                std::array<char, bufferSize> buffer {}; std::size_t filled = 0;
 
+                Multiprecision copy = value;
+                while(copy != 0) {
+                    auto [quotient, remainder] = divide(copy, base);
+                    buffer[filled++] = '0' + remainder.template integralCast<unsigned long>();
+                    copy = quotient;
+                }
+
+                for(; filled > 0; --filled)
+                    ss << buffer[filled - 1];
             }
         } else ss.write("0", 1);
 

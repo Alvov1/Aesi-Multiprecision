@@ -1,0 +1,1 @@
+Bitwise binary operators - sign depends on the first operand.

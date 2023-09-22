@@ -12,9 +12,13 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 file(GLOB Tests *.cpp)
-add_executable(Multiprecision ${Tests} ../Multiprecision.h ../Multiprecision.cpp)
+add_executable(Multiprecision ${Tests} ../Multiprecision.h ../Multiprecision.cpp
+        bitwise/bitwise_and.cpp
+        bitwise/bitwise_or.cpp
+        bitwise/bitwise_xor.cpp)
 add_subdirectory(arithmetic)
 add_subdirectory(operations)
+add_subdirectory(bitwise)
 
 target_link_libraries(Multiprecision GTest::gtest_main)
 

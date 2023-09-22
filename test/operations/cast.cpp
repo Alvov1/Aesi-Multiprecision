@@ -180,4 +180,243 @@ TEST(Casting, NumberCast) {
     }
 }
 
-TEST(Casting, PrecisionCast) { EXPECT_EQ(true, false); }
+TEST(Casting, PrecisionCast) {
+    long long init0 = 7524839891475014690; Multiprecision<256> m0 = init0;
+    EXPECT_EQ(m0.precisionCast<288>(), init0); EXPECT_EQ(m0.precisionCast<320>(), init0); EXPECT_EQ(m0.precisionCast<352>(), init0); EXPECT_EQ(m0.precisionCast<384>(), init0);
+    EXPECT_EQ(m0.precisionCast<416>(), init0); EXPECT_EQ(m0.precisionCast<448>(), init0); EXPECT_EQ(m0.precisionCast<480>(), init0); EXPECT_EQ(m0.precisionCast<512>(), init0);
+    EXPECT_EQ(m0.precisionCast<544>(), init0); EXPECT_EQ(m0.precisionCast<576>(), init0); EXPECT_EQ(m0.precisionCast<608>(), init0); EXPECT_EQ(m0.precisionCast<640>(), init0);
+    EXPECT_EQ(m0.precisionCast<672>(), init0); EXPECT_EQ(m0.precisionCast<704>(), init0); EXPECT_EQ(m0.precisionCast<736>(), init0); EXPECT_EQ(m0.precisionCast<768>(), init0);
+    EXPECT_EQ(m0.precisionCast<800>(), init0); EXPECT_EQ(m0.precisionCast<832>(), init0); EXPECT_EQ(m0.precisionCast<864>(), init0); EXPECT_EQ(m0.precisionCast<896>(), init0);
+
+
+    long long init1 = 8504238977266685499; Multiprecision<256> m1 = init1;
+    EXPECT_EQ(m1.precisionCast<288>(), init1); EXPECT_EQ(m1.precisionCast<320>(), init1); EXPECT_EQ(m1.precisionCast<352>(), init1); EXPECT_EQ(m1.precisionCast<384>(), init1);
+    EXPECT_EQ(m1.precisionCast<416>(), init1); EXPECT_EQ(m1.precisionCast<448>(), init1); EXPECT_EQ(m1.precisionCast<480>(), init1); EXPECT_EQ(m1.precisionCast<512>(), init1);
+    EXPECT_EQ(m1.precisionCast<544>(), init1); EXPECT_EQ(m1.precisionCast<576>(), init1); EXPECT_EQ(m1.precisionCast<608>(), init1); EXPECT_EQ(m1.precisionCast<640>(), init1);
+    EXPECT_EQ(m1.precisionCast<672>(), init1); EXPECT_EQ(m1.precisionCast<704>(), init1); EXPECT_EQ(m1.precisionCast<736>(), init1); EXPECT_EQ(m1.precisionCast<768>(), init1);
+    EXPECT_EQ(m1.precisionCast<800>(), init1); EXPECT_EQ(m1.precisionCast<832>(), init1); EXPECT_EQ(m1.precisionCast<864>(), init1); EXPECT_EQ(m1.precisionCast<896>(), init1);
+
+
+    long long init2 = -7698721489817646536; Multiprecision<256> m2 = init2;
+    EXPECT_EQ(m2.precisionCast<288>(), init2); EXPECT_EQ(m2.precisionCast<320>(), init2); EXPECT_EQ(m2.precisionCast<352>(), init2); EXPECT_EQ(m2.precisionCast<384>(), init2);
+    EXPECT_EQ(m2.precisionCast<416>(), init2); EXPECT_EQ(m2.precisionCast<448>(), init2); EXPECT_EQ(m2.precisionCast<480>(), init2); EXPECT_EQ(m2.precisionCast<512>(), init2);
+    EXPECT_EQ(m2.precisionCast<544>(), init2); EXPECT_EQ(m2.precisionCast<576>(), init2); EXPECT_EQ(m2.precisionCast<608>(), init2); EXPECT_EQ(m2.precisionCast<640>(), init2);
+    EXPECT_EQ(m2.precisionCast<672>(), init2); EXPECT_EQ(m2.precisionCast<704>(), init2); EXPECT_EQ(m2.precisionCast<736>(), init2); EXPECT_EQ(m2.precisionCast<768>(), init2);
+    EXPECT_EQ(m2.precisionCast<800>(), init2); EXPECT_EQ(m2.precisionCast<832>(), init2); EXPECT_EQ(m2.precisionCast<864>(), init2); EXPECT_EQ(m2.precisionCast<896>(), init2);
+
+
+    long long init3 = -6306961477277496307; Multiprecision<256> m3 = init3;
+    EXPECT_EQ(m3.precisionCast<288>(), init3); EXPECT_EQ(m3.precisionCast<320>(), init3); EXPECT_EQ(m3.precisionCast<352>(), init3); EXPECT_EQ(m3.precisionCast<384>(), init3);
+    EXPECT_EQ(m3.precisionCast<416>(), init3); EXPECT_EQ(m3.precisionCast<448>(), init3); EXPECT_EQ(m3.precisionCast<480>(), init3); EXPECT_EQ(m3.precisionCast<512>(), init3);
+    EXPECT_EQ(m3.precisionCast<544>(), init3); EXPECT_EQ(m3.precisionCast<576>(), init3); EXPECT_EQ(m3.precisionCast<608>(), init3); EXPECT_EQ(m3.precisionCast<640>(), init3);
+    EXPECT_EQ(m3.precisionCast<672>(), init3); EXPECT_EQ(m3.precisionCast<704>(), init3); EXPECT_EQ(m3.precisionCast<736>(), init3); EXPECT_EQ(m3.precisionCast<768>(), init3);
+    EXPECT_EQ(m3.precisionCast<800>(), init3); EXPECT_EQ(m3.precisionCast<832>(), init3); EXPECT_EQ(m3.precisionCast<864>(), init3); EXPECT_EQ(m3.precisionCast<896>(), init3);
+
+
+    long long init4 = -1439223510727390957; Multiprecision<256> m4 = init4;
+    EXPECT_EQ(m4.precisionCast<288>(), init4); EXPECT_EQ(m4.precisionCast<320>(), init4); EXPECT_EQ(m4.precisionCast<352>(), init4); EXPECT_EQ(m4.precisionCast<384>(), init4);
+    EXPECT_EQ(m4.precisionCast<416>(), init4); EXPECT_EQ(m4.precisionCast<448>(), init4); EXPECT_EQ(m4.precisionCast<480>(), init4); EXPECT_EQ(m4.precisionCast<512>(), init4);
+    EXPECT_EQ(m4.precisionCast<544>(), init4); EXPECT_EQ(m4.precisionCast<576>(), init4); EXPECT_EQ(m4.precisionCast<608>(), init4); EXPECT_EQ(m4.precisionCast<640>(), init4);
+    EXPECT_EQ(m4.precisionCast<672>(), init4); EXPECT_EQ(m4.precisionCast<704>(), init4); EXPECT_EQ(m4.precisionCast<736>(), init4); EXPECT_EQ(m4.precisionCast<768>(), init4);
+    EXPECT_EQ(m4.precisionCast<800>(), init4); EXPECT_EQ(m4.precisionCast<832>(), init4); EXPECT_EQ(m4.precisionCast<864>(), init4); EXPECT_EQ(m4.precisionCast<896>(), init4);
+
+
+    long long init5 = -9108790223466577088; Multiprecision<256> m5 = init5;
+    EXPECT_EQ(m5.precisionCast<288>(), init5); EXPECT_EQ(m5.precisionCast<320>(), init5); EXPECT_EQ(m5.precisionCast<352>(), init5); EXPECT_EQ(m5.precisionCast<384>(), init5);
+    EXPECT_EQ(m5.precisionCast<416>(), init5); EXPECT_EQ(m5.precisionCast<448>(), init5); EXPECT_EQ(m5.precisionCast<480>(), init5); EXPECT_EQ(m5.precisionCast<512>(), init5);
+    EXPECT_EQ(m5.precisionCast<544>(), init5); EXPECT_EQ(m5.precisionCast<576>(), init5); EXPECT_EQ(m5.precisionCast<608>(), init5); EXPECT_EQ(m5.precisionCast<640>(), init5);
+    EXPECT_EQ(m5.precisionCast<672>(), init5); EXPECT_EQ(m5.precisionCast<704>(), init5); EXPECT_EQ(m5.precisionCast<736>(), init5); EXPECT_EQ(m5.precisionCast<768>(), init5);
+    EXPECT_EQ(m5.precisionCast<800>(), init5); EXPECT_EQ(m5.precisionCast<832>(), init5); EXPECT_EQ(m5.precisionCast<864>(), init5); EXPECT_EQ(m5.precisionCast<896>(), init5);
+
+
+    long long init6 = 7336368703164388051; Multiprecision<256> m6 = init6;
+    EXPECT_EQ(m6.precisionCast<288>(), init6); EXPECT_EQ(m6.precisionCast<320>(), init6); EXPECT_EQ(m6.precisionCast<352>(), init6); EXPECT_EQ(m6.precisionCast<384>(), init6);
+    EXPECT_EQ(m6.precisionCast<416>(), init6); EXPECT_EQ(m6.precisionCast<448>(), init6); EXPECT_EQ(m6.precisionCast<480>(), init6); EXPECT_EQ(m6.precisionCast<512>(), init6);
+    EXPECT_EQ(m6.precisionCast<544>(), init6); EXPECT_EQ(m6.precisionCast<576>(), init6); EXPECT_EQ(m6.precisionCast<608>(), init6); EXPECT_EQ(m6.precisionCast<640>(), init6);
+    EXPECT_EQ(m6.precisionCast<672>(), init6); EXPECT_EQ(m6.precisionCast<704>(), init6); EXPECT_EQ(m6.precisionCast<736>(), init6); EXPECT_EQ(m6.precisionCast<768>(), init6);
+    EXPECT_EQ(m6.precisionCast<800>(), init6); EXPECT_EQ(m6.precisionCast<832>(), init6); EXPECT_EQ(m6.precisionCast<864>(), init6); EXPECT_EQ(m6.precisionCast<896>(), init6);
+
+
+    long long init7 = 2314166570054255036; Multiprecision<256> m7 = init7;
+    EXPECT_EQ(m7.precisionCast<288>(), init7); EXPECT_EQ(m7.precisionCast<320>(), init7); EXPECT_EQ(m7.precisionCast<352>(), init7); EXPECT_EQ(m7.precisionCast<384>(), init7);
+    EXPECT_EQ(m7.precisionCast<416>(), init7); EXPECT_EQ(m7.precisionCast<448>(), init7); EXPECT_EQ(m7.precisionCast<480>(), init7); EXPECT_EQ(m7.precisionCast<512>(), init7);
+    EXPECT_EQ(m7.precisionCast<544>(), init7); EXPECT_EQ(m7.precisionCast<576>(), init7); EXPECT_EQ(m7.precisionCast<608>(), init7); EXPECT_EQ(m7.precisionCast<640>(), init7);
+    EXPECT_EQ(m7.precisionCast<672>(), init7); EXPECT_EQ(m7.precisionCast<704>(), init7); EXPECT_EQ(m7.precisionCast<736>(), init7); EXPECT_EQ(m7.precisionCast<768>(), init7);
+    EXPECT_EQ(m7.precisionCast<800>(), init7); EXPECT_EQ(m7.precisionCast<832>(), init7); EXPECT_EQ(m7.precisionCast<864>(), init7); EXPECT_EQ(m7.precisionCast<896>(), init7);
+
+
+    long long init8 = 7305419937287767522; Multiprecision<256> m8 = init8;
+    EXPECT_EQ(m8.precisionCast<288>(), init8); EXPECT_EQ(m8.precisionCast<320>(), init8); EXPECT_EQ(m8.precisionCast<352>(), init8); EXPECT_EQ(m8.precisionCast<384>(), init8);
+    EXPECT_EQ(m8.precisionCast<416>(), init8); EXPECT_EQ(m8.precisionCast<448>(), init8); EXPECT_EQ(m8.precisionCast<480>(), init8); EXPECT_EQ(m8.precisionCast<512>(), init8);
+    EXPECT_EQ(m8.precisionCast<544>(), init8); EXPECT_EQ(m8.precisionCast<576>(), init8); EXPECT_EQ(m8.precisionCast<608>(), init8); EXPECT_EQ(m8.precisionCast<640>(), init8);
+    EXPECT_EQ(m8.precisionCast<672>(), init8); EXPECT_EQ(m8.precisionCast<704>(), init8); EXPECT_EQ(m8.precisionCast<736>(), init8); EXPECT_EQ(m8.precisionCast<768>(), init8);
+    EXPECT_EQ(m8.precisionCast<800>(), init8); EXPECT_EQ(m8.precisionCast<832>(), init8); EXPECT_EQ(m8.precisionCast<864>(), init8); EXPECT_EQ(m8.precisionCast<896>(), init8);
+
+
+    long long init9 = -2561303725389650172; Multiprecision<256> m9 = init9;
+    EXPECT_EQ(m9.precisionCast<288>(), init9); EXPECT_EQ(m9.precisionCast<320>(), init9); EXPECT_EQ(m9.precisionCast<352>(), init9); EXPECT_EQ(m9.precisionCast<384>(), init9);
+    EXPECT_EQ(m9.precisionCast<416>(), init9); EXPECT_EQ(m9.precisionCast<448>(), init9); EXPECT_EQ(m9.precisionCast<480>(), init9); EXPECT_EQ(m9.precisionCast<512>(), init9);
+    EXPECT_EQ(m9.precisionCast<544>(), init9); EXPECT_EQ(m9.precisionCast<576>(), init9); EXPECT_EQ(m9.precisionCast<608>(), init9); EXPECT_EQ(m9.precisionCast<640>(), init9);
+    EXPECT_EQ(m9.precisionCast<672>(), init9); EXPECT_EQ(m9.precisionCast<704>(), init9); EXPECT_EQ(m9.precisionCast<736>(), init9); EXPECT_EQ(m9.precisionCast<768>(), init9);
+    EXPECT_EQ(m9.precisionCast<800>(), init9); EXPECT_EQ(m9.precisionCast<832>(), init9); EXPECT_EQ(m9.precisionCast<864>(), init9); EXPECT_EQ(m9.precisionCast<896>(), init9);
+
+
+    long long init10 = 3383802386880547846; Multiprecision<256> m10 = init10;
+    EXPECT_EQ(m10.precisionCast<288>(), init10); EXPECT_EQ(m10.precisionCast<320>(), init10); EXPECT_EQ(m10.precisionCast<352>(), init10); EXPECT_EQ(m10.precisionCast<384>(), init10);
+    EXPECT_EQ(m10.precisionCast<416>(), init10); EXPECT_EQ(m10.precisionCast<448>(), init10); EXPECT_EQ(m10.precisionCast<480>(), init10); EXPECT_EQ(m10.precisionCast<512>(), init10);
+    EXPECT_EQ(m10.precisionCast<544>(), init10); EXPECT_EQ(m10.precisionCast<576>(), init10); EXPECT_EQ(m10.precisionCast<608>(), init10); EXPECT_EQ(m10.precisionCast<640>(), init10);
+    EXPECT_EQ(m10.precisionCast<672>(), init10); EXPECT_EQ(m10.precisionCast<704>(), init10); EXPECT_EQ(m10.precisionCast<736>(), init10); EXPECT_EQ(m10.precisionCast<768>(), init10);
+    EXPECT_EQ(m10.precisionCast<800>(), init10); EXPECT_EQ(m10.precisionCast<832>(), init10); EXPECT_EQ(m10.precisionCast<864>(), init10); EXPECT_EQ(m10.precisionCast<896>(), init10);
+
+
+    long long init11 = 5703252986956204740; Multiprecision<256> m11 = init11;
+    EXPECT_EQ(m11.precisionCast<288>(), init11); EXPECT_EQ(m11.precisionCast<320>(), init11); EXPECT_EQ(m11.precisionCast<352>(), init11); EXPECT_EQ(m11.precisionCast<384>(), init11);
+    EXPECT_EQ(m11.precisionCast<416>(), init11); EXPECT_EQ(m11.precisionCast<448>(), init11); EXPECT_EQ(m11.precisionCast<480>(), init11); EXPECT_EQ(m11.precisionCast<512>(), init11);
+    EXPECT_EQ(m11.precisionCast<544>(), init11); EXPECT_EQ(m11.precisionCast<576>(), init11); EXPECT_EQ(m11.precisionCast<608>(), init11); EXPECT_EQ(m11.precisionCast<640>(), init11);
+    EXPECT_EQ(m11.precisionCast<672>(), init11); EXPECT_EQ(m11.precisionCast<704>(), init11); EXPECT_EQ(m11.precisionCast<736>(), init11); EXPECT_EQ(m11.precisionCast<768>(), init11);
+    EXPECT_EQ(m11.precisionCast<800>(), init11); EXPECT_EQ(m11.precisionCast<832>(), init11); EXPECT_EQ(m11.precisionCast<864>(), init11); EXPECT_EQ(m11.precisionCast<896>(), init11);
+
+
+    long long init12 = 1248358330450460190; Multiprecision<256> m12 = init12;
+    EXPECT_EQ(m12.precisionCast<288>(), init12); EXPECT_EQ(m12.precisionCast<320>(), init12); EXPECT_EQ(m12.precisionCast<352>(), init12); EXPECT_EQ(m12.precisionCast<384>(), init12);
+    EXPECT_EQ(m12.precisionCast<416>(), init12); EXPECT_EQ(m12.precisionCast<448>(), init12); EXPECT_EQ(m12.precisionCast<480>(), init12); EXPECT_EQ(m12.precisionCast<512>(), init12);
+    EXPECT_EQ(m12.precisionCast<544>(), init12); EXPECT_EQ(m12.precisionCast<576>(), init12); EXPECT_EQ(m12.precisionCast<608>(), init12); EXPECT_EQ(m12.precisionCast<640>(), init12);
+    EXPECT_EQ(m12.precisionCast<672>(), init12); EXPECT_EQ(m12.precisionCast<704>(), init12); EXPECT_EQ(m12.precisionCast<736>(), init12); EXPECT_EQ(m12.precisionCast<768>(), init12);
+    EXPECT_EQ(m12.precisionCast<800>(), init12); EXPECT_EQ(m12.precisionCast<832>(), init12); EXPECT_EQ(m12.precisionCast<864>(), init12); EXPECT_EQ(m12.precisionCast<896>(), init12);
+
+
+    long long init13 = 4175697953158773741; Multiprecision<256> m13 = init13;
+    EXPECT_EQ(m13.precisionCast<288>(), init13); EXPECT_EQ(m13.precisionCast<320>(), init13); EXPECT_EQ(m13.precisionCast<352>(), init13); EXPECT_EQ(m13.precisionCast<384>(), init13);
+    EXPECT_EQ(m13.precisionCast<416>(), init13); EXPECT_EQ(m13.precisionCast<448>(), init13); EXPECT_EQ(m13.precisionCast<480>(), init13); EXPECT_EQ(m13.precisionCast<512>(), init13);
+    EXPECT_EQ(m13.precisionCast<544>(), init13); EXPECT_EQ(m13.precisionCast<576>(), init13); EXPECT_EQ(m13.precisionCast<608>(), init13); EXPECT_EQ(m13.precisionCast<640>(), init13);
+    EXPECT_EQ(m13.precisionCast<672>(), init13); EXPECT_EQ(m13.precisionCast<704>(), init13); EXPECT_EQ(m13.precisionCast<736>(), init13); EXPECT_EQ(m13.precisionCast<768>(), init13);
+    EXPECT_EQ(m13.precisionCast<800>(), init13); EXPECT_EQ(m13.precisionCast<832>(), init13); EXPECT_EQ(m13.precisionCast<864>(), init13); EXPECT_EQ(m13.precisionCast<896>(), init13);
+
+
+    long long init14 = -2938517079411100489; Multiprecision<256> m14 = init14;
+    EXPECT_EQ(m14.precisionCast<288>(), init14); EXPECT_EQ(m14.precisionCast<320>(), init14); EXPECT_EQ(m14.precisionCast<352>(), init14); EXPECT_EQ(m14.precisionCast<384>(), init14);
+    EXPECT_EQ(m14.precisionCast<416>(), init14); EXPECT_EQ(m14.precisionCast<448>(), init14); EXPECT_EQ(m14.precisionCast<480>(), init14); EXPECT_EQ(m14.precisionCast<512>(), init14);
+    EXPECT_EQ(m14.precisionCast<544>(), init14); EXPECT_EQ(m14.precisionCast<576>(), init14); EXPECT_EQ(m14.precisionCast<608>(), init14); EXPECT_EQ(m14.precisionCast<640>(), init14);
+    EXPECT_EQ(m14.precisionCast<672>(), init14); EXPECT_EQ(m14.precisionCast<704>(), init14); EXPECT_EQ(m14.precisionCast<736>(), init14); EXPECT_EQ(m14.precisionCast<768>(), init14);
+    EXPECT_EQ(m14.precisionCast<800>(), init14); EXPECT_EQ(m14.precisionCast<832>(), init14); EXPECT_EQ(m14.precisionCast<864>(), init14); EXPECT_EQ(m14.precisionCast<896>(), init14);
+
+
+    long long init15 = -6902692574326511305; Multiprecision<256> m15 = init15;
+    EXPECT_EQ(m15.precisionCast<288>(), init15); EXPECT_EQ(m15.precisionCast<320>(), init15); EXPECT_EQ(m15.precisionCast<352>(), init15); EXPECT_EQ(m15.precisionCast<384>(), init15);
+    EXPECT_EQ(m15.precisionCast<416>(), init15); EXPECT_EQ(m15.precisionCast<448>(), init15); EXPECT_EQ(m15.precisionCast<480>(), init15); EXPECT_EQ(m15.precisionCast<512>(), init15);
+    EXPECT_EQ(m15.precisionCast<544>(), init15); EXPECT_EQ(m15.precisionCast<576>(), init15); EXPECT_EQ(m15.precisionCast<608>(), init15); EXPECT_EQ(m15.precisionCast<640>(), init15);
+    EXPECT_EQ(m15.precisionCast<672>(), init15); EXPECT_EQ(m15.precisionCast<704>(), init15); EXPECT_EQ(m15.precisionCast<736>(), init15); EXPECT_EQ(m15.precisionCast<768>(), init15);
+    EXPECT_EQ(m15.precisionCast<800>(), init15); EXPECT_EQ(m15.precisionCast<832>(), init15); EXPECT_EQ(m15.precisionCast<864>(), init15); EXPECT_EQ(m15.precisionCast<896>(), init15);
+
+
+    long long init16 = -2409078837645875887; Multiprecision<256> m16 = init16;
+    EXPECT_EQ(m16.precisionCast<288>(), init16); EXPECT_EQ(m16.precisionCast<320>(), init16); EXPECT_EQ(m16.precisionCast<352>(), init16); EXPECT_EQ(m16.precisionCast<384>(), init16);
+    EXPECT_EQ(m16.precisionCast<416>(), init16); EXPECT_EQ(m16.precisionCast<448>(), init16); EXPECT_EQ(m16.precisionCast<480>(), init16); EXPECT_EQ(m16.precisionCast<512>(), init16);
+    EXPECT_EQ(m16.precisionCast<544>(), init16); EXPECT_EQ(m16.precisionCast<576>(), init16); EXPECT_EQ(m16.precisionCast<608>(), init16); EXPECT_EQ(m16.precisionCast<640>(), init16);
+    EXPECT_EQ(m16.precisionCast<672>(), init16); EXPECT_EQ(m16.precisionCast<704>(), init16); EXPECT_EQ(m16.precisionCast<736>(), init16); EXPECT_EQ(m16.precisionCast<768>(), init16);
+    EXPECT_EQ(m16.precisionCast<800>(), init16); EXPECT_EQ(m16.precisionCast<832>(), init16); EXPECT_EQ(m16.precisionCast<864>(), init16); EXPECT_EQ(m16.precisionCast<896>(), init16);
+
+
+    long long init17 = -7506774356715976030; Multiprecision<256> m17 = init17;
+    EXPECT_EQ(m17.precisionCast<288>(), init17); EXPECT_EQ(m17.precisionCast<320>(), init17); EXPECT_EQ(m17.precisionCast<352>(), init17); EXPECT_EQ(m17.precisionCast<384>(), init17);
+    EXPECT_EQ(m17.precisionCast<416>(), init17); EXPECT_EQ(m17.precisionCast<448>(), init17); EXPECT_EQ(m17.precisionCast<480>(), init17); EXPECT_EQ(m17.precisionCast<512>(), init17);
+    EXPECT_EQ(m17.precisionCast<544>(), init17); EXPECT_EQ(m17.precisionCast<576>(), init17); EXPECT_EQ(m17.precisionCast<608>(), init17); EXPECT_EQ(m17.precisionCast<640>(), init17);
+    EXPECT_EQ(m17.precisionCast<672>(), init17); EXPECT_EQ(m17.precisionCast<704>(), init17); EXPECT_EQ(m17.precisionCast<736>(), init17); EXPECT_EQ(m17.precisionCast<768>(), init17);
+    EXPECT_EQ(m17.precisionCast<800>(), init17); EXPECT_EQ(m17.precisionCast<832>(), init17); EXPECT_EQ(m17.precisionCast<864>(), init17); EXPECT_EQ(m17.precisionCast<896>(), init17);
+
+
+    long long init18 = 227163478686314711; Multiprecision<256> m18 = init18;
+    EXPECT_EQ(m18.precisionCast<288>(), init18); EXPECT_EQ(m18.precisionCast<320>(), init18); EXPECT_EQ(m18.precisionCast<352>(), init18); EXPECT_EQ(m18.precisionCast<384>(), init18);
+    EXPECT_EQ(m18.precisionCast<416>(), init18); EXPECT_EQ(m18.precisionCast<448>(), init18); EXPECT_EQ(m18.precisionCast<480>(), init18); EXPECT_EQ(m18.precisionCast<512>(), init18);
+    EXPECT_EQ(m18.precisionCast<544>(), init18); EXPECT_EQ(m18.precisionCast<576>(), init18); EXPECT_EQ(m18.precisionCast<608>(), init18); EXPECT_EQ(m18.precisionCast<640>(), init18);
+    EXPECT_EQ(m18.precisionCast<672>(), init18); EXPECT_EQ(m18.precisionCast<704>(), init18); EXPECT_EQ(m18.precisionCast<736>(), init18); EXPECT_EQ(m18.precisionCast<768>(), init18);
+    EXPECT_EQ(m18.precisionCast<800>(), init18); EXPECT_EQ(m18.precisionCast<832>(), init18); EXPECT_EQ(m18.precisionCast<864>(), init18); EXPECT_EQ(m18.precisionCast<896>(), init18);
+
+
+    long long init19 = -4966632676207774604; Multiprecision<256> m19 = init19;
+    EXPECT_EQ(m19.precisionCast<288>(), init19); EXPECT_EQ(m19.precisionCast<320>(), init19); EXPECT_EQ(m19.precisionCast<352>(), init19); EXPECT_EQ(m19.precisionCast<384>(), init19);
+    EXPECT_EQ(m19.precisionCast<416>(), init19); EXPECT_EQ(m19.precisionCast<448>(), init19); EXPECT_EQ(m19.precisionCast<480>(), init19); EXPECT_EQ(m19.precisionCast<512>(), init19);
+    EXPECT_EQ(m19.precisionCast<544>(), init19); EXPECT_EQ(m19.precisionCast<576>(), init19); EXPECT_EQ(m19.precisionCast<608>(), init19); EXPECT_EQ(m19.precisionCast<640>(), init19);
+    EXPECT_EQ(m19.precisionCast<672>(), init19); EXPECT_EQ(m19.precisionCast<704>(), init19); EXPECT_EQ(m19.precisionCast<736>(), init19); EXPECT_EQ(m19.precisionCast<768>(), init19);
+    EXPECT_EQ(m19.precisionCast<800>(), init19); EXPECT_EQ(m19.precisionCast<832>(), init19); EXPECT_EQ(m19.precisionCast<864>(), init19); EXPECT_EQ(m19.precisionCast<896>(), init19);
+
+
+    long long init20 = -4021786551316732423; Multiprecision<256> m20 = init20;
+    EXPECT_EQ(m20.precisionCast<288>(), init20); EXPECT_EQ(m20.precisionCast<320>(), init20); EXPECT_EQ(m20.precisionCast<352>(), init20); EXPECT_EQ(m20.precisionCast<384>(), init20);
+    EXPECT_EQ(m20.precisionCast<416>(), init20); EXPECT_EQ(m20.precisionCast<448>(), init20); EXPECT_EQ(m20.precisionCast<480>(), init20); EXPECT_EQ(m20.precisionCast<512>(), init20);
+    EXPECT_EQ(m20.precisionCast<544>(), init20); EXPECT_EQ(m20.precisionCast<576>(), init20); EXPECT_EQ(m20.precisionCast<608>(), init20); EXPECT_EQ(m20.precisionCast<640>(), init20);
+    EXPECT_EQ(m20.precisionCast<672>(), init20); EXPECT_EQ(m20.precisionCast<704>(), init20); EXPECT_EQ(m20.precisionCast<736>(), init20); EXPECT_EQ(m20.precisionCast<768>(), init20);
+    EXPECT_EQ(m20.precisionCast<800>(), init20); EXPECT_EQ(m20.precisionCast<832>(), init20); EXPECT_EQ(m20.precisionCast<864>(), init20); EXPECT_EQ(m20.precisionCast<896>(), init20);
+
+
+    long long init21 = 7309039963756908723; Multiprecision<256> m21 = init21;
+    EXPECT_EQ(m21.precisionCast<288>(), init21); EXPECT_EQ(m21.precisionCast<320>(), init21); EXPECT_EQ(m21.precisionCast<352>(), init21); EXPECT_EQ(m21.precisionCast<384>(), init21);
+    EXPECT_EQ(m21.precisionCast<416>(), init21); EXPECT_EQ(m21.precisionCast<448>(), init21); EXPECT_EQ(m21.precisionCast<480>(), init21); EXPECT_EQ(m21.precisionCast<512>(), init21);
+    EXPECT_EQ(m21.precisionCast<544>(), init21); EXPECT_EQ(m21.precisionCast<576>(), init21); EXPECT_EQ(m21.precisionCast<608>(), init21); EXPECT_EQ(m21.precisionCast<640>(), init21);
+    EXPECT_EQ(m21.precisionCast<672>(), init21); EXPECT_EQ(m21.precisionCast<704>(), init21); EXPECT_EQ(m21.precisionCast<736>(), init21); EXPECT_EQ(m21.precisionCast<768>(), init21);
+    EXPECT_EQ(m21.precisionCast<800>(), init21); EXPECT_EQ(m21.precisionCast<832>(), init21); EXPECT_EQ(m21.precisionCast<864>(), init21); EXPECT_EQ(m21.precisionCast<896>(), init21);
+
+
+    long long init22 = -4037333522000484564; Multiprecision<256> m22 = init22;
+    EXPECT_EQ(m22.precisionCast<288>(), init22); EXPECT_EQ(m22.precisionCast<320>(), init22); EXPECT_EQ(m22.precisionCast<352>(), init22); EXPECT_EQ(m22.precisionCast<384>(), init22);
+    EXPECT_EQ(m22.precisionCast<416>(), init22); EXPECT_EQ(m22.precisionCast<448>(), init22); EXPECT_EQ(m22.precisionCast<480>(), init22); EXPECT_EQ(m22.precisionCast<512>(), init22);
+    EXPECT_EQ(m22.precisionCast<544>(), init22); EXPECT_EQ(m22.precisionCast<576>(), init22); EXPECT_EQ(m22.precisionCast<608>(), init22); EXPECT_EQ(m22.precisionCast<640>(), init22);
+    EXPECT_EQ(m22.precisionCast<672>(), init22); EXPECT_EQ(m22.precisionCast<704>(), init22); EXPECT_EQ(m22.precisionCast<736>(), init22); EXPECT_EQ(m22.precisionCast<768>(), init22);
+    EXPECT_EQ(m22.precisionCast<800>(), init22); EXPECT_EQ(m22.precisionCast<832>(), init22); EXPECT_EQ(m22.precisionCast<864>(), init22); EXPECT_EQ(m22.precisionCast<896>(), init22);
+
+
+    long long init23 = 3067962240659289255; Multiprecision<256> m23 = init23;
+    EXPECT_EQ(m23.precisionCast<288>(), init23); EXPECT_EQ(m23.precisionCast<320>(), init23); EXPECT_EQ(m23.precisionCast<352>(), init23); EXPECT_EQ(m23.precisionCast<384>(), init23);
+    EXPECT_EQ(m23.precisionCast<416>(), init23); EXPECT_EQ(m23.precisionCast<448>(), init23); EXPECT_EQ(m23.precisionCast<480>(), init23); EXPECT_EQ(m23.precisionCast<512>(), init23);
+    EXPECT_EQ(m23.precisionCast<544>(), init23); EXPECT_EQ(m23.precisionCast<576>(), init23); EXPECT_EQ(m23.precisionCast<608>(), init23); EXPECT_EQ(m23.precisionCast<640>(), init23);
+    EXPECT_EQ(m23.precisionCast<672>(), init23); EXPECT_EQ(m23.precisionCast<704>(), init23); EXPECT_EQ(m23.precisionCast<736>(), init23); EXPECT_EQ(m23.precisionCast<768>(), init23);
+    EXPECT_EQ(m23.precisionCast<800>(), init23); EXPECT_EQ(m23.precisionCast<832>(), init23); EXPECT_EQ(m23.precisionCast<864>(), init23); EXPECT_EQ(m23.precisionCast<896>(), init23);
+
+
+    long long init24 = -3707800888550614839; Multiprecision<256> m24 = init24;
+    EXPECT_EQ(m24.precisionCast<288>(), init24); EXPECT_EQ(m24.precisionCast<320>(), init24); EXPECT_EQ(m24.precisionCast<352>(), init24); EXPECT_EQ(m24.precisionCast<384>(), init24);
+    EXPECT_EQ(m24.precisionCast<416>(), init24); EXPECT_EQ(m24.precisionCast<448>(), init24); EXPECT_EQ(m24.precisionCast<480>(), init24); EXPECT_EQ(m24.precisionCast<512>(), init24);
+    EXPECT_EQ(m24.precisionCast<544>(), init24); EXPECT_EQ(m24.precisionCast<576>(), init24); EXPECT_EQ(m24.precisionCast<608>(), init24); EXPECT_EQ(m24.precisionCast<640>(), init24);
+    EXPECT_EQ(m24.precisionCast<672>(), init24); EXPECT_EQ(m24.precisionCast<704>(), init24); EXPECT_EQ(m24.precisionCast<736>(), init24); EXPECT_EQ(m24.precisionCast<768>(), init24);
+    EXPECT_EQ(m24.precisionCast<800>(), init24); EXPECT_EQ(m24.precisionCast<832>(), init24); EXPECT_EQ(m24.precisionCast<864>(), init24); EXPECT_EQ(m24.precisionCast<896>(), init24);
+
+
+    long long init25 = -6878944643378492415; Multiprecision<256> m25 = init25;
+    EXPECT_EQ(m25.precisionCast<288>(), init25); EXPECT_EQ(m25.precisionCast<320>(), init25); EXPECT_EQ(m25.precisionCast<352>(), init25); EXPECT_EQ(m25.precisionCast<384>(), init25);
+    EXPECT_EQ(m25.precisionCast<416>(), init25); EXPECT_EQ(m25.precisionCast<448>(), init25); EXPECT_EQ(m25.precisionCast<480>(), init25); EXPECT_EQ(m25.precisionCast<512>(), init25);
+    EXPECT_EQ(m25.precisionCast<544>(), init25); EXPECT_EQ(m25.precisionCast<576>(), init25); EXPECT_EQ(m25.precisionCast<608>(), init25); EXPECT_EQ(m25.precisionCast<640>(), init25);
+    EXPECT_EQ(m25.precisionCast<672>(), init25); EXPECT_EQ(m25.precisionCast<704>(), init25); EXPECT_EQ(m25.precisionCast<736>(), init25); EXPECT_EQ(m25.precisionCast<768>(), init25);
+    EXPECT_EQ(m25.precisionCast<800>(), init25); EXPECT_EQ(m25.precisionCast<832>(), init25); EXPECT_EQ(m25.precisionCast<864>(), init25); EXPECT_EQ(m25.precisionCast<896>(), init25);
+
+
+    long long init26 = -590213465179246446; Multiprecision<256> m26 = init26;
+    EXPECT_EQ(m26.precisionCast<288>(), init26); EXPECT_EQ(m26.precisionCast<320>(), init26); EXPECT_EQ(m26.precisionCast<352>(), init26); EXPECT_EQ(m26.precisionCast<384>(), init26);
+    EXPECT_EQ(m26.precisionCast<416>(), init26); EXPECT_EQ(m26.precisionCast<448>(), init26); EXPECT_EQ(m26.precisionCast<480>(), init26); EXPECT_EQ(m26.precisionCast<512>(), init26);
+    EXPECT_EQ(m26.precisionCast<544>(), init26); EXPECT_EQ(m26.precisionCast<576>(), init26); EXPECT_EQ(m26.precisionCast<608>(), init26); EXPECT_EQ(m26.precisionCast<640>(), init26);
+    EXPECT_EQ(m26.precisionCast<672>(), init26); EXPECT_EQ(m26.precisionCast<704>(), init26); EXPECT_EQ(m26.precisionCast<736>(), init26); EXPECT_EQ(m26.precisionCast<768>(), init26);
+    EXPECT_EQ(m26.precisionCast<800>(), init26); EXPECT_EQ(m26.precisionCast<832>(), init26); EXPECT_EQ(m26.precisionCast<864>(), init26); EXPECT_EQ(m26.precisionCast<896>(), init26);
+
+
+    long long init27 = 6023706187360170892; Multiprecision<256> m27 = init27;
+    EXPECT_EQ(m27.precisionCast<288>(), init27); EXPECT_EQ(m27.precisionCast<320>(), init27); EXPECT_EQ(m27.precisionCast<352>(), init27); EXPECT_EQ(m27.precisionCast<384>(), init27);
+    EXPECT_EQ(m27.precisionCast<416>(), init27); EXPECT_EQ(m27.precisionCast<448>(), init27); EXPECT_EQ(m27.precisionCast<480>(), init27); EXPECT_EQ(m27.precisionCast<512>(), init27);
+    EXPECT_EQ(m27.precisionCast<544>(), init27); EXPECT_EQ(m27.precisionCast<576>(), init27); EXPECT_EQ(m27.precisionCast<608>(), init27); EXPECT_EQ(m27.precisionCast<640>(), init27);
+    EXPECT_EQ(m27.precisionCast<672>(), init27); EXPECT_EQ(m27.precisionCast<704>(), init27); EXPECT_EQ(m27.precisionCast<736>(), init27); EXPECT_EQ(m27.precisionCast<768>(), init27);
+    EXPECT_EQ(m27.precisionCast<800>(), init27); EXPECT_EQ(m27.precisionCast<832>(), init27); EXPECT_EQ(m27.precisionCast<864>(), init27); EXPECT_EQ(m27.precisionCast<896>(), init27);
+
+
+    long long init28 = 5869361540369536229; Multiprecision<256> m28 = init28;
+    EXPECT_EQ(m28.precisionCast<288>(), init28); EXPECT_EQ(m28.precisionCast<320>(), init28); EXPECT_EQ(m28.precisionCast<352>(), init28); EXPECT_EQ(m28.precisionCast<384>(), init28);
+    EXPECT_EQ(m28.precisionCast<416>(), init28); EXPECT_EQ(m28.precisionCast<448>(), init28); EXPECT_EQ(m28.precisionCast<480>(), init28); EXPECT_EQ(m28.precisionCast<512>(), init28);
+    EXPECT_EQ(m28.precisionCast<544>(), init28); EXPECT_EQ(m28.precisionCast<576>(), init28); EXPECT_EQ(m28.precisionCast<608>(), init28); EXPECT_EQ(m28.precisionCast<640>(), init28);
+    EXPECT_EQ(m28.precisionCast<672>(), init28); EXPECT_EQ(m28.precisionCast<704>(), init28); EXPECT_EQ(m28.precisionCast<736>(), init28); EXPECT_EQ(m28.precisionCast<768>(), init28);
+    EXPECT_EQ(m28.precisionCast<800>(), init28); EXPECT_EQ(m28.precisionCast<832>(), init28); EXPECT_EQ(m28.precisionCast<864>(), init28); EXPECT_EQ(m28.precisionCast<896>(), init28);
+
+
+    long long init29 = 1220581244790115876; Multiprecision<256> m29 = init29;
+    EXPECT_EQ(m29.precisionCast<288>(), init29); EXPECT_EQ(m29.precisionCast<320>(), init29); EXPECT_EQ(m29.precisionCast<352>(), init29); EXPECT_EQ(m29.precisionCast<384>(), init29);
+    EXPECT_EQ(m29.precisionCast<416>(), init29); EXPECT_EQ(m29.precisionCast<448>(), init29); EXPECT_EQ(m29.precisionCast<480>(), init29); EXPECT_EQ(m29.precisionCast<512>(), init29);
+    EXPECT_EQ(m29.precisionCast<544>(), init29); EXPECT_EQ(m29.precisionCast<576>(), init29); EXPECT_EQ(m29.precisionCast<608>(), init29); EXPECT_EQ(m29.precisionCast<640>(), init29);
+    EXPECT_EQ(m29.precisionCast<672>(), init29); EXPECT_EQ(m29.precisionCast<704>(), init29); EXPECT_EQ(m29.precisionCast<736>(), init29); EXPECT_EQ(m29.precisionCast<768>(), init29);
+    EXPECT_EQ(m29.precisionCast<800>(), init29); EXPECT_EQ(m29.precisionCast<832>(), init29); EXPECT_EQ(m29.precisionCast<864>(), init29); EXPECT_EQ(m29.precisionCast<896>(), init29);
+}

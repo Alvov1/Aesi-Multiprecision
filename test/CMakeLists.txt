@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 file(GLOB Tests *.cpp)
-add_executable(Multiprecision ${Tests} ../Multiprecision.h ../Multiprecision.cpp
+add_executable(Multiprecision ${Tests} ../Multiprecision.h
         bitwise/bitwise_and.cpp
         bitwise/bitwise_or.cpp
         bitwise/bitwise_xor.cpp)

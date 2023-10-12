@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 set(CMAKE_CXX_STANDARD 20)
-project(MetalMultiprecision)
+project(MultiprecisionGPU)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 file(GLOB Tests *.cpp)
-add_executable(Multiprecision ${Tests} ../Multiprecision.h
+add_executable(MultiprecisionGPU ${Tests} ../Multiprecision.h
         bitwise/bitwise_and.cpp
         bitwise/bitwise_or.cpp
         bitwise/bitwise_xor.cpp)
@@ -20,9 +20,9 @@ add_subdirectory(arithmetic)
 add_subdirectory(operations)
 add_subdirectory(bitwise)
 
-target_link_libraries(Multiprecision GTest::gtest_main)
+target_link_libraries(MultiprecisionGPU GTest::gtest_main)
 
 include(GoogleTest)
-gtest_discover_tests(Multiprecision)
+gtest_discover_tests(MultiprecisionGPU)
 
 

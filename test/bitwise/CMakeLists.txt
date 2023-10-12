@@ -1,2 +1,2 @@
 file(GLOB BitwiseTests *.cpp)
-target_sources(Multiprecision PRIVATE ${BitwiseTests})
+target_sources(MultiprecisionGPU PRIVATE ${BitwiseTests})

@@ -1,2 +1,2 @@
 file(GLOB ArithmeticTests *.cpp)
-target_sources(Multiprecision PRIVATE ${ArithmeticTests})
+target_sources(MultiprecisionGPU PRIVATE ${ArithmeticTests})

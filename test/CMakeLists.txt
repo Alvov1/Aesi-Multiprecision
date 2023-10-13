@@ -19,6 +19,7 @@ add_executable(MultiprecisionGPU ${Tests} ../Multiprecision.h
 add_subdirectory(arithmetic)
 add_subdirectory(operations)
 add_subdirectory(bitwise)
+add_subdirectory(number-theory)
 
 target_link_libraries(MultiprecisionGPU GTest::gtest_main)
 

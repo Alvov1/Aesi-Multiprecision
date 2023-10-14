@@ -575,6 +575,27 @@ public:
     }
     /* ----------------------------------------------------------------------- */
 
+
+    /* -------------------- Public number theory functions. ------------------ */
+    static constexpr auto gcd(const Multiprecision& first, const Multiprecision& second) noexcept -> Multiprecision {
+        auto[greater, smaller] = [&first, &second] {
+            const auto ratio = first.operator<=>(second);
+            return ratio == std::strong_ordering::greater ?
+                   std::pair { first, second }
+                                                          :
+                   std::pair { second, first };
+        } ();
+        while(!isLineEmpty(smaller.blocks)) {
+            auto [quotient, remainder] = divide(greater, smaller);
+            greater = smaller; smaller = remainder;
+        }
+        return greater;
+    }
+    static constexpr auto powm(const Multiprecision& base, const Multiprecision& power, const Multiprecision& mod) noexcept -> Multiprecision {
+        return {};
+    }
+    /* ----------------------------------------------------------------------- */
+
     constexpr friend std::ostream& operator<<(std::ostream& ss, const Multiprecision& value) noexcept {
         auto flags = ss.flags();
 
@@ -843,6 +864,47 @@ constexpr auto operator|(const Multiprecision<bFirst>& first, const Multiprecisi
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
 constexpr auto operator|=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
     return first.operator|=(second.template precisionCast<bFirst>());
+}
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+/* ------------------------------------------- Greatest common divisor -------------------------------------------- */
+template<std::size_t bFirst, std::size_t bSecond>
+constexpr auto gcd(const Multiprecision<bFirst> &first, const Multiprecision<bSecond> &second)
+-> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
+    if constexpr (bFirst > bSecond) {
+        return Multiprecision<bFirst>::gcd(first, second.template precisionCast<bFirst>());
+    } else {
+        return Multiprecision<bSecond>::gcd(first.template precisionCast<bSecond>(), second);
+    }
+}
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+
+/* ----------------------------------------------- Power by modulo ------------------------------------------------ */
+namespace {
+    template<std::size_t bCommon, std::size_t bDiffer>
+    constexpr auto
+    powm(const Multiprecision<bCommon> &base, const Multiprecision<bCommon> &power, const Multiprecision<bDiffer> &mod)
+    -> typename std::conditional<(bCommon > bDiffer), Multiprecision<bCommon>, Multiprecision<bDiffer>>::type {
+        if constexpr (bCommon > bDiffer) {
+            return Multiprecision<bCommon>::powm(base, power, mod.template precisionCast<bCommon>());
+        } else {
+            return Multiprecision<bDiffer>::powm(base.template precisionCast<bDiffer>(),
+                                                 power.template precisionCast<bDiffer>(), mod);
+        }
+    }
+}
+
+template<std::size_t bBase, std::size_t bPow, std::size_t bMod>
+constexpr auto powm(const Multiprecision<bBase> &base, const Multiprecision<bPow> &power, const Multiprecision<bMod> &mod)
+-> typename std::conditional<(bBase > bPow),
+        typename std::conditional<(bBase > bMod), Multiprecision<bBase>, Multiprecision<bMod>>::value,
+        typename std::conditional<(bPow > bMod), Multiprecision<bPow>, Multiprecision<bMod>>::value>::value {
+    if constexpr (bBase > bPow) {
+        return powm(base, power.template precisionCast<bBase>(), mod);
+    } else {
+        return powm(base.template precisionCast<bPow>(), power, mod);
+    }
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
 

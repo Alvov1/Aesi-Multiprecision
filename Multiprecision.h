@@ -122,96 +122,48 @@ public:
                     return '-';
                 if constexpr (std::is_same_v<wchar_t, Char>)
                     return L'-';
-                if constexpr (std::is_same_v<char8_t, Char>)
-                    return u8'-';
-                if constexpr (std::is_same_v<char16_t, Char>)
-                    return u'-';
-                if constexpr (std::is_same_v<char32_t, Char>)
-                    return U'-';
             } ();
             Char zero = [] {
                 if constexpr (std::is_same_v<char, Char>)
                     return '0';
                 if constexpr (std::is_same_v<wchar_t, Char>)
                     return L'0';
-                if constexpr (std::is_same_v<char8_t, Char>)
-                    return u8'0';
-                if constexpr (std::is_same_v<char16_t, Char>)
-                    return u'0';
-                if constexpr (std::is_same_v<char32_t, Char>)
-                    return U'0';
             } ();
             Char nine = [] {
                 if constexpr (std::is_same_v<char, Char>)
                     return '9';
                 if constexpr (std::is_same_v<wchar_t, Char>)
                     return L'9';
-                if constexpr (std::is_same_v<char8_t, Char>)
-                    return u8'9';
-                if constexpr (std::is_same_v<char16_t, Char>)
-                    return u'9';
-                if constexpr (std::is_same_v<char32_t, Char>)
-                    return U'9';
             } ();
             std::pair<Char, Char> a = [] {
                 if constexpr (std::is_same_v<char, Char>)
                     return std::pair { 'a', 'A' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
                     return std::pair { L'a', L'A' };
-                if constexpr (std::is_same_v<char8_t, Char>)
-                    return std::pair { u8'a', u8'A' };
-                if constexpr (std::is_same_v<char16_t, Char>)
-                    return std::pair { u'a', u'A' };
-                if constexpr (std::is_same_v<char32_t, Char>)
-                    return std::pair { U'a', U'A' };
             } ();
             std::pair<Char, Char> f = [] {
                 if constexpr (std::is_same_v<char, Char>)
                     return std::pair { 'f', 'F' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
                     return std::pair { L'f', L'F' };
-                if constexpr (std::is_same_v<char8_t, Char>)
-                    return std::pair { u8'f', u8'F' };
-                if constexpr (std::is_same_v<char16_t, Char>)
-                    return std::pair { u'f', u'F' };
-                if constexpr (std::is_same_v<char32_t, Char>)
-                    return std::pair { U'f', U'F' };
             } ();
             std::pair<Char, Char> octal = [] {
                 if constexpr (std::is_same_v<char, Char>)
                     return std::pair { 'o', 'O' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
                     return std::pair { L'o', L'O' };
-                if constexpr (std::is_same_v<char8_t, Char>)
-                    return std::pair { u8'o', u8'O' };
-                if constexpr (std::is_same_v<char16_t, Char>)
-                    return std::pair { u'o', u'O' };
-                if constexpr (std::is_same_v<char32_t, Char>)
-                    return std::pair { U'o', U'O' };
             } ();
             std::pair<Char, Char> binary = [] {
                 if constexpr (std::is_same_v<char, Char>)
                     return std::pair { 'b', 'B' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
                     return std::pair { L'b', L'B' };
-                if constexpr (std::is_same_v<char8_t, Char>)
-                    return std::pair { u8'b', u8'B' };
-                if constexpr (std::is_same_v<char16_t, Char>)
-                    return std::pair { u'b', u'B' };
-                if constexpr (std::is_same_v<char32_t, Char>)
-                    return std::pair { U'b', U'B' };
             } ();
             std::pair<Char, Char> hexadecimal = [] {
                 if constexpr (std::is_same_v<char, Char>)
                     return std::pair { 'x', 'X' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
                     return std::pair { L'x', L'X' };
-                if constexpr (std::is_same_v<char8_t, Char>)
-                    return std::pair { u8'x', u8'X' };
-                if constexpr (std::is_same_v<char16_t, Char>)
-                    return std::pair { u'x', u'X' };
-                if constexpr (std::is_same_v<char32_t, Char>)
-                    return std::pair { U'x', u'X' };
             } ();
         } characters;
         std::size_t position = 0;
@@ -330,13 +282,13 @@ public:
             return this->operator=(Multiprecision());
         sign = (sign != value.sign ? Negative : Positive);
 
-        constexpr auto multiplyLines = [] (const blockLine& longerLine, std::size_t longerLength,
-                const blockLine& smallerLine, std::size_t smallerLength) {
+        constexpr auto multiplyLines = [] (const blockLine& longerLine, const std::size_t longerLength,
+                const blockLine& smallerLine, const std::size_t smallerLength) {
             blockLine buffer {};
 
             for(std::size_t i = 0; i < longerLength; ++i) {
                 uint64_t tBlock = longerLine[i], carryOut = 0;
-                for(std::size_t j = 0; j < smallerLength; ++j) {
+                for(std::size_t j = 0; j < smallerLength && i + j < buffer.size(); ++j) {
                     const auto product = tBlock * static_cast<uint64_t>(smallerLine[j]) + carryOut;
                     const auto block = static_cast<uint64_t>(buffer[i + j]) + (product % blockBase);
                     carryOut = product / blockBase + block / blockBase;
@@ -349,7 +301,7 @@ public:
             return buffer;
         };
 
-        const auto thisLength = lineLength(blocks), valueLength = lineLength(value.blocks);
+        const std::size_t thisLength = lineLength(blocks), valueLength = lineLength(value.blocks);
         if(thisLength > valueLength)
             blocks = multiplyLines(blocks, thisLength, value.blocks, valueLength);
         else
@@ -420,25 +372,6 @@ public:
     }
     template <typename Integral> requires (std::is_integral_v<Integral>)
     constexpr Multiprecision& operator<<=(Integral bitShift) noexcept {
-        /*                    3                                               2                                     1                                     0
-           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0011 0010 0110 0100 0011 0110 || 0010 0001 0001 1011 1011 0110 1001 0111 << 48
-           0000 0000 0000 0000|0000 0000 0011 0010 || 0110 0100 0011 0110|0010 0001 0001 1011 || 1011 0110 1001 0111|0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000
-            Правая половина 2   Левая половина 1   || Правая половина 1    Левая половина 0   || Правая половина 0   ---- ---- ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
-           3992422065038923586049945894912 = 0x( 0000 0032 || 6436 211B || B697 0000 || 0000 0000 )
-
-           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 1011 1000 0011 0110 1010 1101 || 1101 1100 0110 0101 0010 0110 1110 0100 << 40
-           ---- ---- ---- ---- ---- ----|0000 0000 || 1011 1000 0011 0110 1010 1101|1101 1100 || 0110 0101 0010 0110 1110 0100|---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
-                      Право 2              Лево 1  ||            Право 1              Лево 0  ||            Право 0            ---- ---- || ---- ---- ---- ---- ---- ---- ---- ----
-           -57011344836360679021114032128 = -0x( 0000 0000 || B836 ADDC || 6526 E400 || 0000 0000)
-
-           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000
-           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 << 32
-           2852520100991549003783995392 = 0x( 0000 0000 || 0937 8CA0 || 8716 1000 || 0000 0000 )
-
-           0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 << 64
-           12251480544941320143633640456854700032 = 0x( 0937 8CA0 || 8716 1000 || 0000 0000 || 0000 0000 )
-        */
-
         if(bitShift < 0)
             return this->operator>>=(-bitShift);
 
@@ -466,25 +399,6 @@ public:
     }
     template <typename Integral> requires (std::is_integral_v<Integral>)
     constexpr Multiprecision& operator>>=(Integral bitShift) noexcept {
-        /*                    3                                               2                                     1                                     0
-           0000 0000 0000 0000 0000 0000 0011 0010 || 0110 0100 0011 0110 0010 0001 0001 1011 || 1011 0110 1001 0111 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 >> 48
-           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0011 0010|0110 0100 0011 0110 || 0010 0001 0001 1011|1011 0110 1001 0111
-           ---- ---- ---- ---- ---- ---- ---- ---- || ---- ---- ---- ----    Левая часть 3    ||    Правая часть 3      Левая часть 2    ||    Правая часть 2       Левая часть 1
-           14183932482008727 = 0x( 0000 0000 || 0000 0000 || 0032 6436 || 211B B697 )
-
-           0000 0000 0000 0000 0000 0000 0000 0000 || 1011 1000 0011 0110 1010 1101 1101 1100 || 0110 0101 0010 0110 1110 0100 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 >> 40
-           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000|1011 1000 0011 0110 1010 1101 || 1101 1100|0110 0101 0010 0110 1110 0100
-           ---- ---- ---- ---- ---- ---- ---- ---- || ---- ---- ---- ---- ---- ---- ---- ---- ||  Право 3             Лево 2             ||  Право 2             Лево 1
-           51851516069619428 = 0x( 0000 0000 || 0000 0000 || 00B8 36AD || DC65 26E4 )
-
-           0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000
-           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 >> 32
-           2852520100991549003783995392 = 0x( 0000 0000 || 0937 8CA0 || 8716 1000 || 0000 0000 )
-
-           0000 0000 0000 0000 0000 0000 0000 0000 || 0000 0000 0000 0000 0000 0000 0000 0000 || 0000 1001 0011 0111 1000 1100 1010 0000 || 1000 0111 0001 0110 0001 0000 0000 0000 >> 64
-           664154091149463552 = 0x( 0000 0000 || 0000 0000 || 0937 8CA0 || 8716 1000 )
-        */
-
         if(bitShift < 0)
             return this->operator<<=(-bitShift);
 

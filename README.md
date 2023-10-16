@@ -38,7 +38,28 @@ int main() {
 It is admissible to use numbers of different precision inside the majority of operations, but it is not recommended cause it leads to redundant copying inside type conversions. Operation-assignment expressions (+=, -=, &=, etc...) requires the bitness of assignment to be greater or equal than bitness of assignable.
 Precision cast operator could be called by user directly.
 
+```cpp
+#include <iostream>
+#include "Multiprecision.h"
+
+int main() {
+    Multiprecision<128> m128 = "265252859812191058636308479999999";
+    Multiprecision<160> m160 = "263130836933693530167218012159999999";
+
+    std::cout << m128 * m160 << std::endl;
+
+    Multiprecision<256> base = "10888869450418352160768000001";
+    Multiprecision<96> power = "99990001";
+    Multiprecision<256> mod = "8683317618811886495518194401279999999";
+
+    std::cout << Multiprecision<256>::powm(base, power, mod) << std::endl;
+}
+```
+>1142184225164688919052733263067509431086585217025     
+6680141832773294447513292887050873529
+
 ## Implementation notes:
 - Sign in bitwise operators is depending on sign of the first operand.
 - Tilde operator (~) does __NOT__ affect the sign of number.
 - Both bitshift operators do not make any effort if the shift value is greater than the bitness of the number. If the shift is negative, the opposite operator is called with the absolute value of the shift.
+- Be careful with multiplication overflow when using __POWM__ function and similar.

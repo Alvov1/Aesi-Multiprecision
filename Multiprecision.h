@@ -594,37 +594,23 @@ public:
         return greater;
     }
     static constexpr auto powm(const Multiprecision& base, const Multiprecision& power, const Multiprecision& mod) noexcept -> Multiprecision {
-        Multiprecision result = 1;
-
-        auto bitsEmptyCheck = [] (const Multiprecision& value, std::size_t offset) {
-            const auto bitIndex = offset % blockBitLength;
-
-            for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i) {
-                if(i == offset && bitIndex != 0) {
-
-                    for(uint8_t j = 0; j < blockBitLength; ++j) // Any one bit in block is true - return false ??
-                        if(0x1 & (value.blocks[i] >> j)) return false;
-
-                } else if (value.blocks[i] != 0) return false;
-            }
+        constexpr auto remainingBlocksEmpty = [] (const Multiprecision& value, std::size_t offset) {
+            for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i)
+                if (value.blocks[i] != 0) return false;
             return true;
         };
 
-        Multiprecision tmp1 = base;
-        auto [tmp2, b] = divide(tmp1, mod);
+        Multiprecision result = 1;
+        auto [_, b] = divide(base, mod);
 
-        for(unsigned iteration = 0; !bitsEmptyCheck(power, iteration); iteration++) {
+        for(unsigned iteration = 0; !remainingBlocksEmpty(power, iteration); iteration++) {
             if(power.getBit(iteration)) {
-                tmp1 = result * b;
-
-                const auto [quotient, remainder] = divide(tmp1, mod);
-                tmp2 = quotient; result = remainder;
+                const auto [quotient, remainder] = divide(result * b, mod);
+                result = remainder;
             }
 
-            tmp1 = b; tmp2 = b * tmp1;
-
-            const auto [quotient, remainder] = divide(tmp2, mod);
-            tmp1 = quotient; b = remainder;
+            const auto [quotient, remainder] = divide(b * b, mod);
+            b = remainder;
         }
 
         return result;

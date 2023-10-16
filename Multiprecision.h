@@ -568,6 +568,8 @@ public:
                 sign = Zero;
         }
     }
+    [[nodiscard]] constexpr auto isOdd() const noexcept -> bool { return (0x1 & blocks[0]) == 1; }
+    [[nodiscard]] constexpr auto isEven() const noexcept -> bool { return (0x1 & blocks[0]) == 0; }
     [[nodiscard]] constexpr auto abs() const noexcept -> Multiprecision {
         if(sign == Zero)
             return *this;
@@ -596,10 +598,13 @@ public:
 
         auto bitsEmptyCheck = [] (const Multiprecision& value, std::size_t offset) {
             const auto bitIndex = offset % blockBitLength;
+
             for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i) {
                 if(i == offset && bitIndex != 0) {
-                    for(uint8_t j = 0; j < blockBitLength; ++j)
+
+                    for(uint8_t j = 0; j < blockBitLength; ++j) // Any one bit in block is true - return false ??
                         if(0x1 & (value.blocks[i] >> j)) return false;
+
                 } else if (value.blocks[i] != 0) return false;
             }
             return true;

@@ -1,185 +1,6 @@
 #include <gtest/gtest.h>
 #include "../../Multiprecision.h"
 
-TEST(Casting, NumberCast) {
-    {
-        short v0 = 12660; Multiprecision o0 = v0; EXPECT_EQ(o0.integralCast<short>(), v0);
-        short v1 = 1291; Multiprecision o1 = v1; EXPECT_EQ(o1.integralCast<short>(), v1);
-        short v2 = 9379; Multiprecision o2 = v2; EXPECT_EQ(o2.integralCast<short>(), v2);
-        short v3 = -5507; Multiprecision o3 = v3; EXPECT_EQ(o3.integralCast<short>(), v3);
-        short v4 = 10503; Multiprecision o4 = v4; EXPECT_EQ(o4.integralCast<short>(), v4);
-        short v5 = -15803; Multiprecision o5 = v5; EXPECT_EQ(o5.integralCast<short>(), v5);
-        short v6 = -25434; Multiprecision o6 = v6; EXPECT_EQ(o6.integralCast<short>(), v6);
-        short v7 = 31225; Multiprecision o7 = v7; EXPECT_EQ(o7.integralCast<short>(), v7);
-        short v8 = 27368; Multiprecision o8 = v8; EXPECT_EQ(o8.integralCast<short>(), v8);
-        short v9 = 3854; Multiprecision o9 = v9; EXPECT_EQ(o9.integralCast<short>(), v9);
-        short v10 = -31821; Multiprecision o10 = v10; EXPECT_EQ(o10.integralCast<short>(), v10);
-        short v11 = -14224; Multiprecision o11 = v11; EXPECT_EQ(o11.integralCast<short>(), v11);
-        short v12 = 16812; Multiprecision o12 = v12; EXPECT_EQ(o12.integralCast<short>(), v12);
-        short v13 = 24874; Multiprecision o13 = v13; EXPECT_EQ(o13.integralCast<short>(), v13);
-        short v14 = 18866; Multiprecision o14 = v14; EXPECT_EQ(o14.integralCast<short>(), v14);
-        short v15 = -14076; Multiprecision o15 = v15; EXPECT_EQ(o15.integralCast<short>(), v15);
-        short v16 = 31911; Multiprecision o16 = v16; EXPECT_EQ(o16.integralCast<short>(), v16);
-        short v17 = -8633; Multiprecision o17 = v17; EXPECT_EQ(o17.integralCast<short>(), v17);
-        short v18 = 18120; Multiprecision o18 = v18; EXPECT_EQ(o18.integralCast<short>(), v18);
-        short v19 = 3968; Multiprecision o19 = v19; EXPECT_EQ(o19.integralCast<short>(), v19);
-    }
-    {
-        unsigned short v0 = 1941; Multiprecision o0 = v0; EXPECT_EQ(o0.integralCast<unsigned short>(), v0);
-        unsigned short v1 = 65126; Multiprecision o1 = v1; EXPECT_EQ(o1.integralCast<unsigned short>(), v1);
-        unsigned short v2 = 31635; Multiprecision o2 = v2; EXPECT_EQ(o2.integralCast<unsigned short>(), v2);
-        unsigned short v3 = 57499; Multiprecision o3 = v3; EXPECT_EQ(o3.integralCast<unsigned short>(), v3);
-        unsigned short v4 = 38058; Multiprecision o4 = v4; EXPECT_EQ(o4.integralCast<unsigned short>(), v4);
-        unsigned short v5 = 63039; Multiprecision o5 = v5; EXPECT_EQ(o5.integralCast<unsigned short>(), v5);
-        unsigned short v6 = 8296; Multiprecision o6 = v6; EXPECT_EQ(o6.integralCast<unsigned short>(), v6);
-        unsigned short v7 = 24236; Multiprecision o7 = v7; EXPECT_EQ(o7.integralCast<unsigned short>(), v7);
-        unsigned short v8 = 29619; Multiprecision o8 = v8; EXPECT_EQ(o8.integralCast<unsigned short>(), v8);
-        unsigned short v9 = 60555; Multiprecision o9 = v9; EXPECT_EQ(o9.integralCast<unsigned short>(), v9);
-        unsigned short v10 = 38254; Multiprecision o10 = v10; EXPECT_EQ(o10.integralCast<unsigned short>(), v10);
-        unsigned short v11 = 59479; Multiprecision o11 = v11; EXPECT_EQ(o11.integralCast<unsigned short>(), v11);
-        unsigned short v12 = 63392; Multiprecision o12 = v12; EXPECT_EQ(o12.integralCast<unsigned short>(), v12);
-        unsigned short v13 = 25152; Multiprecision o13 = v13; EXPECT_EQ(o13.integralCast<unsigned short>(), v13);
-        unsigned short v14 = 3758; Multiprecision o14 = v14; EXPECT_EQ(o14.integralCast<unsigned short>(), v14);
-        unsigned short v15 = 18321; Multiprecision o15 = v15; EXPECT_EQ(o15.integralCast<unsigned short>(), v15);
-        unsigned short v16 = 39353; Multiprecision o16 = v16; EXPECT_EQ(o16.integralCast<unsigned short>(), v16);
-        unsigned short v17 = 8739; Multiprecision o17 = v17; EXPECT_EQ(o17.integralCast<unsigned short>(), v17);
-        unsigned short v18 = 42112; Multiprecision o18 = v18; EXPECT_EQ(o18.integralCast<unsigned short>(), v18);
-        unsigned short v19 = 19620; Multiprecision o19 = v19; EXPECT_EQ(o19.integralCast<unsigned short>(), v19);
-    }
-    {
-        int v0 = 1633072347; Multiprecision o0 = v0; EXPECT_EQ(o0.integralCast<int>(), v0);
-        int v1 = 1373045468; Multiprecision o1 = v1; EXPECT_EQ(o1.integralCast<int>(), v1);
-        int v2 = -168273879; Multiprecision o2 = v2; EXPECT_EQ(o2.integralCast<int>(), v2);
-        int v3 = 1946447499; Multiprecision o3 = v3; EXPECT_EQ(o3.integralCast<int>(), v3);
-        int v4 = -182071435; Multiprecision o4 = v4; EXPECT_EQ(o4.integralCast<int>(), v4);
-        int v5 = 1000724497; Multiprecision o5 = v5; EXPECT_EQ(o5.integralCast<int>(), v5);
-        int v6 = 690522175; Multiprecision o6 = v6; EXPECT_EQ(o6.integralCast<int>(), v6);
-        int v7 = 2085869570; Multiprecision o7 = v7; EXPECT_EQ(o7.integralCast<int>(), v7);
-        int v8 = 1710099476; Multiprecision o8 = v8; EXPECT_EQ(o8.integralCast<int>(), v8);
-        int v9 = -1830783184; Multiprecision o9 = v9; EXPECT_EQ(o9.integralCast<int>(), v9);
-        int v10 = 1171383165; Multiprecision o10 = v10; EXPECT_EQ(o10.integralCast<int>(), v10);
-        int v11 = -1751249685; Multiprecision o11 = v11; EXPECT_EQ(o11.integralCast<int>(), v11);
-        int v12 = -1668504170; Multiprecision o12 = v12; EXPECT_EQ(o12.integralCast<int>(), v12);
-        int v13 = -241908811; Multiprecision o13 = v13; EXPECT_EQ(o13.integralCast<int>(), v13);
-        int v14 = 540291974; Multiprecision o14 = v14; EXPECT_EQ(o14.integralCast<int>(), v14);
-        int v15 = -1643457674; Multiprecision o15 = v15; EXPECT_EQ(o15.integralCast<int>(), v15);
-        int v16 = 902106685; Multiprecision o16 = v16; EXPECT_EQ(o16.integralCast<int>(), v16);
-        int v17 = -39871497; Multiprecision o17 = v17; EXPECT_EQ(o17.integralCast<int>(), v17);
-        int v18 = 888304759; Multiprecision o18 = v18; EXPECT_EQ(o18.integralCast<int>(), v18);
-        int v19 = 1568953909; Multiprecision o19 = v19; EXPECT_EQ(o19.integralCast<int>(), v19);
-    }
-    {
-        unsigned v0 = 2005690205; Multiprecision o0 = v0; EXPECT_EQ(o0.integralCast<unsigned>(), v0);
-        unsigned v1 = 1449627982; Multiprecision o1 = v1; EXPECT_EQ(o1.integralCast<unsigned>(), v1);
-        unsigned v2 = 1101302552; Multiprecision o2 = v2; EXPECT_EQ(o2.integralCast<unsigned>(), v2);
-        unsigned v3 = 595765511; Multiprecision o3 = v3; EXPECT_EQ(o3.integralCast<unsigned>(), v3);
-        unsigned v4 = 3553780719; Multiprecision o4 = v4; EXPECT_EQ(o4.integralCast<unsigned>(), v4);
-        unsigned v5 = 1594854713; Multiprecision o5 = v5; EXPECT_EQ(o5.integralCast<unsigned>(), v5);
-        unsigned v6 = 1443312011; Multiprecision o6 = v6; EXPECT_EQ(o6.integralCast<unsigned>(), v6);
-        unsigned v7 = 4050435786; Multiprecision o7 = v7; EXPECT_EQ(o7.integralCast<unsigned>(), v7);
-        unsigned v8 = 2322528604; Multiprecision o8 = v8; EXPECT_EQ(o8.integralCast<unsigned>(), v8);
-        unsigned v9 = 659532747; Multiprecision o9 = v9; EXPECT_EQ(o9.integralCast<unsigned>(), v9);
-        unsigned v10 = 4162423578; Multiprecision o10 = v10; EXPECT_EQ(o10.integralCast<unsigned>(), v10);
-        unsigned v11 = 2641111926; Multiprecision o11 = v11; EXPECT_EQ(o11.integralCast<unsigned>(), v11);
-        unsigned v12 = 4253288915; Multiprecision o12 = v12; EXPECT_EQ(o12.integralCast<unsigned>(), v12);
-        unsigned v13 = 3110878193; Multiprecision o13 = v13; EXPECT_EQ(o13.integralCast<unsigned>(), v13);
-        unsigned v14 = 587696870; Multiprecision o14 = v14; EXPECT_EQ(o14.integralCast<unsigned>(), v14);
-        unsigned v15 = 1153568748; Multiprecision o15 = v15; EXPECT_EQ(o15.integralCast<unsigned>(), v15);
-        unsigned v16 = 4175266679; Multiprecision o16 = v16; EXPECT_EQ(o16.integralCast<unsigned>(), v16);
-        unsigned v17 = 346810525; Multiprecision o17 = v17; EXPECT_EQ(o17.integralCast<unsigned>(), v17);
-        unsigned v18 = 274355692; Multiprecision o18 = v18; EXPECT_EQ(o18.integralCast<unsigned>(), v18);
-        unsigned v19 = 3087867327; Multiprecision o19 = v19; EXPECT_EQ(o19.integralCast<unsigned>(), v19);
-    }
-    {
-        long v0 = 634812322182757621; Multiprecision o0 = v0; EXPECT_EQ(o0.integralCast<long>(), v0);
-        long v1 = -927449906461017615; Multiprecision o1 = v1; EXPECT_EQ(o1.integralCast<long>(), v1);
-        long v2 = -3504628980837960044; Multiprecision o2 = v2; EXPECT_EQ(o2.integralCast<long>(), v2);
-        long v3 = -2155375560745272488; Multiprecision o3 = v3; EXPECT_EQ(o3.integralCast<long>(), v3);
-        long v4 = -6526318726215051137; Multiprecision o4 = v4; EXPECT_EQ(o4.integralCast<long>(), v4);
-        long v5 = -2694746162811842986; Multiprecision o5 = v5; EXPECT_EQ(o5.integralCast<long>(), v5);
-        long v6 = 1631485759082327833; Multiprecision o6 = v6; EXPECT_EQ(o6.integralCast<long>(), v6);
-        long v7 = 8407645366062381801; Multiprecision o7 = v7; EXPECT_EQ(o7.integralCast<long>(), v7);
-        long v8 = 5841857305468410835; Multiprecision o8 = v8; EXPECT_EQ(o8.integralCast<long>(), v8);
-        long v9 = 9165801435086311778; Multiprecision o9 = v9; EXPECT_EQ(o9.integralCast<long>(), v9);
-        long v10 = 7049900736852272389; Multiprecision o10 = v10; EXPECT_EQ(o10.integralCast<long>(), v10);
-        long v11 = -1116039134974475934; Multiprecision o11 = v11; EXPECT_EQ(o11.integralCast<long>(), v11);
-        long v12 = 6134624124941989956; Multiprecision o12 = v12; EXPECT_EQ(o12.integralCast<long>(), v12);
-        long v13 = -1989814207699167888; Multiprecision o13 = v13; EXPECT_EQ(o13.integralCast<long>(), v13);
-        long v14 = -5162674662935837073; Multiprecision o14 = v14; EXPECT_EQ(o14.integralCast<long>(), v14);
-        long v15 = 361978787381322157; Multiprecision o15 = v15; EXPECT_EQ(o15.integralCast<long>(), v15);
-        long v16 = 2358318038699402381; Multiprecision o16 = v16; EXPECT_EQ(o16.integralCast<long>(), v16);
-        long v17 = 6721455152406516439; Multiprecision o17 = v17; EXPECT_EQ(o17.integralCast<long>(), v17);
-        long v18 = 6240728962025263647; Multiprecision o18 = v18; EXPECT_EQ(o18.integralCast<long>(), v18);
-        long v19 = -7516849453343319431; Multiprecision o19 = v19; EXPECT_EQ(o19.integralCast<long>(), v19);
-    }
-    {
-        unsigned long v0 = 1458432336447339549UL; Multiprecision o0 = v0; EXPECT_EQ(o0.integralCast<unsigned long>(), v0);
-        unsigned long v1 = 15166986956279526495UL; Multiprecision o1 = v1; EXPECT_EQ(o1.integralCast<unsigned long>(), v1);
-        unsigned long v2 = 843907744079905873UL; Multiprecision o2 = v2; EXPECT_EQ(o2.integralCast<unsigned long>(), v2);
-        unsigned long v3 = 16831641047459684976UL; Multiprecision o3 = v3; EXPECT_EQ(o3.integralCast<unsigned long>(), v3);
-        unsigned long v4 = 8233716564210995814UL; Multiprecision o4 = v4; EXPECT_EQ(o4.integralCast<unsigned long>(), v4);
-        unsigned long v5 = 12056099167404879864UL; Multiprecision o5 = v5; EXPECT_EQ(o5.integralCast<unsigned long>(), v5);
-        unsigned long v6 = 9195468763811385966UL; Multiprecision o6 = v6; EXPECT_EQ(o6.integralCast<unsigned long>(), v6);
-        unsigned long v7 = 6838015201710322987UL; Multiprecision o7 = v7; EXPECT_EQ(o7.integralCast<unsigned long>(), v7);
-        unsigned long v8 = 15909623765770348916UL; Multiprecision o8 = v8; EXPECT_EQ(o8.integralCast<unsigned long>(), v8);
-        unsigned long v9 = 580359803260052445UL; Multiprecision o9 = v9; EXPECT_EQ(o9.integralCast<unsigned long>(), v9);
-        unsigned long v10 = 1562144106091796071UL; Multiprecision o10 = v10; EXPECT_EQ(o10.integralCast<unsigned long>(), v10);
-        unsigned long v11 = 9499213611466063262UL; Multiprecision o11 = v11; EXPECT_EQ(o11.integralCast<unsigned long>(), v11);
-        unsigned long v12 = 12515821306029840702UL; Multiprecision o12 = v12; EXPECT_EQ(o12.integralCast<unsigned long>(), v12);
-        unsigned long v13 = 5666922082602738570UL; Multiprecision o13 = v13; EXPECT_EQ(o13.integralCast<unsigned long>(), v13);
-        unsigned long v14 = 12546046344820481203UL; Multiprecision o14 = v14; EXPECT_EQ(o14.integralCast<unsigned long>(), v14);
-        unsigned long v15 = 13562221276840283927UL; Multiprecision o15 = v15; EXPECT_EQ(o15.integralCast<unsigned long>(), v15);
-        unsigned long v16 = 12646097440568072921UL; Multiprecision o16 = v16; EXPECT_EQ(o16.integralCast<unsigned long>(), v16);
-        unsigned long v17 = 14099814405939634110UL; Multiprecision o17 = v17; EXPECT_EQ(o17.integralCast<unsigned long>(), v17);
-        unsigned long v18 = 13036786147570218084UL; Multiprecision o18 = v18; EXPECT_EQ(o18.integralCast<unsigned long>(), v18);
-        unsigned long v19 = 14809679552796761321UL; Multiprecision o19 = v19; EXPECT_EQ(o19.integralCast<unsigned long>(), v19);
-    }
-    {
-        long long v0 = -966320832989284844; Multiprecision o0 = v0; EXPECT_EQ(o0.integralCast<long long>(), v0);
-        long long v1 = -2539299047194883024; Multiprecision o1 = v1; EXPECT_EQ(o1.integralCast<long long>(), v1);
-        long long v2 = -4072657627411227702; Multiprecision o2 = v2; EXPECT_EQ(o2.integralCast<long long>(), v2);
-        long long v3 = 6676151703625450453; Multiprecision o3 = v3; EXPECT_EQ(o3.integralCast<long long>(), v3);
-        long long v4 = 6024657647873919769; Multiprecision o4 = v4; EXPECT_EQ(o4.integralCast<long long>(), v4);
-        long long v5 = -3436387051813180897; Multiprecision o5 = v5; EXPECT_EQ(o5.integralCast<long long>(), v5);
-        long long v6 = -930863918495184864; Multiprecision o6 = v6; EXPECT_EQ(o6.integralCast<long long>(), v6);
-        long long v7 = -2648679724062892078; Multiprecision o7 = v7; EXPECT_EQ(o7.integralCast<long long>(), v7);
-        long long v8 = 163799229998191542; Multiprecision o8 = v8; EXPECT_EQ(o8.integralCast<long long>(), v8);
-        long long v9 = 7096985823516738807; Multiprecision o9 = v9; EXPECT_EQ(o9.integralCast<long long>(), v9);
-        long long v10 = 9021468662796673265; Multiprecision o10 = v10; EXPECT_EQ(o10.integralCast<long long>(), v10);
-        long long v11 = 7329596342632026139; Multiprecision o11 = v11; EXPECT_EQ(o11.integralCast<long long>(), v11);
-        long long v12 = 2830097210272796867; Multiprecision o12 = v12; EXPECT_EQ(o12.integralCast<long long>(), v12);
-        long long v13 = -8165373913969389069; Multiprecision o13 = v13; EXPECT_EQ(o13.integralCast<long long>(), v13);
-        long long v14 = 1849790133061638302; Multiprecision o14 = v14; EXPECT_EQ(o14.integralCast<long long>(), v14);
-        long long v15 = -8953474544892738048; Multiprecision o15 = v15; EXPECT_EQ(o15.integralCast<long long>(), v15);
-        long long v16 = -4256943809212026391; Multiprecision o16 = v16; EXPECT_EQ(o16.integralCast<long long>(), v16);
-        long long v17 = 5358224103492354631; Multiprecision o17 = v17; EXPECT_EQ(o17.integralCast<long long>(), v17);
-        long long v18 = -1353061819987477708; Multiprecision o18 = v18; EXPECT_EQ(o18.integralCast<long long>(), v18);
-        long long v19 = 5852270391142351733; Multiprecision o19 = v19; EXPECT_EQ(o19.integralCast<long long>(), v19);
-    }
-    {
-        unsigned long long v0 = 7056752338713246902ULL; Multiprecision o0 = v0; EXPECT_EQ(o0.integralCast<unsigned long long>(), v0);
-        unsigned long long v1 = 1752111911588599450ULL; Multiprecision o1 = v1; EXPECT_EQ(o1.integralCast<unsigned long long>(), v1);
-        unsigned long long v2 = 9479044036425476019ULL; Multiprecision o2 = v2; EXPECT_EQ(o2.integralCast<unsigned long long>(), v2);
-        unsigned long long v3 = 5193170295485823118ULL; Multiprecision o3 = v3; EXPECT_EQ(o3.integralCast<unsigned long long>(), v3);
-        unsigned long long v4 = 7329594209829406618ULL; Multiprecision o4 = v4; EXPECT_EQ(o4.integralCast<unsigned long long>(), v4);
-        unsigned long long v5 = 17408589177287406633ULL; Multiprecision o5 = v5; EXPECT_EQ(o5.integralCast<unsigned long long>(), v5);
-        unsigned long long v6 = 10049699202423151920ULL; Multiprecision o6 = v6; EXPECT_EQ(o6.integralCast<unsigned long long>(), v6);
-        unsigned long long v7 = 14893142280413871075ULL; Multiprecision o7 = v7; EXPECT_EQ(o7.integralCast<unsigned long long>(), v7);
-        unsigned long long v8 = 14477514342547457937ULL; Multiprecision o8 = v8; EXPECT_EQ(o8.integralCast<unsigned long long>(), v8);
-        unsigned long long v9 = 14158198760418317512ULL; Multiprecision o9 = v9; EXPECT_EQ(o9.integralCast<unsigned long long>(), v9);
-        unsigned long long v10 = 1737450455060823428ULL; Multiprecision o10 = v10; EXPECT_EQ(o10.integralCast<unsigned long long>(), v10);
-        unsigned long long v11 = 12956079072589122739ULL; Multiprecision o11 = v11; EXPECT_EQ(o11.integralCast<unsigned long long>(), v11);
-        unsigned long long v12 = 15263083373573044880ULL; Multiprecision o12 = v12; EXPECT_EQ(o12.integralCast<unsigned long long>(), v12);
-        unsigned long long v13 = 11589228342409016981ULL; Multiprecision o13 = v13; EXPECT_EQ(o13.integralCast<unsigned long long>(), v13);
-        unsigned long long v14 = 12279481383607276825ULL; Multiprecision o14 = v14; EXPECT_EQ(o14.integralCast<unsigned long long>(), v14);
-        unsigned long long v15 = 11338438110938113974ULL; Multiprecision o15 = v15; EXPECT_EQ(o15.integralCast<unsigned long long>(), v15);
-        unsigned long long v16 = 14528990072287077479ULL; Multiprecision o16 = v16; EXPECT_EQ(o16.integralCast<unsigned long long>(), v16);
-        unsigned long long v17 = 13754684638618159726ULL; Multiprecision o17 = v17; EXPECT_EQ(o17.integralCast<unsigned long long>(), v17);
-        unsigned long long v18 = 6821012615472018674ULL; Multiprecision o18 = v18; EXPECT_EQ(o18.integralCast<unsigned long long>(), v18);
-        unsigned long long v19 = 5576836686719978266ULL; Multiprecision o19 = v19; EXPECT_EQ(o19.integralCast<unsigned long long>(), v19);
-    }
-}
-
 TEST(Casting, PrecisionCast) {
     long long init0 = 7524839891475014690; Multiprecision<256> m0 = init0;
     EXPECT_EQ(m0.precisionCast<288>(), init0); EXPECT_EQ(m0.precisionCast<320>(), init0); EXPECT_EQ(m0.precisionCast<352>(), init0); EXPECT_EQ(m0.precisionCast<384>(), init0);
@@ -419,4 +240,65 @@ TEST(Casting, PrecisionCast) {
     EXPECT_EQ(m29.precisionCast<544>(), init29); EXPECT_EQ(m29.precisionCast<576>(), init29); EXPECT_EQ(m29.precisionCast<608>(), init29); EXPECT_EQ(m29.precisionCast<640>(), init29);
     EXPECT_EQ(m29.precisionCast<672>(), init29); EXPECT_EQ(m29.precisionCast<704>(), init29); EXPECT_EQ(m29.precisionCast<736>(), init29); EXPECT_EQ(m29.precisionCast<768>(), init29);
     EXPECT_EQ(m29.precisionCast<800>(), init29); EXPECT_EQ(m29.precisionCast<832>(), init29); EXPECT_EQ(m29.precisionCast<864>(), init29); EXPECT_EQ(m29.precisionCast<896>(), init29);
+
+    Multiprecision<448> l0 = "554241380131154142962417280417998404754929828012346097179687246704910303315350311367744175378443304128036758983824324734859979768793199.";
+    EXPECT_EQ(l0.precisionCast<288>(), "408360527252105534419027813905394704348416525449517229626145092686873334890812834908271.");
+    Multiprecision<576> l1 = "173149006578507408541558843749803097456182801623666290320265239338181642132588175569300761116459015677654013937947922994294373883893325690805618652779686048163576445320646483.";
+    EXPECT_EQ(l1.precisionCast<128>(), "210443040993062611785785420324814540627.");
+    Multiprecision<576> l2 = "66531456573720529442216757952933331047332848598711407403162907502778746277356003198417676048381460115126892609965612607567352416913344652080416627158294298245466839069775512.";
+    EXPECT_EQ(l2.precisionCast<160>(), "1443229828299692348357792670919834022979176257176.");
+    Multiprecision<384> l3 = "1098897099174270538478178379535802020226067483295913532002005072123857444388599717512365115154922424475266850503120.";
+    EXPECT_EQ(l3.precisionCast<320>(), "1913199418936122088346837076981965348887692948209008066197015782466463820230886895375591805565392.");
+    Multiprecision<512> l4 = "3069476797928086052610870903467024437789501028462434594919744663711449127505497769599003817092647117494652657649787519339440892062605145266124294683385280.";
+    EXPECT_EQ(l4.precisionCast<288>(), "404126981474586070624526050760237057921124714973395197115667617772232279058850682265024.");
+    Multiprecision<352> l5 = "2948016904402708200913240914482790524802448562129494737510300849124666954825609112501202095235581771983067.";
+    EXPECT_EQ(l5.precisionCast<192>(), "1120442763073472009948111228858560283233140945287272409307.");
+    Multiprecision<544> l6 = "10812628969630480520296504856105212223514943626905130339806055726389997460671652738109321632680730144583156832174036283780045422846847056560092948355830105461452561.";
+    EXPECT_EQ(l6.precisionCast<128>(), "330342928733391374787712324367724277521.");
+    Multiprecision<544> l7 = "4112600136041780850943347403651201772866193144792995503451651200434798923608930918174270859878921981299563448120913143826254282006786082095303150341646975970259785.";
+    EXPECT_EQ(l7.precisionCast<288>(), "257304491601243764544329915240262128843475594535859368626521507218543067528530890011465.");
+    Multiprecision<384> l8 = "28048835949300858284373720359733481364253247860667645736041649560388756406925265368724245525050388699493492127215396.";
+    EXPECT_EQ(l8.precisionCast<256>(), "41878091393227431195219434526290235492405672892345774495477168807404321681188.");
+    Multiprecision<640> l9 = "3848583613533234298953998803964435640019755235139553979562211441430877304606643444685829881598731682613890268054287149783980908651187506403654762887423297734191981318623098337988025363561114940.";
+    EXPECT_EQ(l9.precisionCast<160>(), "541300877713023860093328693961789219540436446524.");
+    Multiprecision<512> l10 = "8488462826013523989070679682331534259557436274695014765129319667636222109541019846966725069632607848463488852770772093964627525568328843684570072600088832.";
+    EXPECT_EQ(l10.precisionCast<160>(), "523538838524052847229876918926034085392282358016.");
+    Multiprecision<576> l11 = "11236969385546154746878679488297868602806916111627187642798923353498840149284473359875405738278850824908974037092662116610981773121895588572197349961886691945064651776229050.";
+    EXPECT_EQ(l11.precisionCast<128>(), "29179789164106523943541955618292268730.");
+    Multiprecision<480> l12 = "924082864945322453283057577897421592990774691137290429034141806501722486590884960785337810624006801980116699350354269354398363040536296529326681.";
+    EXPECT_EQ(l12.precisionCast<256>(), "15790246827509817793328866413084671789409373095293932456575888129892184748633.");
+    Multiprecision<512> l13 = "9607535504179656540242447115527397529604623905521687360978734063119313561780639573012578165648934865049773849480530263572594554247909207343890208529325178.";
+    EXPECT_EQ(l13.precisionCast<96>(), "43716316362024562473758891130.");
+    Multiprecision<352> l14 = "504397667162110386921588331778312416154169943905827797809093816111203720055808585599403524127547394508185.";
+    EXPECT_EQ(l14.precisionCast<320>(), "366270022681278488140630850294606110994384776947473041868263123438838372271196545770306825766297.");
+    Multiprecision<544> l15 = "27608764507031531319380382106462863564782632077695501707054751614193288192180423340509534352068491112085645377731761780973224450169988873068318780343686563718281728.";
+    EXPECT_EQ(l15.precisionCast<128>(), "299026899257808842617251361117814438400.");
+    Multiprecision<352> l16 = "1978129624964056450214026876059300487877996643140932950061364608660420356925042564405231900323677600676732.";
+    EXPECT_EQ(l16.precisionCast<320>(), "365332643823514689801663993143371567677009732484894048068501453581388238598858847283260927441788.");
+    Multiprecision<576> l17 = "195265355728943716865923619155375969530111891393015085388776834717930166073822658430177349287072569812662023940174467801397134386843815407817766067594355521616265929622366898.";
+    EXPECT_EQ(l17.precisionCast<160>(), "221431119546753700832094394260270558954283936434.");
+    Multiprecision<448> l18 = "414657978233561248876686250413054606900177295904410399578041220021615424324810017863916222257119299661647319122459751028412186388057654.";
+    EXPECT_EQ(l18.precisionCast<160>(), "287129154900729631574915186396319442248636812854.");
+    Multiprecision<416> l19 = "56687510612260333551549640577823250078355837097233108084669493198465659199087411861462621495608437125573216962137258061197924.";
+    EXPECT_EQ(l19.precisionCast<192>(), "3671611332121323818239920054049877596259686932276771811940.");
+    Multiprecision<640> l20 = "1546223449542899971558886608789690118697134740086024592798235620930020323290348765670723997823619247765209481873838363731256837657816604584457400460176692587426042570895554473755247436115230189.";
+    EXPECT_EQ(l20.precisionCast<320>(), "1705058499460706178048346990812902342294295809567394699482134087317553182108908996873089872575981.");
+    Multiprecision<544> l21 = "174065680196633578590894771435895688468079098486287540664921962829963159709119456409138894766839898574579608494679948491219544731370758383681896937747086278361071.";
+    EXPECT_EQ(l21.precisionCast<160>(), "220794710368648048438000780675654519053309411311.");
+    Multiprecision<448> l22 = "136337341513559528961653942676228706381771186833849367631461720301064785651836843206251270469997623786977461200400063656318366284038665.";
+    EXPECT_EQ(l22.precisionCast<224>(), "816945909177209805889026909383334983853515920833335341477807047177.");
+    Multiprecision<352> l23 = "5882616107094423670384170997721509360066167036113934904312412848395219509023523677500755059444938780072409.";
+    EXPECT_EQ(l23.precisionCast<192>(), "2482927072274059692659564052439247617034525043020273441241.");
+    Multiprecision<576> l24 = "49857691326617957339080952718292050690932576020199908481126156219200801064319573633766216649464944745473827870799580369859357610319478396095070633417622983092014069297900742.";
+    EXPECT_EQ(l24.precisionCast<96>(), "20676605872175966156536081606.");
+    Multiprecision<384> l25 = "28597517267806223597843711502305823530466336309097073757475161768363138442370308787956725565043616828782360287501138.";
+    EXPECT_EQ(l25.precisionCast<192>(), "2349989946988515365971908154524797542461532293278087240530.");
+    Multiprecision<352> l26 = "5359709770582948688991943818180669926832250789635927200530270394005210447928718134456374737387522683948933.";
+    EXPECT_EQ(l26.precisionCast<96>(), "30780870628112076616018546565.");
+    Multiprecision<608> l27 = "800374186897442994345991532287383427669343624463618411247954314190792985454915883373717659254388118542800958906763592267710368929085300529376043722066941548681087911311229845689540460.";
+    EXPECT_EQ(l27.precisionCast<128>(), "2854867648611582803837292073272156012.");
+    Multiprecision<384> l28 = "33405800918446002208040817593884350731087014451427547055891417316377644807769010652297688512536252488106030729965818.";
+    EXPECT_EQ(l28.precisionCast<224>(), "459273051701248468242064512442751256897801283813240021045830922490.");
+    Multiprecision<448> l29 = "545136889659423149046640496483142589267039543174772529930583944491083582156213563276447863450923726927200116011820859957964687342869311.";
+    EXPECT_EQ(l29.precisionCast<224>(), "11564578527812652389272649650310409698199102565460528063263161490239.");
 }

@@ -92,7 +92,7 @@ public:
     template <typename Integral> requires (std::is_integral_v<Integral>)
     constexpr Multiprecision(Integral value) noexcept {
         if(value != 0) {
-            uint64_t tValue {};
+            uint64_t tValue;
             if (value < 0) {
                 sign = Negative;
                 tValue = static_cast<uint64_t>(value * -1);

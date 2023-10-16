@@ -12,7 +12,7 @@ namespace {
 
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Multiprecision {
-    static_assert(bitness > 64, "Use built-in types for numbers 64-bit or less.");
+    static_assert(bitness > sizeof(uint64_t), "Use built-in types for numbers 64-bit or less.");
 
     static constexpr std::size_t blocksNumber = bitness / blockBitLength;
     using blockLine = std::array<block, blocksNumber>;
@@ -261,6 +261,11 @@ public:
         if(negative) sign = Negative;
     }
 
+    template<std::size_t rBitness> requires (rBitness != bitness)
+    constexpr Multiprecision(const Multiprecision<rBitness>& copy) noexcept {
+        this->operator=(copy.template precisionCast<bitness>());
+    }
+
     constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {
         blocks = other.blocks; sign = other.sign; return *this;
     }
@@ -405,6 +410,7 @@ public:
     constexpr Multiprecision& operator|=(const Multiprecision& value) noexcept {
         for(std::size_t i = 0; i < blocksNumber; ++i)
             blocks[i] |= value.blocks[i];
+        if(sign == Zero && !isLineEmpty(blocks)) sign = Positive;
         return *this;
     }
 
@@ -617,6 +623,27 @@ public:
     }
     /* ----------------------------------------------------------------------- */
 
+    template <typename Integral> requires (std::is_integral_v<Integral>)
+    constexpr auto integralCast() const noexcept -> Integral {
+        const uint64_t value = (static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0]);
+        if constexpr (std::is_signed_v<Integral>)
+            return static_cast<Integral>(value) * (sign == Negative ? -1 : 1); else return static_cast<Integral>(value);
+    }
+
+    template <std::size_t newBitness> requires (newBitness != bitness)
+    constexpr auto precisionCast() const noexcept -> Multiprecision<newBitness> {
+        Multiprecision<newBitness> result = 0;
+
+        long startBlock = (blocksNumber < (newBitness / blockBitLength) ? blocksNumber - 1 : (newBitness / blockBitLength) - 1);
+        for(; startBlock >= 0; --startBlock) {
+            result <<= blockBitLength;
+            result |= blocks[startBlock];
+        }
+
+        if(sign == Negative) result *= -1;
+        return result;
+    }
+
     constexpr friend std::ostream& operator<<(std::ostream& ss, const Multiprecision& value) noexcept {
         auto flags = ss.flags();
 
@@ -658,41 +685,6 @@ public:
 
         return ss;
     }
-
-    template <typename Integral> requires (std::is_integral_v<Integral>)
-    constexpr auto integralCast() const noexcept -> Integral {
-        const uint64_t value = (static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0]);
-        if constexpr (std::is_signed_v<Integral>)
-            return static_cast<Integral>(value) * (sign == Negative ? -1 : 1); else return static_cast<Integral>(value);
-    }
-
-    template <std::size_t length>
-    constexpr explicit Multiprecision(const std::array<block, length>& data) noexcept {
-        /* FIXME: Remove this function, change precision cast to use bitness. */
-        for(std::size_t i = 0; i < blocksNumber && i < length; ++i)
-            blocks[i] = data[i]; sign = Positive;
-        /* FIXME */
-    }
-
-    template <std::size_t newBitness> requires (newBitness > bitness)
-    constexpr auto precisionCast() const noexcept -> Multiprecision<newBitness> {
-        Multiprecision<newBitness> result (blocks);
-        if(sign == Negative) return -result; return result;
-    }
-    /*  TODO: Fixed version of precision cast
-        template <std::size_t newBitness> requires (newBitness > bitness)
-        constexpr auto precisionCast() const noexcept -> Multiprecision<newBitness> {
-            Multiprecision<newBitness> result;
-            for(block block: blocks) {
-                result <<= blockBitLength;
-                result |= block;
-            }
-
-            if(sign == Negative)
-                return -result;
-            return result;
-        }
-    */
 };
 
 /* ---------------------------------------- Different precision comparison ---------------------------------------- */

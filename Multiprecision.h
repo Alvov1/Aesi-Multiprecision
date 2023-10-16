@@ -1,5 +1,5 @@
-#ifndef METALMULTIPRECISION_MULTIPRECISION_H
-#define METALMULTIPRECISION_MULTIPRECISION_H
+#ifndef MULTIPRECISION_GPU_H
+#define MULTIPRECISION_GPU_H
 
 #include <iostream>
 #include <array>
@@ -592,7 +592,37 @@ public:
         return greater;
     }
     static constexpr auto powm(const Multiprecision& base, const Multiprecision& power, const Multiprecision& mod) noexcept -> Multiprecision {
-        return {};
+        Multiprecision result = 1;
+
+        auto bitsEmptyCheck = [] (const Multiprecision& value, std::size_t offset) {
+            const auto bitIndex = offset % blockBitLength;
+            for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i) {
+                if(i == offset && bitIndex != 0) {
+                    for(uint8_t j = 0; j < blockBitLength; ++j)
+                        if(0x1 & (value.blocks[i] >> j)) return false;
+                } else if (value.blocks[i] != 0) return false;
+            }
+            return true;
+        };
+
+        Multiprecision tmp1 = base;
+        auto [tmp2, b] = divide(tmp1, mod);
+
+        for(unsigned iteration = 0; !bitsEmptyCheck(power, iteration); iteration++) {
+            if(power.getBit(iteration)) {
+                tmp1 = result * b;
+
+                const auto [quotient, remainder] = divide(tmp1, mod);
+                tmp2 = quotient; result = remainder;
+            }
+
+            tmp1 = b; tmp2 = b * tmp1;
+
+            const auto [quotient, remainder] = divide(tmp2, mod);
+            tmp1 = quotient; b = remainder;
+        }
+
+        return result;
     }
     /* ----------------------------------------------------------------------- */
 
@@ -867,6 +897,7 @@ constexpr auto operator|=(Multiprecision<bFirst>& first, const Multiprecision<bS
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
 
+
 /* ------------------------------------------- Greatest common divisor -------------------------------------------- */
 template<std::size_t bFirst, std::size_t bSecond>
 constexpr auto gcd(const Multiprecision<bFirst> &first, const Multiprecision<bSecond> &second)
@@ -881,6 +912,18 @@ constexpr auto gcd(const Multiprecision<bFirst> &first, const Multiprecision<bSe
 
 
 /* ----------------------------------------------- Power by modulo ------------------------------------------------ */
+template<std::size_t bBase, std::size_t bPow, std::size_t bMod>
+constexpr auto powm(const Multiprecision<bBase> &base, const Multiprecision<bPow> &power, const Multiprecision<bMod> &mod)
+-> typename std::conditional<(bBase > bPow),
+        typename std::conditional<(bBase > bMod), Multiprecision<bBase>, Multiprecision<bMod>>::value,
+        typename std::conditional<(bPow > bMod), Multiprecision<bPow>, Multiprecision<bMod>>::value>::value {
+    if constexpr (bBase > bPow) {
+        return powm(base, power.template precisionCast<bBase>(), mod);
+    } else {
+        return powm(base.template precisionCast<bPow>(), power, mod);
+    }
+}
+
 namespace {
     template<std::size_t bCommon, std::size_t bDiffer>
     constexpr auto
@@ -894,18 +937,6 @@ namespace {
         }
     }
 }
-
-template<std::size_t bBase, std::size_t bPow, std::size_t bMod>
-constexpr auto powm(const Multiprecision<bBase> &base, const Multiprecision<bPow> &power, const Multiprecision<bMod> &mod)
--> typename std::conditional<(bBase > bPow),
-        typename std::conditional<(bBase > bMod), Multiprecision<bBase>, Multiprecision<bMod>>::value,
-        typename std::conditional<(bPow > bMod), Multiprecision<bPow>, Multiprecision<bMod>>::value>::value {
-    if constexpr (bBase > bPow) {
-        return powm(base, power.template precisionCast<bBase>(), mod);
-    } else {
-        return powm(base.template precisionCast<bPow>(), power, mod);
-    }
-}
 /* ---------------------------------------------------------------------------------------------------------------- */
 
-#endif //METALMULTIPRECISION_MULTIPRECISION_H
+#endif //MULTIPRECISION_GPU_H

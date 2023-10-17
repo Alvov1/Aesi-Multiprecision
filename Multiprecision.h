@@ -4,6 +4,12 @@
 #include <iostream>
 #include <array>
 
+#ifdef __CUDACC__   // __OPENCL_VERSION__
+    #define gpu __host__ __device__
+#else
+    #define gpu
+#endif
+
 namespace {
     using block = uint32_t;
     constexpr auto blockBitLength = sizeof(block) * 8;
@@ -24,7 +30,7 @@ class Multiprecision {
     /* ----------------------------------------------------------------------- */
 
     /* --------------------------- Helper functions. ------------------------- */
-    static constexpr auto addLine(blockLine& dst, const blockLine& src) noexcept -> uint64_t {
+    gpu static constexpr auto addLine(blockLine& dst, const blockLine& src) noexcept -> uint64_t {
         uint64_t carryOut = 0;
         for (std::size_t i = 0; i < blocksNumber; ++i) {
             uint64_t sum = static_cast<uint64_t>(dst[i])
@@ -34,7 +40,7 @@ class Multiprecision {
         }
         return carryOut;
     }
-    static constexpr auto makeComplement(const blockLine& line) noexcept -> blockLine {
+    gpu static constexpr auto makeComplement(const blockLine& line) noexcept -> blockLine {
         blockLine result {};
 
         uint64_t carryOut = 1;
@@ -45,15 +51,15 @@ class Multiprecision {
 
         return result;
     }
-    static constexpr auto isLineEmpty(const blockLine& line) noexcept -> bool {
+    gpu static constexpr auto isLineEmpty(const blockLine& line) noexcept -> bool {
         return lineLength(line) == 0;
     }
-    static constexpr auto lineLength(const blockLine& line) noexcept -> std::size_t {
+    gpu static constexpr auto lineLength(const blockLine& line) noexcept -> std::size_t {
         for(long long i = blocksNumber - 1; i >= 0; --i)
             if(line[i]) return i + 1;
         return 0;
     }
-    static constexpr auto divide(const Multiprecision& number, const Multiprecision& divisor) noexcept -> std::pair<Multiprecision, Multiprecision> {
+    gpu static constexpr auto divide(const Multiprecision& number, const Multiprecision& divisor) noexcept -> std::pair<Multiprecision, Multiprecision> {
         const Multiprecision divAbs = divisor.abs();
         const auto ratio = number.abs().operator<=>(divAbs);
 
@@ -85,12 +91,12 @@ class Multiprecision {
 
 public:
     /* ----------------------- Different constructors. ----------------------- */
-    constexpr Multiprecision() noexcept = default;
-    constexpr Multiprecision(const Multiprecision& copy) noexcept = default;
-    constexpr Multiprecision(Multiprecision&& move) noexcept = default;
+    gpu constexpr Multiprecision() noexcept = default;
+    gpu constexpr Multiprecision(const Multiprecision& copy) noexcept = default;
+    gpu constexpr Multiprecision(Multiprecision&& move) noexcept = default;
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    constexpr Multiprecision(Integral value) noexcept {
+    gpu constexpr Multiprecision(Integral value) noexcept {
         if(value != 0) {
             uint64_t tValue;
             if (value < 0) {
@@ -109,11 +115,11 @@ public:
     }
 
     template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
-    constexpr Multiprecision(const Char (&array)[arrayLength]) noexcept : Multiprecision(std::basic_string_view<Char>(array)) {}
+    gpu constexpr Multiprecision(const Char (&array)[arrayLength]) noexcept : Multiprecision(std::basic_string_view<Char>(array)) {}
 
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
             typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
-    constexpr Multiprecision(String&& stringView) noexcept {
+    gpu constexpr Multiprecision(String&& stringView) noexcept {
         if(stringView.size() == 0) return;
 
         constexpr struct {
@@ -214,37 +220,37 @@ public:
     }
 
     template<std::size_t rBitness> requires (rBitness != bitness)
-    constexpr Multiprecision(const Multiprecision<rBitness>& copy) noexcept {
+    gpu constexpr Multiprecision(const Multiprecision<rBitness>& copy) noexcept {
         this->operator=(copy.template precisionCast<bitness>());
     }
 
-    constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {
+    gpu constexpr Multiprecision& operator=(const Multiprecision& other) noexcept {
         blocks = other.blocks; sign = other.sign; return *this;
     }
     /* ----------------------------------------------------------------------- */
 
 
     /* ------------------------ Arithmetic operators. ------------------------ */
-    constexpr Multiprecision operator+() const noexcept { return *this; }
-    constexpr Multiprecision operator-() const noexcept {
+    gpu constexpr Multiprecision operator+() const noexcept { return *this; }
+    gpu constexpr Multiprecision operator-() const noexcept {
         if(sign == Zero) return Multiprecision();
         Multiprecision result = *this;
         result.sign = (result.sign == Positive ? Negative : Positive); return result;
     }
 
-    constexpr Multiprecision& operator++() noexcept { return this->operator+=(1); }
-    constexpr Multiprecision operator++(int) & noexcept {
+    gpu constexpr Multiprecision& operator++() noexcept { return this->operator+=(1); }
+    gpu constexpr Multiprecision operator++(int) & noexcept {
         Multiprecision old = *this; operator++(); return old;
     }
-    constexpr Multiprecision& operator--() noexcept { return this->operator-=(1); }
-    constexpr Multiprecision operator--(int) & noexcept {
+    gpu constexpr Multiprecision& operator--() noexcept { return this->operator-=(1); }
+    gpu constexpr Multiprecision operator--(int) & noexcept {
         Multiprecision old = *this; operator--(); return old;
     }
 
-    constexpr Multiprecision operator+(const Multiprecision& value) const noexcept {
+    gpu constexpr Multiprecision operator+(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result += value; return result;
     }
-    constexpr Multiprecision& operator+=(const Multiprecision& value) noexcept {
+    gpu constexpr Multiprecision& operator+=(const Multiprecision& value) noexcept {
         if(sign == Zero) return this->operator=(value);
         if(value.sign == Zero) return *this;
 
@@ -266,17 +272,17 @@ public:
         return *this;
     }
 
-    constexpr Multiprecision operator-(const Multiprecision& value) const noexcept {
+    gpu constexpr Multiprecision operator-(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result -= value; return result;
     }
-    constexpr Multiprecision& operator-=(const Multiprecision& value) noexcept {
+    gpu constexpr Multiprecision& operator-=(const Multiprecision& value) noexcept {
         return this->operator+=(-value);
     }
 
-    constexpr Multiprecision operator*(const Multiprecision& value) const noexcept {
+    gpu constexpr Multiprecision operator*(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result *= value; return result;
     }
-    constexpr Multiprecision& operator*=(const Multiprecision& value) noexcept {
+    gpu constexpr Multiprecision& operator*=(const Multiprecision& value) noexcept {
         if(sign == Zero) return *this;
         if(value.sign == Zero)
             return this->operator=(Multiprecision());
@@ -310,24 +316,24 @@ public:
         return *this;
     }
 
-    constexpr Multiprecision operator/(const Multiprecision& divisor) const noexcept {
+    gpu constexpr Multiprecision operator/(const Multiprecision& divisor) const noexcept {
         return divide(*this, divisor).first;
     }
-    constexpr Multiprecision& operator/=(const Multiprecision& divisor) noexcept {
+    gpu constexpr Multiprecision& operator/=(const Multiprecision& divisor) noexcept {
         return this->operator=(divide(*this, divisor).first);
     }
 
-    constexpr Multiprecision operator%(const Multiprecision& divisor) const noexcept {
+    gpu constexpr Multiprecision operator%(const Multiprecision& divisor) const noexcept {
         return divide(*this, divisor).second;
     }
-    constexpr Multiprecision& operator%=(const Multiprecision& divisor) noexcept {
+    gpu constexpr Multiprecision& operator%=(const Multiprecision& divisor) noexcept {
         return this->operator=(divide(*this, divisor).second);
     }
     /* ----------------------------------------------------------------------- */
 
 
     /* ------------------------- Bitwise operators. -------------------------- */
-    constexpr Multiprecision operator~() const noexcept {
+    gpu constexpr Multiprecision operator~() const noexcept {
         Multiprecision result {};
         for(std::size_t i = 0; i < blocksNumber; ++i)
             result.blocks[i] = ~blocks[i];
@@ -336,30 +342,30 @@ public:
         return result;
     }
 
-    constexpr Multiprecision operator^(const Multiprecision& value) const noexcept {
+    gpu constexpr Multiprecision operator^(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result ^= value; return result;
     }
-    constexpr Multiprecision& operator^=(const Multiprecision& value) noexcept {
+    gpu constexpr Multiprecision& operator^=(const Multiprecision& value) noexcept {
         for(std::size_t i = 0; i < blocksNumber; ++i)
             blocks[i] ^= value.blocks[i];
         if(isLineEmpty(blocks)) sign = Zero;
         return *this;
     }
 
-    constexpr Multiprecision operator&(const Multiprecision& value) const noexcept {
+    gpu constexpr Multiprecision operator&(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result &= value; return result;
     }
-    constexpr Multiprecision& operator&=(const Multiprecision& value) noexcept {
+    gpu constexpr Multiprecision& operator&=(const Multiprecision& value) noexcept {
         for(std::size_t i = 0; i < blocksNumber; ++i)
             blocks[i] &= value.blocks[i];
         if(isLineEmpty(blocks)) sign = Zero;
         return *this;
     }
 
-    constexpr Multiprecision operator|(const Multiprecision& value) const noexcept {
+    gpu constexpr Multiprecision operator|(const Multiprecision& value) const noexcept {
         Multiprecision result = *this; result |= value; return result;
     }
-    constexpr Multiprecision& operator|=(const Multiprecision& value) noexcept {
+    gpu constexpr Multiprecision& operator|=(const Multiprecision& value) noexcept {
         for(std::size_t i = 0; i < blocksNumber; ++i)
             blocks[i] |= value.blocks[i];
         if(sign == Zero && !isLineEmpty(blocks)) sign = Positive;
@@ -367,11 +373,11 @@ public:
     }
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    constexpr Multiprecision operator<<(Integral bitShift) const noexcept {
+    gpu constexpr Multiprecision operator<<(Integral bitShift) const noexcept {
         Multiprecision result = *this; result <<= bitShift; return result;
     }
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    constexpr Multiprecision& operator<<=(Integral bitShift) noexcept {
+    gpu constexpr Multiprecision& operator<<=(Integral bitShift) noexcept {
         if(bitShift < 0)
             return this->operator>>=(-bitShift);
 
@@ -394,11 +400,11 @@ public:
     }
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    constexpr Multiprecision operator>>(Integral bitShift) const noexcept {
+    gpu constexpr Multiprecision operator>>(Integral bitShift) const noexcept {
         Multiprecision result = *this; result >>= bitShift; return result;
     }
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    constexpr Multiprecision& operator>>=(Integral bitShift) noexcept {
+    gpu constexpr Multiprecision& operator>>=(Integral bitShift) noexcept {
         if(bitShift < 0)
             return this->operator<<=(-bitShift);
 
@@ -423,8 +429,8 @@ public:
 
 
     /* ----------------------- Comparison operators. ------------------------- */
-    constexpr bool operator==(const Multiprecision& value) const noexcept = default;
-    constexpr std::strong_ordering operator<=>(const Multiprecision& value) const noexcept {
+    gpu constexpr bool operator==(const Multiprecision& value) const noexcept = default;
+    gpu constexpr std::strong_ordering operator<=>(const Multiprecision& value) const noexcept {
         switch (sign) {
             case Zero:
                 switch (value.sign) {
@@ -470,12 +476,12 @@ public:
 
 
     /* ------------------------ Arithmetic methods. -------------------------- */
-    [[nodiscard]] constexpr auto getBit(std::size_t index) const noexcept -> bool {
+    [[nodiscard]] gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
         if(index >= bitness) return false;
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
         return blocks[blockNumber] & (1U << bitNumber);
     }
-    constexpr auto setBit(std::size_t index, bool value) noexcept -> void {
+    gpu constexpr auto setBit(std::size_t index, bool value) noexcept -> void {
         if(index >= bitness) return;
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
         if(value) {
@@ -488,9 +494,9 @@ public:
                 sign = Zero;
         }
     }
-    [[nodiscard]] constexpr auto isOdd() const noexcept -> bool { return (0x1 & blocks[0]) == 1; }
-    [[nodiscard]] constexpr auto isEven() const noexcept -> bool { return (0x1 & blocks[0]) == 0; }
-    [[nodiscard]] constexpr auto abs() const noexcept -> Multiprecision {
+    [[nodiscard]] gpu constexpr auto isOdd() const noexcept -> bool { return (0x1 & blocks[0]) == 1; }
+    [[nodiscard]] gpu constexpr auto isEven() const noexcept -> bool { return (0x1 & blocks[0]) == 0; }
+    [[nodiscard]] gpu constexpr auto abs() const noexcept -> Multiprecision {
         if(sign == Zero)
             return *this;
         Multiprecision result = *this; result.sign = Positive; return result;
@@ -499,7 +505,7 @@ public:
 
 
     /* -------------------- Public number theory functions. ------------------ */
-    static constexpr auto gcd(const Multiprecision& first, const Multiprecision& second) noexcept -> Multiprecision {
+    gpu static constexpr auto gcd(const Multiprecision& first, const Multiprecision& second) noexcept -> Multiprecision {
         auto[greater, smaller] = [&first, &second] {
             const auto ratio = first.operator<=>(second);
             return ratio == std::strong_ordering::greater ?
@@ -513,7 +519,7 @@ public:
         }
         return greater;
     }
-    static constexpr auto powm(const Multiprecision& base, const Multiprecision& power, const Multiprecision& mod) noexcept -> Multiprecision {
+    gpu static constexpr auto powm(const Multiprecision& base, const Multiprecision& power, const Multiprecision& mod) noexcept -> Multiprecision {
         constexpr auto remainingBlocksEmpty = [] (const Multiprecision& value, std::size_t offset) {
             for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i)
                 if (value.blocks[i] != 0) return false;
@@ -538,14 +544,14 @@ public:
     /* ----------------------------------------------------------------------- */
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    constexpr auto integralCast() const noexcept -> Integral {
+    gpu constexpr auto integralCast() const noexcept -> Integral {
         const uint64_t value = (static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0]);
         if constexpr (std::is_signed_v<Integral>)
             return static_cast<Integral>(value) * (sign == Negative ? -1 : 1); else return static_cast<Integral>(value);
     }
 
     template <std::size_t newBitness> requires (newBitness != bitness)
-    constexpr auto precisionCast() const noexcept -> Multiprecision<newBitness> {
+    gpu constexpr auto precisionCast() const noexcept -> Multiprecision<newBitness> {
         Multiprecision<newBitness> result = 0;
 
         long startBlock = (blocksNumber < (newBitness / blockBitLength) ? blocksNumber - 1 : (newBitness / blockBitLength) - 1);
@@ -558,7 +564,7 @@ public:
         return result;
     }
 
-    constexpr friend std::ostream& operator<<(std::ostream& ss, const Multiprecision& value) noexcept {
+    gpu constexpr friend std::ostream& operator<<(std::ostream& ss, const Multiprecision& value) noexcept {
         auto flags = ss.flags();
 
         if(value.sign != Zero) {
@@ -603,7 +609,7 @@ public:
 
 /* ---------------------------------------- Different precision comparison ---------------------------------------- */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr bool operator==(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) noexcept {
+gpu constexpr bool operator==(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) noexcept {
     if constexpr (bFirst > bSecond) {
         Multiprecision<bFirst> reducedSecond = second.template precisionCast<bFirst>();
         return (first == reducedSecond);
@@ -613,7 +619,7 @@ constexpr bool operator==(const Multiprecision<bFirst>& first, const Multiprecis
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr std::strong_ordering operator<=>(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) noexcept {
+gpu constexpr std::strong_ordering operator<=>(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) noexcept {
     if constexpr (bFirst > bSecond) {
         Multiprecision<bFirst> reducedSecond = second.template precisionCast<bFirst>();
         return (first <=> reducedSecond);
@@ -627,11 +633,11 @@ constexpr std::strong_ordering operator<=>(const Multiprecision<bFirst>& first, 
 
 /* ----------------------------------------- Different precision addition ----------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-constexpr auto operator+(Integral number, const Multiprecision<bitness>& value) noexcept {
+gpu constexpr auto operator+(Integral number, const Multiprecision<bitness>& value) noexcept {
     return Multiprecision<bitness>(number) + value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr auto operator+(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) noexcept
+gpu constexpr auto operator+(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) noexcept
 -> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         Multiprecision<bFirst> reducedSecond = second.template precisionCast<bFirst>();
@@ -642,7 +648,7 @@ constexpr auto operator+(const Multiprecision<bFirst>& first, const Multiprecisi
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-constexpr auto operator+=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
+gpu constexpr auto operator+=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
     return first.operator+=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -650,11 +656,11 @@ constexpr auto operator+=(Multiprecision<bFirst>& first, const Multiprecision<bS
 
 /* --------------------------------------- Different precision subtraction ---------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-constexpr auto operator-(Integral number, const Multiprecision<bitness>& value) noexcept {
+gpu constexpr auto operator-(Integral number, const Multiprecision<bitness>& value) noexcept {
     return Multiprecision<bitness>(number) - value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr auto operator-(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
+gpu constexpr auto operator-(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
 -> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first - second.template precisionCast<bFirst>();
@@ -663,7 +669,7 @@ constexpr auto operator-(const Multiprecision<bFirst>& first, const Multiprecisi
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-constexpr auto operator-=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
+gpu constexpr auto operator-=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
     return first.operator-=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -671,11 +677,11 @@ constexpr auto operator-=(Multiprecision<bFirst>& first, const Multiprecision<bS
 
 /* -------------------------------------- Different precision multiplication -------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-constexpr auto operator*(Integral number, const Multiprecision<bitness>& value) noexcept {
+gpu constexpr auto operator*(Integral number, const Multiprecision<bitness>& value) noexcept {
     return Multiprecision<bitness>(number) * value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr auto operator*(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
+gpu constexpr auto operator*(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
 -> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first * second.template precisionCast<bFirst>();
@@ -684,7 +690,7 @@ constexpr auto operator*(const Multiprecision<bFirst>& first, const Multiprecisi
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-constexpr auto operator*=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
+gpu constexpr auto operator*=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
     return first.operator*=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -692,11 +698,11 @@ constexpr auto operator*=(Multiprecision<bFirst>& first, const Multiprecision<bS
 
 /* ----------------------------------------- Different precision division ----------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-constexpr auto operator/(Integral number, const Multiprecision<bitness>& value) noexcept {
+gpu constexpr auto operator/(Integral number, const Multiprecision<bitness>& value) noexcept {
     return Multiprecision<bitness>(number) / value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr auto operator/(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
+gpu constexpr auto operator/(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
 -> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first / second.template precisionCast<bFirst>();
@@ -705,7 +711,7 @@ constexpr auto operator/(const Multiprecision<bFirst>& first, const Multiprecisi
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-constexpr auto operator/=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
+gpu constexpr auto operator/=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
     return first.operator/=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -713,11 +719,11 @@ constexpr auto operator/=(Multiprecision<bFirst>& first, const Multiprecision<bS
 
 /* ------------------------------------------ Different precision modulo ------------------------------------------ */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-constexpr auto operator%(Integral number, const Multiprecision<bitness>& value) noexcept {
+gpu constexpr auto operator%(Integral number, const Multiprecision<bitness>& value) noexcept {
     return Multiprecision<bitness>(number) % value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr auto operator%(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
+gpu constexpr auto operator%(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
 -> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first % second.template precisionCast<bFirst>();
@@ -726,7 +732,7 @@ constexpr auto operator%(const Multiprecision<bFirst>& first, const Multiprecisi
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-constexpr auto operator%=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
+gpu constexpr auto operator%=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
     return first.operator%=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -734,11 +740,11 @@ constexpr auto operator%=(Multiprecision<bFirst>& first, const Multiprecision<bS
 
 /* ------------------------------------------- Different precision XOR -------------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-constexpr auto operator^(Integral number, const Multiprecision<bitness>& value) noexcept {
+gpu constexpr auto operator^(Integral number, const Multiprecision<bitness>& value) noexcept {
     return Multiprecision<bitness>(number) ^ value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr auto operator^(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
+gpu constexpr auto operator^(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
 -> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first ^ second.template precisionCast<bFirst>();
@@ -747,7 +753,7 @@ constexpr auto operator^(const Multiprecision<bFirst>& first, const Multiprecisi
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-constexpr auto operator^=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
+gpu constexpr auto operator^=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
     return first.operator^=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -755,11 +761,11 @@ constexpr auto operator^=(Multiprecision<bFirst>& first, const Multiprecision<bS
 
 /* -------------------------------------------- Different precision AND ------------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-constexpr auto operator&(Integral number, const Multiprecision<bitness>& value) noexcept {
+gpu constexpr auto operator&(Integral number, const Multiprecision<bitness>& value) noexcept {
     return Multiprecision<bitness>(number) & value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr auto operator&(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
+gpu constexpr auto operator&(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
 -> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first & second.template precisionCast<bFirst>();
@@ -768,7 +774,7 @@ constexpr auto operator&(const Multiprecision<bFirst>& first, const Multiprecisi
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-constexpr auto operator&=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
+gpu constexpr auto operator&=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
     return first.operator&=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -776,11 +782,11 @@ constexpr auto operator&=(Multiprecision<bFirst>& first, const Multiprecision<bS
 
 /* -------------------------------------------- Different precision OR -------------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-constexpr auto operator|(Integral number, const Multiprecision<bitness>& value) noexcept {
+gpu constexpr auto operator|(Integral number, const Multiprecision<bitness>& value) noexcept {
     return Multiprecision<bitness>(number) | value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-constexpr auto operator|(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
+gpu constexpr auto operator|(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second)
 -> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first | second.template precisionCast<bFirst>();
@@ -789,7 +795,7 @@ constexpr auto operator|(const Multiprecision<bFirst>& first, const Multiprecisi
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-constexpr auto operator|=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
+gpu constexpr auto operator|=(Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) -> Multiprecision<bFirst>& {
     return first.operator|=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -797,7 +803,7 @@ constexpr auto operator|=(Multiprecision<bFirst>& first, const Multiprecision<bS
 
 /* ------------------------------------------- Greatest common divisor -------------------------------------------- */
 template<std::size_t bFirst, std::size_t bSecond>
-constexpr auto gcd(const Multiprecision<bFirst> &first, const Multiprecision<bSecond> &second)
+gpu constexpr auto gcd(const Multiprecision<bFirst> &first, const Multiprecision<bSecond> &second)
 -> typename std::conditional<(bFirst > bSecond), Multiprecision<bFirst>, Multiprecision<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return Multiprecision<bFirst>::gcd(first, second.template precisionCast<bFirst>());
@@ -810,7 +816,7 @@ constexpr auto gcd(const Multiprecision<bFirst> &first, const Multiprecision<bSe
 
 /* ----------------------------------------------- Power by modulo ------------------------------------------------ */
 template<std::size_t bBase, std::size_t bPow, std::size_t bMod>
-constexpr auto powm(const Multiprecision<bBase> &base, const Multiprecision<bPow> &power, const Multiprecision<bMod> &mod)
+gpu constexpr auto powm(const Multiprecision<bBase> &base, const Multiprecision<bPow> &power, const Multiprecision<bMod> &mod)
 -> typename std::conditional<(bBase > bPow),
         typename std::conditional<(bBase > bMod), Multiprecision<bBase>, Multiprecision<bMod>>::value,
         typename std::conditional<(bPow > bMod), Multiprecision<bPow>, Multiprecision<bMod>>::value>::value {
@@ -823,8 +829,7 @@ constexpr auto powm(const Multiprecision<bBase> &base, const Multiprecision<bPow
 
 namespace {
     template<std::size_t bCommon, std::size_t bDiffer>
-    constexpr auto
-    powm(const Multiprecision<bCommon> &base, const Multiprecision<bCommon> &power, const Multiprecision<bDiffer> &mod)
+    gpu constexpr auto powm(const Multiprecision<bCommon> &base, const Multiprecision<bCommon> &power, const Multiprecision<bDiffer> &mod)
     -> typename std::conditional<(bCommon > bDiffer), Multiprecision<bCommon>, Multiprecision<bDiffer>>::type {
         if constexpr (bCommon > bDiffer) {
             return Multiprecision<bCommon>::powm(base, power, mod.template precisionCast<bCommon>());

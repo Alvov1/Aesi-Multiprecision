@@ -130,13 +130,9 @@ public:
         }
     }
 
-    template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
-    gpu constexpr Multiprecision(const Char (&array)[arrayLength]) noexcept : Multiprecision(std::basic_string_view<Char>(array)) {}
-
-    template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
-            typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
-    constexpr Multiprecision(String&& stringView) noexcept {
-        if(stringView.size() == 0) return;
+    template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
+    gpu constexpr Multiprecision(const Char* ptr, std::size_t size) {
+        if(size == 0) return;
 
         constexpr const Char* characters = [] {
             if constexpr (std::is_same_v<char, Char>) {
@@ -149,13 +145,13 @@ public:
         std::size_t position = 0;
 
         bool negative = false;
-        if(stringView[position] == characters[0]) {
+        if(ptr[position] == characters[0]) {
             negative = true; ++position;
         }
 
-        const auto base = [&stringView, &position, &characters] {
-            if (stringView[position] == characters[1] && stringView.size() > position + 1) {
-                switch (stringView[position + 1]) {
+        const auto base = [&ptr, &size, &position, &characters] {
+            if (ptr[position] == characters[1] && size > position + 1) {
+                switch (ptr[position + 1]) {
                     case characters[9]:
                     case characters[10]:
                         position += 2; return 2;
@@ -170,7 +166,7 @@ public:
                 }
             } else return 10;
         } ();
-        for(; position < stringView.size(); ++position) {
+        for(; position < size; ++position) {
             const auto digit = [&characters] (Char ch) {
                 if(characters[1] <= ch && ch <= characters[2])
                     return static_cast<int>(ch) - static_cast<int>(characters[1]);
@@ -179,7 +175,7 @@ public:
                 if(characters[4] <= ch && ch <= characters[6])
                     return static_cast<int>(ch) - static_cast<int>(characters[4]) + 10;
                 return 99;
-            } (stringView[position]);
+            } (ptr[position]);
 
             if(digit < base) {
                 this->operator*=(base);
@@ -189,6 +185,13 @@ public:
 
         if(negative) sign = Negative;
     }
+
+    template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
+    gpu constexpr Multiprecision(const Char (&array)[arrayLength]) noexcept : Multiprecision(array, arrayLength) {}
+
+    template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
+            typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
+    constexpr Multiprecision(String&& stringView) noexcept : Multiprecision(stringView.data(), stringView.size()){}
 
     template<std::size_t rBitness> requires (rBitness != bitness)
     gpu constexpr Multiprecision(const Multiprecision<rBitness>& copy) noexcept {

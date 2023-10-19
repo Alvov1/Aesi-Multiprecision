@@ -6,11 +6,9 @@
 #ifdef __CUDACC__
     #define gpu __host__ __device__
     #include <cuda/std/utility>
-    #define gpuPair std::pair
 #else
     #define gpu
     #include <utility>
-    #define gpuPair std::pair
 #endif
 
 namespace {
@@ -30,8 +28,7 @@ class Multiprecision final {
         ValueType data [lineSize] {};
         gpu constexpr bool operator==(const MyArray& value) const noexcept {
             for(std::size_t i = 0; i < lineSize; ++i)
-                if(data[i] != value.data[i]) return false;
-            return true;
+                if(data[i] != value.data[i]) return false; return true;
         };
         [[nodiscard]] gpu constexpr auto size() const noexcept -> std::size_t { return lineSize; };
         gpu constexpr auto operator[](std::size_t index) const noexcept -> const ValueType& { return data[index]; }
@@ -75,11 +72,11 @@ class Multiprecision final {
             if(line[i]) return i + 1;
         return 0;
     }
-    gpu static constexpr auto divide(const Multiprecision& number, const Multiprecision& divisor) noexcept -> gpuPair<Multiprecision, Multiprecision> {
+    gpu static constexpr auto divide(const Multiprecision& number, const Multiprecision& divisor) noexcept -> std::pair<Multiprecision, Multiprecision> {
         const Multiprecision divAbs = divisor.abs();
         const auto ratio = number.abs().operator<=>(divAbs);
 
-        gpuPair<Multiprecision, Multiprecision> results = { 0, 0 };
+        std::pair<Multiprecision, Multiprecision> results = { 0, 0 };
         auto& [quotient, remainder] = results;
 
         if(ratio == std::strong_ordering::greater) {
@@ -486,9 +483,9 @@ public:
         auto[greater, smaller] = [&first, &second] {
             const auto ratio = first.operator<=>(second);
             return ratio == std::strong_ordering::greater ?
-                   gpuPair { first, second }
+                   std::pair { first, second }
                                                           :
-                   gpuPair { second, first };
+                   std::pair { second, first };
         } ();
         while(!isLineEmpty(smaller.blocks)) {
             auto [quotient, remainder] = divide(greater, smaller);
@@ -583,7 +580,6 @@ public:
     }
 };
 
-#ifndef __CUDACC__
 /* ---------------------------------------- Different precision comparison ---------------------------------------- */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr bool operator==(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) noexcept {
@@ -817,6 +813,5 @@ namespace {
     }
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
-#endif//__CUDACC__
 
 #endif //MULTIPRECISION_GPU_H

@@ -27,8 +27,12 @@ class Multiprecision final {
 
     template <typename ValueType, std::size_t lineSize>
     struct MyArray final {
-        ValueType data [lineSize];
-        gpu constexpr bool operator==(const MyArray& value) const noexcept = default;
+        ValueType data [lineSize] {};
+        gpu constexpr bool operator==(const MyArray& value) const noexcept {
+            for(std::size_t i = 0; i < lineSize; ++i)
+                if(data[i] != value.data[i]) return false;
+            return true;
+        };
         [[nodiscard]] gpu constexpr auto size() const noexcept -> std::size_t { return lineSize; };
         gpu constexpr auto operator[](std::size_t index) const noexcept -> const ValueType& { return data[index]; }
         gpu constexpr auto operator[](std::size_t index) noexcept -> ValueType& { return data[index]; }
@@ -103,9 +107,12 @@ class Multiprecision final {
 
 public:
     /* ----------------------- Different constructors. ----------------------- */
-    gpu constexpr Multiprecision() noexcept = default;
-    gpu constexpr Multiprecision(const Multiprecision& copy) noexcept = default;
-    gpu constexpr Multiprecision(Multiprecision&& move) noexcept = default;
+    gpu constexpr Multiprecision() noexcept {};
+    gpu constexpr Multiprecision(const Multiprecision& copy) noexcept {
+        sign = copy.sign;
+        if(copy.sign != Zero)
+            blocks = copy.blocks;
+    };
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr Multiprecision(Integral value) noexcept {
@@ -134,78 +141,33 @@ public:
     constexpr Multiprecision(String&& stringView) noexcept {
         if(stringView.size() == 0) return;
 
-        constexpr struct {
-            Char minus = [] {
-                if constexpr (std::is_same_v<char, Char>)
-                    return '-';
-                if constexpr (std::is_same_v<wchar_t, Char>)
-                    return L'-';
-            } ();
-            Char zero = [] {
-                if constexpr (std::is_same_v<char, Char>)
-                    return '0';
-                if constexpr (std::is_same_v<wchar_t, Char>)
-                    return L'0';
-            } ();
-            Char nine = [] {
-                if constexpr (std::is_same_v<char, Char>)
-                    return '9';
-                if constexpr (std::is_same_v<wchar_t, Char>)
-                    return L'9';
-            } ();
-            gpuPair<Char, Char> a = [] {
-                if constexpr (std::is_same_v<char, Char>)
-                    return gpuPair { 'a', 'A' };
-                if constexpr (std::is_same_v<wchar_t, Char>)
-                    return gpuPair { L'a', L'A' };
-            } ();
-            gpuPair<Char, Char> f = [] {
-                if constexpr (std::is_same_v<char, Char>)
-                    return gpuPair { 'f', 'F' };
-                if constexpr (std::is_same_v<wchar_t, Char>)
-                    return gpuPair { L'f', L'F' };
-            } ();
-            gpuPair<Char, Char> octal = [] {
-                if constexpr (std::is_same_v<char, Char>)
-                    return gpuPair { 'o', 'O' };
-                if constexpr (std::is_same_v<wchar_t, Char>)
-                    return gpuPair { L'o', L'O' };
-            } ();
-            gpuPair<Char, Char> binary = [] {
-                if constexpr (std::is_same_v<char, Char>)
-                    return gpuPair { 'b', 'B' };
-                if constexpr (std::is_same_v<wchar_t, Char>)
-                    return gpuPair { L'b', L'B' };
-            } ();
-            gpuPair<Char, Char> hexadecimal = [] {
-                if constexpr (std::is_same_v<char, Char>)
-                    return gpuPair { 'x', 'X' };
-                if constexpr (std::is_same_v<wchar_t, Char>)
-                    return gpuPair { L'x', L'X' };
-            } ();
-        } characters;
+        constexpr const Char* characters = [] {
+            if constexpr (std::is_same_v<char, Char>) {
+                return "-09aAfFoObBxX";
+            } else {
+                return L"-09aAfFoObBxX";
+            }
+        } ();
+
         std::size_t position = 0;
 
         bool negative = false;
-        if(stringView[position] == characters.minus) {
+        if(stringView[position] == characters[0]) {
             negative = true; ++position;
         }
 
         const auto base = [&stringView, &position, &characters] {
-            if (stringView[position] == characters.zero && stringView.size() > position + 1) {
+            if (stringView[position] == characters[1] && stringView.size() > position + 1) {
                 switch (stringView[position + 1]) {
-                    case characters.binary.first:
-                    case characters.binary.second:
-                        position += 2;
-                        return 2;
-                    case characters.octal.first:
-                    case characters.octal.second:
-                        position += 2;
-                        return 8;
-                    case characters.hexadecimal.first:
-                    case characters.hexadecimal.second:
-                        position += 2;
-                        return 16;
+                    case characters[9]:
+                    case characters[10]:
+                        position += 2; return 2;
+                    case characters[7]:
+                    case characters[8]:
+                        position += 2; return 8;
+                    case characters[11]:
+                    case characters[12]:
+                        position += 2; return 16;
                     default:
                         return 10;
                 }
@@ -213,12 +175,12 @@ public:
         } ();
         for(; position < stringView.size(); ++position) {
             const auto digit = [&characters] (Char ch) {
-                if(characters.zero <= ch && ch <= characters.nine)
-                    return static_cast<int>(ch) - static_cast<int>(characters.zero);
-                if(characters.a.first <= ch && ch <= characters.f.first)
-                    return static_cast<int>(ch) - static_cast<int>(characters.a.first) + 10;
-                if(characters.a.second <= ch && ch <= characters.f.second)
-                    return static_cast<int>(ch) - static_cast<int>(characters.a.second) + 10;
+                if(characters[1] <= ch && ch <= characters[2])
+                    return static_cast<int>(ch) - static_cast<int>(characters[1]);
+                if(characters[3] <= ch && ch <= characters[5])
+                    return static_cast<int>(ch) - static_cast<int>(characters[3]) + 10;
+                if(characters[4] <= ch && ch <= characters[6])
+                    return static_cast<int>(ch) - static_cast<int>(characters[4]) + 10;
                 return 99;
             } (stringView[position]);
 
@@ -441,7 +403,10 @@ public:
 
 
     /* ----------------------- Comparison operators. ------------------------- */
-    gpu constexpr bool operator==(const Multiprecision& value) const noexcept = default;
+    gpu constexpr bool operator==(const Multiprecision& value) const noexcept {
+        if(sign != Zero || value.sign != Zero)
+            return (sign == value.sign && blocks == value.blocks); else return true;
+    };
     gpu constexpr std::strong_ordering operator<=>(const Multiprecision& value) const noexcept {
         switch (sign) {
             case Zero:

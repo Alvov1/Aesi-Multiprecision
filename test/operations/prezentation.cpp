@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include "../../Multiprecision.h"
+#include "../../AesiMultiprecision.h"
 
 TEST(Prezentation, Factorial) {
-    Multiprecision<1024> f = 1;
+    Aesi<1024> f = 1;
     for(unsigned i = 2; i <= 100; ++i)
         f *= i;
 

@@ -2,12 +2,15 @@
 #define MULTIPRECISION_GPU_H
 
 #include <iostream>
-#include <array>
 
-#ifdef __CUDACC__   // __OPENCL_VERSION__
+#ifdef __CUDACC__
     #define gpu __host__ __device__
+    #include <cuda/std/utility>
+    #define gpuPair std::pair
 #else
     #define gpu
+    #include <utility>
+    #define gpuPair std::pair
 #endif
 
 namespace {
@@ -17,11 +20,20 @@ namespace {
 }
 
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
-class Multiprecision {
+class Multiprecision final {
     static_assert(bitness > sizeof(uint64_t), "Use built-in types for numbers 64-bit or less.");
 
     static constexpr std::size_t blocksNumber = bitness / blockBitLength;
-    using blockLine = std::array<block, blocksNumber>;
+
+    template <typename ValueType, std::size_t lineSize>
+    struct MyArray final {
+        ValueType data [lineSize];
+        gpu constexpr bool operator==(const MyArray& value) const noexcept = default;
+        [[nodiscard]] gpu constexpr auto size() const noexcept -> std::size_t { return lineSize; };
+        gpu constexpr auto operator[](std::size_t index) const noexcept -> const ValueType& { return data[index]; }
+        gpu constexpr auto operator[](std::size_t index) noexcept -> ValueType& { return data[index]; }
+    };
+    using blockLine = MyArray<block, blocksNumber>;
     enum Sign { Zero = 0, Positive = 1, Negative = 2 };
 
     /* ---------------------------- Class members. --------------------------- */
@@ -59,11 +71,11 @@ class Multiprecision {
             if(line[i]) return i + 1;
         return 0;
     }
-    gpu static constexpr auto divide(const Multiprecision& number, const Multiprecision& divisor) noexcept -> std::pair<Multiprecision, Multiprecision> {
+    gpu static constexpr auto divide(const Multiprecision& number, const Multiprecision& divisor) noexcept -> gpuPair<Multiprecision, Multiprecision> {
         const Multiprecision divAbs = divisor.abs();
         const auto ratio = number.abs().operator<=>(divAbs);
 
-        std::pair<Multiprecision, Multiprecision> results = { 0, 0 };
+        gpuPair<Multiprecision, Multiprecision> results = { 0, 0 };
         auto& [quotient, remainder] = results;
 
         if(ratio == std::strong_ordering::greater) {
@@ -119,7 +131,7 @@ public:
 
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
             typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
-    gpu constexpr Multiprecision(String&& stringView) noexcept {
+    constexpr Multiprecision(String&& stringView) noexcept {
         if(stringView.size() == 0) return;
 
         constexpr struct {
@@ -141,35 +153,35 @@ public:
                 if constexpr (std::is_same_v<wchar_t, Char>)
                     return L'9';
             } ();
-            std::pair<Char, Char> a = [] {
+            gpuPair<Char, Char> a = [] {
                 if constexpr (std::is_same_v<char, Char>)
-                    return std::pair { 'a', 'A' };
+                    return gpuPair { 'a', 'A' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
-                    return std::pair { L'a', L'A' };
+                    return gpuPair { L'a', L'A' };
             } ();
-            std::pair<Char, Char> f = [] {
+            gpuPair<Char, Char> f = [] {
                 if constexpr (std::is_same_v<char, Char>)
-                    return std::pair { 'f', 'F' };
+                    return gpuPair { 'f', 'F' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
-                    return std::pair { L'f', L'F' };
+                    return gpuPair { L'f', L'F' };
             } ();
-            std::pair<Char, Char> octal = [] {
+            gpuPair<Char, Char> octal = [] {
                 if constexpr (std::is_same_v<char, Char>)
-                    return std::pair { 'o', 'O' };
+                    return gpuPair { 'o', 'O' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
-                    return std::pair { L'o', L'O' };
+                    return gpuPair { L'o', L'O' };
             } ();
-            std::pair<Char, Char> binary = [] {
+            gpuPair<Char, Char> binary = [] {
                 if constexpr (std::is_same_v<char, Char>)
-                    return std::pair { 'b', 'B' };
+                    return gpuPair { 'b', 'B' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
-                    return std::pair { L'b', L'B' };
+                    return gpuPair { L'b', L'B' };
             } ();
-            std::pair<Char, Char> hexadecimal = [] {
+            gpuPair<Char, Char> hexadecimal = [] {
                 if constexpr (std::is_same_v<char, Char>)
-                    return std::pair { 'x', 'X' };
+                    return gpuPair { 'x', 'X' };
                 if constexpr (std::is_same_v<wchar_t, Char>)
-                    return std::pair { L'x', L'X' };
+                    return gpuPair { L'x', L'X' };
             } ();
         } characters;
         std::size_t position = 0;
@@ -509,9 +521,9 @@ public:
         auto[greater, smaller] = [&first, &second] {
             const auto ratio = first.operator<=>(second);
             return ratio == std::strong_ordering::greater ?
-                   std::pair { first, second }
+                   gpuPair { first, second }
                                                           :
-                   std::pair { second, first };
+                   gpuPair { second, first };
         } ();
         while(!isLineEmpty(smaller.blocks)) {
             auto [quotient, remainder] = divide(greater, smaller);
@@ -544,7 +556,7 @@ public:
     /* ----------------------------------------------------------------------- */
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr auto integralCast() const noexcept -> Integral {
+    [[nodiscard]] gpu constexpr auto integralCast() const noexcept -> Integral {
         const uint64_t value = (static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0]);
         if constexpr (std::is_signed_v<Integral>)
             return static_cast<Integral>(value) * (sign == Negative ? -1 : 1); else return static_cast<Integral>(value);
@@ -564,7 +576,7 @@ public:
         return result;
     }
 
-    gpu constexpr friend std::ostream& operator<<(std::ostream& ss, const Multiprecision& value) noexcept {
+    constexpr friend std::ostream& operator<<(std::ostream& ss, const Multiprecision& value) noexcept {
         auto flags = ss.flags();
 
         if(value.sign != Zero) {
@@ -576,20 +588,19 @@ public:
                 return base;
             } (flags & std::ios::basefield, ss, flags & std::ios::showbase);
 
-
-            auto iter = value.blocks.rbegin();
-            for(; *iter == 0 && iter != value.blocks.rend(); ++iter);
+            long long iter = value.blocks.size() - 1;
+            for(; value.blocks[iter] == 0 && iter >= 0; --iter);
 
             if(base == 16) {
-                ss << *iter++;
-                for (; iter != value.blocks.rend(); ++iter) {
-                    ss.fill('0'); ss.width(8); ss << std::right << *iter;
+                ss << value.blocks[iter--];
+                for (; iter >= 0; --iter) {
+                    ss.fill('0'); ss.width(8); ss << std::right << value.blocks[iter];
                 }
             } else {
                 /* Well, here we use a pre-calculated magic number to ratio the lengths of numbers in decimal or octal notation according to bitness.
                  * It is 2.95-98 for octal and 3.2 for decimal. */
                 constexpr auto bufferSize = static_cast<std::size_t>(static_cast<double>(bitness) / 2.95);
-                std::array<char, bufferSize> buffer {}; std::size_t filled = 0;
+                MyArray<char, bufferSize> buffer {}; std::size_t filled = 0;
 
                 Multiprecision copy = value;
                 while(copy != 0) {
@@ -607,6 +618,7 @@ public:
     }
 };
 
+#ifndef __CUDACC__
 /* ---------------------------------------- Different precision comparison ---------------------------------------- */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr bool operator==(const Multiprecision<bFirst>& first, const Multiprecision<bSecond>& second) noexcept {
@@ -840,5 +852,6 @@ namespace {
     }
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
+#endif//__CUDACC__
 
 #endif //MULTIPRECISION_GPU_H

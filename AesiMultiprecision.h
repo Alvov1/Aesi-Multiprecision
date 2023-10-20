@@ -543,43 +543,102 @@ public:
         return result;
     }
 
-    constexpr friend std::ostream& operator<<(std::ostream& ss, const Aesi& value) noexcept {
+    template <uint8_t base, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> &&
+            (base == 2 || base == 8 || base == 10 || base == 16))
+    gpu constexpr auto getString(Char* const buffer, std::size_t bufferSize, bool showBase = false) const noexcept -> std::size_t {
+        if(bufferSize < 2) return 0;
+
+        std::size_t position = 0;
+
+        if (showBase) [&position] (Char *const buffer, std::size_t bufferSize) {
+                if constexpr (base == 2) {              // Binary
+                    if (bufferSize < 3) return;
+                    memcpy(buffer, [] { if constexpr (std::is_same_v<Char, char>) { return "0b"; } else { return L"0b"; } }(), 2 * sizeof(Char));
+                    position += 2;
+                } else if constexpr (base == 8) {       // Octal
+                    if (bufferSize < 3) return;
+                    memcpy(buffer, [] { if constexpr (std::is_same_v<Char, char>) { return "0o"; } else { return L"0o"; } }(), 2 * sizeof(Char));
+                    position += 2;
+                } else if constexpr (base == 16) {      // Hexadecimal
+                    if (bufferSize < 3) return;
+                    memcpy(buffer, [] { if constexpr (std::is_same_v<Char, char>) { return "0x"; } else { return L"0x"; } }(), 2 * sizeof(Char));
+                    position += 2;
+                }                                       // Without base in decimal
+            } (buffer, bufferSize);
+
+        if(sign != Zero) {
+            if constexpr (base == 16) {
+                long long iter = blocks.size() - 1;
+                for (; blocks[iter] == 0 && iter >= 0; --iter);
+
+                if constexpr (std::is_same_v<Char, char>) {
+                    position += snprintf(buffer + position, bufferSize - position, "%x", blocks[iter--]);
+                    for (; iter >= 0; --iter)
+                        position += snprintf(buffer + position, bufferSize - position, "%08x", blocks[iter]);
+                } else {
+                    position += swprintf(buffer + position, bufferSize - position, L"%x", blocks[iter--]);
+                    for (; iter >= 0; --iter)
+                        position += swprintf(buffer + position, bufferSize - position, L"%08x", blocks[iter]);
+                }
+            } else {
+                const auto startPosition = position;
+
+                Aesi copy = *this;
+                while (copy != 0 && position < bufferSize) {
+                    auto [quotient, remainder] = divide(copy, base);
+                    buffer[position++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } }() + remainder.template integralCast<uint8_t>();
+                    copy = quotient;
+                }
+
+                for (std::size_t i = startPosition; i * 2 < position; ++i) {
+                    Char t = buffer[i]; buffer[i] = buffer[position - 1 - i]; buffer[position - 1 - i] = t;
+                }
+            }
+        } else
+            buffer[position++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } ();
+        buffer[position++] = Char();
+        return position;
+    }
+
+    template <typename Char>
+    constexpr friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& ss, const Aesi& value) noexcept {
         auto flags = ss.flags();
 
         if(value.sign != Zero) {
-            if (value.sign == Negative) ss.write("-", 1);
+            if (value.sign == Negative) ss.write([] { if constexpr (std::is_same_v<Char, char>) { return "-"; } else { return L"-"; } } (), 1);
 
-            const auto base = [] (long baseField, std::ostream& ss, bool showbase) {
+            const auto base = [] (long baseField, std::basic_ostream<Char>& ss, bool showbase) {
                 auto base = (baseField == std::ios::hex ? 16 : (baseField == std::ios::oct ? 8 : 10));
-                if(showbase && base != 10) ss.write(base == 8 ? "0o" : "0x", 2);
+                if(showbase && base != 10) ss.write([&base] { if constexpr (std::is_same_v<Char, char>) { return base == 8 ? "0o" : "0x"; } else { return base == 8 ? L"0o" : L"0x"; } } (), 2);
                 return base;
             } (flags & std::ios::basefield, ss, flags & std::ios::showbase);
 
-            long long iter = value.blocks.size() - 1;
-            for(; value.blocks[iter] == 0 && iter >= 0; --iter);
-
             if(base == 16) {
+                long long iter = value.blocks.size() - 1;
+                for(; value.blocks[iter] == 0 && iter >= 0; --iter);
+
                 ss << value.blocks[iter--];
                 for (; iter >= 0; --iter) {
-                    ss.fill('0'); ss.width(8); ss << std::right << value.blocks[iter];
+                    ss.fill([] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } ());
+                    ss.width(8); ss << std::right << value.blocks[iter];
                 }
             } else {
-                /* Well, here we use a pre-calculated magic number to ratio the lengths of numbers in decimal or octal notation according to bitness.
+                /* Well, here we use a pre-calculated magic number to ratio the length of numbers in decimal or octal notation according to bitness.
                  * It is 2.95-98 for octal and 3.2 for decimal. */
                 constexpr auto bufferSize = static_cast<std::size_t>(static_cast<double>(bitness) / 2.95);
-                MyArray<char, bufferSize> buffer {}; std::size_t filled = 0;
+                Char buffer [bufferSize] {}; std::size_t filled = 0;
 
                 Aesi copy = value;
                 while(copy != 0) {
-                    auto [quotient, remainder] = divide(copy, base);
-                    buffer[filled++] = '0' + remainder.template integralCast<unsigned long>();
+                    const auto [quotient, remainder] = divide(copy, base);
+                    buffer[filled++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } () + remainder.template integralCast<uint8_t>();
                     copy = quotient;
                 }
 
                 for(; filled > 0; --filled)
                     ss << buffer[filled - 1];
             }
-        } else ss.write("0", 1);
+        } else ss.write([] { if constexpr (std::is_same_v<Char, char>) { return "0"; } else { return L"0"; } } (), 1);
 
         return ss;
     }

@@ -12,7 +12,7 @@ Library supports object-oriented style of data management. Class operators are o
 
 __1. Initialization.__ Number's initialization could be done with numbers, strings, string-views, string literals or library objects with different precision. User-defined string literals are planned to be released in the future.
 
-__2. Display.__ Library supports STD streams along with stream modifications (std::showbase, std::uppercase, std::hex, std::dec, std::oct). Printf-like functions and std::format support is planned to be released in the future.
+__2. Display.__ Library supports STD streams along with stream modifications (std::showbase, std::uppercase, std::hex, std::dec, std::oct). std::format support is planned to be released in the future.
 
 ### Host:
 ```cpp
@@ -40,7 +40,7 @@ __global__ void test() {
     const auto tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid != 0) return;
 
-    Aesi amp = 1562144106091796071UL;
+    Aesi<128> amp = 1562144106091796071UL;
     printf("Were in kernel thread and number is %lu\n", amp.integralCast<unsigned long>());
 }
 
@@ -93,3 +93,5 @@ std::cout << Aesi<256>::powm(base, power, modulo) << std::endl; // Fine
 - Tilde operator (~) does __NOT__ affect the sign of number.
 - Both bitshift operators do not make any effort if the shift value is greater than the bitness of the number. If the shift is negative, the opposite operator is called with the absolute value of the shift.
 - Be careful with exponentiation overflow when using __POWM__ function and similar.
+- GetString method for hexadecimal notation returns number representation with letters in __LOWERCASE__
+- Both display methods work significantly faster for hexadecimal notation

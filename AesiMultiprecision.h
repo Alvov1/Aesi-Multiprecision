@@ -13,6 +13,7 @@
 
 namespace {
     using block = uint32_t;
+    constexpr auto bitsInByte = 8;
     constexpr auto blockBitLength = sizeof(block) * 8;
     constexpr uint64_t blockBase = 1ULL << blockBitLength;
 }
@@ -450,7 +451,7 @@ public:
     /* ----------------------------------------------------------------------- */
 
 
-    /* ------------------------ Arithmetic methods. -------------------------- */
+    /* ------------------------ Supporting methods. -------------------------- */
     gpu constexpr auto setBit(std::size_t index, bool value) noexcept -> void {
         if(index >= bitness) return;
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
@@ -469,6 +470,52 @@ public:
         if(index >= bitness) return false;
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
         return blocks[blockNumber] & (1U << bitNumber);
+    }
+    gpu constexpr auto setByte(std::size_t index, uint8_t byte) noexcept -> void {
+        if(index > blocksNumber * sizeof(block)) return;
+
+        const std::size_t blockNumber = index / sizeof(block), byteInBlock = index % sizeof(block), shift = byteInBlock * bitsInByte;
+        blocks[blockNumber] &= ~(0xffU << shift); blocks[blockNumber] |= static_cast<block>(byte) << shift;
+
+        if(sign != Zero && isLineEmpty(blocks)) sign = Zero;
+        if(sign == Zero && !isLineEmpty(blocks)) sign = Positive;
+    }
+    [[nodiscard]]
+    gpu constexpr auto getByte(std::size_t index) const noexcept -> uint8_t {
+        if(index > blocksNumber * sizeof(block)) return 0;
+        
+        const std::size_t blockNumber = index / sizeof(block), byteInBlock = index % sizeof(block), shift = byteInBlock * bitsInByte;
+        return (blocks[blockNumber] & (0xffU << shift)) >> shift;
+    }
+    [[nodiscard]]
+    gpu constexpr auto byteCount() const noexcept -> std::size_t {
+        std::size_t lastBlock = blocksNumber - 1;
+        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock);
+
+        for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
+            const auto byte = (blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte);
+            if(byte)
+                return lastBlock * sizeof(block) + byteN + 1;
+        }
+        return lastBlock * sizeof(block);
+    }
+    [[nodiscard]]
+    gpu constexpr auto bitCount() const noexcept -> std::size_t {
+        std::size_t lastBlock = blocksNumber - 1;
+        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock);
+
+        for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
+            const auto byte = (blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte);
+            if(!byte) continue;
+
+            for(int8_t bitN = bitsInByte - 1; bitN >= 0; --bitN) {
+                const auto bit = (byte & (0x1u << bitN)) >> bitN;
+                if(bit)
+                    return (lastBlock * sizeof(block) + byteN) * bitsInByte + bitN + 1;
+            }
+            return ((lastBlock - 1) * sizeof(block) + byteN) * bitsInByte;
+        }
+        return lastBlock * sizeof(block);
     }
     [[nodiscard]]
     gpu constexpr auto isOdd() const noexcept -> bool { return (0x1 & blocks[0]) == 1; }

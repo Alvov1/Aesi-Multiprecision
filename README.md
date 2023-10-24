@@ -2,7 +2,7 @@
 The goal of this project is to develop a fast and handy multiprecision library which can be used with GPU parallelization frameworks such as CUDA, OpenCL and Metal. Library should correspond to modern C++ standards, support constexpr expressions and move semantic. Library is header only to avoid difficulties while building.
 
 ## Current progress
-Project is currently under development and is being tested for support the __Cuda__ framework. OpenCL support is next in line for development. Metal support will be implemented after some time, due to the presence of significant differences of the framework from Cuda and from OpenCL.
+The project is currently under development and is being tested to support the __Cuda__ framework. OpenCL support is next in line for development. Metal support is scheduled after some time, due to the presence of significant differences in the framework from Cuda and from OpenCL.
 
 ## Functionality
 Library supports each of arithmetic (binary and unary), bitwise and boolean operations. Various functions from number theory are being added to the library, among which greatest common divisor and exponentiation by modulo have already been implemented.
@@ -51,11 +51,6 @@ int main() {
 ```
 >Were in kernel thread and number is 1562144106091796071
 
-### OpenCl kernel:
-```cpp
-```
->
-
 ## About precision cast
 It is admissible to use numbers of different precision inside the majority of operations, but it is not recommended cause it leads to redundant copying inside type conversions. Operation-assignment expressions (+=, -=, &=, etc...) requires the bitness of assignment to be greater or equal than bitness of assignable.
 Precision cast operator could be called by user directly.
@@ -93,5 +88,5 @@ std::cout << Aesi<256>::powm(base, power, modulo) << std::endl; // Fine
 - Tilde operator (~) does __NOT__ affect the sign of number.
 - Both bitshift operators do not make any effort if the shift value is greater than the bitness of the number. If the shift is negative, the opposite operator is called with the absolute value of the shift.
 - Be careful with exponentiation overflow when using __POWM__ function and similar.
-- GetString method for hexadecimal notation returns number representation with letters in __LOWERCASE__
-- Both display methods work significantly faster for hexadecimal notation
+- GetString method for hexadecimal notation returns number representation with letters in __LOWERCASE__.
+- Both display methods (stream operator, getString()) work significantly faster for hexadecimal notation.

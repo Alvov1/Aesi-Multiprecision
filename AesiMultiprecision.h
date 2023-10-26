@@ -15,7 +15,7 @@
 namespace {
     using block = uint32_t;
     constexpr auto bitsInByte = 8;
-    constexpr auto blockBitLength = sizeof(block) * 8;
+    constexpr auto blockBitLength = sizeof(block) * bitsInByte;
     constexpr uint64_t blockBase = 1ULL << blockBitLength;
 }
 
@@ -466,12 +466,6 @@ public:
                 sign = Zero;
         }
     }
-    [[nodiscard]]
-    gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
-        if(index >= bitness) return false;
-        const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
-        return blocks[blockNumber] & (1U << bitNumber);
-    }
     gpu constexpr auto setByte(std::size_t index, uint8_t byte) noexcept -> void {
         if(index > blocksNumber * sizeof(block)) return;
 
@@ -480,6 +474,12 @@ public:
 
         if(sign != Zero && isLineEmpty(blocks)) sign = Zero;
         if(sign == Zero && !isLineEmpty(blocks)) sign = Positive;
+    }
+    [[nodiscard]]
+    gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
+        if(index >= bitness) return false;
+        const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
+        return blocks[blockNumber] & (1U << bitNumber);
     }
     [[nodiscard]]
     gpu constexpr auto getByte(std::size_t index) const noexcept -> uint8_t {
@@ -548,6 +548,7 @@ public:
 
 
     /* -------------------- Public number theory functions. ------------------ */
+    [[nodiscard]]
     gpu static constexpr auto gcd(const Aesi& first, const Aesi& second) noexcept -> Aesi {
         auto[greater, smaller] = [&first, &second] {
             const auto ratio = first.operator<=>(second);
@@ -562,6 +563,7 @@ public:
         }
         return greater;
     }
+    [[nodiscard]]
     gpu static constexpr auto powm(const Aesi& base, const Aesi& power, const Aesi& mod) noexcept -> Aesi {
         constexpr auto remainingBlocksEmpty = [] (const Aesi& value, std::size_t offset) {
             for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i)
@@ -584,9 +586,11 @@ public:
 
         return result;
     }
+    [[nodiscard]]
     gpu static constexpr auto lcm(const Aesi& first, const Aesi& second) noexcept -> Aesi {
         return first / gcd(first, second) * second;
     }
+    [[nodiscard]]
     gpu static constexpr auto power2(std::size_t e) noexcept -> Aesi {
         Aesi result {}; result.setBit(e, true); return result;
     }

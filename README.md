@@ -1,14 +1,14 @@
 # Aesi multiprecision
 The goal of this project is to develop a fast and handy multiprecision library which can be used with GPU parallelization frameworks such as CUDA, OpenCL and Metal. Library should correspond to modern C++ standards, support constexpr expressions and move semantic. Library is header only to avoid difficulties while building.
 
-## Current progress
-The project is currently under development and is being tested to support the __Cuda__ framework. OpenCL support is next in line for development. Metal support is scheduled after some time, due to the presence of significant differences in the framework from Cuda and from OpenCL.
+## Project status
+<u>__Project is currently in the testing and development stage to support the *Cuda* framework. Please be aware that errors and problems may occur.__</u> OpenCL support is next in line for development. Metal support is scheduled after some time, due to the presence of significant differences in the framework from Cuda and from OpenCL.
 
 ## Functionality
-Library supports each of arithmetic (binary and unary), bitwise and boolean operations. Various functions from number theory are being added to the library, among which greatest common divisor and exponentiation by modulo have already been implemented.
+Library supports each of arithmetic (binary and unary), bitwise and boolean operations. Various functions from number theory are being added to the library, among which greatest common divisor, the least common multiplier and exponentiation by modulo have already been implemented.
 
-## Usage instructions: 
-Library supports object-oriented style of data management. Class operators are overloaded for use in expressions and universal references are used whenever possible. Number's bitness is passed to the class object as a template parameter and has a default value of __*512 bit*__. It should be a multiple of 32 (bit length of unsigned type, which could be different on your system).
+## Usage:
+Library supports object-oriented style of data management. Class operators are overloaded for use in expressions. Number's bitness is passed to the class object as a template parameter and has a default value of __*512 bit*__. It should be a multiple of 32.
 
 __1. Initialization.__ Number's initialization could be done with numbers, strings, string-views, string literals or library objects with different precision. User-defined string literals are planned to be released in the future.
 

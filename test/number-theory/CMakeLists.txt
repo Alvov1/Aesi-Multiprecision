@@ -1,2 +1,2 @@
 file(GLOB NumberTheorySources *.cpp)
-target_sources(MultiprecisionGPU PRIVATE ${NumberTheorySources})
+target_sources(AesiMultiprecisionTesting PRIVATE ${NumberTheorySources})

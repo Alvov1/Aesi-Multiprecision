@@ -1,2 +1,2 @@
 file(GLOB OperationsTesting *.cpp)
-target_sources(MultiprecisionGPU PRIVATE ${OperationsTesting})
+target_sources(AesiMultiprecisionTesting PRIVATE ${OperationsTesting})

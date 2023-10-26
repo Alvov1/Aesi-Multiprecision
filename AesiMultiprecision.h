@@ -530,6 +530,20 @@ public:
     gpu constexpr auto isEven() const noexcept -> bool { return (0x1 & blocks[0]) == 0; }
     [[nodiscard]]
     gpu constexpr auto getBitness() const noexcept -> std::size_t { return bitness; }
+    [[nodiscard]]
+    gpu constexpr auto squareRoot() const noexcept -> Aesi {
+        if(sign != Positive)
+            return Aesi {};
+
+        Aesi x {}, y = power2((bitCount() + 1) / 2);
+
+        do {
+            x = y;
+            y = (x + this->operator/(x)) >> 1;
+        } while (y < x);
+
+        return x;
+    }
     /* ----------------------------------------------------------------------- */
 
 
@@ -572,6 +586,9 @@ public:
     }
     gpu static constexpr auto lcm(const Aesi& first, const Aesi& second) noexcept -> Aesi {
         return first / gcd(first, second) * second;
+    }
+    gpu static constexpr auto power2(std::size_t e) noexcept -> Aesi {
+        Aesi result {}; result.setBit(e, true); return result;
     }
     /* ----------------------------------------------------------------------- */
 

@@ -179,3 +179,26 @@ TEST(Casting, IntegralCast) {
         unsigned long long v19 = 5576836686719978266ULL; Aesi o19 = v19; EXPECT_EQ(o19.integralCast<unsigned long long>(), v19);
     }
 }
+
+TEST(Casting, IntegralCastDevice) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (const std::pair<Aesi, Aesi>& data, Aesi& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        result = data.first.integralCast<uint64_t>() + data.second.integralCast<uint64_t>();
+    };
+
+    const std::pair values = {
+            Aesi("123426017006182"),
+            Aesi("86833176188118")
+    };
+    Aesi result {};
+    kernel<<<32, 32>>>(values, result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, "210259193194300");
+#endif
+}

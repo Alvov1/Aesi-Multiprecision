@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../AesiMultiprecision.h"
 
+#ifdef __CUDACC__
+#include <thrust/device_vector.h>
+#endif
+
 TEST(Display, Zero) {
     Aesi m = 0;
 
@@ -985,4 +989,30 @@ TEST(Display, HexadecimalFormat) {
         const auto size = m.getString<16>(utf.data(), utf.size());
         EXPECT_EQ(std::wstring_view(utf.data()), L"defc4fa2a8ad010fbe96a6c4a8d1b278bbe5589d2795f7844726d83e320a3c293c9deedb7bc0094cbaa6b29500f106953e4bb427cbcab55cfbf48bc850dc63ec"sv);
     }
+}
+
+TEST(Display, Device) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (const std::pair<Aesi, Aesi>& data, thrust::device_vector<char>& buffer) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+
+        const auto size = data.first.getString<16>(buffer.data(), 128);
+        data.second.getString<8>(buffer.data() + size, 128 - size);
+    };
+
+    const std::pair values = {
+            Aesi("123426017006182806728593424683999798008235734137469123231828679"),
+            Aesi("8683317618811886495518194401279999999")
+    };
+    thrust::device_vector<char> buffer (128);
+
+    kernel<<<32, 32>>>(values, buffer);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(std::string(buffer.data()), "4ccee620615d565c88f3468922e6b30b48660c6e2643b7694ac764205423460164520274274577345257777777777");
+#endif
 }

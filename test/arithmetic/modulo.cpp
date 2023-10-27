@@ -341,3 +341,26 @@ TEST(Modulo, Huge) {
     Aesi<512> o39 = "151246567336848655594742713804671303477.";
     EXPECT_EQ(o38 % o39, "56129243505051103512160725382779920784."); o38 %= o39; EXPECT_EQ(o38, "56129243505051103512160725382779920784.");
 }
+
+TEST(Modulo, Device) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (const std::pair<Aesi, Aesi>& data, Aesi& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        result = data.first % data.second;
+    };
+
+    const std::pair values = {
+            Aesi("123426017006182806728593424683999798008235734137469123231828679"),
+            Aesi("8683317618811886495518194401279999999")
+    };
+    Aesi result {};
+    kernel<<<32, 32>>>(values, result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, "4666753355079812953002885381610025880");
+#endif
+}

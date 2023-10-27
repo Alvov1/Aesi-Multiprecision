@@ -197,3 +197,24 @@ TEST(Initialization, Hexadecimal) {
     Aesi m481 = "0xa773fbd9f49f399a", m482 = "0xfba69cf8314c843e", m483 = "0xaa8daf0c322ed564"; EXPECT_EQ(m481, 12066264740186241434ULL); EXPECT_EQ(m482, 18133353539446801470ULL); EXPECT_EQ(m483, 12289671425080350052ULL);
     Aesi m491 = "0xfa56fb5e3d0c01e3", m492 = "0xfc45d62e6351335b", m493 = "0x9b99b10ee0300918"; EXPECT_EQ(m491, 18038881739648795107ULL); EXPECT_EQ(m492, 18178170965673980763ULL); EXPECT_EQ(m493, 11212187424764463384ULL);
 }
+
+TEST(Initialization, DeviceNotations) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (Aesi& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        result = Aesi("0b123426017006182806728593424683999798008235734137469123231828679")
+                + "0o263130836933693530167218012159999999"
+                + "0x8683317618811886495518194401279999999";
+    };
+
+    Aesi result {};
+    kernel<<<32, 32>>>(result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, "123426017006182806728593433630448253753815759822881536671828677");
+#endif
+}

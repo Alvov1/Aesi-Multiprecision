@@ -35,3 +35,26 @@ TEST(OddEven, Basic) {
     Aesi b28 = "221186673493144611395088919473087294307."; EXPECT_EQ(b28.isOdd(), 1); EXPECT_EQ(b28.isEven(), 0);
     Aesi b29 = "162251677695606858198966267606861399521."; EXPECT_EQ(b29.isOdd(), 1); EXPECT_EQ(b29.isEven(), 0);
 }
+
+TEST(OddEven, Device) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (const std::pair<Aesi, Aesi>& data, Aesi& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        result = (data.first.isOdd() ? 1 : 0) + (data.second.isOdd() ? 1 : 0);
+    };
+
+    const std::pair values = {
+            Aesi("123426017006182806728593424683999798008235734137469123231828679"),
+            Aesi("8683317618811886495518194401279999999")
+    };
+    Aesi result {};
+    kernel<<<32, 32>>>(values, result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, 2);
+#endif
+}

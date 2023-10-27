@@ -269,3 +269,27 @@ TEST(NumberTheory, PowerByModuloDifferentPrecision) {
         EXPECT_EQ(Aesi<1216>::powm(b, p, m), "747010848843677046214727000262387707994984622979618490501109772079728919179161077526702803786705859329999612677945347174518196555969887238227623990389320927325076719623193015838862584");
     }
 }
+
+TEST(Powm, Device) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (const std::pair<Aesi, Aesi>& data, Aesi& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        const Aesi<512> pow = 22189;
+        result = Aesi<512>::powm(data.first, pow, data.second);
+    };
+
+    const std::pair values = {
+            Aesi("123426017006182806728593424683999798008235734137469123231828679"),
+            Aesi("8683317618811886495518194401279999999")
+    };
+    Aesi result {};
+    kernel<<<32, 32>>>(values, result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, "951337582723992641770951189194121063");
+#endif
+}

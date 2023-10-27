@@ -166,3 +166,26 @@ TEST(NumberTheory, GreatestCommonDivisorDifferentPrecision) {
         EXPECT_EQ(Aesi<608>::gcd(l, r), "68017067994476894939528303364.");
     }
 }
+
+TEST(Gcd, Device) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (const std::pair<Aesi, Aesi>& data, Aesi& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        result = Aesi<512>::gcd(data.first, data.second);
+    };
+
+    const std::pair values = {
+            Aesi("123426017006182806728593424683999798008235734137469123231828679"),
+            Aesi("8683317618811886495518194401279999999")
+    };
+    Aesi result {};
+    kernel<<<32, 32>>>(values, result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, "1");
+#endif
+}

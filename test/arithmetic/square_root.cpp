@@ -84,3 +84,26 @@ TEST(SquareRoot, SquareRoot) {
     m = "5955813785675588109518975395472748958137987074475981158876199212009943507928308334573693535545462979243470395215093466596560400578633978166204064517715396.";
     EXPECT_EQ(m.squareRoot(), "77173919076820169671684270220139975015863766388260649610600962754358359900654.");
 }
+
+TEST(SquareRoot, Device) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (const std::pair<Aesi, Aesi>& data, Aesi& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        result = data.first.squareRoot() + data.second.squareRoot();
+    };
+
+    const std::pair values = {
+            Aesi("123426017006182806728593424683999798008235734137469123231828679"),
+            Aesi("8683317618811886495518194401279999999")
+    };
+    Aesi result {};
+    kernel<<<32, 32>>>(values, result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, "11109726234531986964721410156435");
+#endif
+}

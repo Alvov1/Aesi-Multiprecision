@@ -188,3 +188,26 @@ TEST(NumberTheory, LeastCommonMultiplierDifferentPrecision) {
         EXPECT_EQ(Aesi<800>::lcm(l, r), "4098078484815494518988918928970371415570484750740385558683521371491536161647777095989028821989315177308012450600299021387444091565797254015441361414486134159012436672112591485508373278429950420503002623854285576158420392669943062729769560877.");
     }
 }
+
+TEST(Lcm, Device) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (const std::pair<Aesi, Aesi>& data, Aesi& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        result = Aesi<512>::lcm(data.first, data.second);
+    };
+
+    const std::pair values = {
+            Aesi("123426017006182806728593424683999798008235734137469123231828679"),
+            Aesi("8683317618811886495518194401279999999")
+    };
+    Aesi result {};
+    kernel<<<32, 32>>>(values, result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, "1071747308089562696998003052186565658067621146073151404808497949426246352153158371816469185888171321");
+#endif
+}

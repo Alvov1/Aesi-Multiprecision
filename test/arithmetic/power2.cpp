@@ -516,3 +516,21 @@ TEST(Power2, Power2) {
     EXPECT_EQ(Aesi<512>::power2(511), "6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042048.");
     EXPECT_EQ(Aesi<512>::power2(512), 0);
 }
+
+TEST(Power2, Device) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (Aesi& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        result = Aesi<512>::power2(500);
+    };
+
+    Aesi result {}; kernel<<<32, 32>>>(result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, "");
+#endif
+}

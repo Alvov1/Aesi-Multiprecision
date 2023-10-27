@@ -302,3 +302,26 @@ TEST(Casting, PrecisionCast) {
     Aesi<448> l29 = "545136889659423149046640496483142589267039543174772529930583944491083582156213563276447863450923726927200116011820859957964687342869311.";
     EXPECT_EQ(l29.precisionCast<224>(), "11564578527812652389272649650310409698199102565460528063263161490239.");
 }
+
+TEST(Casting, PrecisionCastDevice) {
+#ifdef __CUDACC__
+    const auto kernel = [] __global__ (const std::pair<Aesi, Aesi>& data, Aesi<768>& result) {
+        const auto tid = threadIdx.x + blockIdx.x * blockDim.x;
+        if(tid != 0) return;
+        result = first.precisionCast<768>() + second.precisionCast<768>();
+    };
+
+    const std::pair values = {
+            Aesi("123426017006182806728593424683999798008235734137469123231828679"),
+            Aesi("123426017006182806728593433630448253753815759822881536671828677")
+    };
+    Aesi<768> result {};
+    kernel<<<32, 32>>>(values, result);
+
+    const auto code = cudaDeviceSynchronize();
+    if (code != cudaSuccess)
+        FAIL() << cudaGetErrorString(code);
+
+    EXPECT_EQ(result, "246852034012365613457186858314448051762051493960350659903657356");
+#endif
+}

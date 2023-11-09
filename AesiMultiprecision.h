@@ -44,6 +44,7 @@ class Aesi final {
     Sign sign { Zero };
     /* ----------------------------------------------------------------------- */
 
+
     /* --------------------------- Helper functions. ------------------------- */
     gpu static constexpr auto addLine(blockLine& dst, const blockLine& src) noexcept -> uint64_t {
         uint64_t carryOut = 0;
@@ -564,6 +565,10 @@ public:
         return greater;
     }
     [[nodiscard]]
+    gpu static constexpr auto lcm(const Aesi& first, const Aesi& second) noexcept -> Aesi {
+        return first / gcd(first, second) * second;
+    }
+    [[nodiscard]]
     gpu static constexpr auto powm(const Aesi& base, const Aesi& power, const Aesi& mod) noexcept -> Aesi {
         constexpr auto remainingBlocksEmpty = [] (const Aesi& value, std::size_t offset) {
             for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i)
@@ -587,14 +592,11 @@ public:
         return result;
     }
     [[nodiscard]]
-    gpu static constexpr auto lcm(const Aesi& first, const Aesi& second) noexcept -> Aesi {
-        return first / gcd(first, second) * second;
-    }
-    [[nodiscard]]
     gpu static constexpr auto power2(std::size_t e) noexcept -> Aesi {
         Aesi result {}; result.setBit(e, true); return result;
     }
     /* ----------------------------------------------------------------------- */
+
 
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
     gpu constexpr auto integralCast() const noexcept -> Integral {
@@ -683,7 +685,8 @@ public:
 
             const auto base = [] (long baseField, std::basic_ostream<Char>& ss, bool showbase) {
                 auto base = (baseField == std::ios::hex ? 16 : (baseField == std::ios::oct ? 8 : 10));
-                if(showbase && base != 10) ss.write([&base] { if constexpr (std::is_same_v<Char, char>) { return base == 8 ? "0o" : "0x"; } else { return base == 8 ? L"0o" : L"0x"; } } (), 2);
+                if(showbase && base != 10)
+                    ss << [&base] { if constexpr (std::is_same_v<Char, char>) { return base == 8 ? "0o" : "0x"; } else { return base == 8 ? L"0o" : L"0x"; }} () << std::noshowbase ;
                 return base;
             } (flags & std::ios::basefield, ss, flags & std::ios::showbase);
 

@@ -6,6 +6,7 @@
 /* <Utility>: std::pair. */
 #ifdef __CUDACC__
     #define gpu __host__ __device__
+    #define gpuonly __device__
     #include <cuda/std/utility>
 #else
     #define gpu
@@ -719,6 +720,14 @@ public:
 
         return ss;
     }
+
+#ifdef __CUDACC__
+    gpuonly constexpr void atomicSet(const Aesi& value) noexcept {
+        atomicExch(&sign, 1);
+        for(std::size_t i = 0; i < bitness; ++i)
+            atomicExch(&blocks[i], value.blocks[i]);
+    }
+#endif
 };
 
 #include "PrecisionCast.h"

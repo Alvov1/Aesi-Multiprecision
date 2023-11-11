@@ -531,6 +531,8 @@ public:
     [[nodiscard]]
     gpu constexpr auto isEven() const noexcept -> bool { return (0x1 & blocks[0]) == 0; }
     [[nodiscard]]
+    gpu constexpr auto isZero() const noexcept -> bool { return sign == Zero; }
+    [[nodiscard]]
     gpu constexpr auto getBitness() const noexcept -> std::size_t { return bitness; }
     [[nodiscard]]
     gpu constexpr auto squareRoot() const noexcept -> Aesi {

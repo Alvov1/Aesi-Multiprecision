@@ -19,6 +19,7 @@ add_subdirectory(bitwise)
 add_subdirectory(number-theory)
 add_subdirectory(gpu)
 add_subdirectory(benchmarks)
+add_subdirectory(boolean)
 
 target_link_libraries(AesiMultiprecisionTesting GTest::gtest_main)
 

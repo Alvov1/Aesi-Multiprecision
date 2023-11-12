@@ -5,23 +5,54 @@
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr bool operator==(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept {
     if constexpr (bFirst > bSecond) {
-        Aesi<bFirst> reducedSecond = second.template precisionCast<bFirst>();
-        return (first == reducedSecond);
+        return (first == second.template precisionCast<bFirst>());
     } else {
-        Aesi<bSecond> reducedFirst = first.template precisionCast<bSecond>();
-        return (reducedFirst == second);
+        return (first.template precisionCast<bSecond>() == second);
     }
 }
+
+
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr std::strong_ordering operator<=>(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept {
+gpu constexpr auto compareTo(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> AesiCMP {
     if constexpr (bFirst > bSecond) {
-        Aesi<bFirst> reducedSecond = second.template precisionCast<bFirst>();
-        return (first <=> reducedSecond);
+        return first.compareTo(second.template precisionCast<bFirst>());
     } else {
-        Aesi<bSecond> reducedFirst = first.template precisionCast<bSecond>();
-        return (reducedFirst <=> second);
+        return first.template precisionCast<bSecond>().compareTo(second);
     }
 }
+
+#if defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)
+template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
+    gpu constexpr auto operator!=(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return !first.operator==(second); }
+    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
+    gpu constexpr auto operator<(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return first.compareTo(second) == AesiCMP::less; }
+    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
+    gpu constexpr auto operator<=(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return !first.operator>(second); }
+    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
+    gpu constexpr auto operator>(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return first.compareTo(second) == AesiCMP::greater; }
+    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
+    gpu constexpr auto operator>=(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return !first.operator<(second); }
+
+#else
+    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
+    gpu constexpr auto operator<=>(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> std::strong_ordering {
+        if constexpr (bFirst > bSecond) {
+            switch(first.compareTo(second.template precisionCast<bFirst>())) {
+                case AesiCMP::less: return std::strong_ordering::less;
+                case AesiCMP::greater: return std::strong_ordering::greater;
+                case AesiCMP::equal: return std::strong_ordering::equal;
+                default: return std::strong_ordering::equivalent;
+            }
+        } else {
+            switch(first.template precisionCast<bSecond>().compareTo(second)) {
+                case AesiCMP::less: return std::strong_ordering::less;
+                case AesiCMP::greater: return std::strong_ordering::greater;
+                case AesiCMP::equal: return std::strong_ordering::equal;
+                default: return std::strong_ordering::equivalent;
+            }
+        }
+    }
+#endif
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 
@@ -34,11 +65,9 @@ template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator+(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept
 -> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
-        Aesi<bFirst> reducedSecond = second.template precisionCast<bFirst>();
-        return first + reducedSecond;
+        return first + second.template precisionCast<bFirst>();
     } else {
-        Aesi<bSecond> reducedFirst = first.template precisionCast<bSecond>();
-        return reducedFirst + second;
+        return first.template precisionCast<bSecond>() + second;
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)

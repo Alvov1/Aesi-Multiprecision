@@ -19,6 +19,8 @@ namespace {
     constexpr uint64_t blockBase = 1ULL << blockBitLength;
 }
 
+enum class AesiCMP { equal = 0, less = 1, greater = 2, equivalent = 3 };
+
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Aesi final {
     static_assert(bitness > sizeof(uint64_t), "Use built-in types for numbers 64-bit or less.");
@@ -77,12 +79,12 @@ class Aesi final {
     }
     gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor) noexcept -> std::pair<Aesi, Aesi> {
         const Aesi divAbs = divisor.abs();
-        const auto ratio = number.abs().operator<=>(divAbs);
+        const auto ratio = number.abs().compareTo(divAbs);
 
         std::pair<Aesi, Aesi> results = {0, 0 };
         auto& [quotient, remainder] = results;
 
-        if(ratio == std::strong_ordering::greater) {
+        if(ratio == AesiCMP::greater) {
             const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
             for(long long i = bitsUsed - 1; i >= 0; --i) {
                 remainder <<= 1;
@@ -98,7 +100,7 @@ class Aesi final {
                 quotient.sign = Zero; else if(number.sign != divisor.sign) quotient = -quotient;
             if(isLineEmpty(remainder.blocks))
                 remainder.sign = Zero; else if(number.sign == Negative) remainder = -remainder;
-        } else if(ratio == std::strong_ordering::less)
+        } else if(ratio == AesiCMP::less)
             remainder = number; else quotient = 1;
 
         return results;
@@ -408,48 +410,69 @@ public:
         if(sign != Zero || value.sign != Zero)
             return (sign == value.sign && blocks == value.blocks); else return true;
     };
-    gpu constexpr std::strong_ordering operator<=>(const Aesi& value) const noexcept {
+    gpu constexpr auto compareTo(const Aesi& value) const noexcept -> AesiCMP {
         switch (sign) {
             case Zero:
                 switch (value.sign) {
-                    case Zero: return std::strong_ordering::equal;
-                    case Positive: return std::strong_ordering::less;
-                    case Negative: return std::strong_ordering::greater;
-                    default: return std::strong_ordering::equivalent;
+                    case Zero: return AesiCMP::equal;
+                    case Positive: return AesiCMP::less;
+                    case Negative: return AesiCMP::greater;
+                    default: return AesiCMP::equivalent;
                 }
             case Positive:
                 switch (value.sign) {
                     case Positive: {
                         const auto thisLength = lineLength(blocks), valueLength = lineLength(value.blocks);
-                        if(thisLength != valueLength) return thisLength <=> valueLength;
+                        if(thisLength != valueLength)
+                            return (thisLength > valueLength) ? AesiCMP::greater : AesiCMP::less;
 
                         for(long long i = thisLength; i >= 0; --i)
-                            if(blocks[i] != value.blocks[i]) return blocks[i] <=> value.blocks[i];
+                            if(blocks[i] != value.blocks[i])
+                                return (blocks[i] > value.blocks[i]) ? AesiCMP::greater : AesiCMP::less;
 
-                        return std::strong_ordering::equal;
+                        return AesiCMP::equal;
                     }
                     case Zero:
-                    case Negative: return std::strong_ordering::greater;
-                    default: return std::strong_ordering::equivalent;
+                    case Negative: return AesiCMP::greater;
+                    default: return AesiCMP::equivalent;
                 }
             case Negative:
                 switch (value.sign) {
                     case Negative: {
                         const auto thisLength = lineLength(blocks), valueLength = lineLength(value.blocks);
-                        if(thisLength != valueLength) return (static_cast<long long>(thisLength) * -1) <=> (static_cast<long long>(valueLength) * -1);
+                        if(thisLength != valueLength)
+                            return (static_cast<long long>(thisLength) * -1 > static_cast<long long>(valueLength) * -1) ? AesiCMP::greater : AesiCMP::less;
 
                         for(long long i = thisLength; i >= 0; --i)
-                            if(blocks[i] != value.blocks[i]) return (static_cast<long>(blocks[i]) * -1) <=> (static_cast<long>(value.blocks[i]) * -1);
+                            if(blocks[i] != value.blocks[i])
+                                return (static_cast<long>(blocks[i]) * -1 > static_cast<long>(value.blocks[i]) * -1) ? AesiCMP::greater : AesiCMP::less;
 
-                        return std::strong_ordering::equal;
+                        return AesiCMP::equal;
                     }
                     case Zero:
-                    case Positive: return std::strong_ordering::less;
-                    default: return std::strong_ordering::equivalent;
+                    case Positive: return AesiCMP::less;
+                    default: return AesiCMP::equivalent;
                 }
+            default: return AesiCMP::equivalent;
+        }
+    };
+
+#if defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)
+    gpu constexpr auto operator!=(const Aesi& value) const noexcept -> bool { return !this->operator==(value); }
+    gpu constexpr auto operator<(const Aesi& value) const noexcept -> bool { return this->compareTo(value) == AesiCMP::less; }
+    gpu constexpr auto operator<=(const Aesi& value) const noexcept -> bool { return !this->operator>(value); }
+    gpu constexpr auto operator>(const Aesi& value) const noexcept -> bool { return this->compareTo(value) == AesiCMP::greater; }
+    gpu constexpr auto operator>=(const Aesi& value) const noexcept -> bool { return !this->operator<(value); }
+#else
+    gpu constexpr auto operator<=>(const Aesi& value) const noexcept -> std::strong_ordering {
+        switch(this->compareTo(value)) {
+            case AesiCMP::less: return std::strong_ordering::less;
+            case AesiCMP::greater: return std::strong_ordering::greater;
+            case AesiCMP::equal: return std::strong_ordering::equal;
             default: return std::strong_ordering::equivalent;
         }
     };
+#endif
     /* ----------------------------------------------------------------------- */
 
 
@@ -554,11 +577,8 @@ public:
     [[nodiscard]]
     gpu static constexpr auto gcd(const Aesi& first, const Aesi& second) noexcept -> Aesi {
         auto[greater, smaller] = [&first, &second] {
-            const auto ratio = first.operator<=>(second);
-            return ratio == std::strong_ordering::greater ?
-                   std::pair { first, second }
-                                                          :
-                   std::pair { second, first };
+            const auto ratio = first.compareTo(second);
+            return ratio == AesiCMP::greater ? std::pair { first, second } : std::pair { second, first };
         } ();
         while(!isLineEmpty(smaller.blocks)) {
             auto [quotient, remainder] = divide(greater, smaller);

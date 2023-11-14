@@ -700,18 +700,9 @@ public:
             } else {
                 const auto startPosition = position;
 
-                printf("Before copy.\n");
                 Aesi copy = *this;
-                printf("After copy.\n");
-                copy.introspect();
-                printf("\n");
                 while (copy != 0 && position < bufferSize) {
-                    printf("Before division.\n");
                     auto [quotient, remainder] = divide(copy, base);
-                    printf("Division.\n");
-                    quotient.introspect();
-                    remainder.introspect();
-                    printf("\n\n");
                     if constexpr (std::is_same_v<Char, char>) {
                         buffer[position++] = '0' + remainder.template integralCast<uint8_t>();
                     } else {
@@ -720,7 +711,6 @@ public:
                     copy = quotient;
                 }
 
-                printf("GetString: shifting bytes forward-backward. Start position: %u\n, position: %u\n", position);
                 for (std::size_t i = startPosition; i * 2 < position; ++i) {
                     Char t = buffer[i]; buffer[i] = buffer[position - 1 - i]; buffer[position - 1 - i] = t;
                 }

@@ -81,8 +81,9 @@ class Aesi final {
         const Aesi divAbs = divisor.abs();
         const auto ratio = number.abs().compareTo(divAbs);
 
-        std::pair<Aesi, Aesi> results = {0, 0 };
-        auto& [quotient, remainder] = results;
+        Aesi quotient = 0, remainder = 0;
+//        std::pair<Aesi, Aesi> results = {0, 0 };
+//        auto& [quotient, remainder] = results;
 
         if(ratio == AesiCMP::greater) {
             const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
@@ -103,7 +104,7 @@ class Aesi final {
         } else if(ratio == AesiCMP::less)
             remainder = number; else quotient = 1;
 
-        return results;
+        return { quotient, remainder };
     }
     /* ----------------------------------------------------------------------- */
 

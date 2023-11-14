@@ -6,9 +6,11 @@
 /* <Utility>: std::pair. */
 #ifdef __CUDACC__
     #define gpu __host__ __device__
-    #include <cuda/std/utility>
+    #define pair thrust::pair
+    #include <thrust/pair.h>
 #else
     #define gpu
+    #define pair std::pair
     #include <utility>
 #endif
 
@@ -35,8 +37,8 @@ class Aesi final {
                 if(data[i] != value.data[i]) return false; return true;
         };
         [[nodiscard]] gpu constexpr auto size() const noexcept -> std::size_t { return lineSize; };
-        gpu constexpr auto operator[](std::size_t index) const noexcept -> const ValueType& { return data[index]; }
-        gpu constexpr auto operator[](std::size_t index) noexcept -> ValueType& { return data[index]; }
+        gpu constexpr auto operator[] (std::size_t index) const noexcept -> const ValueType& { return data[index]; }
+        gpu constexpr auto operator[] (std::size_t index) noexcept -> ValueType& { return data[index]; }
     };
     using blockLine = MyArray<block, blocksNumber>;
     enum Sign { Zero = 0, Positive = 1, Negative = 2 };
@@ -77,12 +79,12 @@ class Aesi final {
             if(line[i]) return i + 1;
         return 0;
     }
-    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor) noexcept -> std::pair<Aesi, Aesi> {
+    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor) noexcept -> pair<Aesi, Aesi> {
         const Aesi divAbs = divisor.abs();
         const auto ratio = number.abs().compareTo(divAbs);
 
         Aesi quotient = 0, remainder = 0;
-//        std::pair<Aesi, Aesi> results = {0, 0 };
+//        pair<Aesi, Aesi> results = {0, 0 };
 //        auto& [quotient, remainder] = results;
 
         if(ratio == AesiCMP::greater) {
@@ -579,7 +581,7 @@ public:
     gpu static constexpr auto gcd(const Aesi& first, const Aesi& second) noexcept -> Aesi {
         auto[greater, smaller] = [&first, &second] {
             const auto ratio = first.compareTo(second);
-            return ratio == AesiCMP::greater ? std::pair { first, second } : std::pair { second, first };
+            return ratio == AesiCMP::greater ? pair { first, second } : pair { second, first };
         } ();
         while(!isLineEmpty(smaller.blocks)) {
             auto [quotient, remainder] = divide(greater, smaller);

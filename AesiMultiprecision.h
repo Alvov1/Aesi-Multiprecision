@@ -744,13 +744,13 @@ public:
 
 #ifdef __CUDACC__
     __device__ constexpr auto atomicSet(const Aesi& value) noexcept -> void {
-        atomicExch(&std::to_underlying(sign), 1);
+        sign = 1;
         for(std::size_t i = 0; i < blocksNumber; ++i)
             atomicExch(&blocks[i], value.blocks[i]);
     }
 
     __device__ constexpr auto atomicExchange(const Aesi& value) noexcept -> void {
-        atomicExch(&value.sign, atomicExch(&sign, value.sign));
+        sign = value.sign;
         for(std::size_t i = 0; i < blocksNumber; ++i)
             atomicExch(&value.blocks[i], atomicExch(&blocks[i], value.blocks[i]));
     }

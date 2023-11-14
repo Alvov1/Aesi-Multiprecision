@@ -744,7 +744,7 @@ public:
 
 #ifdef __CUDACC__
     __device__ constexpr auto atomicSet(const Aesi& value) noexcept -> void {
-        atomicExch(&std::to_underlying(b::B2), 1);
+        atomicExch(&std::to_underlying(sign), 1);
         for(std::size_t i = 0; i < blocksCount; ++i)
             atomicExch(&blocks[i], value.blocks[i]);
     }

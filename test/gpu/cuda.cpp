@@ -16,6 +16,8 @@ TEST(Cuda, ComplexTesting) {
     if(code != cudaSuccess)
         FAIL() << "Execution failed: " << cudaGetErrorString(code) << '.';
 #else
+
+
     SUCCEED() << "Everything's fine, just different compiler.";
 #endif
 }

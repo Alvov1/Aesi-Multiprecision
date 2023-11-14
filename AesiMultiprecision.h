@@ -654,21 +654,31 @@ public:
 
         std::size_t position = 0;
 
-        if (showBase) [&position] (Char *const buffer, std::size_t bufferSize) {
-                if constexpr (base == 2) {              // Binary
-                    if (bufferSize < 3) return;
-                    memcpy(buffer, [] { if constexpr (std::is_same_v<Char, char>) { return "0b"; } else { return L"0b"; } }(), 2 * sizeof(Char));
-                    position += 2;
-                } else if constexpr (base == 8) {       // Octal
-                    if (bufferSize < 3) return;
-                    memcpy(buffer, [] { if constexpr (std::is_same_v<Char, char>) { return "0o"; } else { return L"0o"; } }(), 2 * sizeof(Char));
-                    position += 2;
-                } else if constexpr (base == 16) {      // Hexadecimal
-                    if (bufferSize < 3) return;
-                    memcpy(buffer, [] { if constexpr (std::is_same_v<Char, char>) { return "0x"; } else { return L"0x"; } }(), 2 * sizeof(Char));
-                    position += 2;
-                }                                       // Without base in decimal
-            } (buffer, bufferSize);
+        if (showBase && bufferSize > 3) {
+            if constexpr (base == 2) {              // Binary
+                if constexpr (std::is_same_v<Char, char>) {
+                    memcpy(buffer, "0b", 2 * sizeof(Char));
+                } else {
+                    memcpy(buffer, L"0b", 2 * sizeof(Char));
+                }
+                position += 2;
+            } else if constexpr (base == 8) {       // Octal
+                if constexpr (std::is_same_v<Char, char>) {
+                    memcpy(buffer, "0o", 2 * sizeof(Char));
+                } else {
+                    memcpy(buffer, L"0o", 2 * sizeof(Char));
+                }
+                position += 2;
+            } else if constexpr (base == 16) {      // Hexadecimal
+                if constexpr (std::is_same_v<Char, char>) {
+                    memcpy(buffer, "0x", 2 * sizeof(Char));
+                } else {
+                    memcpy(buffer, L"0x", 2 * sizeof(Char));
+                }
+                position += 2;
+            }                                       // Without base in decimal
+        }
+
 
         if(sign != Zero) {
             if constexpr (base == 16) {
@@ -690,7 +700,11 @@ public:
                 Aesi copy = *this;
                 while (copy != 0 && position < bufferSize) {
                     auto [quotient, remainder] = divide(copy, base);
-                    buffer[position++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } }() + remainder.template integralCast<uint8_t>();
+                    if constexpr (std::is_same_v<Char, char>) {
+                        buffer[position++] = '0' + remainder.template integralCast<uint8_t>();
+                    } else {
+                        buffer[position++] = L'0' + remainder.template integralCast<uint8_t>();
+                    }
                     copy = quotient;
                 }
 
@@ -699,7 +713,11 @@ public:
                 }
             }
         } else
-            buffer[position++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } ();
+            if constexpr (std::is_same_v<Char, char>) {
+                buffer[position++] = '0';
+            } else {
+                buffer[position++] = L'0';
+            }
         buffer[position++] = Char();
         return position;
     }

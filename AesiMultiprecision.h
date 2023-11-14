@@ -700,6 +700,10 @@ public:
                 Aesi copy = *this;
                 while (copy != 0 && position < bufferSize) {
                     auto [quotient, remainder] = divide(copy, base);
+                    printf("Division.\n");
+                    quotient.introspect();
+                    remainder.introspect();
+                    printf("\n\n");
                     if constexpr (std::is_same_v<Char, char>) {
                         buffer[position++] = '0' + remainder.template integralCast<uint8_t>();
                     } else {

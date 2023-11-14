@@ -697,8 +697,13 @@ public:
             } else {
                 const auto startPosition = position;
 
+                printf("Before copy.\n");
                 Aesi copy = *this;
+                printf("After copy.\n");
+                copy.introspect();
+                printf("\n");
                 while (copy != 0 && position < bufferSize) {
+                    printf("Before division.\n");
                     auto [quotient, remainder] = divide(copy, base);
                     printf("Division.\n");
                     quotient.introspect();

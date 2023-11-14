@@ -198,7 +198,7 @@ public:
 
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
             typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
-    constexpr Aesi(String&& stringView) noexcept : Aesi(stringView.data(), stringView.size()){}
+    gpu constexpr Aesi(String&& stringView) noexcept : Aesi(stringView.data(), stringView.size()){}
 
     template<std::size_t rBitness> requires (rBitness != bitness)
     gpu constexpr Aesi(const Aesi<rBitness>& copy) noexcept {
@@ -406,7 +406,7 @@ public:
 
 
     /* ----------------------- Comparison operators. ------------------------- */
-    gpu constexpr bool operator==(const Aesi& value) const noexcept {
+    gpu constexpr auto operator==(const Aesi& value) const noexcept -> bool {
         if(sign != Zero || value.sign != Zero)
             return (sign == value.sign && blocks == value.blocks); else return true;
     };
@@ -699,7 +699,7 @@ public:
     }
 
     template <typename Char>
-    constexpr friend std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& ss, const Aesi& value) noexcept {
+    constexpr friend auto operator<<(std::basic_ostream<Char>& ss, const Aesi& value) noexcept -> std::basic_ostream<Char>& {
         auto flags = ss.flags();
 
         if(value.sign != Zero) {
@@ -743,10 +743,16 @@ public:
     }
 
 #ifdef __CUDACC__
-    __device__ constexpr void atomicSet(const Aesi& value) noexcept {
-        atomicExch(&sign, 1);
-        for(std::size_t i = 0; i < bitness; ++i)
+    __device__ constexpr auto atomicSet(const Aesi& value) noexcept -> void {
+        atomicExch(&std::to_underlying(b::B2), 1);
+        for(std::size_t i = 0; i < blocksCount; ++i)
             atomicExch(&blocks[i], value.blocks[i]);
+    }
+
+    __device__ constexpr auto atomicExchange(const Aesi& value) noexcept -> void {
+        atomicExch(&value.sign, atomicExch(&sign, value.sign));
+        for(std::size_t i = 0; i < blocksCount; ++i)
+            atomicExch(&value.blocks[i], atomicExch(&blocks[i], value.blocks[i]));
     }
 #endif
 };

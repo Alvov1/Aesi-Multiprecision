@@ -641,6 +641,12 @@ public:
         return result;
     }
 
+    gpu constexpr auto introspect() const noexcept -> void {
+        printf("Sign: %d\n", static_cast<int>(sign));
+        for(std::size_t i = 0; i < blocksNumber; ++i)
+            printf("%u ", blocks[i]); printf("\n");
+    }
+
     template <uint8_t base, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> &&
             (base == 2 || base == 8 || base == 10 || base == 16))
     gpu constexpr auto getString(Char* const buffer, std::size_t bufferSize, bool showBase = false) const noexcept -> std::size_t {

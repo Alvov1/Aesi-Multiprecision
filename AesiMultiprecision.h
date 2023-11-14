@@ -708,6 +708,7 @@ public:
                     copy = quotient;
                 }
 
+                printf("GetString: shifting bytes forward-backward. Position: %u\n", position);
                 for (std::size_t i = startPosition; i * 2 < position; ++i) {
                     Char t = buffer[i]; buffer[i] = buffer[position - 1 - i]; buffer[position - 1 - i] = t;
                 }

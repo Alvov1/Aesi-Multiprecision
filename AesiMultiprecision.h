@@ -3,14 +3,11 @@
 
 #include <iostream>
 
-/* <Utility>: std::pair. */
 #ifdef __CUDACC__
     #define gpu __host__ __device__
-    #define pair thrust::pair
     #include <thrust/pair.h>
 #else
     #define gpu
-    #define pair std::pair
     #include <utility>
 #endif
 
@@ -28,6 +25,14 @@ class Aesi final {
     static_assert(bitness > sizeof(uint64_t), "Use built-in types for numbers 64-bit or less.");
 
     static constexpr std::size_t blocksNumber = bitness / blockBitLength;
+
+#ifdef __CUDACC__
+    template <typename T1, typename T2>
+    using pair = thrust::pair<T1, T2>;
+#else
+    template <typename T1, typename T2>
+    using pair = std::pair<T1, T2>;
+#endif
 
     template <typename ValueType, std::size_t lineSize>
     struct MyArray final {
@@ -581,7 +586,7 @@ public:
     gpu static constexpr auto gcd(const Aesi& first, const Aesi& second) noexcept -> Aesi {
         auto[greater, smaller] = [&first, &second] {
             const auto ratio = first.compareTo(second);
-            return ratio == AesiCMP::greater ? pair { first, second } : pair { second, first };
+            return ratio == AesiCMP::greater ? pair<Aesi, Aesi> { first, second } : pair<Aesi, Aesi> { second, first };
         } ();
         while(!isLineEmpty(smaller.blocks)) {
             auto [quotient, remainder] = divide(greater, smaller);

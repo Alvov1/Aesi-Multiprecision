@@ -354,93 +354,93 @@ TEST(Multiplication, MixedMultiplicationAssignment) {
 
 TEST(Multiplication, DifferentPrecision) {
     {
-        AesiMP < 320 > first = 80176598; // AesiMP<10 blocks>
-        AesiMP < 480 > second = -426614748; // AesiMP<15 blocks>
+        Aesi < 320 > first = 80176598; // Aesi<10 blocks>
+        Aesi < 480 > second = -426614748; // Aesi<15 blocks>
         EXPECT_EQ(first * second, -34204519151267304);
 
-        AesiMP < 320 > third = 638380867; // AesiMP<10 blocks>
-        AesiMP < 352 > forth = 534963661; // AesiMP<11 blocks>
+        Aesi < 320 > third = 638380867; // Aesi<10 blocks>
+        Aesi < 352 > forth = 534963661; // Aesi<11 blocks>
         forth *= third; EXPECT_EQ(forth, 341510565722674087);
     }
     {
-        AesiMP < 352 > first = 118510918; // AesiMP<11 blocks>
-        AesiMP < 256 > second = 392821062; // AesiMP<8 blocks>
+        Aesi < 352 > first = 118510918; // Aesi<11 blocks>
+        Aesi < 256 > second = 392821062; // Aesi<8 blocks>
         EXPECT_EQ(first * second, 46553584667354916);
 
-        AesiMP < 320 > third = 490743664; // AesiMP<10 blocks>
-        AesiMP < 416 > forth = -755654452; // AesiMP<13 blocks>
+        Aesi < 320 > third = 490743664; // Aesi<10 blocks>
+        Aesi < 416 > forth = -755654452; // Aesi<13 blocks>
         forth *= third; EXPECT_EQ(forth, -370832634492392128);
     }
     {
-        AesiMP < 480 > first = 368054998; // AesiMP<15 blocks>
-        AesiMP < 352 > second = -412866557; // AesiMP<11 blocks>
+        Aesi < 480 > first = 368054998; // Aesi<15 blocks>
+        Aesi < 352 > second = -412866557; // Aesi<11 blocks>
         EXPECT_EQ(first * second, -151957599810901886);
 
-        AesiMP < 256 > third = -806407399; // AesiMP<8 blocks>
-        AesiMP < 416 > forth = -755378465; // AesiMP<13 blocks>
+        Aesi < 256 > third = -806407399; // Aesi<8 blocks>
+        Aesi < 416 > forth = -755378465; // Aesi<13 blocks>
         forth *= third; EXPECT_EQ(forth, 609142783221262535);
     }
     {
-        AesiMP < 288 > first = 929534487; // AesiMP<9 blocks>
-        AesiMP < 480 > second = -405487320; // AesiMP<15 blocks>
+        Aesi < 288 > first = 929534487; // Aesi<9 blocks>
+        Aesi < 480 > second = -405487320; // Aesi<15 blocks>
         EXPECT_EQ(first * second, -376914447981204840);
 
-        AesiMP < 320 > third = -797426321; // AesiMP<10 blocks>
-        AesiMP < 352 > forth = 271542653; // AesiMP<11 blocks>
+        Aesi < 320 > third = -797426321; // Aesi<10 blocks>
+        Aesi < 352 > forth = 271542653; // Aesi<11 blocks>
         forth *= third; EXPECT_EQ(forth, -216535258776369613);
     }
     {
-        AesiMP < 256 > first = -143407538; // AesiMP<8 blocks>
-        AesiMP < 320 > second = 342454657; // AesiMP<10 blocks>
+        Aesi < 256 > first = -143407538; // Aesi<8 blocks>
+        Aesi < 320 > second = 342454657; // Aesi<10 blocks>
         EXPECT_EQ(first * second, -49110579237004466);
 
-        AesiMP < 224 > third = -549448186; // AesiMP<7 blocks>
-        AesiMP < 416 > forth = -271976909; // AesiMP<13 blocks>
+        Aesi < 224 > third = -549448186; // Aesi<7 blocks>
+        Aesi < 416 > forth = -271976909; // Aesi<13 blocks>
         forth *= third; EXPECT_EQ(forth, 149437219283937074);
     }
     {
-        AesiMP < 352 > first = -219679513; // AesiMP<11 blocks>
-        AesiMP < 416 > second = -854551178; // AesiMP<13 blocks>
+        Aesi < 352 > first = -219679513; // Aesi<11 blocks>
+        Aesi < 416 > second = -854551178; // Aesi<13 blocks>
         EXPECT_EQ(first * second, 187727386616616314);
 
-        AesiMP < 224 > third = 666244848; // AesiMP<7 blocks>
-        AesiMP < 480 > forth = 296272756; // AesiMP<15 blocks>
+        Aesi < 224 > third = 666244848; // Aesi<7 blocks>
+        Aesi < 480 > forth = 296272756; // Aesi<15 blocks>
         forth *= third; EXPECT_EQ(forth, 197390197287761088);
     }
     {
-        AesiMP < 448 > first = -268356793; // AesiMP<14 blocks>
-        AesiMP < 416 > second = 842723607; // AesiMP<13 blocks>
+        Aesi < 448 > first = -268356793; // Aesi<14 blocks>
+        Aesi < 416 > second = 842723607; // Aesi<13 blocks>
         EXPECT_EQ(first * second, -226150604559912351);
 
-        AesiMP < 192 > third = -616257946; // AesiMP<6 blocks>
-        AesiMP < 448 > forth = 491688630; // AesiMP<14 blocks>
+        Aesi < 192 > third = -616257946; // Aesi<6 blocks>
+        Aesi < 448 > forth = 491688630; // Aesi<14 blocks>
         forth *= third; EXPECT_EQ(forth, -303007025195353980);
     }
     {
-        AesiMP < 256 > first = 456747220; // AesiMP<8 blocks>
-        AesiMP < 384 > second = -110801174; // AesiMP<12 blocks>
+        Aesi < 256 > first = 456747220; // Aesi<8 blocks>
+        Aesi < 384 > second = -110801174; // Aesi<12 blocks>
         EXPECT_EQ(first * second, -50608128197236280);
 
-        AesiMP < 224 > third = -396227181; // AesiMP<7 blocks>
-        AesiMP < 416 > forth = -244030095; // AesiMP<13 blocks>
+        Aesi < 224 > third = -396227181; // Aesi<7 blocks>
+        Aesi < 416 > forth = -244030095; // Aesi<13 blocks>
         forth *= third; EXPECT_EQ(forth, 96691356621012195);
     }
     {
-        AesiMP < 352 > first = 623180065; // AesiMP<11 blocks>
-        AesiMP < 288 > second = -2907435; // AesiMP<9 blocks>
+        Aesi < 352 > first = 623180065; // Aesi<11 blocks>
+        Aesi < 288 > second = -2907435; // Aesi<9 blocks>
         EXPECT_EQ(first * second, -1811855532283275);
 
-        AesiMP < 256 > third = 541805924; // AesiMP<8 blocks>
-        AesiMP < 448 > forth = 257383120; // AesiMP<14 blocks>
+        Aesi < 256 > third = 541805924; // Aesi<8 blocks>
+        Aesi < 448 > forth = 257383120; // Aesi<14 blocks>
         forth *= third; EXPECT_EQ(forth, 139451699153602880);
     }
     {
-        AesiMP < 288 > first = -84363176; // AesiMP<9 blocks>
-        AesiMP < 352 > second = -347420155; // AesiMP<11 blocks>
+        Aesi < 288 > first = -84363176; // Aesi<9 blocks>
+        Aesi < 352 > second = -347420155; // Aesi<11 blocks>
         EXPECT_EQ(first * second, 29309467682212280);
 
-        AesiMP < 224 > third = 289550886; // AesiMP<7 blocks>
-        AesiMP < 480 > forth = -717975170; // AesiMP<15 blocks>
+        Aesi < 224 > third = 289550886; // Aesi<7 blocks>
+        Aesi < 480 > forth = -717975170; // Aesi<15 blocks>
         forth *= third; EXPECT_EQ(forth, -207890346599500620);
     }
 }

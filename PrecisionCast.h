@@ -3,7 +3,7 @@
 
 /* ---------------------------------------- Different precision comparison ---------------------------------------- */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr bool operator==(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second) noexcept {
+gpu constexpr bool operator==(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept {
     if constexpr (bFirst > bSecond) {
         return (first == second.template precisionCast<bFirst>());
     } else {
@@ -13,7 +13,7 @@ gpu constexpr bool operator==(const AesiMP<bFirst>& first, const AesiMP<bSecond>
 
 
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto compareTo(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second) noexcept -> AesiCMP {
+gpu constexpr auto compareTo(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> AesiCMP {
     if constexpr (bFirst > bSecond) {
         return first.compareTo(second.template precisionCast<bFirst>());
     } else {
@@ -23,19 +23,19 @@ gpu constexpr auto compareTo(const AesiMP<bFirst>& first, const AesiMP<bSecond>&
 
 #if defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator!=(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second) noexcept -> bool { return !first.operator==(second); }
+    gpu constexpr auto operator!=(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return !first.operator==(second); }
     template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator<(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second) noexcept -> bool { return first.compareTo(second) == AesiCMP::less; }
+    gpu constexpr auto operator<(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return first.compareTo(second) == AesiCMP::less; }
     template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator<=(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second) noexcept -> bool { return !first.operator>(second); }
+    gpu constexpr auto operator<=(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return !first.operator>(second); }
     template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator>(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second) noexcept -> bool { return first.compareTo(second) == AesiCMP::greater; }
+    gpu constexpr auto operator>(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return first.compareTo(second) == AesiCMP::greater; }
     template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator>=(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second) noexcept -> bool { return !first.operator<(second); }
+    gpu constexpr auto operator>=(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> bool { return !first.operator<(second); }
 
 #else
     template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator<=>(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second) noexcept -> std::strong_ordering {
+    gpu constexpr auto operator<=>(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept -> std::strong_ordering {
         if constexpr (bFirst > bSecond) {
             switch(first.compareTo(second.template precisionCast<bFirst>())) {
                 case AesiCMP::less: return std::strong_ordering::less;
@@ -58,12 +58,12 @@ template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 
 /* ----------------------------------------- Different precision addition ----------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-gpu constexpr auto operator+(Integral number, const AesiMP<bitness>& value) noexcept {
-    return AesiMP<bitness>(number) + value;
+gpu constexpr auto operator+(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) + value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator+(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second) noexcept
--> typename std::conditional<(bFirst > bSecond), AesiMP<bFirst>, AesiMP<bSecond>>::type {
+gpu constexpr auto operator+(const Aesi<bFirst>& first, const Aesi<bSecond>& second) noexcept
+-> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first + second.template precisionCast<bFirst>();
     } else {
@@ -71,7 +71,7 @@ gpu constexpr auto operator+(const AesiMP<bFirst>& first, const AesiMP<bSecond>&
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-gpu constexpr auto operator+=(AesiMP<bFirst>& first, const AesiMP<bSecond>& second) -> AesiMP<bFirst>& {
+gpu constexpr auto operator+=(Aesi<bFirst>& first, const Aesi<bSecond>& second) -> Aesi<bFirst>& {
     return first.operator+=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -79,12 +79,12 @@ gpu constexpr auto operator+=(AesiMP<bFirst>& first, const AesiMP<bSecond>& seco
 
 /* --------------------------------------- Different precision subtraction ---------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-gpu constexpr auto operator-(Integral number, const AesiMP<bitness>& value) noexcept {
-    return AesiMP<bitness>(number) - value;
+gpu constexpr auto operator-(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) - value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator-(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second)
--> typename std::conditional<(bFirst > bSecond), AesiMP<bFirst>, AesiMP<bSecond>>::type {
+gpu constexpr auto operator-(const Aesi<bFirst>& first, const Aesi<bSecond>& second)
+-> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first - second.template precisionCast<bFirst>();
     } else {
@@ -92,7 +92,7 @@ gpu constexpr auto operator-(const AesiMP<bFirst>& first, const AesiMP<bSecond>&
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-gpu constexpr auto operator-=(AesiMP<bFirst>& first, const AesiMP<bSecond>& second) -> AesiMP<bFirst>& {
+gpu constexpr auto operator-=(Aesi<bFirst>& first, const Aesi<bSecond>& second) -> Aesi<bFirst>& {
     return first.operator-=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -100,12 +100,12 @@ gpu constexpr auto operator-=(AesiMP<bFirst>& first, const AesiMP<bSecond>& seco
 
 /* -------------------------------------- Different precision multiplication -------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-gpu constexpr auto operator*(Integral number, const AesiMP<bitness>& value) noexcept {
-    return AesiMP<bitness>(number) * value;
+gpu constexpr auto operator*(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) * value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator*(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second)
--> typename std::conditional<(bFirst > bSecond), AesiMP<bFirst>, AesiMP<bSecond>>::type {
+gpu constexpr auto operator*(const Aesi<bFirst>& first, const Aesi<bSecond>& second)
+-> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first * second.template precisionCast<bFirst>();
     } else {
@@ -113,7 +113,7 @@ gpu constexpr auto operator*(const AesiMP<bFirst>& first, const AesiMP<bSecond>&
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-gpu constexpr auto operator*=(AesiMP<bFirst>& first, const AesiMP<bSecond>& second) -> AesiMP<bFirst>& {
+gpu constexpr auto operator*=(Aesi<bFirst>& first, const Aesi<bSecond>& second) -> Aesi<bFirst>& {
     return first.operator*=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -121,12 +121,12 @@ gpu constexpr auto operator*=(AesiMP<bFirst>& first, const AesiMP<bSecond>& seco
 
 /* ----------------------------------------- Different precision division ----------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-gpu constexpr auto operator/(Integral number, const AesiMP<bitness>& value) noexcept {
-    return AesiMP<bitness>(number) / value;
+gpu constexpr auto operator/(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) / value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator/(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second)
--> typename std::conditional<(bFirst > bSecond), AesiMP<bFirst>, AesiMP<bSecond>>::type {
+gpu constexpr auto operator/(const Aesi<bFirst>& first, const Aesi<bSecond>& second)
+-> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first / second.template precisionCast<bFirst>();
     } else {
@@ -134,7 +134,7 @@ gpu constexpr auto operator/(const AesiMP<bFirst>& first, const AesiMP<bSecond>&
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-gpu constexpr auto operator/=(AesiMP<bFirst>& first, const AesiMP<bSecond>& second) -> AesiMP<bFirst>& {
+gpu constexpr auto operator/=(Aesi<bFirst>& first, const Aesi<bSecond>& second) -> Aesi<bFirst>& {
     return first.operator/=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -142,12 +142,12 @@ gpu constexpr auto operator/=(AesiMP<bFirst>& first, const AesiMP<bSecond>& seco
 
 /* ------------------------------------------ Different precision modulo ------------------------------------------ */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-gpu constexpr auto operator%(Integral number, const AesiMP<bitness>& value) noexcept {
-    return AesiMP<bitness>(number) % value;
+gpu constexpr auto operator%(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) % value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator%(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second)
--> typename std::conditional<(bFirst > bSecond), AesiMP<bFirst>, AesiMP<bSecond>>::type {
+gpu constexpr auto operator%(const Aesi<bFirst>& first, const Aesi<bSecond>& second)
+-> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first % second.template precisionCast<bFirst>();
     } else {
@@ -155,7 +155,7 @@ gpu constexpr auto operator%(const AesiMP<bFirst>& first, const AesiMP<bSecond>&
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-gpu constexpr auto operator%=(AesiMP<bFirst>& first, const AesiMP<bSecond>& second) -> AesiMP<bFirst>& {
+gpu constexpr auto operator%=(Aesi<bFirst>& first, const Aesi<bSecond>& second) -> Aesi<bFirst>& {
     return first.operator%=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -163,12 +163,12 @@ gpu constexpr auto operator%=(AesiMP<bFirst>& first, const AesiMP<bSecond>& seco
 
 /* ------------------------------------------- Different precision XOR -------------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-gpu constexpr auto operator^(Integral number, const AesiMP<bitness>& value) noexcept {
-    return AesiMP<bitness>(number) ^ value;
+gpu constexpr auto operator^(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) ^ value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator^(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second)
--> typename std::conditional<(bFirst > bSecond), AesiMP<bFirst>, AesiMP<bSecond>>::type {
+gpu constexpr auto operator^(const Aesi<bFirst>& first, const Aesi<bSecond>& second)
+-> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first ^ second.template precisionCast<bFirst>();
     } else {
@@ -176,7 +176,7 @@ gpu constexpr auto operator^(const AesiMP<bFirst>& first, const AesiMP<bSecond>&
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-gpu constexpr auto operator^=(AesiMP<bFirst>& first, const AesiMP<bSecond>& second) -> AesiMP<bFirst>& {
+gpu constexpr auto operator^=(Aesi<bFirst>& first, const Aesi<bSecond>& second) -> Aesi<bFirst>& {
     return first.operator^=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -184,12 +184,12 @@ gpu constexpr auto operator^=(AesiMP<bFirst>& first, const AesiMP<bSecond>& seco
 
 /* -------------------------------------------- Different precision AND ------------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-gpu constexpr auto operator&(Integral number, const AesiMP<bitness>& value) noexcept {
-    return AesiMP<bitness>(number) & value;
+gpu constexpr auto operator&(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) & value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator&(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second)
--> typename std::conditional<(bFirst > bSecond), AesiMP<bFirst>, AesiMP<bSecond>>::type {
+gpu constexpr auto operator&(const Aesi<bFirst>& first, const Aesi<bSecond>& second)
+-> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first & second.template precisionCast<bFirst>();
     } else {
@@ -197,7 +197,7 @@ gpu constexpr auto operator&(const AesiMP<bFirst>& first, const AesiMP<bSecond>&
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-gpu constexpr auto operator&=(AesiMP<bFirst>& first, const AesiMP<bSecond>& second) -> AesiMP<bFirst>& {
+gpu constexpr auto operator&=(Aesi<bFirst>& first, const Aesi<bSecond>& second) -> Aesi<bFirst>& {
     return first.operator&=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -205,12 +205,12 @@ gpu constexpr auto operator&=(AesiMP<bFirst>& first, const AesiMP<bSecond>& seco
 
 /* -------------------------------------------- Different precision OR -------------------------------------------- */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
-gpu constexpr auto operator|(Integral number, const AesiMP<bitness>& value) noexcept {
-    return AesiMP<bitness>(number) | value;
+gpu constexpr auto operator|(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) | value;
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator|(const AesiMP<bFirst>& first, const AesiMP<bSecond>& second)
--> typename std::conditional<(bFirst > bSecond), AesiMP<bFirst>, AesiMP<bSecond>>::type {
+gpu constexpr auto operator|(const Aesi<bFirst>& first, const Aesi<bSecond>& second)
+-> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
         return first | second.template precisionCast<bFirst>();
     } else {
@@ -218,7 +218,7 @@ gpu constexpr auto operator|(const AesiMP<bFirst>& first, const AesiMP<bSecond>&
     }
 }
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
-gpu constexpr auto operator|=(AesiMP<bFirst>& first, const AesiMP<bSecond>& second) -> AesiMP<bFirst>& {
+gpu constexpr auto operator|=(Aesi<bFirst>& first, const Aesi<bSecond>& second) -> Aesi<bFirst>& {
     return first.operator|=(second.template precisionCast<bFirst>());
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -226,12 +226,12 @@ gpu constexpr auto operator|=(AesiMP<bFirst>& first, const AesiMP<bSecond>& seco
 
 /* ------------------------------------------- Greatest common divisor -------------------------------------------- */
 template<std::size_t bFirst, std::size_t bSecond>
-gpu constexpr auto gcd(const AesiMP<bFirst> &first, const AesiMP<bSecond> &second)
--> typename std::conditional<(bFirst > bSecond), AesiMP<bFirst>, AesiMP<bSecond>>::type {
+gpu constexpr auto gcd(const Aesi<bFirst> &first, const Aesi<bSecond> &second)
+-> typename std::conditional<(bFirst > bSecond), Aesi<bFirst>, Aesi<bSecond>>::type {
     if constexpr (bFirst > bSecond) {
-        return AesiMP<bFirst>::gcd(first, second.template precisionCast<bFirst>());
+        return Aesi<bFirst>::gcd(first, second.template precisionCast<bFirst>());
     } else {
-        return AesiMP<bSecond>::gcd(first.template precisionCast<bSecond>(), second);
+        return Aesi<bSecond>::gcd(first.template precisionCast<bSecond>(), second);
     }
 }
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -239,10 +239,10 @@ gpu constexpr auto gcd(const AesiMP<bFirst> &first, const AesiMP<bSecond> &secon
 
 /* ----------------------------------------------- Power by modulo ------------------------------------------------ */
 template<std::size_t bBase, std::size_t bPow, std::size_t bMod>
-gpu constexpr auto powm(const AesiMP<bBase> &base, const AesiMP<bPow> &power, const AesiMP<bMod> &mod)
+gpu constexpr auto powm(const Aesi<bBase> &base, const Aesi<bPow> &power, const Aesi<bMod> &mod)
 -> typename std::conditional<(bBase > bPow),
-        typename std::conditional<(bBase > bMod), AesiMP<bBase>, AesiMP<bMod>>::value,
-        typename std::conditional<(bPow > bMod), AesiMP<bPow>, AesiMP<bMod>>::value>::value {
+        typename std::conditional<(bBase > bMod), Aesi<bBase>, Aesi<bMod>>::value,
+        typename std::conditional<(bPow > bMod), Aesi<bPow>, Aesi<bMod>>::value>::value {
     if constexpr (bBase > bPow) {
         return powm(base, power.template precisionCast<bBase>(), mod);
     } else {
@@ -252,13 +252,13 @@ gpu constexpr auto powm(const AesiMP<bBase> &base, const AesiMP<bPow> &power, co
 
 namespace {
     template<std::size_t bCommon, std::size_t bDiffer>
-    gpu constexpr auto powm(const AesiMP<bCommon> &base, const AesiMP<bCommon> &power, const AesiMP<bDiffer> &mod)
-    -> typename std::conditional<(bCommon > bDiffer), AesiMP<bCommon>, AesiMP<bDiffer>>::type {
+    gpu constexpr auto powm(const Aesi<bCommon> &base, const Aesi<bCommon> &power, const Aesi<bDiffer> &mod)
+    -> typename std::conditional<(bCommon > bDiffer), Aesi<bCommon>, Aesi<bDiffer>>::type {
         if constexpr (bCommon > bDiffer) {
-            return AesiMP<bCommon>::powm(base, power, mod.template precisionCast<bCommon>());
+            return Aesi<bCommon>::powm(base, power, mod.template precisionCast<bCommon>());
         } else {
-            return AesiMP<bDiffer>::powm(base.template precisionCast<bDiffer>(),
-                                         power.template precisionCast<bDiffer>(), mod);
+            return Aesi<bDiffer>::powm(base.template precisionCast<bDiffer>(),
+                                       power.template precisionCast<bDiffer>(), mod);
         }
     }
 }

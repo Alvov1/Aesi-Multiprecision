@@ -1,4 +1,4 @@
-# Aesi multiprecision
+# AesiMP multiprecision
 The goal of this project is to develop a fast and handy multi-precision library that can be used with GPU parallelization frameworks such as CUDA, OpenCL, and Metal. The library should correspond to modern C++ standards, support constexpr expressions, and move semantics. The library is a header only to avoid difficulties while building.
 
 ## Project status
@@ -17,17 +17,17 @@ __2. Display.__ Library supports STD streams (char and wchar_t based only), alon
 ### Host:
 ```cpp
 #include <iostream>
-#include "Aesi.h"
+#include "AesiMP.h"
 
-Aesi<1024> factorial(unsigned n) {
-    Aesi<1024> f = 1;
+AesiMP<1024> factorial(unsigned n) {
+    AesiMP<1024> f = 1;
     for(unsigned i = 2; i <= n; ++i)
         f *= i;
     return f;
 }
 
 int main() {
-    Aesi<1024> f100 = factorial(100);
+    AesiMP<1024> f100 = factorial(100);
     std::cout << std::hex << f100 << std::endl;
     return 0;
 }
@@ -40,7 +40,7 @@ __global__ void test() {
     const auto tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid != 0) return;
 
-    Aesi<128> amp = 1562144106091796071UL;
+    AesiMP<128> amp = 1562144106091796071UL;
     printf("Were in kernel thread and number is %lu\n", amp.integralCast<unsigned long>());
 }
 
@@ -55,15 +55,15 @@ int main() {
 It is admissible to use numbers of different precision inside the majority of operations, but it is not recommended cause it leads to redundant copying inside type conversions. Operation-assignment expressions (+=, -=, &=, etc...) require the bitness of the assignment to be greater or equal to the bitness of the assignable. The precision cast operator could be called by a user directly.
 
 ```cpp
-Aesi<128> base = "10888869450418352160768000001";
-Aesi<96> power = "99990001";
-Aesi<256> mod = "8683317618811886495518194401279999999";
+AesiMP<128> base = "10888869450418352160768000001";
+AesiMP<96> power = "99990001";
+AesiMP<256> mod = "8683317618811886495518194401279999999";
 
-std::cout << Aesi<256>::powm(base, power, mod) << std::endl;
+std::cout << AesiMP<256>::powm(base, power, mod) << std::endl;
 // Numbers are cast explicitly to bitness 256 
 
-Aesi<128> m128 = "265252859812191058636308479999999";
-Aesi<160> m160 = "263130836933693530167218012159999999";
+AesiMP<128> m128 = "265252859812191058636308479999999";
+AesiMP<160> m160 = "263130836933693530167218012159999999";
 
 std::cout << m128.precisionCast<256>() * m160 << std::endl; 
 // Cast number of 128 bits to 256 bits, than multiply by number of 160 bits
@@ -73,12 +73,12 @@ std::cout << m128.precisionCast<256>() * m160 << std::endl;
 
 An exception to the rule above is using longer precision boundaries inside functions, susceptible to overflow. As far as the number's precision is fixed on the stage of compilation, functions that require number multiplication or exponentiation may easily lead to overflow:
 ```cpp
-Aesi<128> base = "340199290171201906239764863559915798527",
+AesiMP<128> base = "340199290171201906239764863559915798527",
         power = "340282366920937859000464800151540596704",
         modulo = "338953138925230918806032648491249958912";
 
-std::cout << Aesi<128>::powm(base, power, modulo) << std::endl; // Overflow !!!
-std::cout << Aesi<256>::powm(base, power, modulo) << std::endl; // Fine
+std::cout << AesiMP<128>::powm(base, power, modulo) << std::endl; // Overflow !!!
+std::cout << AesiMP<256>::powm(base, power, modulo) << std::endl; // Fine
 ```
 >201007033690655614485250957754150944769
 

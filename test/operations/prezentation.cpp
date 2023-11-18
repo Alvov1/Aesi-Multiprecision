@@ -2,7 +2,7 @@
 #include "../../AesiMultiprecision.h"
 
 TEST(Prezentation, Factorial) {
-    Aesi<1024> f = 1;
+    Aesi1024 f = 1;
     for(unsigned i = 2; i <= 100; ++i)
         f *= i;
 

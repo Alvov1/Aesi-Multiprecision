@@ -2,6 +2,7 @@
 #define AESI_MULTIPRECISION
 
 #include <iostream>
+#include <array>
 
 #ifdef __CUDACC__
     #define gpu __host__ __device__
@@ -34,18 +35,19 @@ class Aesi final {
     using pair = std::pair<T1, T2>;
 #endif
 
-    template <typename ValueType, std::size_t lineSize>
-    struct MyArray final {
-        ValueType data [lineSize] {};
-        gpu constexpr bool operator==(const MyArray& value) const noexcept {
-            for(std::size_t i = 0; i < lineSize; ++i)
-                if(data[i] != value.data[i]) return false; return true;
-        };
-        [[nodiscard]] gpu constexpr auto size() const noexcept -> std::size_t { return lineSize; };
-        gpu constexpr auto operator[] (std::size_t index) const noexcept -> const ValueType& { return data[index]; }
-        gpu constexpr auto operator[] (std::size_t index) noexcept -> ValueType& { return data[index]; }
-    };
-    using blockLine = MyArray<block, blocksNumber>;
+//    template <typename ValueType, std::size_t lineSize>
+//    struct MyArray final {
+//        ValueType data [lineSize] {};
+//        gpu constexpr bool operator==(const MyArray& value) const noexcept {
+//            for(std::size_t i = 0; i < lineSize; ++i)
+//                if(data[i] != value.data[i]) return false; return true;
+//        };
+//        [[nodiscard]] gpu constexpr auto size() const noexcept -> std::size_t { return lineSize; };
+//        gpu constexpr auto operator[] (std::size_t index) const noexcept -> const ValueType& { return data[index]; }
+//        gpu constexpr auto operator[] (std::size_t index) noexcept -> ValueType& { return data[index]; }
+//    };
+//    using blockLine = MyArray<block, blocksNumber>;
+    using blockLine = std::array<block, blocksNumber>;
     enum Sign { Zero = 0, Positive = 1, Negative = 2 };
 
     /* ---------------------------- Class members. --------------------------- */
@@ -88,9 +90,8 @@ class Aesi final {
         const Aesi divAbs = divisor.abs();
         const auto ratio = number.abs().compareTo(divAbs);
 
-        Aesi quotient = 0, remainder = 0;
-//        pair<Aesi, Aesi> results = {0, 0 };
-//        auto& [quotient, remainder] = results;
+        pair<Aesi, Aesi> results = { 0, 0 };
+        auto& [quotient, remainder] = results;
 
         if(ratio == AesiCMP::greater) {
             const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
@@ -111,7 +112,7 @@ class Aesi final {
         } else if(ratio == AesiCMP::less)
             remainder = number; else quotient = 1;
 
-        return { quotient, remainder };
+        return results;
     }
     /* ----------------------------------------------------------------------- */
 
@@ -498,6 +499,12 @@ public:
                 sign = Zero;
         }
     }
+    [[nodiscard]]
+    gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
+        if(index >= bitness) return false;
+        const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
+        return blocks[blockNumber] & (1U << bitNumber);
+    }
     gpu constexpr auto setByte(std::size_t index, uint8_t byte) noexcept -> void {
         if(index > blocksNumber * sizeof(block)) return;
 
@@ -506,12 +513,6 @@ public:
 
         if(sign != Zero && isLineEmpty(blocks)) sign = Zero;
         if(sign == Zero && !isLineEmpty(blocks)) sign = Positive;
-    }
-    [[nodiscard]]
-    gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
-        if(index >= bitness) return false;
-        const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
-        return blocks[blockNumber] & (1U << bitNumber);
     }
     [[nodiscard]]
     gpu constexpr auto getByte(std::size_t index) const noexcept -> uint8_t {

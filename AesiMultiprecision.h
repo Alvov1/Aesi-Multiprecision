@@ -1,6 +1,7 @@
 #ifndef AESI_MULTIPRECISION
 #define AESI_MULTIPRECISION
 
+/// @cond HIDE_INCLUDES
 #include <iostream>
 #include <array>
 
@@ -11,6 +12,7 @@
     #define gpu
     #include <utility>
 #endif
+/// @endcond
 
 /**
  * @file AesiMultiprecision.h
@@ -457,7 +459,7 @@ public:
     /**
      * @brief Bitwise complement operator
      * @return Aesi
-     * @note Affects sign only when result becomes zero
+     * @note Does not affect the sign
      */
     [[nodiscard]]
     gpu constexpr auto operator~() const noexcept -> Aesi {
@@ -473,7 +475,7 @@ public:
      * @brief Bitwise XOR operator
      * @param Aesi other
      * @return Aesi
-     * @note Affects sign only when result becomes zero
+     * @note Does not affect the sign
      */
     [[nodiscard]]
     gpu constexpr auto operator^(const Aesi& other) const noexcept -> Aesi {
@@ -484,7 +486,7 @@ public:
      * @brief Assignment bitwise XOR operator
      * @param Aesi other
      * @return Aesi&
-     * @note Affects sign only when result becomes zero
+     * @note Does not affect the sign
      */
     gpu constexpr auto operator^=(const Aesi& other) noexcept -> Aesi& {
         for(std::size_t i = 0; i < blocksNumber; ++i)
@@ -497,7 +499,7 @@ public:
      * @brief Bitwise AND operator
      * @param Aesi other
      * @return Aesi
-     * @note Affects sign only when result becomes zero
+     * @note Does not affect the sign
      */
     [[nodiscard]]
     gpu constexpr auto operator&(const Aesi& other) const noexcept -> Aesi {
@@ -508,7 +510,7 @@ public:
      * @brief Assignment bitwise AND operator
      * @param Aesi other
      * @return Aesi&
-     * @note Affects sign only when result becomes zero
+     * @note Does not affect the sign
      */
     gpu constexpr auto operator&=(const Aesi& other) noexcept -> Aesi& {
         for(std::size_t i = 0; i < blocksNumber; ++i)
@@ -521,7 +523,7 @@ public:
      * @brief Bitwise OR operator
      * @param Aesi other
      * @return Aesi
-     * @note Affects sign only when applying to zero
+     * @note Does not affect the sign
      */
     [[nodiscard]]
     gpu constexpr auto operator|(const Aesi& other) const noexcept -> Aesi {
@@ -532,7 +534,7 @@ public:
      * @brief Assignment bitwise OR operator
      * @param Aesi other
      * @return Aesi&
-     * @note Affects sign only when applying to zero
+     * @note Does not affect the sign
      */
     gpu constexpr auto operator|=(const Aesi& other) noexcept -> Aesi& {
         for(std::size_t i = 0; i < blocksNumber; ++i)
@@ -543,9 +545,9 @@ public:
 
     /**
      * @brief Left shift operator
-     * @param Integral shift
+     * @param Integral bit_shift
      * @return Aesi
-     * @note Does right shift for negative shift value and nothing for value greater than precision
+     * @note Does right shift (>>) for negative bit_shift value, and nothing for positive shift greater than precision
      */
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
     gpu constexpr auto operator<<(Integral bitShift) const noexcept -> Aesi {
@@ -554,9 +556,9 @@ public:
 
     /**
      * @brief Left shift assignment operator
-     * @param Integral shift
+     * @param Integral bit_shift
      * @return Aesi&
-     * @note Does right shift for negative shift value and nothing for value greater than precision
+     * @note Does right shift (>>=) for negative bit_shift value, and nothing for positive shift greater than precision
      */
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr auto operator<<=(Integral bitShift) noexcept -> Aesi& {
@@ -583,9 +585,9 @@ public:
 
     /**
      * @brief Right shift operator
-     * @param Integral shift
+     * @param Integral bit_shift
      * @return Aesi
-     * @note Does left shift for negative shift value and nothing for value greater than precision
+     * @note Does left shift (<<) for negative bit_shift value, and nothing for positive shift greater than precision
      */
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
     gpu constexpr auto operator>>(Integral bitShift) const noexcept -> Aesi {
@@ -594,9 +596,9 @@ public:
 
     /**
      * @brief Right shift assignment operator
-     * @param Integral shift
+     * @param Integral bit_shift
      * @return Aesi&
-     * @note Does left shift for negative shift value and nothing for value greater than precision
+     * @note Does left shift (<<=) for negative bit_shift value, and nothing for positive shift greater than precision
      */
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr auto operator>>=(Integral bitShift) noexcept -> Aesi& {
@@ -701,7 +703,7 @@ public:
     /**
      * @brief Three-way comparison operator
      * @param Aesi other
-     * @return Strong_ordering
+     * @return Std::Strong_ordering
      * @note Should almost never return Strong_ordering::Equivalent
      */
     gpu constexpr auto operator<=>(const Aesi& other) const noexcept -> std::strong_ordering {
@@ -862,7 +864,7 @@ public:
     /**
      * @brief Get square root
      * @return Aesi
-     * @note Returns zero for negative values or zero
+     * @note Returns zero for negative value or zero
      */
     [[nodiscard]]
     gpu constexpr auto squareRoot() const noexcept -> Aesi {
@@ -1062,7 +1064,7 @@ public:
      * @details If required precision greater than current precision, remaining blocks are filled with zeros.
      * Otherwise - number is cropped inside smaller blocks array
      * @note This method is used in all manipulations between numbers of different precision. Using this method is not recommended,
-     * cause it leads to redundant copying and very slow
+     * cause it leads to redundant copying and may be slow
      */
     template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
     gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
@@ -1088,7 +1090,7 @@ public:
      * @return Size_t - amount of symbols written
      * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10,
      * or 16 and should be known at compile time
-     * @note Works significantly faster for hexadecimal notation. Hexadecimal notation uses lowercase letters
+     * @note Works significantly faster for hexadecimal notation
      */
     template <byte base, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> &&
             (base == 2 || base == 8 || base == 10 || base == 16))
@@ -1170,11 +1172,10 @@ public:
      * @param Ostream stream
      * @param Aesi number
      * @return Ostream
-     * @details Writes number in stream. Supported STD stream conversions:
+     * @details Writes number in stream. Accepts STD streams based on char or wchar_t. Supports stream manipulators:
      * - Number's notation (std::hex, std::dec, std::oct);
      * - Number's base (std::showbase);
      * - Hexadecimal letters case (std::uppercase, std::lowercase)
-     * Accepts STD streams based on char or wchar_t
      * @note Works significantly faster for hexadecimal notation
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
@@ -1248,9 +1249,48 @@ public:
 #endif
 };
 
-using Aesi128 = Aesi<128>; using Aesi256 = Aesi<256>; using Aesi512 = Aesi<512>; using Aesi768 = Aesi<768>;
-using Aesi1024 = Aesi<1024>; using Aesi2048 = Aesi<2048>; using Aesi4096 = Aesi<4096>; using Aesi8192 = Aesi<8192>;
+/**
+ * @typedef Aesi128
+ * @brief Number with precision 128-bit. */
+using Aesi128 = Aesi<128>;
 
-#include "PrecisionCast.h"
+/**
+ * @typedef Aesi256
+ * @brief Number with precision 128-bit. */
+using Aesi256 = Aesi<256>;
+
+/**
+ * @typedef Aesi512
+ * @brief Number with precision 512-bit. */
+using Aesi512 = Aesi<512>;
+
+/**
+ * @typedef Aesi768
+ * @brief Number with precision 768-bit. */
+using Aesi768 = Aesi<768>;
+
+/**
+ * @typedef Aesi1024
+ * @brief Number with precision 1024-bit. */
+using Aesi1024 = Aesi<1024>;
+
+/**
+ * @typedef Aesi2048
+ * @brief Number with precision 2048-bit. */
+using Aesi2048 = Aesi<2048>;
+
+/**
+ * @typedef Aesi4096
+ * @brief Number with precision 4096-bit. */
+using Aesi4096 = Aesi<4096>;
+
+/**
+ * @typedef Aesi8192
+ * @brief Number with precision 8192-bit. */
+using Aesi8192 = Aesi<8192>;
+
+/// @cond HIDE_INCLUDES
+#include "Multiprecision.h"
+/// @endcond
 
 #endif //AESI_MULTIPRECISION

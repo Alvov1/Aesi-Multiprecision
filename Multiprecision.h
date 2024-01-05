@@ -2,7 +2,7 @@
 #define PRECISION_CAST_H
 
 /**
- * @file PrecisionCast.h
+ * @file Multiprecision.h
  * @brief List of operations for two or more integers with different precision
  * @details The library was designed to support operations with numbers of different precision. Each function in this list
  * receives two or more numbers with different precision. It performs precision cast of number with lower precision to
@@ -61,7 +61,6 @@ gpu constexpr auto compareTo(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
      * @param Aesi<lPrecision> left
      * @param Aesi<rPrecision> right.
      * @return STD::Strong_ordering.
-     * @note Uses precision cast.
      */
     template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
     gpu constexpr auto operator<=>(const Aesi<bFirst>& left, const Aesi<bSecond>& right) noexcept -> std::strong_ordering {

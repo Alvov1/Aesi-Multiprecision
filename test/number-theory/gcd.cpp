@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(NumberTheory, GreatestCommonDivisor) {
     Aesi768 l, r, bezoutX, bezoutY, gcd;

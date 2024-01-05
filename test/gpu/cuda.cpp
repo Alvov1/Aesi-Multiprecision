@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 #ifdef __CUDACC__
 #include "thrust/device_vector.h"
 #endif

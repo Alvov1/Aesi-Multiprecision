@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Initialization, Binary) {
     Aesi512 m0 = 0b1111111111111111111111111111111111111111111111111111111111111111;

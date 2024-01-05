@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Prezentation, Factorial) {
     Aesi1024 f = 1;

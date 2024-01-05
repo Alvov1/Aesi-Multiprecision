@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #define DEVICE_TESTING
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Boolean, ThreeWayComparasionDevice) {
     Aesi512 m0 = 414346834219605873, m1 = 6659613388634065159;

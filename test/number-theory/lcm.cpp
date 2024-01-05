@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(NumberTheory, LeastCommonMultiplier) {
     Aesi512 l, r;

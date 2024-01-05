@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(NumberTheory, PowerByModulo) {
     Aesi512 b0 = "340282366920938463463370103832140840975", p0 = "3221225475", m0 = "339950141050392709210118888586112663551";

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Boolean, ThreeWayComparasion) {
     Aesi512 m0 = 414346834219605873, m1 = 6659613388634065159; EXPECT_EQ(m0 < m1, true); EXPECT_EQ(m0 > m1, false); EXPECT_EQ(m0 == m1, false);

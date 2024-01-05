@@ -15,7 +15,7 @@
 /// @endcond
 
 /**
- * @file AesiMultiprecision.h
+ * @file Aesi.h
  * @brief Long precision integer with arithmetic operations
  */
 
@@ -730,11 +730,11 @@ public:
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
         if(bit) {
             blocks[blockNumber] |= (1U << bitNumber);
-            if(sign == Zero && !isLineEmpty(blocks))
+            if(sign == Zero && blocks[blockNumber] != 0)
                 sign = Positive;
         } else {
             blocks[blockNumber] &= (~(1U << bitNumber));
-            if(sign != Zero && isLineEmpty(blocks))
+            if(sign != Zero && blocks[blockNumber] == 0 && isLineEmpty(blocks))
                 sign = Zero;
         }
     }

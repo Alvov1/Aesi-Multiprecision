@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Bitwise, LeftShift) {
     Aesi128 t = 14183932482008727;

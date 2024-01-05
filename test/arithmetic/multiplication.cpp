@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Multiplication, ZeroOne) {
     Aesi512 zero = 0, one = 1;

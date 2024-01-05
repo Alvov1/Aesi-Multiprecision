@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Modulo, MixedModulo) {
     Aesi512 m0 = -4825285950739, m1 = -26462400;

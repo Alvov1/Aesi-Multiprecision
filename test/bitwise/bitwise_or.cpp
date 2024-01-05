@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Bitwise, OR) {
     Aesi < 96 > m0 = 2020645940044775524ULL, m1 = 5357268711087358525ULL;

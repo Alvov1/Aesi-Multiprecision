@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Power2, Power2) {
     EXPECT_EQ(Aesi512::power2(0), "1.");

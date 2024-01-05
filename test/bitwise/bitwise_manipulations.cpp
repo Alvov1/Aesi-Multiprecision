@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Bitwise, GetSetBit) {
     Aesi512 m0 = "72705387953193747615171521307121358171.";

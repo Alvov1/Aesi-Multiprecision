@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Casting, PrecisionCast) {
     long long init0 = 7524839891475014690; Aesi256 m0 = init0;

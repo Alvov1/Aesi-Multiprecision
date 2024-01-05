@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Bitwise, NOT) {
     Aesi128 m0 = "80485170205531225268958246362050776262729757004686902370993288887735453058696.";

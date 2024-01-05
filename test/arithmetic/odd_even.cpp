@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(OddEven, Basic) {
     Aesi512 zero = 0; EXPECT_EQ(zero.isOdd(), 0); EXPECT_EQ(zero.isEven(), 1);

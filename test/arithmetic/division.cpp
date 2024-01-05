@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../AesiMultiprecision.h"
+#include "../../Aesi.h"
 
 TEST(Division, SmallPositive) {
     Aesi512 small1 = -8492, small2 = 4243, small3 = -678, small4 = 2323;

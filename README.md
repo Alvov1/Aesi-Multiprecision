@@ -1,5 +1,5 @@
 # Aesi multiprecision
-The goal of this project is to develop a fast and handy multi-precision library that can be used with GPU parallelization frameworks such as CUDA, OpenCL, and Metal. The library should correspond to modern C++ standards, support constexpr expressions, and move semantics. The library is a header only to avoid difficulties while building.
+The goal of this project is to develop a fast and handy multi-precision library that can be used with GPU parallelization frameworks such as CUDA, OpenCL, and Metal. The library should correspond to modern C++ standards, support constexpr expressions, and move semantics.
 
 ## Project status
 <u>__Project is currently in the testing and development stage to support the *Cuda* framework. Please be aware that errors and problems may occur.__</u> OpenCL support is next in line for development. Metal support is scheduled after some time, due to the presence of significant differences in the framework from Cuda and from OpenCL.
@@ -8,7 +8,7 @@ The goal of this project is to develop a fast and handy multi-precision library 
 Library supports each arithmetic (binary and unary), bitwise, and boolean operations. Various functions from number theory are being added to the library, among which the greatest common divisor, the least common multiplier, and exponentiation by modulo have already been implemented.
 
 ## Usage:
-Library supports an object-oriented style of data management. Class operators are overloaded for use in expressions. The number's bitness is passed to the class object as a template parameter and has a default value of __*512 bits*__. It should be a multiple of 32.
+The library is a header only to avoid difficulties while building. In this case, it can be used simultaneously in C++ and CUDA projects without changing the file extension from .cu to .cpp and backwards. Library supports an object-oriented style of data management. Class operators are overloaded for use in expressions. The number's bitness is passed to the class object as a template parameter and has a default value of __*512 bits*__. It should be a multiple of 32.
 
 __1. Initialization.__ Number initialization could be done with numbers, strings, string-views, string literals, or library objects with different precision. User-defined string literals are planned to be released in the future.
 
@@ -60,7 +60,7 @@ Aesi<96> power = "99990001";
 Aesi<256> mod = "8683317618811886495518194401279999999";
 
 std::cout << Aesi<256>::powm(base, power, mod) << std::endl;
-// Numbers are cast explicitly to bitness 256 
+// Numbers get cast explicitly to bitness 256 
 
 Aesi<128> m128 = "265252859812191058636308479999999";
 Aesi<160> m160 = "263130836933693530167218012159999999";

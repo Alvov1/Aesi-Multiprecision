@@ -12,20 +12,30 @@
     #include <utility>
 #endif
 
+/**
+ * @file AesiMultiprecision.h
+ * @brief Long precision integer with arithmetic operations
+ */
+
 namespace {
     using byte = uint8_t;
     using block = uint32_t;
-    constexpr auto bitsInByte = 8;
-    constexpr auto blockBitLength = sizeof(block) * bitsInByte;
+
+    constexpr std::size_t bitsInByte = 8, blockBitLength = sizeof(block) * bitsInByte;
     constexpr uint64_t blockBase = 1ULL << blockBitLength;
 
     /**
      * @enum AesiCMP
-     * @brief Analogue STD::Strong_ordering since CUDA does not support <=> operator
+     * @brief Analogue of STD::Strong_ordering since CUDA does not support <=> operator
      */
     enum class AesiCMP { equal = 0, less = 1, greater = 2, equivalent = 3 };
 }
 
+/**
+ * @class Aesi
+ * @brief Long precision integer with arithmetic operations
+ * @details May be used to represent positive and negative integers. Number precision is set in template parameter bitness.
+ */
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Aesi final {
     static_assert(bitness > sizeof(uint64_t), "Use built-in types for numbers 64-bit or less.");
@@ -40,7 +50,7 @@ class Aesi final {
     using pair = std::pair<T1, T2>;
 #endif
 
-    /* -------------------------- @name Class members. -------------------- @{ */
+    /* -------------------------- @name Class members. ----------------------- */
     /**
      * @brief Block line of the number
      */
@@ -51,13 +61,11 @@ class Aesi final {
      * @enum Aesi::Sign
      * @brief Specifies sign of the number. Should be Positive, Negative or Zero
      */
-    enum Sign { /* @brief the value is zero */ Zero = 0,
-            /* @brief the value is positive */ Positive = 1,
-            /* @brief the value is negative */ Negative = 2 } sign;
-    /* @} -------------------------------------------------------------------- */
+    enum Sign { Zero = 0, Positive = 1, Negative = 2 } sign;
+    /* ----------------------------------------------------------------------- */
 
 
-    /* ------------------------ @name Helper functions. ------------------- @{ */
+    /* ------------------------ @name Helper functions. ---------------------- */
     /**
      * @brief Makes line addition
      * @param BlockLine dst
@@ -80,6 +88,7 @@ class Aesi final {
      * @param BlockLine line
      * @return BlockLine
      */
+    [[nodiscard]]
     gpu static constexpr auto makeComplement(const blockLine& line) noexcept -> blockLine {
         blockLine result {};
 
@@ -111,55 +120,10 @@ class Aesi final {
             if(line[i]) return i + 1;
         return 0;
     }
-
-    /**
-     * @brief Division helper method
-     * @param Aesi number
-     * @param Aesi divisor
-     * @param Aesi quotient
-     * @param Aesi remainder
-     * @return Quotient and remainder by reference
-     */
-    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor, Aesi& quotient, Aesi& remainder) noexcept -> void {
-        const Aesi divAbs = divisor.abs();
-        const auto ratio = number.abs().compareTo(divAbs);
-
-        if(!quotient.isZero()) quotient = Aesi {};
-        if(!remainder.isZero()) remainder = Aesi {};
-
-        if(ratio == AesiCMP::greater) {
-            const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
-            for(long long i = bitsUsed - 1; i >= 0; --i) {
-                remainder <<= 1;
-                remainder.setBit(0, number.getBit(i));
-
-                if(remainder >= divAbs) {
-                    remainder -= divAbs;
-                    quotient.setBit(i, true);
-                }
-            }
-
-            if(isLineEmpty(quotient.blocks))
-                quotient.sign = Zero; else if(number.sign != divisor.sign) quotient = -quotient;
-            if(isLineEmpty(remainder.blocks))
-                remainder.sign = Zero; else if(number.sign == Negative) remainder = -remainder;
-        } else if(ratio == AesiCMP::less)
-            remainder = number; else quotient = 1;
-    }
-
-    /**
-     * @brief Division helper method
-     * @param Aesi number
-     * @param Aesi divisor
-     * @return Pair(Quotient, Remainder)
-     */
-    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor) noexcept -> pair<Aesi, Aesi> {
-        pair<Aesi, Aesi> results = { 0, 0 }; divide(number, divisor, results.first, results.second); return results;
-    }
-    /* @} -------------------------------------------------------------------- */
+    /* ----------------------------------------------------------------------- */
 
 public:
-    /* --------------------- @name Different constructors. ---------------- @{ */
+    /* --------------------- @name Different constructors. ------------------- */
     /**
      * @brief Default constructor
      */
@@ -271,7 +235,7 @@ public:
 
     /**
      * @brief C-style string literal constructor
-     * @param literal Char[]
+     * @param Char[] literal
      */
     template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
     gpu constexpr Aesi(const Char (&literal)[arrayLength]) noexcept : Aesi(literal, arrayLength) {}
@@ -294,10 +258,10 @@ public:
     gpu constexpr Aesi(const Aesi<rBitness>& copy) noexcept {
         this->operator=(copy.template precisionCast<bitness>());
     }
-    /* @} -------------------------------------------------------------------- */
+    /* ----------------------------------------------------------------------- */
 
 
-    /* --------------------- @name Arithmetic operators. ------------------ @{ */
+    /* --------------------- @name Arithmetic operators. --------------------- */
     /**
      * @brief Unary plus operator
      * @return Aesi
@@ -309,6 +273,7 @@ public:
      * @brief Unary minus operator
      * @return Aesi
      */
+    [[nodiscard]]
     gpu constexpr auto operator-() const noexcept -> Aesi {
         if(sign == Zero) return Aesi {};
         Aesi result = *this;
@@ -348,6 +313,7 @@ public:
      * @param Aesi addendum
      * @return Aesi
      */
+    [[nodiscard]]
     gpu constexpr auto operator+(const Aesi& addendum) const noexcept -> Aesi {
         Aesi result = *this; result += addendum; return result;
     }
@@ -384,6 +350,7 @@ public:
      * @param Aesi subtrahend
      * @return Aesi
      */
+    [[nodiscard]]
     gpu constexpr auto operator-(const Aesi& subtrahend) const noexcept -> Aesi {
         Aesi result = *this; result -= subtrahend; return result;
     }
@@ -402,6 +369,7 @@ public:
      * @param Aesi factor
      * @return Aesi
      */
+    [[nodiscard]]
     gpu constexpr auto operator*(const Aesi& factor) const noexcept -> Aesi {
         Aesi result = *this; result *= factor; return result;
     }
@@ -450,6 +418,7 @@ public:
      * @param Aesi divisor
      * @return Aesi
      */
+    [[nodiscard]]
     gpu constexpr auto operator/(const Aesi& divisor) const noexcept -> Aesi {
         Aesi quotient, _; divide(*this, divisor, quotient, _); return quotient;
     }
@@ -468,6 +437,7 @@ public:
      * @param Aesi modulo
      * @return Aesi
      */
+    [[nodiscard]]
     gpu constexpr auto operator%(const Aesi& modulo) const noexcept -> Aesi {
         Aesi _, remainder; divide(*this, modulo, _, remainder); return remainder;
     }
@@ -480,15 +450,16 @@ public:
     gpu constexpr auto operator%=(const Aesi& modulo) noexcept -> Aesi& {
         return this->operator=(divide(*this, modulo).second);
     }
-    /* @} -------------------------------------------------------------------- */
+    /* ----------------------------------------------------------------------- */
 
 
-    /* ----------------------- @name Bitwise operators. ------------------- @{ */
+    /* ----------------------- @name Bitwise operators. ---------------------- */
     /**
      * @brief Bitwise complement operator
      * @return Aesi
      * @note Affects sign only when result becomes zero
      */
+    [[nodiscard]]
     gpu constexpr auto operator~() const noexcept -> Aesi {
         Aesi result {};
         for(std::size_t i = 0; i < blocksNumber; ++i)
@@ -504,6 +475,7 @@ public:
      * @return Aesi
      * @note Affects sign only when result becomes zero
      */
+    [[nodiscard]]
     gpu constexpr auto operator^(const Aesi& other) const noexcept -> Aesi {
         Aesi result = *this; result ^= other; return result;
     }
@@ -527,6 +499,7 @@ public:
      * @return Aesi
      * @note Affects sign only when result becomes zero
      */
+    [[nodiscard]]
     gpu constexpr auto operator&(const Aesi& other) const noexcept -> Aesi {
         Aesi result = *this; result &= other; return result;
     }
@@ -550,6 +523,7 @@ public:
      * @return Aesi
      * @note Affects sign only when applying to zero
      */
+    [[nodiscard]]
     gpu constexpr auto operator|(const Aesi& other) const noexcept -> Aesi {
         Aesi result = *this; result |= other; return result;
     }
@@ -573,7 +547,7 @@ public:
      * @return Aesi
      * @note Does right shift for negative shift value and nothing for value greater than precision
      */
-    template <typename Integral> requires (std::is_integral_v<Integral>)
+    template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
     gpu constexpr auto operator<<(Integral bitShift) const noexcept -> Aesi {
         Aesi result = *this; result <<= bitShift; return result;
     }
@@ -613,7 +587,7 @@ public:
      * @return Aesi
      * @note Does left shift for negative shift value and nothing for value greater than precision
      */
-    template <typename Integral> requires (std::is_integral_v<Integral>)
+    template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
     gpu constexpr auto operator>>(Integral bitShift) const noexcept -> Aesi {
         Aesi result = *this; result >>= bitShift; return result;
     }
@@ -646,10 +620,10 @@ public:
 
         return *this;
     }
-    /* @} -------------------------------------------------------------------- */
+    /* ----------------------------------------------------------------------- */
 
 
-    /* --------------------- @name Comparison operators. ------------------ @{ */
+    /* --------------------- @name Comparison operators. --------------------- */
     /**
      * @brief Comparison operator
      * @param Aesi other
@@ -666,6 +640,7 @@ public:
      * @return AesiCMP
      * @note Should almost never return AesiCMP::Equivalent
      */
+    [[nodiscard]]
     gpu constexpr auto compareTo(const Aesi& other) const noexcept -> AesiCMP {
         switch (sign) {
             case Zero:
@@ -713,7 +688,10 @@ public:
         }
     };
 
-#if defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)
+#if (defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)) && !defined DOXYGEN_SHOULD_SKIP_THIS
+    /**
+     * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on device
+     */
     gpu constexpr auto operator!=(const Aesi& value) const noexcept -> bool { return !this->operator==(value); }
     gpu constexpr auto operator<(const Aesi& value) const noexcept -> bool { return this->compareTo(value) == AesiCMP::less; }
     gpu constexpr auto operator<=(const Aesi& value) const noexcept -> bool { return !this->operator>(value); }
@@ -721,7 +699,7 @@ public:
     gpu constexpr auto operator>=(const Aesi& value) const noexcept -> bool { return !this->operator<(value); }
 #else
     /**
-     * @brief Boilerplate comparison operator
+     * @brief Three-way comparison operator
      * @param Aesi other
      * @return Strong_ordering
      * @note Should almost never return Strong_ordering::Equivalent
@@ -735,10 +713,10 @@ public:
         }
     };
 #endif
-    /* @} -------------------------------------------------------------------- */
+    /* ----------------------------------------------------------------------- */
 
 
-    /* ---------------------- @name Supporting methods. ------------------- @{ */
+    /* ---------------------- @name Supporting methods. ---------------------- */
     /**
      * @brief Set bit in number by index starting from the right
      * @param Size_t index
@@ -875,7 +853,7 @@ public:
     gpu constexpr auto isZero() const noexcept -> bool { return sign == Zero; }
 
     /**
-     * @brief Get of number's precision
+     * @brief Get number's precision
      * @return Size_t
      */
     [[nodiscard]]
@@ -908,10 +886,56 @@ public:
     gpu constexpr auto swap(Aesi& other) noexcept -> void {
         Aesi t = other; other.operator=(*this); this->operator=(t);
     }
-    /* @} -------------------------------------------------------------------- */
+    /* ----------------------------------------------------------------------- */
 
 
-    /* ----------------- @name Public number theory functions. ------------ @{ */
+    /* -------------- @name Public arithmetic and number theory. ------------- */
+    /**
+     * @brief Integer division
+     * @param Aesi number
+     * @param Aesi divisor
+     * @param Aesi quotient OUT
+     * @param Aesi remainder OUT
+     * @return Quotient and remainder by reference
+     */
+    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor, Aesi& quotient, Aesi& remainder) noexcept -> void {
+        const Aesi divAbs = divisor.abs();
+        const auto ratio = number.abs().compareTo(divAbs);
+
+        if(!quotient.isZero()) quotient = Aesi {};
+        if(!remainder.isZero()) remainder = Aesi {};
+
+        if(ratio == AesiCMP::greater) {
+            const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
+            for(long long i = bitsUsed - 1; i >= 0; --i) {
+                remainder <<= 1;
+                remainder.setBit(0, number.getBit(i));
+
+                if(remainder >= divAbs) {
+                    remainder -= divAbs;
+                    quotient.setBit(i, true);
+                }
+            }
+
+            if(isLineEmpty(quotient.blocks))
+                quotient.sign = Zero; else if(number.sign != divisor.sign) quotient = -quotient;
+            if(isLineEmpty(remainder.blocks))
+                remainder.sign = Zero; else if(number.sign == Negative) remainder = -remainder;
+        } else if(ratio == AesiCMP::less)
+            remainder = number; else quotient = 1;
+    }
+
+    /**
+     * @brief Integer division.
+     * @param Aesi number
+     * @param Aesi divisor
+     * @return Pair(Quotient, Remainder)
+     */
+    [[nodiscard]]
+    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor) noexcept -> pair<Aesi, Aesi> {
+        pair<Aesi, Aesi> results = { 0, 0 }; divide(number, divisor, results.first, results.second); return results;
+    }
+
     /**
      * @brief Extended Euclidean algorithm for greatest common divisor
      * @param Aesi first
@@ -919,7 +943,7 @@ public:
      * @param Aesi bezoutX OUT
      * @param Aesi bezoutY OUT
      * @return Aesi
-     * @details Counts Bézout coefficients along with the greatest common divisor. Takes Bézout coefficients by reference
+     * @details Counts Bézout coefficients along with the greatest common divisor. Returns coefficients by reference
      */
     [[nodiscard]]
     gpu static constexpr auto gcd(const Aesi& first, const Aesi& second, Aesi& bezoutX, Aesi& bezoutY) noexcept -> Aesi {
@@ -1007,7 +1031,7 @@ public:
 
     /**
      * @brief Fast exponentiation for 2
-     * @param Size_t required_power
+     * @param Size_t power
      * @return Aesi
      * @details Returns zero for power greater than current bitness
      */
@@ -1015,12 +1039,12 @@ public:
     gpu static constexpr auto power2(std::size_t e) noexcept -> Aesi {
         Aesi result {}; result.setBit(e, true); return result;
     }
-    /* @} -------------------------------------------------------------------- */
+    /* ----------------------------------------------------------------------- */
 
 
     /**
-     * @brief Integral cast from Aesi to built-in types
-     * @param Required integral type
+     * @brief Cast from Aesi to built-in integral types
+     * @param Type integral_type TEMPLATE
      * @return Integral
      * @details Takes the lowes part of Aesi for conversion. Accepts signed and unsigned types
      */
@@ -1033,8 +1057,8 @@ public:
 
     /**
      * @brief Precision cast for Aesi numbers of different length
-     * @param Size_t required_precision
-     * @return Aesi
+     * @param Size_t new_bitness TEMPLATE
+     * @return Aesi<new_bitness>
      * @details If required precision greater than current precision, remaining blocks are filled with zeros.
      * Otherwise - number is cropped inside smaller blocks array
      * @note This method is used in all manipulations between numbers of different precision. Using this method is not recommended,
@@ -1055,13 +1079,15 @@ public:
     }
 
     /**
-     * @brief Printing inside C-style array buffer
+     * @brief Print number inside C-style array buffer
+     * @param Byte base TEMPLATE
      * @param Char* buffer
      * @param Size_t buffer_size
      * @param Bool show_number_base
      * @param Bool use_hexadecimal_uppercase
      * @return Size_t - amount of symbols written
-     * @details Places the maximum possible amount of number's characters in buffer
+     * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10,
+     * or 16 and should be known at compile time
      * @note Works significantly faster for hexadecimal notation. Hexadecimal notation uses lowercase letters
      */
     template <byte base, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> &&
@@ -1140,13 +1166,14 @@ public:
     }
 
     /**
-     * @brief Printing inside STD stream
+     * @brief Print number inside STD stream
      * @param Ostream stream
      * @param Aesi number
      * @return Ostream
      * @details Writes number in stream. Supported STD stream conversions:
      * - Number's notation (std::hex, std::dec, std::oct);
-     * - Number's base (std::showbase)
+     * - Number's base (std::showbase);
+     * - Hexadecimal letters case (std::uppercase, std::lowercase)
      * Accepts STD streams based on char or wchar_t
      * @note Works significantly faster for hexadecimal notation
      */

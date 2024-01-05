@@ -1,12 +1,21 @@
 #ifndef PRECISION_CAST_H
 #define PRECISION_CAST_H
 
+/**
+ * @file PrecisionCast.h
+ * @brief List of operations for two or more integers with different precision
+ * @details The library was designed to support operations with numbers of different precision. Each function in this list
+ * receives two or more numbers with different precision. It performs precision cast of number with lower precision to
+ * greater precision and calls corresponding arithmetic operator. Please note that precision cast operator requires
+ * redundant copying and may be slow. Take a look at the main page to find out more.
+ */
+
 /* ---------------------------------------- Different precision comparison ---------------------------------------- */
 /**
- * @brief Multiprecision comparison operator.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Bool.
- * @note Uses precision cast.
+ * @brief Multiprecision comparison operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Bool
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator==(const Aesi<bFirst>& left, const Aesi<bSecond>& right) noexcept -> bool {
@@ -18,10 +27,10 @@ gpu constexpr auto operator==(const Aesi<bFirst>& left, const Aesi<bSecond>& rig
 }
 
 /**
- * @brief Multiprecision three-way comparison method.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return AesiCMP.
- * @note Uses precision cast.
+ * @brief Multiprecision three-way comparison method
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return AesiCMP
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto compareTo(const Aesi<bFirst>& left, const Aesi<bSecond>& right) noexcept -> AesiCMP {
@@ -32,8 +41,11 @@ gpu constexpr auto compareTo(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
     }
 }
 
-#if defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)
-template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
+#if (defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)) && !defined DOXYGEN_SHOULD_SKIP_THIS
+    /**
+     * @brief Oldstyle binary comparison operator(s). Used inside CUDA cause it does not support <=> on device
+     */
+    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
     gpu constexpr auto operator!=(const Aesi<bFirst>& left, const Aesi<bSecond>& right) noexcept -> bool { return !left.operator==(right); }
     template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
     gpu constexpr auto operator<(const Aesi<bFirst>& left, const Aesi<bSecond>& right) noexcept -> bool { return left.compareTo(right) == AesiCMP::less; }
@@ -43,11 +55,11 @@ template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
     gpu constexpr auto operator>(const Aesi<bFirst>& left, const Aesi<bSecond>& right) noexcept -> bool { return left.compareTo(right) == AesiCMP::greater; }
     template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
     gpu constexpr auto operator>=(const Aesi<bFirst>& left, const Aesi<bSecond>& right) noexcept -> bool { return !left.operator<(right); }
-
 #else
     /**
      * @brief Multiprecision three-way comparison operator.
-     * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
+     * @param Aesi<lPrecision> left
+     * @param Aesi<rPrecision> right.
      * @return STD::Strong_ordering.
      * @note Uses precision cast.
      */
@@ -75,9 +87,10 @@ template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 
 /* ----------------------------------------- Different precision addition ----------------------------------------- */
 /**
- * @brief Integral conversion addition operator.
- * @param Integral number, Aesi value.
- * @return Aesi.
+ * @brief Integral conversion addition operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
 gpu constexpr auto operator+(Integral number, const Aesi<bitness>& value) noexcept {
@@ -86,10 +99,10 @@ gpu constexpr auto operator+(Integral number, const Aesi<bitness>& value) noexce
 
 /**
  * @brief Multiprecision addition operator
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi.
- * @details Returns Aesi with greater precision from lPrecision, rPrecision
- * @note Uses precision cast.
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between lPrecision, rPrecision
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator+(const Aesi<bFirst>& left, const Aesi<bSecond>& right) noexcept
@@ -102,10 +115,10 @@ gpu constexpr auto operator+(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
 }
 
 /**
- * @brief Multiprecision assignment addition operator.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi<lPrecision>.
- * @note Uses precision cast.
+ * @brief Multiprecision assignment addition operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi<lPrecision>
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
 gpu constexpr auto operator+=(Aesi<bFirst>& left, const Aesi<bSecond>& right) -> Aesi<bFirst>& {
@@ -116,9 +129,10 @@ gpu constexpr auto operator+=(Aesi<bFirst>& left, const Aesi<bSecond>& right) ->
 
 /* --------------------------------------- Different precision subtraction ---------------------------------------- */
 /**
- * @brief Integral conversion subtraction operator.
- * @param Integral number, Aesi value.
- * @return Aesi.
+ * @brief Integral conversion subtraction operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
 gpu constexpr auto operator-(Integral number, const Aesi<bitness>& value) noexcept {
@@ -127,10 +141,10 @@ gpu constexpr auto operator-(Integral number, const Aesi<bitness>& value) noexce
 
 /**
  * @brief Multiprecision subtraction operator
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi.
- * @details Returns Aesi with greater precision from lPrecision, rPrecision.
- * @note Uses precision cast.
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between lPrecision, rPrecision
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator-(const Aesi<bFirst>& left, const Aesi<bSecond>& right)
@@ -143,10 +157,10 @@ gpu constexpr auto operator-(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
 }
 
 /**
- * @brief Multiprecision assignment subtraction operator.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi<lPrecision>.
- * @note Uses precision cast.
+ * @brief Multiprecision assignment subtraction operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi<lPrecision>
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
 gpu constexpr auto operator-=(Aesi<bFirst>& left, const Aesi<bSecond>& right) -> Aesi<bFirst>& {
@@ -157,9 +171,10 @@ gpu constexpr auto operator-=(Aesi<bFirst>& left, const Aesi<bSecond>& right) ->
 
 /* -------------------------------------- Different precision multiplication -------------------------------------- */
 /**
- * @brief Integral conversion multiplication operator.
- * @param Integral number, Aesi value.
- * @return Aesi.
+ * @brief Integral conversion multiplication operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
 gpu constexpr auto operator*(Integral number, const Aesi<bitness>& value) noexcept {
@@ -168,10 +183,10 @@ gpu constexpr auto operator*(Integral number, const Aesi<bitness>& value) noexce
 
 /**
  * @brief Multiprecision multiplication operator
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi.
- * @details Returns Aesi with greater precision from lPrecision, rPrecision.
- * @note Uses precision cast.
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between lPrecision, rPrecision
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator*(const Aesi<bFirst>& left, const Aesi<bSecond>& right)
@@ -184,10 +199,10 @@ gpu constexpr auto operator*(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
 }
 
 /**
- * @brief Multiprecision assignment multiplication operator.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi<lPrecision>.
- * @note Uses precision cast.
+ * @brief Multiprecision assignment multiplication operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi<lPrecision>
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
 gpu constexpr auto operator*=(Aesi<bFirst>& left, const Aesi<bSecond>& right) -> Aesi<bFirst>& {
@@ -198,9 +213,10 @@ gpu constexpr auto operator*=(Aesi<bFirst>& left, const Aesi<bSecond>& right) ->
 
 /* ----------------------------------------- Different precision division ----------------------------------------- */
 /**
- * @brief Integral conversion division operator.
- * @param Integral number, Aesi value.
- * @return Aesi.
+ * @brief Integral conversion division operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
 gpu constexpr auto operator/(Integral number, const Aesi<bitness>& value) noexcept {
@@ -209,10 +225,10 @@ gpu constexpr auto operator/(Integral number, const Aesi<bitness>& value) noexce
 
 /**
  * @brief Multiprecision division operator
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi.
- * @details Returns Aesi with greater precision from lPrecision, rPrecision.
- * @note Uses precision cast.
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between lPrecision, rPrecision
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator/(const Aesi<bFirst>& left, const Aesi<bSecond>& right)
@@ -225,10 +241,10 @@ gpu constexpr auto operator/(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
 }
 
 /**
- * @brief Multiprecision assignment division operator.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi<lPrecision>.
- * @note Uses precision cast.
+ * @brief Multiprecision assignment division operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi<lPrecision>
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
 gpu constexpr auto operator/=(Aesi<bFirst>& left, const Aesi<bSecond>& right) -> Aesi<bFirst>& {
@@ -239,9 +255,10 @@ gpu constexpr auto operator/=(Aesi<bFirst>& left, const Aesi<bSecond>& right) ->
 
 /* ------------------------------------------ Different precision modulo ------------------------------------------ */
 /**
- * @brief Integral conversion modulo operator.
- * @param Integral number, Aesi value.
- * @return Aesi.
+ * @brief Integral conversion modulo operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
 gpu constexpr auto operator%(Integral number, const Aesi<bitness>& value) noexcept {
@@ -250,10 +267,10 @@ gpu constexpr auto operator%(Integral number, const Aesi<bitness>& value) noexce
 
 /**
  * @brief Multiprecision modulo operator
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi.
- * @details Returns Aesi with greater precision from lPrecision, rPrecision.
- * @note Uses precision cast.
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between lPrecision, rPrecision
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator%(const Aesi<bFirst>& left, const Aesi<bSecond>& right)
@@ -266,10 +283,10 @@ gpu constexpr auto operator%(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
 }
 
 /**
- * @brief Multiprecision assignment modulo operator.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi<lPrecision>.
- * @note Uses precision cast.
+ * @brief Multiprecision assignment modulo operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi<lPrecision>
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
 gpu constexpr auto operator%=(Aesi<bFirst>& left, const Aesi<bSecond>& right) -> Aesi<bFirst>& {
@@ -280,9 +297,10 @@ gpu constexpr auto operator%=(Aesi<bFirst>& left, const Aesi<bSecond>& right) ->
 
 /* ------------------------------------------- Different precision XOR -------------------------------------------- */
 /**
- * @brief Integral conversion XOR operator.
- * @param Integral number, Aesi value.
- * @return Aesi.
+ * @brief Integral conversion bitwise XOR operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
 gpu constexpr auto operator^(Integral number, const Aesi<bitness>& value) noexcept {
@@ -290,11 +308,11 @@ gpu constexpr auto operator^(Integral number, const Aesi<bitness>& value) noexce
 }
 
 /**
- * @brief Multiprecision XOR operator
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi.
- * @details Returns Aesi with greater precision from lPrecision, rPrecision.
- * @note Uses precision cast.
+ * @brief Multiprecision bitwise XOR operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between lPrecision, rPrecision
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator^(const Aesi<bFirst>& left, const Aesi<bSecond>& right)
@@ -307,10 +325,10 @@ gpu constexpr auto operator^(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
 }
 
 /**
- * @brief Multiprecision assignment XOR operator.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi<lPrecision>.
- * @note Uses precision cast.
+ * @brief Multiprecision assignment bitwise XOR operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi<lPrecision>
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
 gpu constexpr auto operator^=(Aesi<bFirst>& left, const Aesi<bSecond>& right) -> Aesi<bFirst>& {
@@ -321,9 +339,10 @@ gpu constexpr auto operator^=(Aesi<bFirst>& left, const Aesi<bSecond>& right) ->
 
 /* -------------------------------------------- Different precision AND ------------------------------------------- */
 /**
- * @brief Integral conversion AND operator.
- * @param Integral number, Aesi value.
- * @return Aesi.
+ * @brief Integral conversion bitwise AND operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
 gpu constexpr auto operator&(Integral number, const Aesi<bitness>& value) noexcept {
@@ -331,11 +350,11 @@ gpu constexpr auto operator&(Integral number, const Aesi<bitness>& value) noexce
 }
 
 /**
- * @brief Multiprecision AND operator
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi.
- * @details Returns Aesi with greater precision from lPrecision, rPrecision.
- * @note Uses precision cast.
+ * @brief Multiprecision bitwise AND operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between lPrecision, rPrecision
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator&(const Aesi<bFirst>& left, const Aesi<bSecond>& right)
@@ -348,10 +367,10 @@ gpu constexpr auto operator&(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
 }
 
 /**
- * @brief Multiprecision assignment AND operator.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi<lPrecision>.
- * @note Uses precision cast.
+ * @brief Multiprecision assignment bitwise AND operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi<lPrecision>
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
 gpu constexpr auto operator&=(Aesi<bFirst>& left, const Aesi<bSecond>& right) -> Aesi<bFirst>& {
@@ -362,9 +381,10 @@ gpu constexpr auto operator&=(Aesi<bFirst>& left, const Aesi<bSecond>& right) ->
 
 /* -------------------------------------------- Different precision OR -------------------------------------------- */
 /**
- * @brief Integral conversion OR operator.
- * @param Integral number, Aesi value.
- * @return Aesi.
+ * @brief Integral conversion bitwise OR operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
 gpu constexpr auto operator|(Integral number, const Aesi<bitness>& value) noexcept {
@@ -372,11 +392,11 @@ gpu constexpr auto operator|(Integral number, const Aesi<bitness>& value) noexce
 }
 
 /**
- * @brief Multiprecision OR operator
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi.
- * @details Returns Aesi with greater precision from lPrecision, rPrecision.
- * @note Uses precision cast.
+ * @brief Multiprecision bitwise OR operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between lPrecision, rPrecision
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
 gpu constexpr auto operator|(const Aesi<bFirst>& left, const Aesi<bSecond>& right)
@@ -389,10 +409,10 @@ gpu constexpr auto operator|(const Aesi<bFirst>& left, const Aesi<bSecond>& righ
 }
 
 /**
- * @brief Multiprecision assignment OR operator.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi<lPrecision>.
- * @note Uses precision cast.
+ * @brief Multiprecision assignment bitwise OR operator
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi<lPrecision>
  */
 template <std::size_t bFirst, std::size_t bSecond> requires (bFirst > bSecond)
 gpu constexpr auto operator|=(Aesi<bFirst>& left, const Aesi<bSecond>& right) -> Aesi<bFirst>& {
@@ -403,11 +423,11 @@ gpu constexpr auto operator|=(Aesi<bFirst>& left, const Aesi<bSecond>& right) ->
 
 /* ------------------------------------------- Greatest common divisor -------------------------------------------- */
 /**
- * @brief Multiprecision greatest common divisor function.
- * @param Aesi<lPrecision> left, Aesi<rPrecision> right.
- * @return Aesi.
- * @details Returns Aesi with greater precision from lPrecision, rPrecision.
- * @note Uses precision cast.
+ * @brief Multiprecision greatest common divisor
+ * @param Aesi<lPrecision> left
+ * @param Aesi<rPrecision> right
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between lPrecision, rPrecision
  */
 template<std::size_t bFirst, std::size_t bSecond>
 gpu constexpr auto gcd(const Aesi<bFirst> &left, const Aesi<bSecond> &right)
@@ -423,11 +443,12 @@ gpu constexpr auto gcd(const Aesi<bFirst> &left, const Aesi<bSecond> &right)
 
 /* ----------------------------------------------- Power by modulo ------------------------------------------------ */
 /**
- * @brief Multiprecision power by modulo function.
- * @param Aesi<bPrecision> base, Aesi<pPrecision> power, Aesi<mPrecision> modulo.
- * @return Aesi.
- * @details Returns Aesi with greater precision from bPrecision, pPrecision, mPrecision.
- * @note Uses precision cast.
+ * @brief Multiprecision power by modulo
+ * @param Aesi<bPrecision> base
+ * @param Aesi<pPrecision> power
+ * @param Aesi<mPrecision> modulo
+ * @return Aesi
+ * @details Returns Aesi with the highest precision between bPrecision, pPrecision, mPrecision
  */
 template<std::size_t bBase, std::size_t bPow, std::size_t bMod>
 gpu constexpr auto powm(const Aesi<bBase> &base, const Aesi<bPow> &power, const Aesi<bMod> &mod)

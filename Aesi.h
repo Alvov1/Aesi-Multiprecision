@@ -655,14 +655,17 @@ public:
             case Positive:
                 switch (other.sign) {
                     case Positive: {
-                        const auto thisLength = lineLength(blocks), valueLength = lineLength(other.blocks);
-                        if(thisLength != valueLength)
-                            return (thisLength > valueLength) ? AesiCMP::greater : AesiCMP::less;
-
-                        for(long long i = thisLength; i >= 0; --i)
-                            if(blocks[i] != other.blocks[i])
-                                return (blocks[i] > other.blocks[i]) ? AesiCMP::greater : AesiCMP::less;
-
+                        for(long long i = blocksNumber; i >= 0; --i) {
+                            const block thisBlock = blocks[i], otherBlock = other.blocks[i];
+                            if(thisBlock != 0) {
+                                if(thisBlock > otherBlock)
+                                    return AesiCMP::greater;
+                                if(thisBlock < otherBlock)
+                                    return AesiCMP::less;
+                            } else
+                                if (otherBlock != 0)
+                                    return AesiCMP::less;
+                        }
                         return AesiCMP::equal;
                     }
                     case Zero:
@@ -672,14 +675,17 @@ public:
             case Negative:
                 switch (other.sign) {
                     case Negative: {
-                        const auto thisLength = lineLength(blocks), valueLength = lineLength(other.blocks);
-                        if(thisLength != valueLength)
-                            return (static_cast<long long>(thisLength) * -1 > static_cast<long long>(valueLength) * -1) ? AesiCMP::greater : AesiCMP::less;
-
-                        for(long long i = thisLength; i >= 0; --i)
-                            if(blocks[i] != other.blocks[i])
-                                return (static_cast<long>(blocks[i]) * -1 > static_cast<long>(other.blocks[i]) * -1) ? AesiCMP::greater : AesiCMP::less;
-
+                        for(long long i = blocksNumber; i >= 0; --i) {
+                            const block thisBlock = blocks[i], otherBlock = other.blocks[i];
+                            if(thisBlock != 0) {
+                                if(thisBlock > otherBlock)
+                                    return AesiCMP::less;
+                                if(thisBlock < otherBlock)
+                                    return AesiCMP::greater;
+                            } else
+                            if (otherBlock != 0)
+                                return AesiCMP::greater;
+                        }
                         return AesiCMP::equal;
                     }
                     case Zero:
@@ -764,8 +770,8 @@ public:
         const std::size_t blockNumber = index / sizeof(block), byteInBlock = index % sizeof(block), shift = byteInBlock * bitsInByte;
         blocks[blockNumber] &= ~(0xffU << shift); blocks[blockNumber] |= static_cast<block>(byte) << shift;
 
-        if(sign != Zero && isLineEmpty(blocks)) sign = Zero;
-        if(sign == Zero && !isLineEmpty(blocks)) sign = Positive;
+        if(sign == Zero && blocks[blockNumber] != 0) sign = Positive;
+        if(sign != Zero && blocks[blockNumber] == 0 && isLineEmpty(blocks)) sign = Zero;
     }
 
     /**

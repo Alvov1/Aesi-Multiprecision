@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Initialization, Binary) {
     Aesi512 m0 = 0b1111111111111111111111111111111111111111111111111111111111111111;
@@ -22,6 +23,8 @@ TEST(Initialization, Binary) {
 }
 
 TEST(Initialization, Decimal) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi512 m0 = 99194853094755497;
     EXPECT_EQ(m0, 99194853094755497);
 
@@ -78,9 +81,15 @@ TEST(Initialization, Decimal) {
     Aesi512 m471 = "17784669543737251499", m472 = "14201062765192332341", m473 = "16224984775783005142"; EXPECT_EQ(m471, 17784669543737251499ULL); EXPECT_EQ(m472, 14201062765192332341ULL); EXPECT_EQ(m473, 16224984775783005142ULL);
     Aesi512 m481 = "16472899448046760550", m482 = "17950352882176089499", m483 = "15811180152515576389"; EXPECT_EQ(m481, 16472899448046760550ULL); EXPECT_EQ(m482, 17950352882176089499ULL); EXPECT_EQ(m483, 15811180152515576389ULL);
     Aesi512 m491 = "15561238486743158869", m492 = "12100379568652275533", m493 = "9406939632453216753"; EXPECT_EQ(m491, 15561238486743158869ULL); EXPECT_EQ(m492, 12100379568652275533ULL); EXPECT_EQ(m493, 9406939632453216753ULL);
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Initialization, Octal) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi512 m0 = 05403223057620506251;
     EXPECT_EQ(m0, 99194853094755497);
 
@@ -137,9 +146,15 @@ TEST(Initialization, Octal) {
     Aesi512 m471 = "0o1773471630626071116447", m472 = "0o1156463277237047730167", m473 = "0o1613125470505377336302"; EXPECT_EQ(m471, 18367712881679834407ULL); EXPECT_EQ(m472, 11215770621900206199ULL); EXPECT_EQ(m473, 16342071603892174018ULL);
     Aesi512 m481 = "0o1475136216457375242077", m482 = "0o1340527162106000006667", m483 = "0o1134562323734224705534"; EXPECT_EQ(m481, 14937253494236988479ULL); EXPECT_EQ(m482, 13270673386020801975ULL); EXPECT_EQ(m483, 10893729481136245596ULL);
     Aesi512 m491 = "0o1165631315605731440131", m492 = "0o1541243747012163056475", m493 = "0o1044543755341236157750"; EXPECT_EQ(m491, 11345461210476068953ULL); EXPECT_EQ(m492, 15588223231109913917ULL); EXPECT_EQ(m493, 9884414744230158312ULL);
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Initialization, Hexadecimal) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi512 m0 = 0xFFFFFFFFFFFFFFFF;
     EXPECT_EQ(m0, 18446744073709551615ULL);
 
@@ -196,4 +211,8 @@ TEST(Initialization, Hexadecimal) {
     Aesi512 m471 = "0xddbee9e19acfc41d", m472 = "0xAE59EAF54DBF6B2D", m473 = "0xc807e41831e56bbe"; EXPECT_EQ(m471, 15978465683131319325ULL); EXPECT_EQ(m472, 12563330974818986797ULL); EXPECT_EQ(m473, 14413739924990028734ULL);
     Aesi512 m481 = "0xa773fbd9f49f399a", m482 = "0xfba69cf8314c843e", m483 = "0xaa8daf0c322ed564"; EXPECT_EQ(m481, 12066264740186241434ULL); EXPECT_EQ(m482, 18133353539446801470ULL); EXPECT_EQ(m483, 12289671425080350052ULL);
     Aesi512 m491 = "0xfa56fb5e3d0c01e3", m492 = "0xfc45d62e6351335b", m493 = "0x9b99b10ee0300918"; EXPECT_EQ(m491, 18038881739648795107ULL); EXPECT_EQ(m492, 18178170965673980763ULL); EXPECT_EQ(m493, 11212187424764463384ULL);
+
+    Logging::addRecord("Hexadecimal-initialization",
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }

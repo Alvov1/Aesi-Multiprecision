@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(NumberTheory, GreatestCommonDivisor) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi768 l, r, bezoutX, bezoutY, gcd;
     {
         l = "205784153332541666951721440128698050625116439954815756686985686924136781796364.";
@@ -184,6 +187,10 @@ TEST(NumberTheory, GreatestCommonDivisor) {
         EXPECT_EQ(Aesi768::gcd(l, r, bezoutX, bezoutY), gcd);
         EXPECT_EQ(l * bezoutX + r * bezoutY, gcd);
     }
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(NumberTheory, GreatestCommonDivisorDifferentPrecision) {

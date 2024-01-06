@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Bitwise, LeftShift) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi128 t = 14183932482008727;
     EXPECT_EQ(t << 48, "3992422065038923586049945894912");
 
@@ -163,9 +166,15 @@ TEST(Bitwise, LeftShift) {
     EXPECT_EQ(r8 << 533, -5765383716230255672);
     Aesi < 448 > r9 = 5003573553825361921;
     EXPECT_EQ(r9 << 461, 5003573553825361921);
+
+    Logging::addRecord("Bitwise-leftshift",
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Bitwise, RightShift) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi128 t = "3992422065038923586049945894912";
     EXPECT_EQ(t >> 48, 14183932482008727);
 
@@ -327,4 +336,8 @@ TEST(Bitwise, RightShift) {
     EXPECT_EQ(r8 >> 585, 9183991195476062818);
     Aesi < 320 > r9 = -5895904731635797704;
     EXPECT_EQ(r9 >> 434, -5895904731635797704);
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }

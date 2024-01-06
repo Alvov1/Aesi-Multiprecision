@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Boolean, ThreeWayComparasion) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi512 m0 = 414346834219605873, m1 = 6659613388634065159; EXPECT_EQ(m0 < m1, true); EXPECT_EQ(m0 > m1, false); EXPECT_EQ(m0 == m1, false);
     Aesi512 m2 = 3777391648886866941, m3 = 6468128258198177311; EXPECT_EQ(m2 < m3, true); EXPECT_EQ(m2 > m3, false); EXPECT_EQ(m2 == m3, false);
     Aesi512 m4 = 4972396199517127393, m5 = 2356794928604248388; EXPECT_EQ(m4 < m5, false); EXPECT_EQ(m4 > m5, true); EXPECT_EQ(m4 == m5, false);
@@ -125,9 +128,15 @@ TEST(Boolean, ThreeWayComparasion) {
     Aesi512 r14 = "123332376598963012950955571465063211860.", r15 = "123332376598963012950955571465063211860."; EXPECT_EQ(r14 < r15, false); EXPECT_EQ(r14 > r15, false); EXPECT_EQ(r14 == r15, true);
     Aesi512 r16 = "307003963041772851243779066372380492627.", r17 = "307003963041772851243779066372380492627."; EXPECT_EQ(r16 < r17, false); EXPECT_EQ(r16 > r17, false); EXPECT_EQ(r16 == r17, true);
     Aesi512 r18 = "194662908396084132647198018631066653076.", r19 = "194662908396084132647198018631066653076."; EXPECT_EQ(r18 < r19, false); EXPECT_EQ(r18 > r19, false); EXPECT_EQ(r18 == r19, true);
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Boolean, ThreeWayEquallComparasion) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi512 m0 = 7036437650415461321, m1 = 3512521750905585604; EXPECT_EQ(m0 <= m1, false); EXPECT_EQ(m0 >= m1, true); EXPECT_EQ(m0 == m1, false);
     Aesi512 m2 = 1383437920778735070, m3 = 8349814587438416033; EXPECT_EQ(m2 <= m3, true); EXPECT_EQ(m2 >= m3, false); EXPECT_EQ(m2 == m3, false);
     Aesi512 m4 = 9113619168792656185, m5 = 4220142331454932859; EXPECT_EQ(m4 <= m5, false); EXPECT_EQ(m4 >= m5, true); EXPECT_EQ(m4 == m5, false);
@@ -251,6 +260,10 @@ TEST(Boolean, ThreeWayEquallComparasion) {
     Aesi512 r14 = "69755181066514875766033619263437644053.", r15 = "69755181066514875766033619263437644053."; EXPECT_EQ(r14 <= r15, true); EXPECT_EQ(r14 >= r15, true); EXPECT_EQ(r14 == r15, true);
     Aesi512 r16 = "66735372581418058067234560346509638865.", r17 = "66735372581418058067234560346509638865."; EXPECT_EQ(r16 <= r17, true); EXPECT_EQ(r16 >= r17, true); EXPECT_EQ(r16 == r17, true);
     Aesi512 r18 = "168496873235580456218434496216410553403.", r19 = "168496873235580456218434496216410553403."; EXPECT_EQ(r18 <= r19, true); EXPECT_EQ(r18 >= r19, true); EXPECT_EQ(r18 == r19, true);
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Boolean, DifferentPrecisions) {

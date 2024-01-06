@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Casting, PrecisionCast) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     long long init0 = 7524839891475014690; Aesi256 m0 = init0;
     EXPECT_EQ(m0.precisionCast<288>(), init0); EXPECT_EQ(m0.precisionCast<320>(), init0); EXPECT_EQ(m0.precisionCast<352>(), init0); EXPECT_EQ(m0.precisionCast<384>(), init0);
     EXPECT_EQ(m0.precisionCast<416>(), init0); EXPECT_EQ(m0.precisionCast<448>(), init0); EXPECT_EQ(m0.precisionCast<480>(), init0); EXPECT_EQ(m0.precisionCast<512>(), init0);
@@ -301,4 +304,8 @@ TEST(Casting, PrecisionCast) {
     EXPECT_EQ(l28.precisionCast<224>(), "459273051701248468242064512442751256897801283813240021045830922490.");
     Aesi < 448 > l29 = "545136889659423149046640496483142589267039543174772529930583944491083582156213563276447863450923726927200116011820859957964687342869311.";
     EXPECT_EQ(l29.precisionCast<224>(), "11564578527812652389272649650310409698199102565460528063263161490239.");
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());
 }

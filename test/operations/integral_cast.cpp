@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Casting, IntegralCast) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     {
         short v0 = 12660; Aesi512 o0 = v0; EXPECT_EQ(o0.integralCast<short>(), v0);
         short v1 = 1291; Aesi512 o1 = v1; EXPECT_EQ(o1.integralCast<short>(), v1);
@@ -178,4 +181,9 @@ TEST(Casting, IntegralCast) {
         unsigned long long v18 = 6821012615472018674ULL; Aesi512 o18 = v18; EXPECT_EQ(o18.integralCast<unsigned long long>(), v18);
         unsigned long long v19 = 5576836686719978266ULL; Aesi512 o19 = v19; EXPECT_EQ(o19.integralCast<unsigned long long>(), v19);
     }
+
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }

@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Bitwise, AND) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi < 96 > m0 = 807495886205862545ULL, m1 = 1699422046959474079ULL;
     EXPECT_EQ(m0 & m1, 221957416007270545);
     Aesi < 96 > m2 = 6020843877211540190ULL, m3 = 2820365921155811108ULL;
@@ -114,6 +117,10 @@ TEST(Bitwise, AND) {
     Aesi512 y54 = 531129792006888313; EXPECT_EQ(y54 & 0, 0); Aesi512 y55 = -1866077217373908775; EXPECT_EQ(y55 & 0, 0);
     Aesi512 y56 = 6039725184101265805; EXPECT_EQ(y56 & 0, 0); Aesi512 y57 = 2310906701521457706; EXPECT_EQ(y57 & 0, 0);
     Aesi512 y58 = 5729261014028876522; EXPECT_EQ(y58 & 0, 0); Aesi512 y59 = -7400848010369953160; EXPECT_EQ(y59 & 0, 0);
+
+    Logging::addRecord("Bitwise-AND",
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Bitwise, DifferentPrecisionAND) {

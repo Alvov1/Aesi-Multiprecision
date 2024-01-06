@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Initialization, ZeroInitialization) {
     Aesi512 m0 {};
@@ -213,6 +214,8 @@ TEST(Initialization, DifferentPrecisions) {
 }
 
 TEST(Initialization, CopyConstruction) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi < 320 > l0 = "856969574457709690462967066638280185610032288787864641536747837575250187179350463621579392244871."; Aesi < 640 > r0 = l0;
     EXPECT_EQ(r0, "856969574457709690462967066638280185610032288787864641536747837575250187179350463621579392244871.");
     Aesi < 192 > l1 = "1817464682414554777634009954620732846679878578413134368229."; Aesi < 576 > r1 = l1;
@@ -294,4 +297,9 @@ TEST(Initialization, CopyConstruction) {
     Aesi < 256 > r38 = l38; EXPECT_EQ(r38, "106933706339764000878509010506267008707527642239213681219687340160313450627984.");
     Aesi < 416 > l39 = "86605218842175287861295312762812733538876615816577435089539372437460337976422690938739296779379732680027937815494246618893146.";
     Aesi < 320 > r39 = l39; EXPECT_EQ(r39, "1000120221928044347333617422540787789504562475931143059065186465720343014110720116619366564105050.");
+
+    const auto* test = testing::UnitTest::GetInstance()->current_test_info();
+    Logging::addRecord("Initialization",
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }

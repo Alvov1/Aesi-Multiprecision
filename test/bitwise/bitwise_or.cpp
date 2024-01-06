@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Bitwise, OR) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi < 96 > m0 = 2020645940044775524ULL, m1 = 5357268711087358525ULL;
     EXPECT_EQ(m0 | m1, 6798983837096166013);
     Aesi < 96 > m2 = 1525558537524866468ULL, m3 = 780162980750373835ULL;
@@ -114,6 +117,10 @@ TEST(Bitwise, OR) {
     Aesi512 y54 = -6506001218570206180; EXPECT_EQ(y54 | 0, -6506001218570206180); Aesi512 y55 = -7151596374648398466; EXPECT_EQ(y55 | 0, -7151596374648398466);
     Aesi512 y56 = -2312960319391550338; EXPECT_EQ(y56 | 0, -2312960319391550338); Aesi512 y57 = -205899936757631221; EXPECT_EQ(y57 | 0, -205899936757631221);
     Aesi512 y58 = -8988800751555513056; EXPECT_EQ(y58 | 0, -8988800751555513056); Aesi512 y59 = -5137089545283585480; EXPECT_EQ(y59 | 0, -5137089545283585480);
+
+    Logging::addRecord("Bitwise-OR",
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Bitwise, DifferentPrecisionOR) {

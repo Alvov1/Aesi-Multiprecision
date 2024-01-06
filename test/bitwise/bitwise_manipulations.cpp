@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Bitwise, GetSetBit) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi512 m0 = "72705387953193747615171521307121358171.";
     m0.setBit(126, true); EXPECT_EQ(m0, "157775979683428363481015173165063411035.");
     Aesi512 m1 = "245785293645359766049968031280770229918.";
@@ -337,9 +340,15 @@ TEST(Bitwise, GetSetBit) {
     Aesi512 o19{}; o19.setBit(342, true); o19.setBit(286, true); o19.setBit(46, true);
     EXPECT_EQ(o19, "8958978968711216966560578224720437651332144025643808164713994103192096844836638004813384296588516524032.");
     o19.setBit(342, false); o19.setBit(286, false); o19.setBit(46, false); EXPECT_EQ(o19, 0);
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Bitwise, GetSetByte) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi512 m {}; uint8_t byte {};
     m = "25500030152205279384249040235552387539274952473526657228704168006265771.";
     m.setByte(3, 130); byte = m.getByte(8);
@@ -641,9 +650,15 @@ TEST(Bitwise, GetSetByte) {
     m = "8218490602206465278523501514619487822031474091.";
     m.setByte(17, 158); byte = m.getByte(10);
     EXPECT_EQ(m, "8220494184782895764196373864308046073260527019."); EXPECT_EQ(byte, 136);
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Bitwise, CountBitsBytes) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     {
         Aesi512 m = 0; EXPECT_EQ(m.bitCount(), 0); EXPECT_EQ(m.byteCount(), 0);
     }{
@@ -947,4 +962,9 @@ TEST(Bitwise, CountBitsBytes) {
         Aesi512 m = "4798011951051675050122476777454810968720955910594973468568707443382840023724197.";
         EXPECT_EQ(m.bitCount(), 262); EXPECT_EQ(m.byteCount(), 33);
     }
+
+
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Display, Zero) {
     Aesi512 m = 0;
@@ -988,6 +989,8 @@ TEST(Display, HexadecimalFormat) {
 }
 
 TEST(Display, ShowBase) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     {
         Aesi512 n = "79056762597989804146004589067046304937093448881513449860953244456760618148161";
         std::stringstream ss {}; ss << std::showbase << std::oct << n;
@@ -1109,4 +1112,9 @@ TEST(Display, ShowBase) {
         std::stringstream ss {}; ss << std::showbase << std::oct << n;
         EXPECT_EQ(ss.str(), "0o14143544547206566717156716503762441076677376475744517604677342734205717775707006561214");
     }
+
+    const auto* test = testing::UnitTest::GetInstance()->current_test_info();
+    Logging::addRecord("Display",
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }

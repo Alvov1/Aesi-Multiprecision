@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
+#include "../benchmarks/benchmarks.h"
 
 TEST(Bitwise, XOR) {
+    const auto timeStart = std::chrono::system_clock::now();
+
     Aesi < 96 > m0 = 8980983974862324411ULL, m1 = 2275821107446334292ULL;
     EXPECT_EQ(m0 ^ m1, 7149335124743143919);
     Aesi < 96 > m2 = 5929039959812382730ULL, m3 = 5865990284982001136ULL;
@@ -145,6 +148,10 @@ TEST(Bitwise, XOR) {
     Aesi512 e54 = -2531547591749992014; EXPECT_EQ(e54 ^ e54, 0); Aesi512 e55 = -4358331220058001262; EXPECT_EQ(e55 ^ e55, 0);
     Aesi512 e56 = 627142671780653697; EXPECT_EQ(e56 ^ e56, 0); Aesi512 e57 = -478975383411509354; EXPECT_EQ(e57 ^ e57, 0);
     Aesi512 e58 = 779413273234111004; EXPECT_EQ(e58 ^ e58, 0); Aesi512 e59 = 2987880071363343624; EXPECT_EQ(e59 ^ e59, 0);
+
+    Logging::addRecord("Bitwise-XOR",
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());;
 }
 
 TEST(Bitwise, DifferentPrecisionXOR) {

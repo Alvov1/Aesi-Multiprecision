@@ -1,2 +1,2 @@
 file(GLOB ArithmeticTests *.cpp)
-target_sources(AesiMultiprecisionTesting PRIVATE ${ArithmeticTests})
+target_sources(AesiMultiprecision PRIVATE ${ArithmeticTests})

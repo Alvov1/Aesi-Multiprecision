@@ -212,7 +212,7 @@ TEST(Initialization, Hexadecimal) {
     Aesi512 m481 = "0xa773fbd9f49f399a", m482 = "0xfba69cf8314c843e", m483 = "0xaa8daf0c322ed564"; EXPECT_EQ(m481, 12066264740186241434ULL); EXPECT_EQ(m482, 18133353539446801470ULL); EXPECT_EQ(m483, 12289671425080350052ULL);
     Aesi512 m491 = "0xfa56fb5e3d0c01e3", m492 = "0xfc45d62e6351335b", m493 = "0x9b99b10ee0300918"; EXPECT_EQ(m491, 18038881739648795107ULL); EXPECT_EQ(m492, 18178170965673980763ULL); EXPECT_EQ(m493, 11212187424764463384ULL);
 
-    Logging::addRecord("Hexadecimal-initialization",
+    Logging::addRecord("Hexadecimal_initialization",
                        std::chrono::system_clock::to_time_t(timeStart),
                        (std::chrono::system_clock::now() - timeStart).count());;
 }

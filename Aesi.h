@@ -30,7 +30,7 @@ namespace {
      * @enum AesiCMP
      * @brief Analogue of STD::Strong_ordering since CUDA does not support <=> operator
      */
-    enum class AesiCMP { equal = 0, less = 1, greater = 2, equivalent = 3 };
+    enum AesiCMP { equal = 0, less = 1, greater = 2, equivalent = 3 };
 }
 
 /**
@@ -57,13 +57,13 @@ class Aesi final {
      * @brief Block line of the number
      */
     using blockLine = std::array<block, blocksNumber>;
-    blockLine blocks;
+    blockLine blocks {};
 
     /**
      * @enum Aesi::Sign
      * @brief Specifies sign of the number. Should be Positive, Negative or Zero
      */
-    enum Sign { Zero = 0, Positive = 1, Negative = 2 } sign;
+    enum Sign { Zero = 0, Positive = 1, Negative = 2 } sign { Zero };
     /* ----------------------------------------------------------------------- */
 
 
@@ -647,15 +647,19 @@ public:
         switch (sign) {
             case Zero:
                 switch (other.sign) {
-                    case Zero: return AesiCMP::equal;
-                    case Positive: return AesiCMP::less;
-                    case Negative: return AesiCMP::greater;
-                    default: return AesiCMP::equivalent;
+                    case Zero:
+                        return AesiCMP::equal;
+                    case Positive:
+                        return AesiCMP::less;
+                    case Negative:
+                        return AesiCMP::greater;
+                    default:
+                        return AesiCMP::equivalent;
                 }
             case Positive:
                 switch (other.sign) {
                     case Positive: {
-                        for(long long i = blocksNumber; i >= 0; --i) {
+                        for(long long i = blocksNumber - 1; i >= 0; --i) {
                             const block thisBlock = blocks[i], otherBlock = other.blocks[i];
                             if(thisBlock != 0) {
                                 if(thisBlock > otherBlock)
@@ -669,13 +673,15 @@ public:
                         return AesiCMP::equal;
                     }
                     case Zero:
-                    case Negative: return AesiCMP::greater;
-                    default: return AesiCMP::equivalent;
+                    case Negative:
+                        return AesiCMP::greater;
+                    default:
+                        return AesiCMP::equivalent;
                 }
             case Negative:
                 switch (other.sign) {
                     case Negative: {
-                        for(long long i = blocksNumber; i >= 0; --i) {
+                        for(long long i = blocksNumber - 1; i >= 0; --i) {
                             const block thisBlock = blocks[i], otherBlock = other.blocks[i];
                             if(thisBlock != 0) {
                                 if(thisBlock > otherBlock)
@@ -689,10 +695,13 @@ public:
                         return AesiCMP::equal;
                     }
                     case Zero:
-                    case Positive: return AesiCMP::less;
-                    default: return AesiCMP::equivalent;
+                    case Positive:
+                        return AesiCMP::less;
+                    default:
+                        return AesiCMP::equivalent;
                 }
-            default: return AesiCMP::equivalent;
+            default:
+                return AesiCMP::equivalent;
         }
     };
 
@@ -714,10 +723,14 @@ public:
      */
     gpu constexpr auto operator<=>(const Aesi& other) const noexcept -> std::strong_ordering {
         switch(this->compareTo(other)) {
-            case AesiCMP::less: return std::strong_ordering::less;
-            case AesiCMP::greater: return std::strong_ordering::greater;
-            case AesiCMP::equal: return std::strong_ordering::equal;
-            default: return std::strong_ordering::equivalent;
+            case AesiCMP::less:
+                return std::strong_ordering::less;
+            case AesiCMP::greater:
+                return std::strong_ordering::greater;
+            case AesiCMP::equal:
+                return std::strong_ordering::equal;
+            default:
+                return std::strong_ordering::equivalent;
         }
     };
 #endif
@@ -1049,7 +1062,6 @@ public:
     }
     /* ----------------------------------------------------------------------- */
 
-
     /**
      * @brief Cast from Aesi to built-in integral types
      * @param Type integral_type TEMPLATE
@@ -1072,18 +1084,32 @@ public:
      * @note This method is used in all manipulations between numbers of different precision. Using this method is not recommended,
      * cause it leads to redundant copying and may be slow
      */
-    template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
-    gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
-        Aesi<newBitness> result = 0;
+    template <std::size_t newBitness> requires (newBitness != bitness)
+    constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
+        Aesi<newBitness> result (blocks);
+        if(sign == Negative) return -result; return result;
+    }
 
-        long long startBlock = (blocksNumber < (newBitness / blockBitLength) ? blocksNumber - 1 : (newBitness / blockBitLength) - 1);
-        for(; startBlock >= 0; --startBlock) {
-            result <<= blockBitLength;
-            result |= blocks[startBlock];
-        }
+//    template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
+//    gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
+//        Aesi<newBitness> result = 0;
+//
+//        long long startBlock = (blocksNumber < (newBitness / blockBitLength) ? blocksNumber - 1 : (newBitness / blockBitLength) - 1);
+//        for(; startBlock >= 0; --startBlock) {
+//            result <<= blockBitLength;
+//            result |= blocks[startBlock];
+//        }
+//
+//        if(sign == Negative) result *= -1;
+//        return result;
+//    }
 
-        if(sign == Negative) result *= -1;
-        return result;
+    template <std::size_t length>
+    constexpr explicit Aesi(const std::array<block, length>& data) noexcept {
+        /* FIXME: Remove this function, change precision cast to use bitness. */
+        for(std::size_t i = 0; i < blocksNumber && i < length; ++i)
+            blocks[i] = data[i]; sign = Positive;
+        /* FIXME */
     }
 
     /**
@@ -1198,6 +1224,7 @@ public:
                 return base;
             } (flags & std::ios::basefield, ss, flags & std::ios::showbase);
 
+//            if(true /*base == 16*/) {
             if(base == 16) {
                 long long iter = value.blocks.size() - 1;
                 for(; value.blocks[iter] == 0 && iter >= 0; --iter);
@@ -1209,7 +1236,7 @@ public:
                 }
             } else {
                 /* Well, here we use a pre-calculated magic number to ratio the length of numbers in decimal or octal notation according to bitness.
-                 * It is 2.95-98 for octal and 3.2 for decimal. */
+                 * * It is 2.95-98 for octal and 3.2 for decimal. */
                 constexpr auto bufferSize = static_cast<std::size_t>(static_cast<double>(bitness) / 2.95);
                 Char buffer [bufferSize] {}; std::size_t filled = 0;
 
@@ -1218,6 +1245,12 @@ public:
                     const auto [quotient, remainder] = divide(copy, base);
                     buffer[filled++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } () + remainder.template integralCast<byte>();
                     copy = quotient;
+                }
+
+                if constexpr (std::is_same_v<Char, char>) {
+                    std::cout << "Filled: " << filled << std::endl << "Buffer: " << buffer << std::endl;
+                } else {
+                    std::wcout << L"Filled: " << filled << std::endl << L"Buffer: " << buffer << std::endl;
                 }
 
                 for(; filled > 0; --filled)

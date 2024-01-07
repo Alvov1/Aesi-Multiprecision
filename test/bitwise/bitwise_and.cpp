@@ -118,7 +118,7 @@ TEST(Bitwise, AND) {
     Aesi512 y56 = 6039725184101265805; EXPECT_EQ(y56 & 0, 0); Aesi512 y57 = 2310906701521457706; EXPECT_EQ(y57 & 0, 0);
     Aesi512 y58 = 5729261014028876522; EXPECT_EQ(y58 & 0, 0); Aesi512 y59 = -7400848010369953160; EXPECT_EQ(y59 & 0, 0);
 
-    Logging::addRecord("Bitwise-AND",
+    Logging::addRecord("Bitwise_AND",
                        std::chrono::system_clock::to_time_t(timeStart),
                        (std::chrono::system_clock::now() - timeStart).count());;
 }

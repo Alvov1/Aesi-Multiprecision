@@ -149,9 +149,13 @@ TEST(Bitwise, XOR) {
     Aesi512 e56 = 627142671780653697; EXPECT_EQ(e56 ^ e56, 0); Aesi512 e57 = -478975383411509354; EXPECT_EQ(e57 ^ e57, 0);
     Aesi512 e58 = 779413273234111004; EXPECT_EQ(e58 ^ e58, 0); Aesi512 e59 = 2987880071363343624; EXPECT_EQ(e59 ^ e59, 0);
 
+#ifdef NDEBUG
     Logging::addRecord("Bitwise_XOR",
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }
 
 TEST(Bitwise, DifferentPrecisionXOR) {

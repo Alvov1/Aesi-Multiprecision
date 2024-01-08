@@ -298,8 +298,11 @@ TEST(Initialization, CopyConstruction) {
     Aesi < 416 > l39 = "86605218842175287861295312762812733538876615816577435089539372437460337976422690938739296779379732680027937815494246618893146";
     Aesi < 320 > r39 = l39; EXPECT_EQ(r39, "1000120221928044347333617422540787789504562475931143059065186465720343014110720116619366564105050");
 
-    const auto* test = testing::UnitTest::GetInstance()->current_test_info();
+#ifdef NDEBUG
     Logging::addRecord("Initialization",
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }

@@ -20,7 +20,6 @@ add_subdirectory(operations)
 add_subdirectory(bitwise)
 add_subdirectory(number-theory)
 add_subdirectory(gpu)
-add_subdirectory(benchmarks)
 add_subdirectory(boolean)
 
 include_directories(${SQLite3_INCLUDE_DIRS})

@@ -118,9 +118,13 @@ TEST(Bitwise, OR) {
     Aesi512 y56 = -2312960319391550338; EXPECT_EQ(y56 | 0, -2312960319391550338); Aesi512 y57 = -205899936757631221; EXPECT_EQ(y57 | 0, -205899936757631221);
     Aesi512 y58 = -8988800751555513056; EXPECT_EQ(y58 | 0, -8988800751555513056); Aesi512 y59 = -5137089545283585480; EXPECT_EQ(y59 | 0, -5137089545283585480);
 
+#ifdef NDEBUG
     Logging::addRecord("Bitwise_OR",
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }
 
 TEST(Bitwise, DifferentPrecisionOR) {

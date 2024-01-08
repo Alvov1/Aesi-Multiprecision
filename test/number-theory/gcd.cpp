@@ -188,9 +188,13 @@ TEST(NumberTheory, GreatestCommonDivisor) {
         EXPECT_EQ(l * bezoutX + r * bezoutY, gcd);
     }
 
+#ifdef NDEBUG
     Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }
 
 TEST(NumberTheory, GreatestCommonDivisorDifferentPrecision) {

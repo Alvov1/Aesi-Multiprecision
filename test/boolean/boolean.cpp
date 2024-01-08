@@ -129,9 +129,13 @@ TEST(Boolean, ThreeWayComparasion) {
     Aesi512 r16 = "307003963041772851243779066372380492627.", r17 = "307003963041772851243779066372380492627."; EXPECT_EQ(r16 < r17, false); EXPECT_EQ(r16 > r17, false); EXPECT_EQ(r16 == r17, true);
     Aesi512 r18 = "194662908396084132647198018631066653076.", r19 = "194662908396084132647198018631066653076."; EXPECT_EQ(r18 < r19, false); EXPECT_EQ(r18 > r19, false); EXPECT_EQ(r18 == r19, true);
 
+#ifdef NDEBUG
     Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }
 
 TEST(Boolean, ThreeWayEquallComparasion) {

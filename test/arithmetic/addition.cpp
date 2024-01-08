@@ -496,9 +496,15 @@ TEST(Addition, Huge) {
     Aesi512 m78 = "67824248013177802097397937140001654482400020166872619182813946509566153393272.", m79 = "-77223507462154260090454129169668278804288507713253020067034159485154224143650.";
     EXPECT_EQ(m78 + m79, "-9399259448976457993056192029666624321888487546380400884220212975588070750378.");
 
+
+#ifdef NDEBUG
     Logging::addRecord("Addition",
                        std::chrono::system_clock::to_time_t(timeStart),
                        (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
+
 }
 
 TEST(Addition, HugeAssignment) {

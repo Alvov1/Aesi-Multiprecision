@@ -530,9 +530,14 @@ TEST(Multiplication, Huge) {
     Aesi512 m78 = "93223467270975916336090734961983001873625192983522347709478293874654649973949.", m79 = "1949754677213569656105635639406237736419892971123793020254427530588386527870.";
     EXPECT_EQ(m78 * m79, "181762891337651423076690920197513471149367082716107153842463094269566275979670850596739166785036161010139697396038638980270361053905946909492038062458630.");
 
+
+#ifdef NDEBUG
     Logging::addRecord("Multiplication",
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }
 
 TEST(Multiplication, HugeAssignment) {

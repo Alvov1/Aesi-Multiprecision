@@ -360,7 +360,11 @@ TEST(Division, Huge) {
     Aesi512 o39 = "5398100402588307676844060457667058824456130242156306208509550786794035241114781897022580844578292097188483328808084.";
     EXPECT_EQ(o38 / o39, "263858187166259123024781973845635300468."); o38 /= o39; EXPECT_EQ(o38, "263858187166259123024781973845635300468.");
 
+#ifdef NDEBUG
     Logging::addRecord("Division",
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }

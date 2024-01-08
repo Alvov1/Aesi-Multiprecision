@@ -344,7 +344,11 @@ TEST(Modulo, Huge) {
     Aesi512 o39 = "151246567336848655594742713804671303477.";
     EXPECT_EQ(o38 % o39, "56129243505051103512160725382779920784."); o38 %= o39; EXPECT_EQ(o38, "56129243505051103512160725382779920784.");
 
+#ifdef NDEBUG
     Logging::addRecord("Modulo",
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }

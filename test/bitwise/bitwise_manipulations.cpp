@@ -341,9 +341,13 @@ TEST(Bitwise, GetSetBit) {
     EXPECT_EQ(o19, "8958978968711216966560578224720437651332144025643808164713994103192096844836638004813384296588516524032.");
     o19.setBit(342, false); o19.setBit(286, false); o19.setBit(46, false); EXPECT_EQ(o19, 0);
 
+#ifdef NDEBUG
     Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }
 
 TEST(Bitwise, GetSetByte) {

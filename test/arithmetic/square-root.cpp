@@ -87,7 +87,11 @@ TEST(SquareRoot, SquareRoot) {
     m = "5955813785675588109518975395472748958137987074475981158876199212009943507928308334573693535545462979243470395215093466596560400578633978166204064517715396.";
     EXPECT_EQ(m.squareRoot(), "77173919076820169671684270220139975015863766388260649610600962754358359900654.");
 
+#ifdef NDEBUG
     Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }

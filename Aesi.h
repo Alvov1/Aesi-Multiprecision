@@ -77,10 +77,8 @@ class Aesi final {
     gpu static constexpr auto addLine(blockLine& dst, const blockLine& src) noexcept -> uint64_t {
         uint64_t carryOut = 0;
         for (std::size_t i = 0; i < blocksNumber; ++i) {
-            uint64_t sum = static_cast<uint64_t>(dst[i])
-                                     + static_cast<uint64_t>(src[i]) + carryOut;
-            carryOut = sum / blockBase;
-            dst[i] = sum % blockBase;
+            uint64_t sum = static_cast<uint64_t>(dst[i]) + static_cast<uint64_t>(src[i]) + carryOut;
+            carryOut = sum / blockBase; dst[i] = static_cast<block>(sum % blockBase);
         }
         return carryOut;
     }
@@ -97,19 +95,10 @@ class Aesi final {
         uint64_t carryOut = 1;
         for(std::size_t i = 0; i < blocksNumber; ++i) {
             const uint64_t sum = blockBase - 1ULL - static_cast<uint64_t>(line[i]) + carryOut;
-            carryOut = sum / blockBase; result[i] = sum % blockBase;
+            carryOut = sum / blockBase; result[i] = static_cast<block>(sum % blockBase);
         }
 
         return result;
-    }
-
-    /**
-     * @brief Checks if block line is empty
-     * @param BlockLine line
-     * @return Bool
-     */
-    gpu static constexpr auto isLineEmpty(const blockLine& line) noexcept -> bool {
-        return lineLength(line) == 0;
     }
 
     /**
@@ -121,6 +110,15 @@ class Aesi final {
         for(long long i = blocksNumber - 1; i >= 0; --i)
             if(line[i]) return i + 1;
         return 0;
+    }
+
+    /**
+     * @brief Checks if block line is empty
+     * @param BlockLine line
+     * @return Bool
+     */
+    gpu static constexpr auto isLineEmpty(const blockLine& line) noexcept -> bool {
+        return lineLength(line) == 0;
     }
     /* ----------------------------------------------------------------------- */
 
@@ -167,9 +165,7 @@ public:
                 tValue /= blockBase;
             }
         } else {
-            for (std::size_t i = 0; i < blocksNumber; ++i)
-                blocks[i] = 0;
-            sign = Zero;
+            blocks = {}; sign = Zero;
         }
     }
 
@@ -383,8 +379,7 @@ public:
      */
     gpu constexpr auto operator*=(const Aesi& factor) noexcept -> Aesi& {
         if(sign == Zero) return *this;
-        if(factor.sign == Zero)
-            return this->operator=(Aesi {});
+        if(factor.sign == Zero) return this->operator=(Aesi {});
         sign = (sign != factor.sign ? Negative : Positive);
 
         constexpr auto multiplyLines = [] (const blockLine& longerLine, const std::size_t longerLength,
@@ -393,14 +388,17 @@ public:
 
             for(std::size_t i = 0; i < longerLength; ++i) {
                 uint64_t tBlock = longerLine[i], carryOut = 0;
+
                 for(std::size_t j = 0; j < smallerLength && i + j < buffer.size(); ++j) {
                     const auto product = tBlock * static_cast<uint64_t>(smallerLine[j]) + carryOut;
                     const auto block = static_cast<uint64_t>(buffer[i + j]) + (product % blockBase);
                     carryOut = product / blockBase + block / blockBase;
                     buffer[i + j] = block % blockBase;
                 }
-                if(smallerLength < blocksNumber)
+
+                if(smallerLength < blocksNumber && smallerLength + i < buffer.size()) {
                     buffer[smallerLength + i] += carryOut;
+                }
             }
 
             return buffer;
@@ -551,7 +549,7 @@ public:
      */
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
     gpu constexpr auto operator<<(Integral bitShift) const noexcept -> Aesi {
-        Aesi result = *this; result <<= bitShift; return result;
+        Aesi result = *this; result.operator<<=(bitShift); return result;
     }
 
     /**
@@ -570,7 +568,7 @@ public:
             const block stamp = (1UL << (blockBitLength - remainder)) - 1;
 
             for (long long i = blocksNumber - 1; i >= (quotient + (remainder ? 1 : 0)); --i)
-                blocks[i] = ((blocks[i - quotient] & stamp) << remainder) | ((blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> (blockBitLength - remainder));
+                blocks[i] = ((blocks[i - quotient] & stamp) << remainder) | ((blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> ((blockBitLength - remainder) % blockBitLength));
 
             blocks[quotient] = (blocks[0] & stamp) << remainder;
 
@@ -610,7 +608,7 @@ public:
             const block stamp = (1UL << remainder) - 1;
 
             for(std::size_t i = 0; i < blocksNumber - (quotient + (remainder ? 1 : 0)); ++i)
-                blocks[i] = ((blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << (blockBitLength - remainder)) | ((blocks[i + quotient] & ~stamp) >> remainder);
+                blocks[i] = ((blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << ((blockBitLength - remainder) % blockBitLength)) | ((blocks[i + quotient] & ~stamp) >> remainder);
 
             blocks[blocksNumber - 1 - quotient] = (blocks[blocksNumber - 1] & ~stamp) >> remainder;
 
@@ -659,8 +657,8 @@ public:
             case Positive:
                 switch (other.sign) {
                     case Positive: {
-                        for(long long i = blocksNumber - 1; i >= 0; --i) {
-                            const block thisBlock = blocks[i], otherBlock = other.blocks[i];
+                        for(auto it = blocks.rbegin(), oit = other.blocks.rbegin(); it != blocks.rend(); ++it, ++oit) {
+                            const block thisBlock = *it, otherBlock = *oit;
                             if(thisBlock != 0) {
                                 if(thisBlock > otherBlock)
                                     return AesiCMP::greater;
@@ -681,8 +679,8 @@ public:
             case Negative:
                 switch (other.sign) {
                     case Negative: {
-                        for(long long i = blocksNumber - 1; i >= 0; --i) {
-                            const block thisBlock = blocks[i], otherBlock = other.blocks[i];
+                        for(auto it = blocks.rbegin(), oit = other.blocks.rbegin(); it != blocks.rend(); ++it, ++oit) {
+                            const block thisBlock = *it, otherBlock = *oit;
                             if(thisBlock != 0) {
                                 if(thisBlock > otherBlock)
                                     return AesiCMP::less;
@@ -722,7 +720,10 @@ public:
      * @note Should almost never return Strong_ordering::Equivalent
      */
     gpu constexpr auto operator<=>(const Aesi& other) const noexcept -> std::strong_ordering {
-        switch(this->compareTo(other)) {
+        const auto ratio = this->compareTo(other);
+        assert(ratio == AesiCMP::less || ratio == AesiCMP::greater || ratio == AesiCMP::equal);
+
+        switch(ratio) {
             case AesiCMP::less:
                 return std::strong_ordering::less;
             case AesiCMP::greater:
@@ -747,6 +748,8 @@ public:
     gpu constexpr auto setBit(std::size_t index, bool bit) noexcept -> void {
         if(index >= bitness) return;
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
+        assert(blockNumber < blocksNumber && bitNumber < blockBitLength);
+
         if(bit) {
             blocks[blockNumber] |= (1U << bitNumber);
             if(sign == Zero && blocks[blockNumber] != 0)
@@ -768,6 +771,7 @@ public:
     gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
         if(index >= bitness) return false;
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
+        assert(blockNumber < blocksNumber && bitNumber < blockBitLength);
         return blocks[blockNumber] & (1U << bitNumber);
     }
 
@@ -781,6 +785,7 @@ public:
         if(index > blocksNumber * sizeof(block)) return;
 
         const std::size_t blockNumber = index / sizeof(block), byteInBlock = index % sizeof(block), shift = byteInBlock * bitsInByte;
+        assert(blockNumber < blocksNumber && byteInBlock < sizeof(block));
         blocks[blockNumber] &= ~(0xffU << shift); blocks[blockNumber] |= static_cast<block>(byte) << shift;
 
         if(sign == Zero && blocks[blockNumber] != 0) sign = Positive;
@@ -798,6 +803,7 @@ public:
         if(index > blocksNumber * sizeof(block)) return 0;
         
         const std::size_t blockNumber = index / sizeof(block), byteInBlock = index % sizeof(block), shift = byteInBlock * bitsInByte;
+        assert(blockNumber < blocksNumber && byteInBlock < sizeof(block));
         return (blocks[blockNumber] & (0xffU << shift)) >> shift;
     }
 
@@ -1029,8 +1035,10 @@ public:
     [[nodiscard]]
     gpu static constexpr auto powm(const Aesi& base, const Aesi& power, const Aesi& mod) noexcept -> Aesi {
         constexpr auto remainingBlocksEmpty = [] (const Aesi& value, std::size_t offset) {
-            for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i)
+            for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i) {
+                assert(i < blocksNumber);
                 if (value.blocks[i] != 0) return false;
+            }
             return true;
         };
 
@@ -1084,32 +1092,18 @@ public:
      * @note This method is used in all manipulations between numbers of different precision. Using this method is not recommended,
      * cause it leads to redundant copying and may be slow
      */
-    template <std::size_t newBitness> requires (newBitness != bitness)
-    constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
-        Aesi<newBitness> result (blocks);
-        if(sign == Negative) return -result; return result;
-    }
+    template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
+    gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
+        Aesi<newBitness> result = 0;
 
-//    template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
-//    gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
-//        Aesi<newBitness> result = 0;
-//
-//        long long startBlock = (blocksNumber < (newBitness / blockBitLength) ? blocksNumber - 1 : (newBitness / blockBitLength) - 1);
-//        for(; startBlock >= 0; --startBlock) {
-//            result <<= blockBitLength;
-//            result |= blocks[startBlock];
-//        }
-//
-//        if(sign == Negative) result *= -1;
-//        return result;
-//    }
+        long long startBlock = (blocksNumber < (newBitness / blockBitLength) ? blocksNumber - 1 : (newBitness / blockBitLength) - 1);
+        for(; startBlock >= 0; --startBlock) {
+            result <<= blockBitLength;
+            result |= blocks[startBlock];
+        }
 
-    template <std::size_t length>
-    constexpr explicit Aesi(const std::array<block, length>& data) noexcept {
-        /* FIXME: Remove this function, change precision cast to use bitness. */
-        for(std::size_t i = 0; i < blocksNumber && i < length; ++i)
-            blocks[i] = data[i]; sign = Positive;
-        /* FIXME */
+        if(sign == Negative) result *= -1;
+        return result;
     }
 
     /**
@@ -1224,7 +1218,6 @@ public:
                 return base;
             } (flags & std::ios::basefield, ss, flags & std::ios::showbase);
 
-//            if(true /*base == 16*/) {
             if(base == 16) {
                 long long iter = value.blocks.size() - 1;
                 for(; value.blocks[iter] == 0 && iter >= 0; --iter);
@@ -1245,12 +1238,6 @@ public:
                     const auto [quotient, remainder] = divide(copy, base);
                     buffer[filled++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } () + remainder.template integralCast<byte>();
                     copy = quotient;
-                }
-
-                if constexpr (std::is_same_v<Char, char>) {
-                    std::cout << "Filled: " << filled << std::endl << "Buffer: " << buffer << std::endl;
-                } else {
-                    std::wcout << L"Filled: " << filled << std::endl << L"Buffer: " << buffer << std::endl;
                 }
 
                 for(; filled > 0; --filled)

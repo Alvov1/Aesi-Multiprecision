@@ -305,7 +305,11 @@ TEST(Casting, PrecisionCast) {
     Aesi < 448 > l29 = "545136889659423149046640496483142589267039543174772529930583944491083582156213563276447863450923726927200116011820859957964687342869311.";
     EXPECT_EQ(l29.precisionCast<224>(), "11564578527812652389272649650310409698199102565460528063263161490239.");
 
+#ifdef NDEBUG
     Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
                        std::chrono::system_clock::to_time_t(timeStart),
                        (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }

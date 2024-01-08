@@ -451,9 +451,13 @@ TEST(Subtraction, Huge) {
     Aesi512 m78 = "-34000990628541689650586425967236449811962489573399592518797616588764678311522.", m79 = "112735151533921799285028979146314326415142765594527880905828573317748052289962.";
     EXPECT_EQ(m78 - m79, "-146736142162463488935615405113550776227105255167927473424626189906512730601484.");
 
+#ifdef NDEBUG
     Logging::addRecord("Subtraction",
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }
 
 TEST(Subtraction, HugeAssignment) {

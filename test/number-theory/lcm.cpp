@@ -67,9 +67,13 @@ TEST(NumberTheory, LeastCommonMultiplier) {
     l = "8720764263540820948538075000211372388622786639122083293654620961763476699218.", r = "110961702458500132874127368768157413968053611045363558724462620361461962525319.";
     EXPECT_EQ(Aesi < 512 > ::lcm(l, r), "967670849421737612524447125456492735431589633387181601120103714572698658380496264988047235569079380444672810675962950119507564413129327813249961872500542.");
 
+#ifdef NDEBUG
     Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }
 
 TEST(NumberTheory, LeastCommonMultiplierDifferentPrecision) {

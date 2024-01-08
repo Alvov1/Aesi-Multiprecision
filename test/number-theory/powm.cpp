@@ -146,9 +146,13 @@ TEST(NumberTheory, PowerByModulo) {
     Aesi512 b69 = "340282366920938463463374607429620727808", p69 = "4292869127", m69 = "337623910929368782242998636980171964415";
     EXPECT_EQ(Aesi < 512 > ::powm(b69, p69, m69), "218677222025751705255625011738538361297");
 
+#ifdef NDEBUG
     Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
                        std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());;
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
 }
 
 TEST(NumberTheory, PowerByModuloDifferentPrecision) {

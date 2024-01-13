@@ -4,6 +4,7 @@
 /// @cond HIDE_INCLUDES
 #include <iostream>
 #include <array>
+#include <cassert>
 
 #ifdef __CUDACC__
     #define gpu __host__ __device__

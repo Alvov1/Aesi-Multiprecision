@@ -397,9 +397,8 @@ public:
                     buffer[i + j] = block % blockBase;
                 }
 
-                if(smallerLength < blocksNumber && smallerLength + i < buffer.size()) {
+                if(smallerLength < blocksNumber && smallerLength + i < buffer.size())
                     buffer[smallerLength + i] += carryOut;
-                }
             }
 
             return buffer;
@@ -658,16 +657,10 @@ public:
             case Positive:
                 switch (other.sign) {
                     case Positive: {
-                        for(auto it = blocks.rbegin(), oit = other.blocks.rbegin(); it != blocks.rend(); ++it, ++oit) {
-                            const block thisBlock = *it, otherBlock = *oit;
-                            if(thisBlock != 0) {
-                                if(thisBlock > otherBlock)
-                                    return AesiCMP::greater;
-                                if(thisBlock < otherBlock)
-                                    return AesiCMP::less;
-                            } else
-                                if (otherBlock != 0)
-                                    return AesiCMP::less;
+                        for(long long i = blocksNumber - 1; i >= 0; --i) {
+                            const block thisBlock = blocks[i], otherBlock = other.blocks[i];
+                            if(thisBlock != otherBlock)
+                                return (thisBlock > otherBlock ? AesiCMP::greater : AesiCMP::less);
                         }
                         return AesiCMP::equal;
                     }
@@ -680,16 +673,10 @@ public:
             case Negative:
                 switch (other.sign) {
                     case Negative: {
-                        for(auto it = blocks.rbegin(), oit = other.blocks.rbegin(); it != blocks.rend(); ++it, ++oit) {
-                            const block thisBlock = *it, otherBlock = *oit;
-                            if(thisBlock != 0) {
-                                if(thisBlock > otherBlock)
-                                    return AesiCMP::less;
-                                if(thisBlock < otherBlock)
-                                    return AesiCMP::greater;
-                            } else
-                            if (otherBlock != 0)
-                                return AesiCMP::greater;
+                        for(long long i = blocksNumber - 1; i >= 0; --i) {
+                            const block thisBlock = blocks[i], otherBlock = other.blocks[i];
+                            if(thisBlock != otherBlock)
+                                return (thisBlock > otherBlock ? AesiCMP::less : AesiCMP::greater);
                         }
                         return AesiCMP::equal;
                     }

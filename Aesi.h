@@ -3,15 +3,16 @@
 
 /// @cond HIDE_INCLUDES
 #include <iostream>
-#include <array>
 #include <cassert>
 
 #ifdef __CUDACC__
     #define gpu __host__ __device__
     #include <thrust/pair.h>
+    #include <cuda/std/array>
 #else
     #define gpu
     #include <utility>
+    #include <array>
 #endif
 /// @endcond
 
@@ -872,7 +873,7 @@ public:
      * @return Size_t
      */
     [[nodiscard]]
-    gpu constexpr auto getBitness() const noexcept -> std::size_t { return bitness; }
+    gpu static constexpr auto getBitness() noexcept -> std::size_t { return bitness; }
 
     /**
      * @brief Get square root
@@ -1262,46 +1263,6 @@ public:
     }
 #endif
 };
-
-/**
- * @typedef Aesi128
- * @brief Number with precision 128-bit. */
-using Aesi128 = Aesi<128>;
-
-/**
- * @typedef Aesi256
- * @brief Number with precision 128-bit. */
-using Aesi256 = Aesi<256>;
-
-/**
- * @typedef Aesi512
- * @brief Number with precision 512-bit. */
-using Aesi512 = Aesi<512>;
-
-/**
- * @typedef Aesi768
- * @brief Number with precision 768-bit. */
-using Aesi768 = Aesi<768>;
-
-/**
- * @typedef Aesi1024
- * @brief Number with precision 1024-bit. */
-using Aesi1024 = Aesi<1024>;
-
-/**
- * @typedef Aesi2048
- * @brief Number with precision 2048-bit. */
-using Aesi2048 = Aesi<2048>;
-
-/**
- * @typedef Aesi4096
- * @brief Number with precision 4096-bit. */
-using Aesi4096 = Aesi<4096>;
-
-/**
- * @typedef Aesi8192
- * @brief Number with precision 8192-bit. */
-using Aesi8192 = Aesi<8192>;
 
 /// @cond HIDE_INCLUDES
 #include "Multiprecision.h"

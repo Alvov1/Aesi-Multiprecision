@@ -7,7 +7,7 @@
 
 #ifdef __CUDACC__
     #define gpu __host__ __device__
-    #include <thrust/pair.h>
+    #include <cuda/std/utility>
     #include <cuda/std/array>
 #else
     #define gpu
@@ -48,17 +48,18 @@ class Aesi final {
 
 #ifdef __CUDACC__
     template <typename T1, typename T2>
-    using pair = thrust::pair<T1, T2>;
+    using pair = cuda::std::pair<T1, T2>;
+    using blockLine = cuda::std::array<block, blocksNumber>;
 #else
     template <typename T1, typename T2>
     using pair = std::pair<T1, T2>;
+    using blockLine = std::array<block, blocksNumber>;
 #endif
 
     /* -------------------------- @name Class members. ----------------------- */
     /**
      * @brief Block line of the number
      */
-    using blockLine = std::array<block, blocksNumber>;
     blockLine blocks {};
 
     /**

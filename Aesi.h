@@ -60,13 +60,13 @@ class Aesi final {
     /**
      * @brief Block line of the number
      */
-    blockLine blocks {};
+    blockLine blocks;
 
     /**
      * @enum Aesi::Sign
      * @brief Specifies sign of the number. Should be Positive, Negative or Zero
      */
-    enum Sign { Zero = 0, Positive = 1, Negative = 2 } sign { Zero };
+    enum Sign { Zero = 0, Positive = 1, Negative = 2 } sign;
     /* ----------------------------------------------------------------------- */
 
 
@@ -130,7 +130,7 @@ public:
     /**
      * @brief Default constructor
      */
-    gpu constexpr Aesi() noexcept : blocks{}, sign { Zero } {};
+    gpu constexpr Aesi() noexcept = default;
 
     /**
      * @brief Copy constructor
@@ -179,7 +179,7 @@ public:
      * @details Accepts decimal literals along with binary (starting with 0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : Aesi() {
+    gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : Aesi {} {
         if(size == 0) return;
 
         constexpr const Char* characters = [] {
@@ -248,7 +248,7 @@ public:
      */
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
             typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
-    gpu constexpr Aesi(String&& stringView) noexcept : Aesi(stringView.data(), stringView.size()){}
+    gpu constexpr Aesi(String&& stringView) noexcept : Aesi(stringView.data(), stringView.size()) {}
 
     /**
      * @brief Different precision copy constructor
@@ -416,13 +416,28 @@ public:
     }
 
     /**
+     * @brief Integer multiplication.
+     * @param Aesi left
+     * @param Aesi right
+     * @return Product and carry-out by reference
+     */
+    gpu static constexpr auto multiply(const Aesi& left, const Aesi& right, Aesi& product, block& carryOut) noexcept -> void {
+        if(left.sign == Zero || right.sign == Zero) { product = 0; carryOut = 0; return; }
+        product.sign = (left.sign != right.sign ? Negative : Positive);
+
+
+    }
+
+    /**
      * @brief Division operator
      * @param Aesi divisor
      * @return Aesi
      */
     [[nodiscard]]
     gpu constexpr auto operator/(const Aesi& divisor) const noexcept -> Aesi {
-        Aesi quotient, _; divide(*this, divisor, quotient, _); return quotient;
+        Aesi quotient, _;
+        divide(*this, divisor, quotient, _);
+        return quotient;
     }
 
     /**
@@ -798,6 +813,30 @@ public:
     }
 
     /**
+     * @brief Set block in number by index starting from the right
+     * @param Size_t index
+     * @param Block byte
+     * @note Does nothing for index out of range
+     */
+    gpu constexpr auto setBlock(std::size_t index, block block) noexcept -> void {
+        if(index >= blocksNumber) return; blocks[index] = block;
+
+        if(sign == Zero && block != 0) sign = Positive;
+        if(sign != Zero && block == 0 && isLineEmpty(blocks)) sign = Zero;
+    }
+
+    /**
+     * @brief Get block in number by index starting from the right
+     * @param Size_t index
+     * @return Block
+     * @note Returns zero for index out of range
+     */
+    [[nodiscard]]
+    gpu constexpr auto getBlock(std::size_t index) const noexcept -> block {
+        if(index >= blocksNumber) return block(); return blocks[index];
+    }
+
+    /**
      * @brief Get amount of non-empty bytes in number right to left
      * @return Size_t
      */
@@ -919,8 +958,7 @@ public:
         const Aesi divAbs = divisor.abs();
         const auto ratio = number.abs().compareTo(divAbs);
 
-        if(!quotient.isZero()) quotient = Aesi {};
-        if(!remainder.isZero()) remainder = Aesi {};
+        quotient = Aesi {}; remainder = Aesi {};
 
         if(ratio == AesiCMP::greater) {
             const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
@@ -950,7 +988,7 @@ public:
      */
     [[nodiscard]]
     gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor) noexcept -> pair<Aesi, Aesi> {
-        pair<Aesi, Aesi> results = { 0, 0 }; divide(number, divisor, results.first, results.second); return results;
+        pair<Aesi, Aesi> results; divide(number, divisor, results.first, results.second); return results;
     }
 
     /**
@@ -1084,7 +1122,7 @@ public:
      */
     template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
     gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
-        Aesi<newBitness> result = 0;
+        Aesi<newBitness> result {};
 
         long long startBlock = (blocksNumber < (newBitness / blockBitLength) ? blocksNumber - 1 : (newBitness / blockBitLength) - 1);
         for(; startBlock >= 0; --startBlock) {
@@ -1096,6 +1134,7 @@ public:
         return result;
     }
 
+    /* ----------------- @name Public input-output operators. ---------------- */
     /**
      * @brief Print number inside C-style array buffer
      * @param Byte base TEMPLATE
@@ -1195,7 +1234,7 @@ public:
      * @note Works significantly faster for hexadecimal notation
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    friend constexpr auto operator<<(std::basic_ostream<Char>& ss, const Aesi& value) noexcept -> std::basic_ostream<Char>& {
+    friend constexpr auto operator<<(std::basic_ostream<Char>& ss, const Aesi& value) -> std::basic_ostream<Char>& {
         auto flags = ss.flags();
 
         if(value.sign != Zero) {
@@ -1237,6 +1276,47 @@ public:
 
         return ss;
     }
+
+    /**
+     * @brief Read a number in binary from an input stream
+     * @param Istream stream
+     * @param Boolean big_endian
+     * @return Aesi
+     * @details Reads number from stream using .read method. Accepts STD streams based on char or wchar_t.
+     * @note Fills empty bits with 0s on eof of the stream
+     */
+    template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
+    static constexpr auto readBinary(std::basic_istream<Char>& istream, bool bigEndian = true) -> Aesi {
+        Aesi result {}; result.sign = Positive;
+
+        if(bigEndian) {
+            for(auto it = result.blocks.rbegin(); it != result.blocks.rend(); ++it)
+                if(!istream.read(reinterpret_cast<char*>(&*it), sizeof(block))) break;
+        } else {
+            for(auto& tBlock: result.blocks)
+                if(!istream.read(reinterpret_cast<char*>(&tBlock), sizeof(block))) break;
+        }
+
+        return result;
+    }
+
+    /**
+     * @brief Write a number in binary to the output stream
+     * @param Ostream stream
+     * @param Boolean big_endian
+     * @details Writes number in stream using .write method. Accepts STD streams based on char or wchar_t.
+     */
+    template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
+    constexpr auto writeBinary(std::basic_ostream<Char>& ostream, bool bigEndian = true) noexcept -> void {
+        if(bigEndian) {
+            for(auto& block: blocks)
+                if(!ostream.write(reinterpret_cast<const char*>(&block), sizeof(block))) break;
+        } else {
+            for(auto it = blocks.rbegin(); it != blocks.rend(); ++it)
+                if(!ostream.write(reinterpret_cast<const char*>(&*it), sizeof(block))) break;
+        }
+    }
+    /* ----------------------------------------------------------------------- */
 
 #ifdef __CUDACC__
     /**

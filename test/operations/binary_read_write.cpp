@@ -159,7 +159,7 @@ TEST(Binary, BinaryRead) {
 TEST(Binary, BinaryWrite) {
     {
         Aesi<256> l = "0b1000101101001010100110101101100111101011111110000110010001000000101101100011101101110111011110101111001101110000011001101110010101001000010000010010001000011111010111111111000000100001110110111001000111000111100000000001100100110011111100110110000000100110", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -168,7 +168,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1010000101000101100011011111111100101010011111110100110101101000100011111000110000010101000101001011101010001111100011000111111110110001010110111111010110110110100111101000001000111100011011001110010011100010110011001011010110111000100111100110011101010100", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -177,7 +177,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1001000011101000000001110101111010101110101100110111111101011001010000101110100101000111010011011111001010110000100101001111110011000101011010010011000111011111011011111010111111111011100101110011100010000011101001101001100100001010101101001100111000011101", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -186,7 +186,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0000000101101100100000010010011100010101001110101001010111011101001111100100110000101100011000101001110101101110100111000101001111001001011101001111010100010010001101011101111111100100000101110100000001111000011010011110111101101001011000010011010101011101", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -195,7 +195,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0111000000100011101100110010000101101010101011101010110101101011001001100011110101011111101011000000111110111110100101101101101010101000111110101101110100111011111000100111110101010110110011110010001010100011111010000010000100100111100000001101010110111010", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -204,7 +204,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0110000011101000001111101101010011010100010000011111001000101100100110111101100111101101111001000111001011100100101110110111100001110110111110011100000001111000111111101100010010101100101110001110111011110010011011111001000101100001101101111010101011001011", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -213,7 +213,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1011010101111011100000011110000100010100001010010000101100110010101111010111011011110000111100101000101101111101100001010011101000101011111011001101011100001011011101110010010101110011100100011101111110110110010000101001111110111010100001100011110111011100", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -222,7 +222,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0011101101101000000010000000000100000011010101100110010001101000000001110001101001011011100011101111100100001110100110111101001110000001110110011010001011001101110111010000101001100011101111001001000010000010101011110111111011010101110011010111010111011100", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -231,7 +231,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1010101010000111110100000110100100010101011101111111111011100111101101100100101110010010101111011010011001110110100001111010001001111001111001000001011110100011101010110010100001011101100101100000100100111001011011010000010011111001000000001011001111100010", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -240,7 +240,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0101010000010001110101011100011001001001110110100101011001011111010101000011011101111100011011010111001011111010111111111111110011110011111000100011001111101011100010010011100011011100111010111100011001000101100110011111001101101010010000111111111110111100", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -249,7 +249,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0110101111101100111111011100100011111001110111101000110111101110000110000110011011011111111111001001111001010010001011100101111001111001100110010000000011011111011000111001000001010110000101010001000101011011101110001111001101101101000111111011011111000010", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -258,7 +258,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0101000010011101001011001010001110110101001011000001110100101000101010110101001101011101101011110111101001000000000000101110100110101110101111010111101010001011100101010011100101011110101111110000011000001011000010101000100000000000011001001010100001010110", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -267,7 +267,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0010010001111010010011001101101000110000010001011110100000000110100011111010000011101100001100011110111011011000000011011100010101000010001100110011001010010100001011110000110101001111111000001101001110000101110101100110010110110000101010100000110110011000", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -276,7 +276,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0110100000001001010110101010001110111111110100100111000110011000100111101101011001010001000101111101101001010110110000011101000010000110101000011000101111000001111111000111101100000010101011101010111011001000100101010010111101011011010100011001110110111111", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -285,7 +285,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1001110011010010001110001010011010111000110001011110111010011011110101101100110101010110010001001001110010100100000001001011011111111011000001101101101101011010110100011011010010101011000011011010010100011000110000000010111000111000110110000101111010111011", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -294,7 +294,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0111110000100101001011010111111011001101111010111100011100011011111010011001000111000101111001101010011010010010101011010111010100011110111011110001001001000101110100001100110110111101101001010000111011111101110100010110101101101100100011010011000110000001", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -303,7 +303,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1111001010011101001000110000110110110110110001010100101010110011010111101000111100000001011111000100001101111011100111010000100100101001110101111111100111111100010111100001101001101110101010000100011111111001001010111101111100000101100011011111110101100110", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -312,7 +312,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0101110100000101111010101000010010100100001010111110011000010010110110011001101100110010101111011011011011110011010110001100111001001110001011101000111111011110111010100000001010100101100100010011100010011011100010111001000011110100101100011011111000111110", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -321,7 +321,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0011011000100010010010111010100000000010111110111110000000101100101010111101010110010000111011111000110000100011110001110100010110111111010001010001110100000000110001000110101010001011000011111011011110011100101110110101101010010111100010101101101011100010", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -330,7 +330,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0101100110010000110101001100100101011001101010110100000111100001111001100011011100110000001111111110111001110001101101001011001000111111110000000110110111100110101101010101101010111110011010010100010001010101101000101101000011100110110000010000110110000100", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -339,7 +339,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0101111011110001111000110001010001101000110000111101001000101010110001110000101100011001101010111100100000010110000010001110000101101101101100111001101011101101111011101000101111000011101001100011110001110010110011001011001111010011000110101111111110101011", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -348,7 +348,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0101010001111111000100010110110011010100111100010101100010101100011001001010010000110000110101011100010011010010000110010001001001110111011100111111110100011111001101000011010101000001110000000111100100001011111100011100101101001001101101101110011010100011", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -357,7 +357,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1010111101101111110011110010100010111100010101100101101001001010111000100100110000011101111011111001110101000100000101101000101110010111111111001011100011011101110000011011101010000001001001111111000000011110101011111100000101000010101101100010110111001111", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -366,7 +366,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0000111110101001101010111111001100011110110010111111110101100110100011010001110111011010100011000101001001010111111110011010001001000110101000010011011001111011100010111110110100000000100011101001110111001101001110000100010001000111011111011000010100111010", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -375,7 +375,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0010110110110100011011010000110100010000011101001011110110110010001111111011000010100101101001110101011111001001001101000001011111001000111101011111101011101110010000001001000111111010010000101111100000011011100100111010011001100000100100111010111110100101", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -384,7 +384,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1000001010001011100011101110100100100111010111101111000001010100101001101010001010110011001111111000011111010101110000011010111100011111001001111100000010110011110111010001001011101111011100011011110101110101001101111101101011100011001111101101111011100100", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -393,7 +393,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0100010011101000000110100100100100111110011110000000101111101000011101010010110111110001001010000110010110010011010101000101000000000001001011101010001010111010100100001100000101111110111100000101111000011111011101111011100100111000000000011101111000000000", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -402,7 +402,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1110110110011000001110011101101010000110010100111010101101001111010011011110101100000111101100110000010001011110101011111100111110101100010101011011111010101011010001001000001011101110010001110010101111011100110000001111011001110101011011101011011111011100", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -411,7 +411,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b1100001110010001100001000001011001111011111100011101110001010010110000101111111010100011111011111011000101011110110111101101110011010100011110011111011000101001111100011111111101101111110100110110011001011111110011110000010000100001000011110001011101101001", r {};
-        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
         for(unsigned i = 0; i < 8; ++i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);
@@ -420,7 +420,7 @@ TEST(Binary, BinaryWrite) {
     }
     {
         Aesi<256> l = "0b0111111111010011100110101111111011111110111011100101001000010100010101111110011001111110111110111100100010110001111001110100101101000001111010011110001001111111011101111101010101101010000001010001001101110100100101110110000101101000101000111111101101000100", r {};
-        std::stringstream ss; l.writeBinary(ss, false); unsigned temp {};
+        std::stringstream ss; l.writeBinary(ss, true); unsigned temp {};
         for(long long i = 7; i >= 0; --i) {
             ss.read(reinterpret_cast<char*>(&temp), sizeof(unsigned));
             r.setBlock(i, temp);

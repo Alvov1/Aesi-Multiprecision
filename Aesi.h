@@ -277,8 +277,7 @@ public:
     [[nodiscard]]
     gpu constexpr auto operator-() const noexcept -> Aesi {
         if(sign == Zero) return Aesi {};
-        Aesi result = *this;
-        result.sign = (result.sign == Positive ? Negative : Positive); return result;
+        Aesi result = *this; result.inverse(); return result;
     }
 
     /**
@@ -413,19 +412,6 @@ public:
             blocks = multiplyLines(factor.blocks, valueLength, blocks, thisLength);
 
         return *this;
-    }
-
-    /**
-     * @brief Integer multiplication.
-     * @param Aesi left
-     * @param Aesi right
-     * @return Product and carry-out by reference
-     */
-    gpu static constexpr auto multiply(const Aesi& left, const Aesi& right, Aesi& product, block& carryOut) noexcept -> void {
-        if(left.sign == Zero || right.sign == Zero) { product = 0; carryOut = 0; return; }
-        product.sign = (left.sign != right.sign ? Negative : Positive);
-
-
     }
 
     /**
@@ -916,6 +902,13 @@ public:
     gpu static constexpr auto getBitness() noexcept -> std::size_t { return bitness; }
 
     /**
+     * @brief Get number of blocks inside object
+     * @return Size_t
+     */
+    [[nodiscard]]
+    gpu static constexpr auto getBlocksNumber() noexcept -> std::size_t { return blocksNumber; }
+
+    /**
      * @brief Get square root
      * @return Aesi
      * @note Returns zero for negative value or zero
@@ -942,6 +935,15 @@ public:
     gpu constexpr auto swap(Aesi& other) noexcept -> void {
         Aesi t = other; other.operator=(*this); this->operator=(t);
     }
+
+    /**
+     * @brief Inverse number's sign
+     * @param Aesi value
+     */
+     gpu constexpr auto inverse() noexcept -> void {
+         if(sign != Zero)
+             sign = (sign == Positive ? Negative : Positive);
+     }
     /* ----------------------------------------------------------------------- */
 
 
@@ -1124,14 +1126,11 @@ public:
     gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
         Aesi<newBitness> result {};
 
-        long long startBlock = (blocksNumber < (newBitness / blockBitLength) ? blocksNumber - 1 : (newBitness / blockBitLength) - 1);
-        for(; startBlock >= 0; --startBlock) {
-            result <<= blockBitLength;
-            result |= blocks[startBlock];
-        }
+        const std::size_t blockBoarder = (newBitness > bitness ? Aesi<bitness>::blocksNumber : Aesi<newBitness>::getBlocksNumber());
+        for(std::size_t blockIdx = 0; blockIdx < blockBoarder; ++blockIdx)
+            result.setBlock(blockIdx, blocks[blockIdx]);
 
-        if(sign == Negative) result *= -1;
-        return result;
+        if(sign == Negative) result.inverse(); return result;
     }
 
     /* ----------------- @name Public input-output operators. ---------------- */

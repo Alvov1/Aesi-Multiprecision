@@ -1276,6 +1276,7 @@ public:
         return ss;
     }
 
+
     /**
      * @brief Read a number in binary from an input stream
      * @param Istream stream
@@ -1285,19 +1286,17 @@ public:
      * @note Fills empty bits with 0s on eof of the stream
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    static constexpr auto readBinary(std::basic_istream<Char>& istream, bool bigEndian = true) -> Aesi {
-        Aesi result {}; result.sign = Positive;
-
+    constexpr auto readBinary(std::basic_istream<Char>& istream, bool bigEndian = true) -> void {
+        blocks = {}; sign = Positive;
         if(bigEndian) {
-            for(auto it = result.blocks.rbegin(); it != result.blocks.rend(); ++it)
+            for(auto it = blocks.rbegin(); it != blocks.rend(); ++it)
                 if(!istream.read(reinterpret_cast<char*>(&*it), sizeof(block))) break;
         } else {
-            for(auto& tBlock: result.blocks)
+            for(auto& tBlock: blocks)
                 if(!istream.read(reinterpret_cast<char*>(&tBlock), sizeof(block))) break;
         }
-
-        return result;
     }
+
 
     /**
      * @brief Write a number in binary to the output stream

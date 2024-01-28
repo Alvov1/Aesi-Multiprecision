@@ -1306,7 +1306,7 @@ public:
      * @details Writes number in stream using .write method. Accepts STD streams based on char or wchar_t.
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    constexpr auto writeBinary(std::basic_ostream<Char>& ostream, bool bigEndian = true) noexcept -> void {
+    constexpr auto writeBinary(std::basic_ostream<Char>& ostream, bool bigEndian = true) const noexcept -> void {
         if(bigEndian) {
             for(auto& block: blocks)
                 if(!ostream.write(reinterpret_cast<const char*>(&block), sizeof(block))) break;

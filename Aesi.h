@@ -173,7 +173,7 @@ public:
     }
 
     /**
-     * @brief Pointer-based char constructor
+     * @brief Pointer-based character constructor
      * @param Char* pointer
      * @param Size_t size
      * @details Accepts decimal literals along with binary (starting with 0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
@@ -249,16 +249,6 @@ public:
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
             typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
     gpu constexpr Aesi(String&& stringView) noexcept : Aesi(stringView.data(), stringView.size()) {}
-
-    /**
-     * @brief Different precision copy constructor
-     * @param Aesi<nPrecision> copy
-     * @details Constructs object based on different precision object's block line. Same as precision cast operator
-     */
-    template<std::size_t rBitness> requires (rBitness != bitness)
-    gpu constexpr Aesi(const Aesi<rBitness>& copy) noexcept {
-        this->operator=(copy.template precisionCast<bitness>());
-    }
     /* ----------------------------------------------------------------------- */
 
 
@@ -694,7 +684,7 @@ public:
         }
     };
 
-#if (defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)) && !defined DOXYGEN_SHOULD_SKIP_THIS
+#if (defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)) && !defined DOXYGEN_SKIP
     /**
      * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on device
      */
@@ -949,7 +939,7 @@ public:
 
     /* -------------- @name Public arithmetic and number theory. ------------- */
     /**
-     * @brief Integer division
+     * @brief Integer division. Returns results by reference
      * @param Aesi number
      * @param Aesi divisor
      * @param Aesi quotient OUT
@@ -983,7 +973,7 @@ public:
     }
 
     /**
-     * @brief Integer division.
+     * @brief Integer division. Returns results by value in pair
      * @param Aesi number
      * @param Aesi divisor
      * @return Pair(Quotient, Remainder)
@@ -1089,7 +1079,7 @@ public:
     }
 
     /**
-     * @brief Fast exponentiation for 2
+     * @brief Fast exponentiation for powers of 2
      * @param Size_t power
      * @return Aesi
      * @details Returns zero for power greater than current bitness
@@ -1101,7 +1091,7 @@ public:
     /* ----------------------------------------------------------------------- */
 
     /**
-     * @brief Cast from Aesi to built-in integral types
+     * @brief Built-in integral type cast operator
      * @param Type integral_type TEMPLATE
      * @return Integral
      * @details Takes the lowes part of Aesi for conversion. Accepts signed and unsigned types
@@ -1114,7 +1104,7 @@ public:
     }
 
     /**
-     * @brief Precision cast for Aesi numbers of different length
+     * @brief Precision cast operator
      * @param Size_t new_bitness TEMPLATE
      * @return Aesi<new_bitness>
      * @details If required precision greater than current precision, remaining blocks are filled with zeros.
@@ -1135,15 +1125,14 @@ public:
 
     /* ----------------- @name Public input-output operators. ---------------- */
     /**
-     * @brief Print number inside C-style array buffer
+     * @brief Character buffer output operator
      * @param Byte base TEMPLATE
      * @param Char* buffer
      * @param Size_t buffer_size
      * @param Bool show_number_base
      * @param Bool use_hexadecimal_uppercase
      * @return Size_t - amount of symbols written
-     * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10,
-     * or 16 and should be known at compile time
+     * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10, or 16
      * @note Works significantly faster for hexadecimal notation
      */
     template <byte base, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> &&
@@ -1222,7 +1211,7 @@ public:
     }
 
     /**
-     * @brief Print number inside STD stream
+     * @brief STD stream output operator
      * @param Ostream stream
      * @param Aesi number
      * @return Ostream
@@ -1278,12 +1267,12 @@ public:
 
 
     /**
-     * @brief Read a number in binary from an input stream
+     * @brief STD stream binary reading operator
      * @param Istream stream
      * @param Boolean big_endian
      * @return Aesi
      * @details Reads number from stream using .read method. Accepts STD streams based on char or wchar_t.
-     * @note Fills empty bits with 0s on eof of the stream
+     * @note Fills empty bits with 0s on EOF of the stream
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
     constexpr auto readBinary(std::basic_istream<Char>& istream, bool bigEndian = true) -> void {
@@ -1299,7 +1288,7 @@ public:
 
 
     /**
-     * @brief Write a number in binary to the output stream
+     * @brief STD stream binary writing operator
      * @param Ostream stream
      * @param Boolean big_endian
      * @details Writes number in stream using .write method. Accepts STD streams based on char or wchar_t.
@@ -1316,11 +1305,11 @@ public:
     }
     /* ----------------------------------------------------------------------- */
 
-#ifdef __CUDACC__
+#if defined __CUDACC__ || defined DOXYGEN_SKIP
     /**
-     * @brief Object assignation using atomic CUDA operations
+     * @brief Atomicity-oriented object assignment operator
      * @param Aesi assigning
-     * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks
+     * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for assigning encapsulated class members atomically one by one
      */
     __device__ constexpr auto tryAtomicSet(const Aesi& value) noexcept -> void {
@@ -1330,9 +1319,9 @@ public:
     }
 
     /**
-     * @brief Object exchange using atomic CUDA operations
+     * @brief Atomicity-oriented object exchangement operator
      * @param Aesi exchangeable
-     * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks
+     * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for exchanging encapsulated class members atomically one by one
      */
     __device__ constexpr auto tryAtomicExchange(const Aesi& value) noexcept -> void {
@@ -1343,8 +1332,152 @@ public:
 #endif
 };
 
-/// @cond HIDE_INCLUDES
-#include "Multiprecision.h"
-/// @endcond
+/* -------------------------------------------- @name Type-definitions  ------------------------------------------- */
+/**
+ * @typedef Aesi128
+ * @brief Number with precision 128-bit. */
+using Aesi128 = Aesi<128>;
+
+/**
+ * @typedef Aesi256
+ * @brief Number with precision 128-bit. */
+using Aesi256 = Aesi<256>;
+
+/**
+ * @typedef Aesi512
+ * @brief Number with precision 512-bit. */
+using Aesi512 = Aesi<512>;
+
+/**
+ * @typedef Aesi768
+ * @brief Number with precision 768-bit. */
+using Aesi768 = Aesi<768>;
+
+/**
+ * @typedef Aesi1024
+ * @brief Number with precision 1024-bit. */
+using Aesi1024 = Aesi<1024>;
+
+/**
+ * @typedef Aesi1536
+ * @brief Number with precision 1536-bit. */
+using Aesi1536 = Aesi<1536>;
+
+/**
+ * @typedef Aesi2048
+ * @brief Number with precision 2048-bit. */
+using Aesi2048 = Aesi<2048>;
+
+/**
+ * @typedef Aesi3072
+ * @brief Number with precision 3072-bit. */
+using Aesi3072 = Aesi<3072>;
+
+/**
+ * @typedef Aesi4096
+ * @brief Number with precision 4096-bit. */
+using Aesi4096 = Aesi<4096>;
+
+/**
+ * @typedef Aesi6144
+ * @brief Number with precision 6144-bit. */
+using Aesi6144 = Aesi<6144>;
+
+/**
+ * @typedef Aesi8192
+ * @brief Number with precision 8192-bit. */
+using Aesi8192 = Aesi<8192>;
+/* ---------------------------------------------------------------------------------------------------------------- */
+
+
+/* ------------------------------------------ @name Integral conversions  ----------------------------------------- */
+/**
+ * @brief Integral conversion addition operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
+ */
+template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
+gpu constexpr auto operator+(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) + value;
+}
+
+/**
+ * @brief Integral conversion subtraction operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
+ */
+template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
+gpu constexpr auto operator-(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) - value;
+}
+
+/**
+ * @brief Integral conversion multiplication operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
+ */
+template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
+gpu constexpr auto operator*(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) * value;
+}
+
+/**
+ * @brief Integral conversion division operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
+ */
+template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
+gpu constexpr auto operator/(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) / value;
+}
+
+/**
+ * @brief Integral conversion modulo operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
+ */
+template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
+gpu constexpr auto operator%(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) % value;
+}
+
+/**
+ * @brief Integral conversion bitwise XOR operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
+ */
+template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
+gpu constexpr auto operator^(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) ^ value;
+}
+
+/**
+ * @brief Integral conversion bitwise AND operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
+ */
+template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
+gpu constexpr auto operator&(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) & value;
+}
+
+/**
+ * @brief Integral conversion bitwise OR operator
+ * @param Integral number
+ * @param Aesi value
+ * @return Aesi
+ */
+template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
+gpu constexpr auto operator|(Integral number, const Aesi<bitness>& value) noexcept {
+    return Aesi<bitness>(number) | value;
+}
+/* ---------------------------------------------------------------------------------------------------------------- */
 
 #endif //AESI_MULTIPRECISION

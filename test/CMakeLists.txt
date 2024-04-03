@@ -7,6 +7,7 @@ FetchContent_Declare(
         googletest
         URL https://github.com/google/googletest/archive/refs/heads/main.zip
 )
+
 FetchContent_MakeAvailable(googletest)
 
 find_package (SQLite3)
@@ -21,9 +22,11 @@ add_subdirectory(bitwise)
 add_subdirectory(number-theory)
 add_subdirectory(gpu)
 add_subdirectory(boolean)
+add_subdirectory(benchmarks)
+add_subdirectory(cryptopp-cmake-master)
 
 include_directories(${SQLite3_INCLUDE_DIRS})
-target_link_libraries(AesiMultiprecision GTest::gtest_main ${SQLite3_LIBRARIES})
+target_link_libraries(AesiMultiprecision GTest::gtest_main ${SQLite3_LIBRARIES} cryptopp)
 
 include(GoogleTest)
 gtest_discover_tests(AesiMultiprecision)

@@ -947,6 +947,7 @@ public:
      * @return Quotient and remainder by reference
      */
     gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor, Aesi& quotient, Aesi& remainder) noexcept -> void {
+        /* TODO Попробовать ускорить divide для работы со встроенными типами. */
         const Aesi divAbs = divisor.abs();
         const auto ratio = number.abs().compareTo(divAbs);
 
@@ -970,17 +971,6 @@ public:
                 remainder.sign = Zero; else if(number.sign == Negative) remainder = -remainder;
         } else if(ratio == AesiCMP::less)
             remainder = number; else quotient = 1;
-    }
-
-    /**
-     * @brief Integer division. Returns results by value in pair
-     * @param Aesi number
-     * @param Aesi divisor
-     * @return Pair(Quotient, Remainder)
-     */
-    [[nodiscard]]
-    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor) noexcept -> pair<Aesi, Aesi> {
-        pair<Aesi, Aesi> results; divide(number, divisor, results.first, results.second); return results;
     }
 
     /**
@@ -1022,17 +1012,6 @@ public:
     }
 
     /**
-     * @brief Greatest common divisor
-     * @param Aesi first
-     * @param Aesi second
-     * @return Aesi
-     */
-    [[nodiscard]]
-    gpu static constexpr auto gcd(const Aesi& first, const Aesi& second) noexcept -> Aesi {
-        Aesi bezoutX, bezoutY; return gcd(first, second, bezoutX, bezoutY);
-    }
-
-    /**
      * @brief Least common multiplier
      * @param Aesi first
      * @param Aesi second
@@ -1056,15 +1035,19 @@ public:
     gpu static constexpr auto powm(const Aesi& base, const Aesi& power, const Aesi& mod) noexcept -> Aesi {
         constexpr auto remainingBlocksEmpty = [] (const Aesi& value, std::size_t offset) {
             for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i) {
-                assert(i < blocksNumber);
+                /* TODO Отказаться от деления в счетчике */
                 if (value.blocks[i] != 0) return false;
             }
             return true;
         };
 
+        /* Base - точно Aesi, power - можно числом, mod - точно Aesi.
+         * */
+
         Aesi result = 1;
         auto [_, b] = divide(base, mod);
 
+        /* TODO Странная штука remainingBlocksEmpty(power). Привести power к встроенному типу. */
         for(unsigned iteration = 0; !remainingBlocksEmpty(power, iteration); iteration++) {
             if(power.getBit(iteration)) {
                 const auto [quotient, remainder] = divide(result * b, mod);
@@ -1087,6 +1070,30 @@ public:
     [[nodiscard]]
     gpu static constexpr auto power2(std::size_t e) noexcept -> Aesi {
         Aesi result {}; result.setBit(e, true); return result;
+    }
+    /* ----------------------------------------------------------------------- */
+
+    /* ------------ @name Arithmetic and number theory overrides. ------------ */
+    /**
+     * @brief Greatest common divisor
+     * @param Aesi first
+     * @param Aesi second
+     * @return Aesi
+     */
+    [[nodiscard]]
+    gpu static constexpr auto gcd(const Aesi& first, const Aesi& second) noexcept -> Aesi {
+        Aesi bezoutX, bezoutY; return gcd(first, second, bezoutX, bezoutY);
+    }
+
+    /**
+    * @brief Integer division. Returns results by value in pair
+    * @param Aesi number
+    * @param Aesi divisor
+    * @return Pair(Quotient, Remainder)
+    */
+    [[nodiscard]]
+    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor) noexcept -> pair<Aesi, Aesi> {
+        pair<Aesi, Aesi> results; divide(number, divisor, results.first, results.second); return results;
     }
     /* ----------------------------------------------------------------------- */
 

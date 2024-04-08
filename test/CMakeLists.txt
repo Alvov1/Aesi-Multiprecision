@@ -23,10 +23,15 @@ add_subdirectory(number-theory)
 add_subdirectory(gpu)
 add_subdirectory(boolean)
 add_subdirectory(benchmarks)
-add_subdirectory(cryptopp-cmake-master)
+
+option(CRYPTOPP_CMP "Enable CryptoPP comparison" OFF)
+if (CRYPTOPP_CMP)
+    add_subdirectory(cryptopp-cmake-master)
+    set(CryptoppLibraryCall cryptopp)
+endif()
 
 include_directories(${SQLite3_INCLUDE_DIRS})
-target_link_libraries(AesiMultiprecision GTest::gtest_main ${SQLite3_LIBRARIES} cryptopp)
+target_link_libraries(AesiMultiprecision GTest::gtest_main ${SQLite3_LIBRARIES} ${CryptoppLibraryCall})
 
 include(GoogleTest)
 gtest_discover_tests(AesiMultiprecision)

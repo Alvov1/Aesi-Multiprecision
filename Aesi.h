@@ -930,10 +930,10 @@ public:
      * @brief Inverse number's sign
      * @param Aesi value
      */
-     gpu constexpr auto inverse() noexcept -> void {
+    gpu constexpr auto inverse() noexcept -> void {
          if(sign != Zero)
              sign = (sign == Positive ? Negative : Positive);
-     }
+    }
     /* ----------------------------------------------------------------------- */
 
 

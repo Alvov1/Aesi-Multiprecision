@@ -2,7 +2,7 @@
 #include "../../Aesi.h"
 #include "../benchmarks/benchmarks.h"
 
-TEST(Bitwise, NOT) {
+TEST(Bitwise, Signed_NOT) {
     const auto timeStart = std::chrono::system_clock::now();
 
     Aesi256 m0 = "56061994118377870519623994827540022144637583439516706780608137993940235344250";
@@ -66,6 +66,18 @@ TEST(Bitwise, NOT) {
     Aesi256 m29 = "86546913494278886837761736936709111415403840347721211496422342961787151584586";
     EXPECT_EQ(~m29, "0b0100000010101000001011101101000101110000101010010111001111010011110110101001011011001001011000101011111111101111000000001101000111001011101110011011000011011100000111001100001001100110001111010000100011011000110011100010001100111001011100111111001010110101");
 
+
+#ifdef NDEBUG
+    Logging::addRecord("Bitwise_NOT",
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
+}
+
+TEST(Bitwise, Unsigned_NOT) {
+    const auto timeStart = std::chrono::system_clock::now();
 
 #ifdef NDEBUG
     Logging::addRecord("Bitwise_NOT",

@@ -2,7 +2,7 @@
 #include "../../Aesi.h"
 #include "../benchmarks/benchmarks.h"
 
-TEST(SquareRoot, SquareRoot) {
+TEST(SquareRoot, Signed_SquareRoot) {
     const auto timeStart = std::chrono::system_clock::now();
 
     Aesi512 m;
@@ -86,6 +86,18 @@ TEST(SquareRoot, SquareRoot) {
     EXPECT_EQ(m.squareRoot(), "74974036693404078836937829975059038773972455949610022517963046206798417449826.");
     m = "5955813785675588109518975395472748958137987074475981158876199212009943507928308334573693535545462979243470395215093466596560400578633978166204064517715396.";
     EXPECT_EQ(m.squareRoot(), "77173919076820169671684270220139975015863766388260649610600962754358359900654.");
+
+#ifdef NDEBUG
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
+}
+
+TEST(SquareRoot, Unsigned_SquareRoot) {
+    const auto timeStart = std::chrono::system_clock::now();
 
 #ifdef NDEBUG
     Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),

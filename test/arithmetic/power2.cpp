@@ -2,7 +2,7 @@
 #include "../../Aesi.h"
 #include "../benchmarks/benchmarks.h"
 
-TEST(Power2, Power2) {
+TEST(Power2, Signed_Power2) {
     const auto timeStart = std::chrono::system_clock::now();
 
     EXPECT_EQ(Aesi512::power2(0), "1.");
@@ -518,6 +518,18 @@ TEST(Power2, Power2) {
     EXPECT_EQ(Aesi512::power2(510), "3351951982485649274893506249551461531869841455148098344430890360930441007518386744200468574541725856922507964546621512713438470702986642486608412251521024.");
     EXPECT_EQ(Aesi512::power2(511), "6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503042048.");
     EXPECT_EQ(Aesi512::power2(512), 0);
+
+#ifdef NDEBUG
+    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
+                       std::chrono::system_clock::to_time_t(timeStart),
+                       (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
+}
+
+TEST(Power2, Unsigned_Power2) {
+    const auto timeStart = std::chrono::system_clock::now();
 
 #ifdef NDEBUG
     Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),

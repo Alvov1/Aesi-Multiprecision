@@ -2,7 +2,7 @@
 #include "../../Aesi.h"
 #include "../benchmarks/benchmarks.h"
 
-TEST(Bitwise, LeftShift) {
+TEST(Bitwise, Signed_LeftShift) {
     const auto timeStart = std::chrono::system_clock::now();
 
     Aesi128 t = 14183932482008727;
@@ -176,7 +176,7 @@ TEST(Bitwise, LeftShift) {
 #endif /* NDEBUG */
 }
 
-TEST(Bitwise, RightShift) {
+TEST(Bitwise, Signed_RightShift) {
     const auto timeStart = std::chrono::system_clock::now();
 
     Aesi128 t = "3992422065038923586049945894912";
@@ -345,6 +345,26 @@ TEST(Bitwise, RightShift) {
     Logging::addRecord("Bitwise_right_shift",
                        std::chrono::system_clock::to_time_t(timeStart),
                        (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
+}
+
+TEST(Bitwise, Unsigned_LeftShift) {
+    const auto timeStart = std::chrono::system_clock::now();
+
+#ifdef NDEBUG
+    Logging::addRecord("Bitwise_left_shift", std::chrono::system_clock::to_time_t(timeStart), (std::chrono::system_clock::now() - timeStart).count());
+#else
+    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
+#endif /* NDEBUG */
+}
+
+TEST(Bitwise, Unsigned_RightShift) {
+    const auto timeStart = std::chrono::system_clock::now();
+
+#ifdef NDEBUG
+    Logging::addRecord("Bitwise_right_shift", std::chrono::system_clock::to_time_t(timeStart), (std::chrono::system_clock::now() - timeStart).count());
 #else
     std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
 #endif /* NDEBUG */

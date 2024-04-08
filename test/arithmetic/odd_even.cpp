@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
 
-TEST(OddEven, Basic) {
+TEST(OddEven, Signed_Basic) {
     Aesi512 zero = 0; EXPECT_EQ(zero.isOdd(), 0); EXPECT_EQ(zero.isEven(), 1);
 
     Aesi512 b0 = "1504499442701679703283353229512838841."; EXPECT_EQ(b0.isOdd(), 1); EXPECT_EQ(b0.isEven(), 0);
@@ -34,4 +34,8 @@ TEST(OddEven, Basic) {
     Aesi512 b27 = "58446929804058110604077386122484253003."; EXPECT_EQ(b27.isOdd(), 1); EXPECT_EQ(b27.isEven(), 0);
     Aesi512 b28 = "221186673493144611395088919473087294307."; EXPECT_EQ(b28.isOdd(), 1); EXPECT_EQ(b28.isEven(), 0);
     Aesi512 b29 = "162251677695606858198966267606861399521."; EXPECT_EQ(b29.isOdd(), 1); EXPECT_EQ(b29.isEven(), 0);
+}
+
+TEST(OddEven, Unsigned_Basic) {
+
 }

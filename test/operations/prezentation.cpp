@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include "../../Aesi.h"
+#include "../../Aeu.h"
 
 TEST(Prezentation, Factorial) {
-    Aesi1024 f = 1;
+    Aeu1024 f = 1;
     for(unsigned i = 2; i <= 100; ++i)
         f *= i;
 

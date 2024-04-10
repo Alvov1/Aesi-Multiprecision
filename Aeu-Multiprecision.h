@@ -47,7 +47,7 @@ gpu constexpr auto compareTo(const Aeu<bFirst>& left, const Aeu<bSecond>& right)
 
 #if (defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)) && !defined DOXYGEN_SKIP
 /**
-     * @brief Oldstyle binary comparison operator(s). Used inside CUDA cause it does not support <=> on device
+     * @brief Oldstyle binary comparison operator(s). Used inside CUDA cause it does not support <=> on preCpp20
      */
     template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
     gpu constexpr auto operator!=(const Aeu<bFirst>& left, const Aeu<bSecond>& right) noexcept -> bool {

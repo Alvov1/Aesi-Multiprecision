@@ -2,7 +2,7 @@
 #include "../../Aeu.h"
 
 TEST(Prezentation, Factorial) {
-    Aeu1024 f = 1;
+    Aeu1024 f = 1u;
     for(unsigned i = 2; i <= 100; ++i)
         f *= i;
 

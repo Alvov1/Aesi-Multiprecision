@@ -3,6 +3,6 @@
 #include "../../Aesi.h"
 #include "../benchmarks/benchmarks.h"
 
-TEST(SquareRoot, Signed) { }
+TEST(BitwiseSigned, NOT) { }
 
-TEST(SquareRoot, Unsigned) { }
+TEST(BitwiseUnsigned, NOT) { }

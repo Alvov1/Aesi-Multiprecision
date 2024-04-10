@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
+#include "../../Aeu.h"
 #include "../../Aesi.h"
 #include "../benchmarks/benchmarks.h"
 
-TEST(Power2, Signed_Power2) {
+TEST(Power2, Signed) {
     const auto timeStart = std::chrono::system_clock::now();
 
     EXPECT_EQ(Aesi512::power2(0), "1.");
@@ -528,14 +529,4 @@ TEST(Power2, Signed_Power2) {
 #endif /* NDEBUG */
 }
 
-TEST(Power2, Unsigned_Power2) {
-    const auto timeStart = std::chrono::system_clock::now();
-
-#ifdef NDEBUG
-    Logging::addRecord(testing::UnitTest::GetInstance()->current_test_info()->name(),
-                       std::chrono::system_clock::to_time_t(timeStart),
-                       (std::chrono::system_clock::now() - timeStart).count());
-#else
-    std::cout << "Time estimated: " << (std::chrono::system_clock::now() - timeStart).count() << " ms." << std::endl;
-#endif /* NDEBUG */
-}
+TEST(Power2, Unsigned) { }

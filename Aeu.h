@@ -139,7 +139,7 @@ public:
      * @param value Integral
      * @details Accepts built-in integral types unsigned only!
      */
-    template <typename Integral> requires (std::is_integral_v<Integral> && std::is_unsigned_v<Integral>)
+    template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr Aeu(Integral value) noexcept {
         if(value != 0) {
             uint64_t tValue = (value < 0 ? static_cast<uint64_t>(value * -1) : static_cast<uint64_t>(value));
@@ -567,8 +567,8 @@ public:
     /**
      * @brief Internal comparison operator
      * @param Aeu other
-     * @return AesiCMP
-     * @note Should almost never return AesiCMP::Equivalent
+     * @return Comparison
+     * @note Should almost never return Comparison::Equivalent
      */
     [[nodiscard]]
     gpu constexpr auto compareTo(const Aeu& other) const noexcept -> Comparison {
@@ -582,7 +582,7 @@ public:
 
 #if (defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)) && !defined DOXYGEN_SKIP
     /**
-     * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on device
+     * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on preCpp20
      */
     gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool { return !this->operator==(value); }
     gpu constexpr auto operator<(const Aeu& value) const noexcept -> bool { return this->compareTo(value) == Comparison::less; }
@@ -771,30 +771,12 @@ public:
     gpu static constexpr auto getBlocksNumber() noexcept -> std::size_t { return blocksNumber; }
 
     /**
- * @brief Get square root
- * @return Aeu
- * @note Returns zero for negative value or zero
- */
-    [[nodiscard]]
-    gpu constexpr auto squareRoot() const noexcept -> Aeu {
-        Aeu x, y = power2((bitCount() + 1) / 2);
-
-        do {
-            x = y;
-            y = (x + this->operator/(x)) >> 1;
-        } while (y < x);
-
-        return x;
-    }
-
-    /**
      * @brief Make swap between two objects
      * @param Aeu other
      */
     gpu constexpr auto swap(Aeu& other) noexcept -> void {
         Aeu t = other; other.operator=(*this); this->operator=(t);
     }
-
 
     /**
      * @brief Inverse number's sign
@@ -904,6 +886,10 @@ public:
             return true;
         };
 
+        const auto baseLineLength = lineLength(base.blocks);
+        if(baseLineLength == 0 || (baseLineLength == 1 && base.blocks[0] == 1))
+            return base;
+
         Aeu result = 1;
         auto [_, b] = divide(base, mod);
 
@@ -930,6 +916,23 @@ public:
     [[nodiscard]]
     gpu static constexpr auto power2(std::size_t e) noexcept -> Aeu {
         Aeu result {}; result.setBit(e, true); return result;
+    }
+
+    /**
+ * @brief Get square root
+ * @return Aeu
+ * @note Returns zero for negative value or zero
+ */
+    [[nodiscard]]
+    gpu constexpr auto squareRoot() const noexcept -> Aeu {
+        Aeu x, y = power2((bitCount() + 1) / 2);
+
+        do {
+            x = y;
+            y = (x + this->operator/(x)) >> 1;
+        } while (y < x);
+
+        return x;
     }
     /* ----------------------------------------------------------------------- */
 
@@ -1106,7 +1109,7 @@ public:
             Char buffer [bufferSize] {}; std::size_t filled = 0;
 
             Aeu copy = value;
-            while(copy != 0 && filled < bufferSize) {
+            while(!copy.isZero() && filled < bufferSize) {
                 const auto [quotient, remainder] = divide(copy, base);
                 buffer[filled++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } () + remainder.template integralCast<byte>();
                 copy = quotient;
@@ -1186,59 +1189,59 @@ public:
 
 /* -------------------------------------------- @name Type-definitions  ------------------------------------------- */
 /**
- * @typedef Aesi128
+ * @typedef Aeu128
  * @brief Number with precision 128-bit. */
-using Aesi128 = Aeu<128>;
+using Aeu128 = Aeu<128>;
 
 /**
- * @typedef Aesi256
+ * @typedef Aeu256
  * @brief Number with precision 128-bit. */
-using Aesi256 = Aeu<256>;
+using Aeu256 = Aeu<256>;
 
 /**
- * @typedef Aesi512
+ * @typedef Aeu512
  * @brief Number with precision 512-bit. */
-using Aesi512 = Aeu<512>;
+using Aeu512 = Aeu<512>;
 
 /**
- * @typedef Aesi768
+ * @typedef Aeu768
  * @brief Number with precision 768-bit. */
-using Aesi768 = Aeu<768>;
+using Aeu768 = Aeu<768>;
 
 /**
- * @typedef Aesi1024
+ * @typedef Aeu1024
  * @brief Number with precision 1024-bit. */
-using Aesi1024 = Aeu<1024>;
+using Aeu1024 = Aeu<1024>;
 
 /**
- * @typedef Aesi1536
+ * @typedef Aeu1536
  * @brief Number with precision 1536-bit. */
-using Aesi1536 = Aeu<1536>;
+using Aeu1536 = Aeu<1536>;
 
 /**
- * @typedef Aesi2048
+ * @typedef Aeu2048
  * @brief Number with precision 2048-bit. */
-using Aesi2048 = Aeu<2048>;
+using Aeu2048 = Aeu<2048>;
 
 /**
- * @typedef Aesi3072
+ * @typedef Aeu3072
  * @brief Number with precision 3072-bit. */
-using Aesi3072 = Aeu<3072>;
+using Aeu3072 = Aeu<3072>;
 
 /**
- * @typedef Aesi4096
+ * @typedef Aeu4096
  * @brief Number with precision 4096-bit. */
-using Aesi4096 = Aeu<4096>;
+using Aeu4096 = Aeu<4096>;
 
 /**
- * @typedef Aesi6144
+ * @typedef Aeu6144
  * @brief Number with precision 6144-bit. */
-using Aesi6144 = Aeu<6144>;
+using Aeu6144 = Aeu<6144>;
 
 /**
- * @typedef Aesi8192
+ * @typedef Aeu8192
  * @brief Number with precision 8192-bit. */
-using Aesi8192 = Aeu<8192>;
+using Aeu8192 = Aeu<8192>;
 /* ---------------------------------------------------------------------------------------------------------------- */
 
 /* ------------------------------------------ @name Integral conversions  ----------------------------------------- */

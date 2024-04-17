@@ -3,14 +3,14 @@
 #include "../../../Aesi-Multiprecision.h"
 #include "../../benchmarks/benchmarks.h"
 
-TEST(ModuloUnsigned, Basic) { }
+TEST(Signed_Modulo, Basic) { EXPECT_TRUE(false); }
 
-TEST(ModuloUnsigned, MixedMultiplication) { }
+TEST(Signed_Modulo, MixedMultiplication) { EXPECT_TRUE(false); }
 
-TEST(ModuloUnsigned, MixedMultiplicationAssignment) { }
+TEST(Signed_Modulo, MixedMultiplicationAssignment) { EXPECT_TRUE(false); }
 
-TEST(ModuloUnsigned, DifferentPrecision) { }
+TEST(Signed_Modulo, DifferentPrecision) { EXPECT_TRUE(false); }
 
-TEST(ModuloUnsigned, Huge) { }
+TEST(Signed_Modulo, Huge) { EXPECT_TRUE(false); }
 
-TEST(ModuloUnsigned, HugeAssignment) { }
+TEST(Signed_Modulo, HugeAssignment) { EXPECT_TRUE(false); }

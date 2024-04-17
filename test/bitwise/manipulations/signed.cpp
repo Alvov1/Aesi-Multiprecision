@@ -2,10 +2,10 @@
 #include "../../../Aesi.h"
 #include "../../benchmarks/benchmarks.h"
 
-TEST(BitwiseSigned, GetSetBit) { }
+TEST(Signed_Bitwise, GetSetBit) { EXPECT_TRUE(false); }
 
-TEST(BitwiseSigned, GetSetByte) { }
+TEST(Signed_Bitwise, GetSetByte) { EXPECT_TRUE(false); }
 
-TEST(BitwiseSigned, GetSetBlock) { }
+TEST(Signed_Bitwise, GetSetBlock) { EXPECT_TRUE(false); }
 
-TEST(BitwiseSigned, CountBitsBytes) { }
+TEST(Signed_Bitwise, CountBitsBytes) { EXPECT_TRUE(false); }

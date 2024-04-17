@@ -3,16 +3,16 @@
 #include "../../../Aesi-Multiprecision.h"
 #include "../../benchmarks/benchmarks.h"
 
-TEST(AdditionSigned, Basic) { }
+TEST(Signed_Addition, Basic) { EXPECT_TRUE(false); }
 
-TEST(AdditionSigned, MixedMultiplication) { }
+TEST(Signed_Addition, MixedMultiplication) { EXPECT_TRUE(false); }
 
-TEST(AdditionSigned, MixedMultiplicationAssignment) { }
+TEST(Signed_Addition, MixedMultiplicationAssignment) { EXPECT_TRUE(false); }
 
-TEST(AdditionSigned, DifferentPrecision) { }
+TEST(Signed_Addition, DifferentPrecision) { EXPECT_TRUE(false); }
 
-TEST(AdditionSigned, Huge) { }
+TEST(Signed_Addition, Huge) { EXPECT_TRUE(false); }
 
-TEST(AdditionSigned, HugeAssignment) { }
+TEST(Signed_Addition, HugeAssignment) { EXPECT_TRUE(false); }
 
-TEST(AdditionSigned, Increment) { }
+TEST(Signed_Addition, Increment) { EXPECT_TRUE(false); }

@@ -3,6 +3,6 @@
 #include "../../../Aesi-Multiprecision.h"
 #include "../../benchmarks/benchmarks.h"
 
-TEST(NumberTheorySigned, GreatestCommonDivisor) { }
+TEST(Signed_NumberTheory, GreatestCommonDivisor) { EXPECT_TRUE(false); }
 
-TEST(NumberTheorySigned, GreatestCommonDivisor_DifferentPrecision) { }
+TEST(Signed_NumberTheory, GreatestCommonDivisor_DifferentPrecision) { EXPECT_TRUE(false); }

@@ -30,8 +30,15 @@ class Aesi final {
     /**
      * @brief Number's unsigned base
      */
-    Aeu<bitness> base;
+    using Base = Aeu<bitness>;
+    Base base;
     /* ----------------------------------------------------------------------- */
+
+    /**
+     * @brief Private constructor with members
+     */
+    gpu constexpr Aesi(Sign withSign, Base withBase): sign { withSign }, base { withBase } {};
+
 public:
     /* --------------------- @name Different constructors. ------------------- */
     /**
@@ -42,12 +49,16 @@ public:
     /**
      * @brief Copy constructor
      */
-    gpu constexpr Aesi(const Aesi& copy) noexcept = default;
+    gpu constexpr Aesi(const Aesi& copy) noexcept {
+        sign = copy.sign; if(copy.sign != Sign::Zero) base = copy.base;
+    }
 
     /**
      * @brief Copy assignment operator
      */
-    gpu constexpr Aesi& operator=(const Aesi& other) noexcept = default; //{ blocks = other.blocks; return *this; }
+    gpu constexpr Aesi& operator=(const Aesi& other) noexcept {
+        sign = other.sign; if(other.sign != Sign::Zero) base = other.base; return *this;
+    }
 
     /**
      * @brief Integral constructor
@@ -56,7 +67,10 @@ public:
      */
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr Aesi(Integral value) noexcept : base(static_cast<uint64_t>(abs(value))){
-        if(value < 0) sign = Sign::Negative; else sign = Sign::Positive;
+        if(value == 0)
+            sign = Sign::Zero;
+        else if(value < 0)
+            sign = Sign::Negative; else sign = Sign::Positive;
     }
 
     /**
@@ -70,6 +84,9 @@ public:
         if(size > 0 && ptr[0] == [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ())
             sign = Sign::Negative;
         else sign = Sign::Positive;
+
+        if(base.isZero())
+            sign = Sign::Zero;
     }
 
     /**
@@ -393,7 +410,9 @@ public:
      * @param Aesi other
      * @return Bool
      */
-    gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool { return sign == other.sign && base == other.base; };
+    gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool {
+        return sign == other.sign && base == other.base;
+    };
 
     /**
      * @brief Internal comparison operator

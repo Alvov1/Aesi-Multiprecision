@@ -16,21 +16,7 @@ enable_testing()
 
 file(GLOB Tests *.cpp)
 add_executable(AesiMultiprecision ${Tests} ../Aesi.h
-        arithmetic/addition/unsigned.cpp
-        arithmetic/modulo/unsigned.cpp
-        arithmetic/multiplication/unsigned.cpp
-        arithmetic/subtraction/unsigned.cpp
-        bitwise/and/unsigned.cpp
-        bitwise/or/unsigned.cpp
-        bitwise/xor/unsigned.cpp
-        bitwise/manipulations/unsigned.cpp
-        boolean/spaceship/unsigned.cpp
-        boolean/preCpp20/unsigned.cpp
-        number-theory/gcd/unsigned.cpp
-        number-theory/lcm/unsigned.cpp
-        operations/display/unsigned.cpp
-        operations/initialization/unsigned.cpp
-)
+        bitwise/shift/signed.cpp)
 add_subdirectory(arithmetic)
 add_subdirectory(operations)
 add_subdirectory(bitwise)

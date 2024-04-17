@@ -3,8 +3,10 @@
 #include "../../../Aesi-Multiprecision.h"
 #include "../../benchmarks/benchmarks.h"
 
-TEST(BooleanSigned, ThreeWayComparasion) { }
+#if __cplusplus >= 202002L
+    TEST(Signed_Boolean_Spaceship, ThreeWayComparasion) { EXPECT_TRUE(false); }
 
-TEST(BooleanSigned, ThreeWayEquallComparasion) { }
+    TEST(Signed_Boolean_Spaceship, ThreeWayEquallComparasion) { EXPECT_TRUE(false); }
 
-TEST(BooleanSigned, DifferentPrecisions) { }
+    TEST(Signed_Boolean_Spaceship, DifferentPrecisions) { EXPECT_TRUE(false); }
+#endif

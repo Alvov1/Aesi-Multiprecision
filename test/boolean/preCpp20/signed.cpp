@@ -1,12 +1,12 @@
-#define DEVICE_TESTING
-
 #include <gtest/gtest.h>
 #include "../../../Aesi.h"
 #include "../../../Aesi-Multiprecision.h"
 #include "../../benchmarks/benchmarks.h"
 
-TEST(BooleanSigned, ThreeWayComparasion) { }
+#if __cplusplus < 202002L
+    TEST(Signed_Boolean_preCpp20, ThreeWayComparasion) { }
 
-TEST(BooleanSigned, ThreeWayEquallComparasion) { }
+    TEST(Signed_Boolean_preCpp20, ThreeWayEquallComparasion) { }
 
-TEST(BooleanSigned, DifferentPrecisions) { }
+    TEST(Signed_Boolean_preCpp20, DifferentPrecisions) { }
+#endif

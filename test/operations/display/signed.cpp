@@ -2,18 +2,18 @@
 #include "../../../Aesi.h"
 #include "../../benchmarks/benchmarks.h"
 
-TEST(DisplaySigned, Zero) { }
+TEST(Signed_Display, Zero) { EXPECT_TRUE(false); }
 
-TEST(DisplaySigned, DecimalStreams) { }
+TEST(Signed_Display, DecimalStreams) { EXPECT_TRUE(false); }
 
-TEST(DisplaySigned, DecimalFormat) { }
+TEST(Signed_Display, DecimalFormat) { EXPECT_TRUE(false); }
 
-TEST(DisplaySigned, OctalStreams) { }
+TEST(Signed_Display, OctalStreams) { EXPECT_TRUE(false); }
 
-TEST(DisplaySigned, OctalFormat) { }
+TEST(Signed_Display, OctalFormat) { EXPECT_TRUE(false); }
 
-TEST(DisplaySigned, HexadecimalStreams) { }
+TEST(Signed_Display, HexadecimalStreams) { EXPECT_TRUE(false); }
 
-TEST(DisplaySigned, HexadecimalFormat) { }
+TEST(Signed_Display, HexadecimalFormat) { EXPECT_TRUE(false); }
 
-TEST(DisplaySigned, ShowBase) { }
+TEST(Signed_Display, ShowBase) { EXPECT_TRUE(false); }

@@ -1,18 +1,70 @@
 #include <gtest/gtest.h>
 #include "../../../Aesi.h"
 
-TEST(InitializationSigned, Basic) { }
+TEST(Signed_Initialization, Basic) {
+    EXPECT_TRUE(false);
+//    {
+//        Aesi128 m0 {}, m1(0), m2 = 0, m3 = Aesi128(0), m4 = {}, m5 = "0", m6 = "-0", m7 = "Somebody once told me...";
+//        EXPECT_EQ(m0, 0); EXPECT_EQ(m1, 0); EXPECT_EQ(m2, 0); EXPECT_EQ(m3, 0);
+//        EXPECT_EQ(m4, 0); EXPECT_EQ(m5, 0); EXPECT_EQ(m6, 0); EXPECT_EQ(m7, 0);
+//    }
+//    {
+//        Aesi128 i01 = 1, i02 = -1, i03 = 127, i04 = -127, i05 = -128, i06 = +127;
+//        EXPECT_EQ(i01, 1); EXPECT_EQ(i02, -1); EXPECT_EQ(i03, 127);
+//        EXPECT_EQ(i04, -127); EXPECT_EQ(i05, -128); EXPECT_EQ(i06, 127);
+//    }
+//    {
+//        Aesi128 ten = "10", negTen = "-10", fifty = "50", negFifty = "-50";
+//        EXPECT_EQ(ten, 10); EXPECT_EQ(negTen, -10); EXPECT_EQ(fifty, 50); EXPECT_EQ(negFifty, -50);
+//
+//        Aesi128 octTenLC = "0o24", octTenHC = "0o24", negativeOctTenLC = "-0o24", negativeOctTenHC = "-0o24";
+//        EXPECT_EQ(octTenLC, 20); EXPECT_EQ(octTenHC, 20); EXPECT_EQ(negativeOctTenLC, -20); EXPECT_EQ(negativeOctTenHC, -20);
+//
+//        Aesi128 hexTenLC = "0xa", hexTenHC = "0xA", negativeHexTenLC = "-0xa", negativeHexTenHC = "-0xA";
+//        EXPECT_EQ(hexTenLC, 10); EXPECT_EQ(hexTenHC, 10); EXPECT_EQ(negativeHexTenLC, -10); EXPECT_EQ(negativeHexTenHC, -10);
+//    }
+//    {
+//        using namespace std::string_literals; using namespace std::string_view_literals;
+//        Aesi512 d0 = "489133282872437279"s, d1 = "63018038201"sv, d2 = "-489133282872437279"s, d3 = "-63018038201"sv;
+//        EXPECT_EQ(d0, 489133282872437279); EXPECT_EQ(d1, 63018038201); EXPECT_EQ(d2, -489133282872437279); EXPECT_EQ(d3, -63018038201);
+//
+//        Aesi512 b0 = "0b11011001001110000000010000100010101011011101010101000011111"s;  EXPECT_EQ(b0, 489133282872437279);
+//        Aesi512 b1 = "0b111010101100001010101111001110111001"sv;                        EXPECT_EQ(b1, 63018038201);
+//        Aesi512 b2 = "-0b11011001001110000000010000100010101011011101010101000011111"s; EXPECT_EQ(b2, -489133282872437279);
+//        Aesi512 b3 = "-0b111010101100001010101111001110111001"sv;                       EXPECT_EQ(b3, -63018038201);
+//
+//        Aesi512 o0 = "0o106274176273174613"s, o1 = "0o642054234601645202742"sv, o2 = "-0o106274176273174613"s, o3 = "-0o642054234601645202742"sv;
+//        EXPECT_EQ(o0, 2475842268363147); EXPECT_EQ(o1, 7531577461358003682); EXPECT_EQ(o2, -2475842268363147); EXPECT_EQ(o3, -7531577461358003682);
+//
+//        Aesi512 h0 = "0x688589CC0E9505E2"s, h1 = "0x3C9D4B9CB52FE"sv, h2 = "-0x688589CC0E9505E2"s, h3 = "-0x3C9D4B9CB52FE"sv;
+//        EXPECT_EQ(h0, 7531577461358003682); EXPECT_EQ(h1, 1066340417491710); EXPECT_EQ(h2, -7531577461358003682); EXPECT_EQ(h3, -1066340417491710);
+//        Aesi512 h4 = "0x688589cc0e9505e2"s, h5 = "0x3c9d4b9cb52fe"sv, h6 = "-0x688589cc0e9505e2"s, h7 = "-0x3c9d4b9cb52fe"sv;
+//        EXPECT_EQ(h4, 7531577461358003682); EXPECT_EQ(h5, 1066340417491710); EXPECT_EQ(h6, -7531577461358003682); EXPECT_EQ(h7, -1066340417491710);
+//
+//        d0 = L"489133282872437279"s, d1 = L"63018038201"sv, d2 = L"-489133282872437279"s, d3 = L"-63018038201"sv;
+//        EXPECT_EQ(d0, 489133282872437279); EXPECT_EQ(d1, 63018038201); EXPECT_EQ(d2, -489133282872437279); EXPECT_EQ(d3, -63018038201);
+//
+//        b0 = L"0b11011001001110000000010000100010101011011101010101000011111"s;     EXPECT_EQ(b0, 489133282872437279);
+//        b1 = L"0b111010101100001010101111001110111001"sv;                           EXPECT_EQ(b1, 63018038201);
+//        b2 = L"-0b11011001001110000000010000100010101011011101010101000011111"s;    EXPECT_EQ(b2, -489133282872437279);
+//        b3 = L"-0b111010101100001010101111001110111001"sv;                          EXPECT_EQ(b3, -63018038201);
+//
+//        o0 = L"0o106274176273174613"s, o1 = L"0o642054234601645202742"sv, o2 = L"-0o106274176273174613"s, o3 = L"-0o642054234601645202742"sv;
+//        EXPECT_EQ(o0, 2475842268363147); EXPECT_EQ(o1, 7531577461358003682); EXPECT_EQ(o2, -2475842268363147); EXPECT_EQ(o3, -7531577461358003682);
+//
+//        h0 = L"0x688589CC0E9505E2"s, h1 = L"0x3C9D4B9CB52FE"sv, h2 = L"-0x688589CC0E9505E2"s, h3 = L"-0x3C9D4B9CB52FE"sv;
+//        EXPECT_EQ(h0, 7531577461358003682); EXPECT_EQ(h1, 1066340417491710); EXPECT_EQ(h2, -7531577461358003682); EXPECT_EQ(h3, -1066340417491710);
+//        h4 = L"0x688589cc0e9505e2"s, h5 = L"0x3c9d4b9cb52fe"sv, h6 = L"-0x688589cc0e9505e2"s, h7 = L"-0x3c9d4b9cb52fe"sv;
+//        EXPECT_EQ(h4, 7531577461358003682); EXPECT_EQ(h5, 1066340417491710); EXPECT_EQ(h6, -7531577461358003682); EXPECT_EQ(h7, -1066340417491710);
+//    }
+}
 
-TEST(InitializationSigned, SmallCharArray) { } 
+TEST(Signed_Initialization, Different_precisions) { EXPECT_TRUE(false); }
 
-TEST(InitializationSigned, StringStringView) { }
+TEST(Signed_Initialization, Binary) { EXPECT_TRUE(false); }
 
-TEST(InitializationSigned, Different_precisions) { }
+TEST(Signed_Initialization, Decimal) { EXPECT_TRUE(false); }
 
-TEST(InitializationSigned, Binary) { }
+TEST(Signed_Initialization, Octal) { EXPECT_TRUE(false); }
 
-TEST(InitializationSigned, Decimal) { }
-
-TEST(InitializationSigned, Octal) { }
-
-TEST(InitializationSigned, Hexadecimal) { }
+TEST(Signed_Initialization, Hexadecimal) { EXPECT_TRUE(false); }

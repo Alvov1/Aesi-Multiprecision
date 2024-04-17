@@ -3,6 +3,6 @@
 #include "../../../Aesi-Multiprecision.h"
 #include "../../benchmarks/benchmarks.h"
 
-TEST(BitwiseSigned, OR) { }
+TEST(Signed_Bitwise, OR) { EXPECT_TRUE(false); }
 
-TEST(BitwiseSigned, DifferentPrecisionOR) { }
+TEST(Signed_Bitwise, DifferentPrecisionOR) { EXPECT_TRUE(false); }

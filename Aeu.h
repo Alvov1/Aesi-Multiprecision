@@ -86,16 +86,13 @@ class Aeu final {
      * @return BlockLine
      */
     [[nodiscard]]
-    gpu static constexpr auto makeComplement(const blockLine& line) noexcept -> blockLine {
-        blockLine result {};
-
+    gpu static constexpr auto makeComplement(blockLine& line) noexcept -> uint64_t {
         uint64_t carryOut = 1;
         for(std::size_t i = 0; i < blocksNumber; ++i) {
             const uint64_t sum = blockBase - 1ULL - static_cast<uint64_t>(line[i]) + carryOut;
-            carryOut = sum / blockBase; result[i] = static_cast<block>(sum % blockBase);
+            carryOut = sum / blockBase; line[i] = static_cast<block>(sum % blockBase);
         }
-
-        return result;
+        return carryOut;
     }
 
     /**
@@ -132,7 +129,9 @@ public:
     /**
      * @brief Copy assignment operator
      */
-    gpu constexpr Aeu& operator=(const Aeu& other) noexcept = default; //{ blocks = other.blocks; return *this; }
+    gpu constexpr Aeu& operator=(const Aeu& other) noexcept {
+        blocks = other.blocks; return *this;
+    }
 
     /**
      * @brief Integral constructor
@@ -147,6 +146,8 @@ public:
                 blocks[i] = static_cast<block>(tValue % blockBase);
                 tValue /= blockBase;
             }
+            if(value < 0)
+                const auto carryOut = makeComplement(blocks);
         } else
             blocks = {};
     }
@@ -163,26 +164,26 @@ public:
 
         constexpr const Char* characters = [] {
             if constexpr (std::is_same_v<char, Char>) {
-                return "-09aAfFoObBxX";
+                return "09aAfFoObBxX";
             } else {
-                return L"-09aAfFoObBxX";
+                return L"09aAfFoObBxX";
             }
         } ();
         std::size_t position = 0;
-        if(ptr[0] == [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ())
-            ++position;
+        const auto negative = (ptr[0] == [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ());
+        if(negative) ++position;
 
         const auto base = [&ptr, &size, &position, &characters] {
-            if (ptr[position] == characters[1] && size > position + 1) {
+            if (ptr[position] == characters[0] && size > position + 1) {
                 switch (ptr[position + 1]) {
-                    case characters[9]:
-                    case characters[10]:
-                        position += 2; return 2;
-                    case characters[7]:
                     case characters[8]:
+                    case characters[9]:
+                        position += 2; return 2;
+                    case characters[6]:
+                    case characters[7]:
                         position += 2; return 8;
+                    case characters[10]:
                     case characters[11]:
-                    case characters[12]:
                         position += 2; return 16;
                     default:
                         return 10;
@@ -191,12 +192,12 @@ public:
         } ();
         for(; position < size; ++position) {
             const auto digit = [&characters] (Char ch) {
-                if(characters[1] <= ch && ch <= characters[2])
-                    return static_cast<int>(ch) - static_cast<int>(characters[1]);
+                if(characters[0] <= ch && ch <= characters[1])
+                    return static_cast<int>(ch) - static_cast<int>(characters[0]);
+                if(characters[2] <= ch && ch <= characters[4])
+                    return static_cast<int>(ch) - static_cast<int>(characters[2]) + 10;
                 if(characters[3] <= ch && ch <= characters[5])
                     return static_cast<int>(ch) - static_cast<int>(characters[3]) + 10;
-                if(characters[4] <= ch && ch <= characters[6])
-                    return static_cast<int>(ch) - static_cast<int>(characters[4]) + 10;
                 return 99;
             } (ptr[position]);
 
@@ -206,6 +207,8 @@ public:
             }
         }
 
+        if(negative && !isZero())
+            const auto carryOut = makeComplement(blocks);
     }
 
     /**
@@ -240,7 +243,7 @@ public:
      */
     [[nodiscard]]
     gpu constexpr auto operator-() const noexcept -> Aeu {
-        Aeu result = *this; result.inverse(); return result;
+        Aeu result = *this; const auto carryOut = makeComplement(result.blocks); return result;
     }
 
     /**
@@ -777,15 +780,6 @@ public:
     gpu constexpr auto swap(Aeu& other) noexcept -> void {
         Aeu t = other; other.operator=(*this); this->operator=(t);
     }
-
-    /**
-     * @brief Inverse number's sign
-     * @param Aeu value
-     */
-    gpu constexpr auto inverse() noexcept -> void {
-        for(std::size_t i = 0; i < blocksNumber; ++i)
-            blocks[i] = blockMax - blocks[i];
-    }
     /* ----------------------------------------------------------------------- */
 
 
@@ -1035,6 +1029,11 @@ public:
             }
         }
 
+        if(isZero()) {
+            buffer[position++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; }}();
+            return position;
+        }
+
         if constexpr (base == 16) {
             long long iter = blocks.size() - 1;
             for (; blocks[iter] == 0 && iter >= 0; --iter);
@@ -1092,6 +1091,9 @@ public:
                 ss << [&base] { if constexpr (std::is_same_v<Char, char>) { return base == 8 ? "0o" : "0x"; } else { return base == 8 ? L"0o" : L"0x"; }} () << std::noshowbase ;
             return base;
         } (flags & std::ios::basefield, ss, flags & std::ios::showbase);
+
+        if(value.isZero())
+            return ss << '0';
 
         if(base == 16) {
             long long iter = value.blocks.size() - 1;

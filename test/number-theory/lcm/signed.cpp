@@ -3,6 +3,6 @@
 #include "../../../Aesi-Multiprecision.h"
 #include "../../benchmarks/benchmarks.h"
 
-TEST(NumberTheorySigned, LeastCommonMultiplier) { }
+TEST(Signed_NumberTheory, LeastCommonMultiplier) { EXPECT_TRUE(false); }
 
-TEST(NumberTheorySigned, LeastCommonMultiplier_DifferentPrecision) { }
+TEST(Signed_NumberTheory, LeastCommonMultiplier_DifferentPrecision) { EXPECT_TRUE(false); }

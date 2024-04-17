@@ -867,36 +867,6 @@ public:
     }
 
     /**
-     * @brief Exponentiation by modulo
-     * @param Aeu base
-     * @param Aeu power
-     * @param Aeu modulo
-     * @return Aeu
-     * @note Be aware of overflow
-     */
-    [[nodiscard]]
-    gpu static constexpr auto powm(const Aeu& base, const Aeu& power, const Aeu& mod) noexcept -> Aeu {
-        const auto baseFilledBlocks = base.filledBlocksNumber();
-        if(baseFilledBlocks == 0 || (baseFilledBlocks == 1 && base.blocks[0] == 1))
-            return base;
-
-        Aeu result = 1;
-        auto [_, b] = divide(base, mod);
-
-        for(unsigned iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
-            if(power.getBit(iteration)) {
-                const auto [quotient, remainder] = divide(result * b, mod);
-                result = remainder;
-            }
-
-            const auto [quotient, remainder] = divide(b * b, mod);
-            b = remainder;
-        }
-
-        return result;
-    }
-
-    /**
      * @brief Fast exponentiation for powers of 2
      * @param Size_t power
      * @return Aeu
@@ -923,6 +893,36 @@ public:
 
         return x;
     }
+
+    /**
+     * @brief Exponentiation by modulo
+     * @param Aeu base
+     * @param Aeu power
+     * @param Aeu modulo
+     * @param Aeu result OUT
+     * @return Aeu
+     * @note Be aware of overflow
+     * @details Accepts power of different precision rather than base and modulo. Returns result value by reference
+     */
+    template <std::size_t powerBitness = bitness>
+    gpu static constexpr auto powm(const Aeu& base, const Aeu<powerBitness>& power, const Aeu& mod, Aeu& output) noexcept -> void {
+        const auto baseFilledBlocks = base.filledBlocksNumber();
+        if(baseFilledBlocks == 1 && base.blocks[0] == 1) { output = base; return; }
+        if(baseFilledBlocks == 0) { output = { 1 }; return; }
+
+        output = 1;
+        auto [_, b] = divide(base, mod);
+
+        for(unsigned iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
+            if(power.getBit(iteration)) {
+                const auto [quotient, remainder] = divide(output * b, mod);
+                output = remainder;
+            }
+
+            const auto [quotient, remainder] = divide(b * b, mod);
+            b = remainder;
+        }
+    }
     /* ----------------------------------------------------------------------- */
 
     /* ------------ @name Arithmetic and number theory overrides. ------------ */
@@ -946,6 +946,19 @@ public:
     [[nodiscard]]
     gpu static constexpr auto divide(const Aeu& number, const Aeu& divisor) noexcept -> pair<Aeu, Aeu> {
         pair<Aeu, Aeu> results; divide(number, divisor, results.first, results.second); return results;
+    }
+
+    /**
+     * @brief Exponentiation by modulo
+     * @param Aeu base
+     * @param Aeu power
+     * @param Aeu modulo
+     * @return Aeu
+     * @note Be aware of overflow
+     */
+    template <std::size_t powerBitness = bitness> [[nodiscard]]
+    gpu static constexpr auto powm(const Aeu& base, const Aeu<powerBitness>& power, const Aeu& mod) noexcept -> Aeu {
+        Aeu result; powm<powerBitness>(base, power, mod, result); return result;
     }
     /* ----------------------------------------------------------------------- */
 

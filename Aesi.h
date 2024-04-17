@@ -556,7 +556,7 @@ public:
      * @return Size_t
      */
     [[nodiscard]]
-    gpu static constexpr auto getBlocksNumber() noexcept -> std::size_t { return Aeu<bitness>::getBlocksNumber(); }
+    gpu static constexpr auto getBlocksNumber() noexcept -> std::size_t { return Aeu<bitness>::totalBlocksNumber(); }
 
     /**
      * @brief Make swap between two objects

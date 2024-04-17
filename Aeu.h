@@ -16,6 +16,10 @@
 #endif
 /// @endcond
 
+#if defined AESI_UNSAFE
+    #warning Enabled nightly mode for the library. Access out of bounds and other important errors may be ignored. Be really carefull!
+#endif
+
 /**
  * @file Aeu.h
  * @brief Long precision unsigned integer with arithmetic operations
@@ -94,24 +98,6 @@ class Aeu final {
         }
         return carryOut;
     }
-
-    /**
-     * @brief Counts the number of non-zero blocks inside block line starting from right
-     * @param BlockLine line
-     * @return Size_t
-     */
-    gpu static constexpr auto lineLength(const blockLine& line) noexcept -> std::size_t {
-        for(long long i = blocksNumber - 1; i >= 0; --i)
-            if(line[i]) return i + 1;
-        return 0;
-    }
-
-    /**
-     * @brief Checks if block line is empty
-     * @param BlockLine line
-     * @return Bool
-     */
-    gpu static constexpr auto isLineEmpty(const blockLine& line) noexcept -> bool { return lineLength(line) == 0; }
     /* ----------------------------------------------------------------------- */
 
 public:
@@ -349,7 +335,7 @@ public:
             return buffer;
         };
 
-        const std::size_t thisLength = lineLength(blocks), valueLength = lineLength(factor.blocks);
+        const std::size_t thisLength = this->filledBlocksNumber(), valueLength = factor.filledBlocksNumber();
         if(thisLength > valueLength)
             blocks = multiplyLines(blocks, thisLength, factor.blocks, valueLength);
         else
@@ -500,22 +486,20 @@ public:
      */
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr auto operator<<=(Integral bitShift) noexcept -> Aeu& {
+        if(bitShift >= bitness || bitShift == 0) return *this;
         if(bitShift < 0)
             return this->operator>>=(-bitShift);
 
-        if(bitShift < bitness && bitShift > 0) {
-            const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
-            const block stamp = (1UL << (blockBitLength - remainder)) - 1;
+        const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
+        const block stamp = (1UL << (blockBitLength - remainder)) - 1;
 
-            for (long long i = blocksNumber - 1; i >= (quotient + (remainder ? 1 : 0)); --i)
-                blocks[i] = ((blocks[i - quotient] & stamp) << remainder) | ((blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> ((blockBitLength - remainder) % blockBitLength));
+        for (long long i = blocksNumber - 1; i >= (quotient + (remainder ? 1 : 0)); --i)
+            blocks[i] = ((blocks[i - quotient] & stamp) << remainder) | ((blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> ((blockBitLength - remainder) % blockBitLength));
 
-            blocks[quotient] = (blocks[0] & stamp) << remainder;
+        blocks[quotient] = (blocks[0] & stamp) << remainder;
 
-            for (std::size_t i = 0; i < quotient; ++i)
-                blocks[i] = 0;
-        }
-
+        for (std::size_t i = 0; i < quotient; ++i)
+            blocks[i] = 0;
         return *this;
     }
 
@@ -538,22 +522,20 @@ public:
      */
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr auto operator>>=(Integral bitShift) noexcept -> Aeu& {
+        if(bitShift >= bitness || bitShift == 0) return *this;
         if(bitShift < 0)
             return this->operator<<=(-bitShift);
 
-        if(bitShift < bitness && bitShift > 0) {
-            const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
-            const block stamp = (1UL << remainder) - 1;
+        const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
+        const block stamp = (1UL << remainder) - 1;
 
-            for(std::size_t i = 0; i < blocksNumber - (quotient + (remainder ? 1 : 0)); ++i)
-                blocks[i] = ((blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << ((blockBitLength - remainder) % blockBitLength)) | ((blocks[i + quotient] & ~stamp) >> remainder);
+        for(std::size_t i = 0; i < blocksNumber - (quotient + (remainder ? 1 : 0)); ++i)
+            blocks[i] = ((blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << ((blockBitLength - remainder) % blockBitLength)) | ((blocks[i + quotient] & ~stamp) >> remainder);
 
-            blocks[blocksNumber - 1 - quotient] = (blocks[blocksNumber - 1] & ~stamp) >> remainder;
+        blocks[blocksNumber - 1 - quotient] = (blocks[blocksNumber - 1] & ~stamp) >> remainder;
 
-            for(long long i = blocksNumber - quotient; i < blocksNumber; ++i)
-                blocks[i] = 0;
-        }
-
+        for(long long i = blocksNumber - quotient; i < blocksNumber; ++i)
+            blocks[i] = 0;
         return *this;
     }
     /* ----------------------------------------------------------------------- */
@@ -583,7 +565,7 @@ public:
         return Comparison::equal;
     };
 
-#if (defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)) && !defined DOXYGEN_SKIP
+#if (defined(__CUDACC__) || __cplusplus < 202002L || defined (PRE_CPP_20)) && !defined DOXYGEN_SKIP
     /**
      * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on preCpp20
      */
@@ -624,10 +606,11 @@ public:
      * @note Does nothing for index out of range
      */
     gpu constexpr auto setBit(std::size_t index, bool bit) noexcept -> void {
+#ifndef AESI_UNSAFE
         if(index >= bitness) return;
+#endif
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
         assert(blockNumber < blocksNumber && bitNumber < blockBitLength);
-
         if(bit)
             blocks[blockNumber] |= (1U << bitNumber);
         else
@@ -642,7 +625,9 @@ public:
      */
     [[nodiscard]]
     gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
-        if(index >= bitness) return false;
+#ifndef AESI_UNSAFE
+            if(index >= bitness) return false;
+#endif
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
         assert(blockNumber < blocksNumber && bitNumber < blockBitLength);
         return blocks[blockNumber] & (1U << bitNumber);
@@ -655,8 +640,9 @@ public:
  * @note Does nothing for index out of range
  */
     gpu constexpr auto setByte(std::size_t index, byte byte) noexcept -> void {
+#ifndef AESI_UNSAFE
         if(index > blocksNumber * sizeof(block)) return;
-
+#endif
         const std::size_t blockNumber = index / sizeof(block), byteInBlock = index % sizeof(block), shift = byteInBlock * bitsInByte;
         assert(blockNumber < blocksNumber && byteInBlock < sizeof(block));
         blocks[blockNumber] &= ~(0xffU << shift); blocks[blockNumber] |= static_cast<block>(byte) << shift;
@@ -670,8 +656,9 @@ public:
      */
     [[nodiscard]]
     gpu constexpr auto getByte(std::size_t index) const noexcept -> byte {
+#ifndef AESI_UNSAFE
         if(index > blocksNumber * sizeof(block)) return 0;
-
+#endif
         const std::size_t blockNumber = index / sizeof(block), byteInBlock = index % sizeof(block), shift = byteInBlock * bitsInByte;
         assert(blockNumber < blocksNumber && byteInBlock < sizeof(block));
         return (blocks[blockNumber] & (0xffU << shift)) >> shift;
@@ -684,7 +671,10 @@ public:
      * @note Does nothing for index out of range
      */
     gpu constexpr auto setBlock(std::size_t index, block block) noexcept -> void {
-        if(index >= blocksNumber) return; blocks[index] = block;
+#ifndef AESI_UNSAFE
+        if(index >= blocksNumber) return;
+#endif
+        blocks[index] = block;
     }
 
     /**
@@ -695,7 +685,10 @@ public:
      */
     [[nodiscard]]
     gpu constexpr auto getBlock(std::size_t index) const noexcept -> block {
-        if(index >= blocksNumber) return block(); return blocks[index];
+#ifndef AESI_UNSAFE
+        if(index >= blocksNumber) return block();
+#endif
+        return blocks[index];
     }
 
     /**
@@ -757,7 +750,18 @@ public:
  * @return Bool - true is number is zero and false otherwise
  */
     [[nodiscard]]
-    gpu constexpr auto isZero() const noexcept -> bool { return isLineEmpty(blocks); }
+    gpu constexpr auto isZero() const noexcept -> bool { return filledBlocksNumber() == 0; }
+
+    /**
+     * @brief Get number of non-empty blocks inside object starting from the right
+     * @return Size_t
+     */
+    [[nodiscard]]
+    gpu constexpr auto filledBlocksNumber() const noexcept -> std::size_t {
+        for(long long i = blocksNumber - 1; i >= 0; --i)
+            if(blocks[i]) return i + 1;
+        return 0;
+    }
 
     /**
      * @brief Get number's precision
@@ -767,11 +771,11 @@ public:
     gpu static constexpr auto getBitness() noexcept -> std::size_t { return bitness; }
 
     /**
-     * @brief Get number of blocks inside object
+     * @brief Get the number of blocks (length of array of uint32_t integers) inside object
      * @return Size_t
      */
     [[nodiscard]]
-    gpu static constexpr auto getBlocksNumber() noexcept -> std::size_t { return blocksNumber; }
+    gpu static constexpr auto totalBlocksNumber() noexcept -> std::size_t { return blocksNumber; }
 
     /**
      * @brief Make swap between two objects
@@ -799,7 +803,7 @@ public:
         quotient = Aeu {}; remainder = Aeu {};
 
         if(ratio == Comparison::greater) {
-            const auto bitsUsed = lineLength(number.blocks) * blockBitLength;
+            const auto bitsUsed = number.filledBlocksNumber() * blockBitLength;
             for(long long i = bitsUsed - 1; i >= 0; --i) {
                 remainder <<= 1;
                 remainder.setBit(0, number.getBit(i));
@@ -872,23 +876,14 @@ public:
      */
     [[nodiscard]]
     gpu static constexpr auto powm(const Aeu& base, const Aeu& power, const Aeu& mod) noexcept -> Aeu {
-        constexpr auto remainingBlocksEmpty = [] (const Aeu& value, std::size_t offset) {
-            for(std::size_t i = offset / blockBitLength; i < value.blocksNumber; ++i) {
-                /* TODO Отказаться от деления в счетчике */
-                if (value.blocks[i] != 0) return false;
-            }
-            return true;
-        };
-
-        const auto baseLineLength = lineLength(base.blocks);
-        if(baseLineLength == 0 || (baseLineLength == 1 && base.blocks[0] == 1))
+        const auto baseFilledBlocks = base.filledBlocksNumber();
+        if(baseFilledBlocks == 0 || (baseFilledBlocks == 1 && base.blocks[0] == 1))
             return base;
 
         Aeu result = 1;
         auto [_, b] = divide(base, mod);
 
-        /* TODO Странная штука remainingBlocksEmpty(power). Привести power к встроенному типу. */
-        for(unsigned iteration = 0; !remainingBlocksEmpty(power, iteration); iteration++) {
+        for(unsigned iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
             if(power.getBit(iteration)) {
                 const auto [quotient, remainder] = divide(result * b, mod);
                 result = remainder;
@@ -979,7 +974,7 @@ public:
     gpu constexpr auto precisionCast() const noexcept -> Aeu<newBitness> {
         Aeu<newBitness> result {};
 
-        const std::size_t blockBoarder = (newBitness > bitness ? Aeu<bitness>::blocksNumber : Aeu<newBitness>::getBlocksNumber());
+        const std::size_t blockBoarder = (newBitness > bitness ? Aeu<bitness>::blocksNumber : Aeu<newBitness>::totalBlocksNumber());
         for(std::size_t blockIdx = 0; blockIdx < blockBoarder; ++blockIdx)
             result.setBlock(blockIdx, blocks[blockIdx]);
 

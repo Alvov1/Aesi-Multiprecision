@@ -29,6 +29,14 @@ if (CRYPTOPP_CMP)
     set(CryptoppLibraryCall cryptopp)
 endif()
 
+if (PREPROCESSOR_UNSAFE)
+    add_definitions(-DAESI_UNSAFE=1)
+endif (PREPROCESSOR_UNSAFE)
+
+if (PREPROCESSOR_PRE_CPP_20)
+    add_definitions(-DPRE_CPP_20=1)
+endif (PREPROCESSOR_PRE_CPP_20)
+
 include_directories(${SQLite3_INCLUDE_DIRS})
 
 target_link_libraries(AesiMultiprecision GTest::gtest_main ${SQLite3_LIBRARIES} ${CryptoppLibraryCall})

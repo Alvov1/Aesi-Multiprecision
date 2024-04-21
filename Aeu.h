@@ -120,7 +120,7 @@ public:
     /**
      * @brief Integral constructor
      * @param value Integral
-     * @details Accepts built-in integral types unsigned only!
+     * @details Accepts built-in integral types unsigned only
      */
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr Aeu(Integral value) noexcept {
@@ -140,7 +140,7 @@ public:
      * @brief Pointer-based character constructor
      * @param Char* pointer
      * @param Size_t size
-     * @details Accepts decimal literals along with binary (starting with 0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
+     * @details Accepts decimal strings along with binary (starting with 0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
     gpu constexpr Aeu(const Char* ptr, std::size_t size) noexcept : Aeu {} {
@@ -198,6 +198,7 @@ public:
     /**
      * @brief C-style string literal constructor
      * @param Char[] literal
+     * @details Accepts decimal literals along with binary (starting with 0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
      */
     template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
     gpu constexpr Aeu(const Char (&literal)[arrayLength]) noexcept : Aeu(literal, arrayLength) {}
@@ -651,10 +652,10 @@ public:
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned> && sizeof(Unsigned) < 8)
         gpu constexpr auto operator==(Unsigned other) const noexcept -> bool {
-            return filledBlocksNumber() == 1 && static_cast<block>(other) == blocks[0];
+            return filledBlocksNumber() <= 1 && static_cast<block>(other) == blocks[0];
         }
         gpu constexpr auto operator==(uint64_t other) const noexcept -> bool {
-            return filledBlocksNumber() == 2 && ((static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0])) == other;
+            return filledBlocksNumber() <= 2 && ((static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0])) == other;
         }
 
         /**
@@ -675,121 +676,121 @@ public:
 
 
     /* ----------------------- @name Comparison operators. ----------------------- */
-    /**
-     * @brief Internal comparison operator for built-in integral types uint8_t, uint16_t, uint32_t
-     * @param Unsigned other
-     * @return Comparison
-     * @note Should almost never return Comparison::Equivalent
-     */
-    template <typename Unsigned> requires (std::is_unsigned_v<Unsigned> && sizeof(Unsigned) < 8) [[nodiscard]]
-    gpu constexpr auto compareTo(Unsigned other) const noexcept -> Comparison {
-        if(filledBlocksNumber() > 1) return Comparison::greater;
-        const auto cmp = static_cast<block>(other);
-        if(blocks[0] > cmp)
-            return Comparison::greater;
-        else if(blocks[0] < cmp)
-            return Comparison::less; else return Comparison::equal;
-    }
-
-    /**
-     * @brief Internal comparison operator for type uint64_t
-     * @param uint64_t other
-     * @return Comparison
-     * @note Should almost never return Comparison::Equivalent
-     */
-    [[nodiscard]]
-    gpu constexpr auto compareTo(uint64_t other) const noexcept -> Comparison {
-        if(filledBlocksNumber() > 2) return Comparison::greater;
-        const auto base = (static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0]);
-        if(base > other)
-            return Comparison::greater; else if(base < other) return Comparison::less; else return Comparison::equal;
-    }
-
-    /**
-     * @brief Internal comparison operator
-     * @param Aeu other
-     * @return Comparison
-     * @note Should almost never return Comparison::Equivalent
-     */
-    template <std::size_t otherBitness = bitness> [[nodiscard]]
-    gpu constexpr auto compareTo(const Aeu<otherBitness>& other) const noexcept -> Comparison {
-        /* First compare in common precision. */
-        const auto lowerBlockBorder = (blocksNumber < other.totalBlocksNumber() ? blocksNumber : other.totalBlocksNumber());
-        for(long long i = lowerBlockBorder - 1; i >= 0; --i) {
-            const block thisBlock = blocks[i], otherBlock = other.getBlock(i);
-            if(thisBlock != otherBlock)
-                return (thisBlock > otherBlock ? Comparison::greater : Comparison::less);
+        /**
+         * @brief Internal comparison operator for built-in integral types uint8_t, uint16_t, uint32_t
+         * @param Unsigned other
+         * @return Comparison
+         * @note Should almost never return Comparison::Equivalent
+         */
+        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned> && sizeof(Unsigned) < 8) [[nodiscard]]
+        gpu constexpr auto compareTo(Unsigned other) const noexcept -> Comparison {
+            if(filledBlocksNumber() > 1) return Comparison::greater;
+            const auto cmp = static_cast<block>(other);
+            if(blocks[0] > cmp)
+                return Comparison::greater;
+            else if(blocks[0] < cmp)
+                return Comparison::less; else return Comparison::equal;
         }
-
-        if constexpr (otherBitness != blocksNumber * blockBitLength) {
-            /* If larger number contains data out of lower number's range, it's greater. */
-            if (other.totalBlocksNumber() > blocksNumber) {
-                for (long long i = other.totalBlocksNumber() - 1; i > lowerBlockBorder - 1; --i)
-                    if (other.getBlock(i) != 0)
-                        return Comparison::less;
-            } else if (blocksNumber > other.totalBlocksNumber()) {
-                for (long long i = blocksNumber - 1; i > lowerBlockBorder - 1; --i)
-                    if (blocks[i] != 0)
-                        return Comparison::greater;
+    
+        /**
+         * @brief Internal comparison operator for type uint64_t
+         * @param uint64_t other
+         * @return Comparison
+         * @note Should almost never return Comparison::Equivalent
+         */
+        [[nodiscard]]
+        gpu constexpr auto compareTo(uint64_t other) const noexcept -> Comparison {
+            if(filledBlocksNumber() > 2) return Comparison::greater;
+            const auto base = (static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0]);
+            if(base > other)
+                return Comparison::greater; else if(base < other) return Comparison::less; else return Comparison::equal;
+        }
+    
+        /**
+         * @brief Internal comparison operator
+         * @param Aeu other
+         * @return Comparison
+         * @note Should almost never return Comparison::Equivalent
+         */
+        template <std::size_t otherBitness = bitness> [[nodiscard]]
+        gpu constexpr auto compareTo(const Aeu<otherBitness>& other) const noexcept -> Comparison {
+            /* First compare in common precision. */
+            const auto lowerBlockBorder = (blocksNumber < other.totalBlocksNumber() ? blocksNumber : other.totalBlocksNumber());
+            for(long long i = lowerBlockBorder - 1; i >= 0; --i) {
+                const block thisBlock = blocks[i], otherBlock = other.getBlock(i);
+                if(thisBlock != otherBlock)
+                    return (thisBlock > otherBlock ? Comparison::greater : Comparison::less);
             }
+    
+            if constexpr (otherBitness != blocksNumber * blockBitLength) {
+                /* If larger number contains data out of lower number's range, it's greater. */
+                if (other.totalBlocksNumber() > blocksNumber) {
+                    for (long long i = other.totalBlocksNumber() - 1; i > lowerBlockBorder - 1; --i)
+                        if (other.getBlock(i) != 0)
+                            return Comparison::less;
+                } else if (blocksNumber > other.totalBlocksNumber()) {
+                    for (long long i = blocksNumber - 1; i > lowerBlockBorder - 1; --i)
+                        if (blocks[i] != 0)
+                            return Comparison::greater;
+                }
+            }
+    
+            return Comparison::equal;
         }
-
-        return Comparison::equal;
-    }
     /* --------------------------------------------------------------------------- */
 
 
     /* ------------------------ @name Spaceship operators. ----------------------- */
 #if (defined(__CUDACC__) || __cplusplus < 202002L || defined (PRE_CPP_20)) && !defined DOXYGEN_SKIP
-    /**
-     * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on preCpp20
-     */
-    gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool { return !this->operator==(value); }
-    gpu constexpr auto operator<(const Aeu& value) const noexcept -> bool { return this->compareTo(value) == Comparison::less; }
-    gpu constexpr auto operator<=(const Aeu& value) const noexcept -> bool { return !this->operator>(value); }
-    gpu constexpr auto operator>(const Aeu& value) const noexcept -> bool { return this->compareTo(value) == Comparison::greater; }
-    gpu constexpr auto operator>=(const Aeu& value) const noexcept -> bool { return !this->operator<(value); }
+        /**
+         * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on preCpp20
+         */
+        gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool { return !this->operator==(value); }
+        gpu constexpr auto operator<(const Aeu& value) const noexcept -> bool { return this->compareTo(value) == Comparison::less; }
+        gpu constexpr auto operator<=(const Aeu& value) const noexcept -> bool { return !this->operator>(value); }
+        gpu constexpr auto operator>(const Aeu& value) const noexcept -> bool { return this->compareTo(value) == Comparison::greater; }
+        gpu constexpr auto operator>=(const Aeu& value) const noexcept -> bool { return !this->operator<(value); }
 #else
-    /**
-     * @brief Three-way comparison operator
-     * @param Aeu other
-     * @return Std::Strong_ordering
-     * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
-     */
-    gpu constexpr auto operator<=>(const Aeu& other) const noexcept -> std::strong_ordering {
-        const auto ratio = this->compareTo(other);
-        switch(ratio) {
-            case Comparison::less:
-                return std::strong_ordering::less;
-            case Comparison::greater:
-                return std::strong_ordering::greater;
-            case Comparison::equal:
-                return std::strong_ordering::equal;
-            default:
-                return std::strong_ordering::equivalent;
-        }
-    };
-
-    /**
-     * @brief Three-way comparison operator for numbers of different precision and built-in integral types
-     * @param Aeu<diffPrec>/Unsigned other
-     * @return Std::Strong_ordering
-     * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
-     */
-    template <typename Unsigned>
-    gpu constexpr auto operator<=>(const Unsigned& other) const noexcept -> std::strong_ordering {
-        const auto ratio = this->compareTo(other);
-        switch(ratio) {
-            case Comparison::less:
-                return std::strong_ordering::less;
-            case Comparison::greater:
-                return std::strong_ordering::greater;
-            case Comparison::equal:
-                return std::strong_ordering::equal;
-            default:
-                return std::strong_ordering::equivalent;
-        }
-    };
+        /**
+         * @brief Three-way comparison operator
+         * @param Aeu other
+         * @return Std::Strong_ordering
+         * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
+         */
+        gpu constexpr auto operator<=>(const Aeu& other) const noexcept -> std::strong_ordering {
+            const auto ratio = this->compareTo(other);
+            switch(ratio) {
+                case Comparison::less:
+                    return std::strong_ordering::less;
+                case Comparison::greater:
+                    return std::strong_ordering::greater;
+                case Comparison::equal:
+                    return std::strong_ordering::equal;
+                default:
+                    return std::strong_ordering::equivalent;
+            }
+        };
+    
+        /**
+         * @brief Three-way comparison operator for numbers of different precision and built-in integral types
+         * @param Aeu<diffPrec>/Unsigned other
+         * @return Std::Strong_ordering
+         * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
+         */
+        template <typename Unsigned>
+        gpu constexpr auto operator<=>(const Unsigned& other) const noexcept -> std::strong_ordering {
+            const auto ratio = this->compareTo(other);
+            switch(ratio) {
+                case Comparison::less:
+                    return std::strong_ordering::less;
+                case Comparison::greater:
+                    return std::strong_ordering::greater;
+                case Comparison::equal:
+                    return std::strong_ordering::equal;
+                default:
+                    return std::strong_ordering::equivalent;
+            }
+        };
 #endif
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
@@ -963,7 +964,7 @@ public:
     /**
      * @brief Get number's precision
      * @return Size_t
-     * @ingroup OutValue
+     
      */
     [[nodiscard]]
     gpu static constexpr auto getBitness() noexcept -> std::size_t { return bitness; }
@@ -971,7 +972,7 @@ public:
     /**
      * @brief Get the number of blocks (length of array of uint32_t integers) inside object
      * @return Size_t
-     * @ingroup OutValue
+     
      */
     [[nodiscard]]
     gpu static constexpr auto totalBlocksNumber() noexcept -> std::size_t { return blocksNumber; }
@@ -985,13 +986,8 @@ public:
     }
     /* ----------------------------------------------------------------------- */
 
-
-
-
-    /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
-    /* -------------- @name Public arithmetic and number theory. -------------------------------------------------------------------------------------------------------------------------------- */
-
-    /* ------------------------ @name Basic division. ------------------------ */
+    
+    /* -------------- @name Public arithmetic and number theory. ------------- */
     /**
      * @brief Integer division. Returns results by reference
      * @param Aeu number
@@ -1022,7 +1018,7 @@ public:
     }
 
     /**
-    * @brief Integer division. Returns results by value in pair
+    * @brief Integer division. Returns results by value
     * @param Aeu number
     * @param Aeu divisor
     * @return Pair(Quotient, Remainder)
@@ -1031,144 +1027,97 @@ public:
     gpu static constexpr auto divide(const Aeu& number, const Aeu& divisor) noexcept -> pair<Aeu, Aeu> {
         pair<Aeu, Aeu> results; divide(number, divisor, results.first, results.second); return results;
     }
-    /* ----------------------------------------------------------------------- */
-
-
-    /* -------------------- @name Greatest common divisor. ------------------- */
+    
     /**
      * @brief Extended Euclidean algorithm for greatest common divisor
      * @param Aeu first
      * @param Aeu second
      * @param Aeu bezoutX OUT
      * @param Aeu bezoutY OUT
-     * @param Aeu output OUT
      * @return Aeu
-     * @details Counts Bézout coefficients along with the greatest common divisor. Returns coefficients and result by reference
-     * @ingroup OutReference
+     * @details Counts Bézout coefficients along with the greatest common divisor. Returns coefficients by reference
      */
-    gpu static constexpr auto gcd(const Aeu& first, const Aeu& second, Aeu& bezoutX, Aeu& bezoutY, Aeu& output) noexcept -> void {
-        Aeu tGcd, quotient, remainder;
+    gpu static constexpr auto gcd(const Aeu& first, const Aeu& second, Aeu& bezoutX, Aeu& bezoutY) noexcept -> Aeu {
+        Aeu gcd, tGcd, quotient, remainder;
 
         const auto ratio = first.compareTo(second);
         if(ratio == Comparison::greater) {
-            output = second;
+            gcd = second;
             divide(first, second, quotient, remainder);
         } else {
-            output = first;
+            gcd = first;
             divide(second, first, quotient, remainder);
         }
 
         bezoutX = 0; bezoutY = 1;
         for(Aeu tX = 1, tY = 0; remainder != 0; ) {
-            tGcd = output; output = remainder;
+            tGcd = gcd; gcd = remainder;
 
             Aeu t = bezoutX; bezoutX = tX - quotient * bezoutX; tX = t;
             t = bezoutY; bezoutY = tY - quotient * bezoutY; tY = t;
 
-            divide(tGcd, output, quotient, remainder);
+            divide(tGcd, gcd, quotient, remainder);
         }
 
         if(ratio != Comparison::greater)
             bezoutX.swap(bezoutY);
+        
+        return gcd;
     }
 
     /**
      * @brief Greatest common divisor
      * @param Aeu first
      * @param Aeu second
-     * @param Aeu output OUT
      * @return Aeu
-     * @details Faster version, ignoring bezout coefficients. Returns result by reference.
-     * @ingroup OutReference
+     * @details Faster version, ignoring bezout coefficients
      */
-    gpu static constexpr auto gcd(const Aeu& first, const Aeu& second, Aeu& output) noexcept -> void {
-        Aeu tGcd, quotient, remainder;
+    gpu static constexpr auto gcd(const Aeu& first, const Aeu& second) noexcept -> Aeu {
+        Aeu gcd, tGcd, quotient, remainder;
 
         const auto ratio = first.compareTo(second);
         if(ratio == Comparison::greater) {
-            output = second;
+            gcd = second;
             divide(first, second, quotient, remainder);
         } else {
-            output = first;
+            gcd = first;
             divide(second, first, quotient, remainder);
         }
 
         for(Aeu tX = 1, tY = 0; remainder != 0; ) {
-            tGcd = output; output = remainder;
-            divide(tGcd, output, quotient, remainder);
+            tGcd = gcd; gcd = remainder;
+            divide(tGcd, gcd, quotient, remainder);
         }
+        
+        return gcd;
     }
-
-    /**
-     * @brief Extended Euclidean algorithm for greatest common divisor
-     * @param Aeu first
-     * @param Aeu second
-     * @param Aeu bezoutX OUT
-     * @param Aeu bezoutY OUT
-     * @return Aeu
-     * @ingroup OutValue
-     */
-    [[nodiscard]]
-    gpu static constexpr auto gcd(const Aeu& first, const Aeu& second, Aeu& bezoutX, Aeu& bezoutY) noexcept -> Aeu {
-        Aeu output; gcd(first, second, bezoutX, bezoutY, output); return output;
-    }
-
-    /**
-     * @brief Greatest common divisor
-     * @param Aeu first
-     * @param Aeu second
-     * @return Aeu
-     * @ingroup OutValue
-     */
-    [[nodiscard]]
-    gpu static constexpr auto gcd(const Aeu& first, const Aeu& second) noexcept -> Aeu {
-        Aeu output; gcd(first, second, output); return output;
-    }
-    /* ----------------------------------------------------------------------- */
-
-
-    /* --------------------- @name Least common multiple. -------------------- */
-    /**
-     * @brief Least common multiplier
-     * @param Aeu first
-     * @param Aeu second
-     * @param Aeu output OUT
-     * @return Aeu
-     * @ingroup OutReference
-     */
-    gpu static constexpr auto lcm(const Aeu& first, const Aeu& second, Aeu& output) noexcept -> void { output = first / gcd(first, second) * second; }
 
     /**
      * @brief Least common multiplier
      * @param Aeu first
      * @param Aeu second
      * @return Aeu
-     * @ingroup OutValue
      */
     [[nodiscard]]
     gpu static constexpr auto lcm(const Aeu& first, const Aeu& second) noexcept -> Aeu { return first / gcd(first, second) * second; }
-    /* ----------------------------------------------------------------------- */
-
-
-    /* -------------------- @name Exponentiation by modulo. ------------------ */
+    
     /**
      * @brief Exponentiation by modulo
      * @param Aeu base
      * @param Aeu power
      * @param Aeu modulo
-     * @param Aeu result OUT
      * @return Aeu
      * @note Be aware of overflow
-     * @details Accepts power of different precision rather than base and modulo. Returns result value by reference
-     * @ingroup OutReference
+     * @details Accepts power of different precision rather than base and modulo
      */
     template <std::size_t powerBitness = bitness>
-    gpu static constexpr auto powm(const Aeu& base, const Aeu<powerBitness>& power, const Aeu& mod, Aeu& output) noexcept -> void {
-        const auto baseFilledBlocks = base.filledBlocksNumber();
-        if(baseFilledBlocks == 1 && base.blocks[0] == 1) { output = base; return; }
-        if(baseFilledBlocks == 0) { output = { 1 }; return; }
+    gpu static constexpr auto powm(const Aeu& base, const Aeu<powerBitness>& power, const Aeu& mod) noexcept -> Aeu {
+        if(base == 1u) 
+            return base;
+        if(base == 0u)
+            return { 0u };
 
-        output = 1;
+        Aeu output = 1;
         auto [_, b] = divide(base, mod);
 
         for(unsigned iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
@@ -1180,43 +1129,23 @@ public:
             const auto [quotient, remainder] = divide(b * b, mod);
             b = remainder;
         }
+
+        return output;
     }
-
-    /**
-     * @brief Exponentiation by modulo
-     * @param Aeu base
-     * @param Aeu power
-     * @param Aeu modulo
-     * @return Aeu
-     * @note Be aware of overflow
-     * @ingroup OutValue
-     */
-    template <std::size_t powerBitness = bitness> [[nodiscard]]
-    gpu static constexpr auto powm(const Aeu& base, const Aeu<powerBitness>& power, const Aeu& mod) noexcept -> Aeu {
-        Aeu result; powm<powerBitness>(base, power, mod, result); return result;
-    }
-    /* ----------------------------------------------------------------------- */
-
-
-    /* ---------------------- @name Power 2 generation. ---------------------- */
+    
     /**
      * @brief Fast exponentiation for powers of 2
      * @param Size_t power
      * @return Aeu
      * @details Returns zero for power greater than current bitness
-     * @ingroup OutValue
      */
     [[nodiscard]]
     gpu static constexpr auto power2(std::size_t e) noexcept -> Aeu { Aeu result {}; result.setBit(e, true); return result; }
-    /* ----------------------------------------------------------------------- */
-
-
-    /* -------------------------- @name Square root. ------------------------- */
+    
     /**
      * @brief Get square root
      * @return Aeu
      * @note Returns zero for negative value or zero
-     * @ingroup OutValue
      */
     [[nodiscard]]
     gpu constexpr auto squareRoot() const noexcept -> Aeu {
@@ -1230,11 +1159,6 @@ public:
         return x;
     }
     /* ----------------------------------------------------------------------- */
-
-    /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
-    /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
-
-
 
 
     /* ----------------- @name Public input-output operators. ---------------- */

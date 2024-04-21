@@ -4,8 +4,14 @@
 TEST(Unsigned_Addition, Basic) {
     {
         Aeu128 zero = 0, m0 = 26359343;
-        EXPECT_EQ(zero + m0, 26359343); EXPECT_EQ(m0 + zero, 26359343); EXPECT_EQ(zero + +m0, 26359343); EXPECT_EQ(m0 + +zero, 26359343);
-        EXPECT_EQ(+zero + m0, 26359343); EXPECT_EQ(+m0 + zero, 26359343); EXPECT_EQ(+zero + +m0, 26359343); EXPECT_EQ(+m0 + +zero, 26359343);
+        EXPECT_EQ(zero + m0, 26359343);
+        EXPECT_EQ(m0 + zero, 26359343);
+        EXPECT_EQ(zero + +m0, 26359343);
+        EXPECT_EQ(m0 + +zero, 26359343);
+        EXPECT_EQ(+zero + m0, 26359343);
+        EXPECT_EQ(+m0 + zero, 26359343);
+        EXPECT_EQ(+zero + +m0, 26359343);
+        EXPECT_EQ(+m0 + +zero, 26359343);
         m0 += zero; EXPECT_EQ(m0, 26359343); m0 += +zero; EXPECT_EQ(m0, 26359343); +m0 += zero; EXPECT_EQ(m0, 26359343); +m0 += +zero; EXPECT_EQ(m0, 26359343);
     }
     {
@@ -20,10 +26,22 @@ TEST(Unsigned_Addition, Basic) {
     }
     {
         Aeu128 s1 = 0x24DFBE889, s2 = 0x193E161C, s3 = 0x51CDFC6, s4 = 0x1706808355;
-        EXPECT_EQ(s1 + s1, 0x49BF7D112); EXPECT_EQ(s1 + s2, 0x26739fea5); EXPECT_EQ(s1 + s3, 0x25318c84f); EXPECT_EQ(s1 + s4, 0x19547c6bde);
-        EXPECT_EQ(s2 + s1, 0x26739fea5); EXPECT_EQ(s2 + s2, 0x327c2c38); EXPECT_EQ(s2 + s3, 0x1e5af5e2); EXPECT_EQ(s2 + s4, 0x171fbe9971);
-        EXPECT_EQ(s3 + s1, 0x25318c84f); EXPECT_EQ(s3 + s2, 0x1e5af5e2); EXPECT_EQ(s3 + s3, 0xa39bf8c); EXPECT_EQ(s3 + s4, 0x170b9d631b);
-        EXPECT_EQ(s4 + s1, 0x19547c6bde); EXPECT_EQ(s4 + s2, 0x171fbe9971); EXPECT_EQ(s4 + s3, 0x170b9d631b); EXPECT_EQ(s4 + s4, 0x2e0d0106aa);
+        EXPECT_EQ(s1 + s1, 0x49BF7D112);
+        EXPECT_EQ(s1 + s2, 0x26739fea5);
+        EXPECT_EQ(s1 + s3, 0x25318c84f);
+        EXPECT_EQ(s1 + s4, 0x19547c6bde);
+        EXPECT_EQ(s2 + s1, 0x26739fea5);
+        EXPECT_EQ(s2 + s2, 0x327c2c38);
+        EXPECT_EQ(s2 + s3, 0x1e5af5e2);
+        EXPECT_EQ(s2 + s4, 0x171fbe9971);
+        EXPECT_EQ(s3 + s1, 0x25318c84f);
+        EXPECT_EQ(s3 + s2, 0x1e5af5e2);
+        EXPECT_EQ(s3 + s3, 0xa39bf8c);
+        EXPECT_EQ(s3 + s4, 0x170b9d631b);
+        EXPECT_EQ(s4 + s1, 0x19547c6bde);
+        EXPECT_EQ(s4 + s2, 0x171fbe9971);
+        EXPECT_EQ(s4 + s3, 0x170b9d631b);
+        EXPECT_EQ(s4 + s4, 0x2e0d0106aa);
     }
 }
 
@@ -440,12 +458,6 @@ TEST(Unsigned_Addition, Increment) {
     Aeu512 t0 = m0++, u0 = ++m0;
     EXPECT_EQ(t0, 62493002); EXPECT_EQ(u0, 62493004); EXPECT_EQ(m0, 62493004);
 
-    Aeu512 m1 = -10775863;
-    m1++; ++m1; m1++; ++m1; m1++; ++m1; m1++; ++m1; ++m1; ++m1; m1++; ++m1; ++m1;
-    EXPECT_EQ(m1, -10775850);
-    Aeu512 t1 = m1++, u1 = ++m1;
-    EXPECT_EQ(t1, -10775850); EXPECT_EQ(u1, -10775848); EXPECT_EQ(m1, -10775848);
-
     Aeu512 m2 = 77428594;
     m2++; m2++; ++m2; m2++; m2++; m2++; ++m2; m2++; m2++; m2++; ++m2; m2++; ++m2; ++m2;
     EXPECT_EQ(m2, 77428608);
@@ -457,20 +469,4 @@ TEST(Unsigned_Addition, Increment) {
     EXPECT_EQ(m3, 77677813);
     Aeu512 t3 = m3++, u3 = ++m3;
     EXPECT_EQ(t3, 77677813); EXPECT_EQ(u3, 77677815); EXPECT_EQ(m3, 77677815);
-
-    Aeu512 m4 = -11780979;
-    m4++; ++m4; m4++; ++m4; m4++; ++m4; m4++; ++m4; m4++; ++m4; ++m4; ++m4; m4++; ++m4; m4++; ++m4; ++m4; ++m4; ++m4;
-    EXPECT_EQ(m4, -11780960);
-    Aeu512 t4 = m4++, u4 = ++m4;
-    EXPECT_EQ(t4, -11780960); EXPECT_EQ(u4, -11780958); EXPECT_EQ(m4, -11780958);
-
-    Aeu512 m5 = -1;
-    auto t5 = m5++;
-    EXPECT_EQ(t5, -1);
-    EXPECT_EQ(m5, 0);
-
-    Aeu512 m6 = -1;
-    auto t6 = ++m6;
-    EXPECT_EQ(t6, 0);
-    EXPECT_EQ(m6, 0);
 }

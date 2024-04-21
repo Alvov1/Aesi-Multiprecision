@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include "../../../Aesi.h"
-#include "../../benchmarks/benchmarks.h"
 
 TEST(Signed_Bitwise, GetSetBit) { EXPECT_TRUE(false); }
 

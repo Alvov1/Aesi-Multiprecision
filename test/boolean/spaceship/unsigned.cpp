@@ -259,7 +259,13 @@
     TEST(Unsigned_Boolean_Spaceship, DifferentPrecisions) {
         unsigned long long iv = 9112537908201049656;
         Aeu < 256 > o1 = iv; Aeu < 288 > o2 = iv; Aeu < 320 > o3 = iv; Aeu < 352 > o4 = iv; Aeu < 384 > o5 = iv; Aeu < 416 > o6 = iv; Aeu < 448 > o7 = iv; Aeu < 480 > o8 = iv; Aeu < 512 > o9 = iv; Aeu < 544 > o10 = iv;
-        EXPECT_EQ(o1, o2); EXPECT_EQ(o1, o3); EXPECT_EQ(o1, o4); EXPECT_EQ(o1, o5); EXPECT_EQ(o1, o6); EXPECT_EQ(o1, o7); EXPECT_EQ(o1, o8); EXPECT_EQ(o1, o9); EXPECT_EQ(o1, o10); EXPECT_EQ(o2, o1); EXPECT_EQ(o2, o3); EXPECT_EQ(o2, o4); EXPECT_EQ(o2, o5); EXPECT_EQ(o2, o6); EXPECT_EQ(o2, o7);
+        EXPECT_EQ(o1, o2); EXPECT_EQ(o1, o3); EXPECT_EQ(o1, o4); EXPECT_EQ(o1, o5); EXPECT_EQ(o1, o6); EXPECT_EQ(o1, o7); EXPECT_EQ(o1, o8); EXPECT_EQ(o1, o9); EXPECT_EQ(o1, o10);
+
+
+        EXPECT_EQ(o2, o1);
+
+
+        EXPECT_EQ(o2, o3); EXPECT_EQ(o2, o4); EXPECT_EQ(o2, o5); EXPECT_EQ(o2, o6); EXPECT_EQ(o2, o7);
         EXPECT_EQ(o2, o8); EXPECT_EQ(o2, o9); EXPECT_EQ(o2, o10); EXPECT_EQ(o3, o1); EXPECT_EQ(o3, o2); EXPECT_EQ(o3, o4); EXPECT_EQ(o3, o5); EXPECT_EQ(o3, o6); EXPECT_EQ(o3, o7); EXPECT_EQ(o3, o8); EXPECT_EQ(o3, o9); EXPECT_EQ(o3, o10); EXPECT_EQ(o4, o1); EXPECT_EQ(o4, o2); EXPECT_EQ(o4, o3);
         EXPECT_EQ(o4, o5); EXPECT_EQ(o4, o6); EXPECT_EQ(o4, o7); EXPECT_EQ(o4, o8); EXPECT_EQ(o4, o9); EXPECT_EQ(o4, o10); EXPECT_EQ(o5, o1); EXPECT_EQ(o5, o2); EXPECT_EQ(o5, o3); EXPECT_EQ(o5, o4); EXPECT_EQ(o5, o6); EXPECT_EQ(o5, o7); EXPECT_EQ(o5, o8); EXPECT_EQ(o5, o9); EXPECT_EQ(o5, o10);
         EXPECT_EQ(o6, o1); EXPECT_EQ(o6, o2); EXPECT_EQ(o6, o3); EXPECT_EQ(o6, o4); EXPECT_EQ(o6, o5); EXPECT_EQ(o6, o7); EXPECT_EQ(o6, o8); EXPECT_EQ(o6, o9); EXPECT_EQ(o6, o10); EXPECT_EQ(o7, o1); EXPECT_EQ(o7, o2); EXPECT_EQ(o7, o3); EXPECT_EQ(o7, o4); EXPECT_EQ(o7, o5); EXPECT_EQ(o7, o6);

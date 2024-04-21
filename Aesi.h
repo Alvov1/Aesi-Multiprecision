@@ -16,7 +16,7 @@ namespace {
 
 /**
  * @class Aesi
- * @brief Long precision integer with arithmetic operations
+ * @brief Long precision signed integer
  * @details May be used to represent positive and negative integers. Number precision is set in template parameter bitness.
  */
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)

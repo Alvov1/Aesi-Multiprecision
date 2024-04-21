@@ -14,109 +14,6 @@
  * redundant copying and may be slow. Take a look at the main page to find out more.
  */
 
-/* ---------------------------------------- Different precision comparison ---------------------------------------- */
-/**
- * @brief Multiprecision comparison operator
- * @param Aeu<lPrecision> left
- * @param Aeu<rPrecision> right
- * @return Bool
- */
-template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator==(const Aeu<bFirst>& left, const Aeu<bSecond>& right) noexcept -> bool {
-    if constexpr (bFirst > bSecond) {
-        return (left == right.template precisionCast<bFirst>());
-    } else {
-        return (left.template precisionCast<bSecond>() == right);
-    }
-}
-
-/**
- * @brief Multiprecision three-way comparison method
- * @param Aeu<lPrecision> left
- * @param Aeu<rPrecision> right
- * @return Comparison
- */
-template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto compareTo(const Aeu<bFirst>& left, const Aeu<bSecond>& right) noexcept -> Comparison {
-    if constexpr (bFirst > bSecond) {
-        return left.compareTo(right.template precisionCast<bFirst>());
-    } else {
-        return left.template precisionCast<bSecond>().compareTo(right);
-    }
-}
-
-#if (defined(__CUDACC__) || __cplusplus < 202002L || defined (DEVICE_TESTING)) && !defined DOXYGEN_SKIP
-/**
-     * @brief Oldstyle binary comparison operator(s). Used inside CUDA cause it does not support <=> on preCpp20
-     */
-    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator!=(const Aeu<bFirst>& left, const Aeu<bSecond>& right) noexcept -> bool {
-        if constexpr (bFirst > bSecond) {
-            return !left.operator==(right.template precisionCast<bFirst>());
-        } else {
-            return !left.template precisionCast<bSecond>().operator==(right);
-        };
-    }
-    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator<(const Aeu<bFirst>& left, const Aeu<bSecond>& right) noexcept -> bool {
-        if constexpr (bFirst > bSecond) {
-            return left.compareTo(right.template precisionCast<bFirst>()) == Comparison::less;
-        } else {
-            return left.template precisionCast<bSecond>().compareTo(right) == Comparison::less;
-        };
-    }
-    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator<=(const Aeu<bFirst>& left, const Aeu<bSecond>& right) noexcept -> bool {
-        if constexpr (bFirst > bSecond) {
-            return !left.operator>(right.template precisionCast<bFirst>());
-        } else {
-            return !left.template precisionCast<bSecond>().operator>(right);
-        };
-    }
-    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator>(const Aeu<bFirst>& left, const Aeu<bSecond>& right) noexcept -> bool {
-        if constexpr (bFirst > bSecond) {
-            return left.compareTo(right.template precisionCast<bFirst>()) == Comparison::greater;
-        } else {
-            return left.template precisionCast<bSecond>().compareTo(right) == Comparison::greater;
-        };
-    }
-    template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-    gpu constexpr auto operator>=(const Aeu<bFirst>& left, const Aeu<bSecond>& right) noexcept -> bool {
-        if constexpr (bFirst > bSecond) {
-            return !left.operator<(right.template precisionCast<bFirst>());
-        } else {
-            return !left.template precisionCast<bSecond>().operator<(right);
-        };
-    }
-#else
-/**
- * @brief Multiprecision three-way comparison operator.
- * @param Aeu<lPrecision> left
- * @param Aeu<rPrecision> right.
- * @return STD::Strong_ordering.
- */
-template <std::size_t bFirst, std::size_t bSecond> requires (bFirst != bSecond)
-gpu constexpr auto operator<=>(const Aeu<bFirst>& left, const Aeu<bSecond>& right) noexcept -> std::strong_ordering {
-    if constexpr (bFirst > bSecond) {
-        switch(left.compareTo(right.template precisionCast<bFirst>())) {
-            case Comparison::less: return std::strong_ordering::less;
-            case Comparison::greater: return std::strong_ordering::greater;
-            case Comparison::equal: return std::strong_ordering::equal;
-            default: return std::strong_ordering::equivalent;
-        }
-    } else {
-        switch(left.template precisionCast<bSecond>().compareTo(right)) {
-            case Comparison::less: return std::strong_ordering::less;
-            case Comparison::greater: return std::strong_ordering::greater;
-            case Comparison::equal: return std::strong_ordering::equal;
-            default: return std::strong_ordering::equivalent;
-        }
-    }
-}
-#endif
-/* ---------------------------------------------------------------------------------------------------------------- */
-
 
 /* ----------------------------------------- Different precision addition ----------------------------------------- */
 /**
@@ -409,9 +306,9 @@ namespace AeuMultiprecision {
 /* ----------------------------------------------- Power by modulo ------------------------------------------------ */
     /**
      * @brief Multiprecision power by modulo helper
-     * @param Aeu<precFirst> base
-     * @param Aeu<precFirst> power
-     * @param Aeu<precSecond> modulo
+     * @param Aeu<pFirst> base
+     * @param Aeu<pFirst> power
+     * @param Aeu<pSecond> modulo
      * @return Aeu
      * @details Returns Aeu with the highest precision between base/power and modulo.
      */
@@ -424,7 +321,14 @@ namespace AeuMultiprecision {
         }
     }
 
-    /* Differ-Common-Common */
+    /**
+     * @brief Multiprecision power by modulo helper
+     * @param Aeu<pFirst> base
+     * @param Aeu<pSecond> power
+     * @param Aeu<pSecond> modulo
+     * @return Aeu
+     * @details Returns Aeu with the highest precision between base/power and modulo.
+     */
     template<std::size_t bCommon, std::size_t bDiffer> requires (bCommon != bDiffer)
     gpu constexpr auto powm(const Aeu<bDiffer>& base, const Aeu<bCommon>& power, const Aeu<bCommon>& mod) {
         if constexpr (bCommon > bDiffer) {

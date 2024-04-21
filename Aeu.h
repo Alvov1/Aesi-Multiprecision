@@ -592,6 +592,26 @@ public:
      * @return Std::Strong_ordering
      * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
      */
+    gpu constexpr auto operator<=>(const Aeu& other) const noexcept -> std::strong_ordering {
+        const auto ratio = this->compareTo(other);
+        switch(ratio) {
+            case Comparison::less:
+                return std::strong_ordering::less;
+            case Comparison::greater:
+                return std::strong_ordering::greater;
+            case Comparison::equal:
+                return std::strong_ordering::equal;
+            default:
+                return std::strong_ordering::equivalent;
+        }
+    };
+
+    /**
+     * @brief Three-way comparison operator for different precision comparison
+     * @param Aeu other
+     * @return Std::Strong_ordering
+     * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
+     */
     template <std::size_t otherBitness = bitness>
     gpu constexpr auto operator<=>(const Aeu<otherBitness>& other) const noexcept -> std::strong_ordering {
         const auto ratio = this->compareTo(other);

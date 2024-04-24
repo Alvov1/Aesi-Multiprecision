@@ -6,13 +6,13 @@
 #include <cassert>
 
 #ifdef __CUDACC__
-#define gpu __host__ __device__
+    #define gpu __host__ __device__
     #include <cuda/std/utility>
     #include <cuda/std/array>
 #else
-#define gpu
-#include <utility>
-#include <array>
+    #define gpu
+    #include <utility>
+    #include <array>
 #endif
 /// @endcond
 
@@ -280,32 +280,7 @@ public:
          * @return Aeu
          */
         [[nodiscard]]
-        gpu constexpr auto operator+(const Aeu& addendum) const noexcept -> Aeu {
-            Aeu result = *this; result += addendum; return result;
-        }
 
-        /**
-         * @brief Assignment addition operator for built-in integral types
-         * @param Unsigned addendum
-         * @return Aeu&
-         */
-        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator+=(Unsigned addendum) noexcept -> Aeu& {
-            for(std::size_t i = 0; i < blocksNumber; ++i) {
-                const auto currentSum = static_cast<uint64_t>(blocks[i]) + static_cast<uint64_t>(addendum);
-                addendum = currentSum / blockMax; blocks[i] = currentSum % blockMax;
-            }
-            return *this;
-        }
-
-        /**
-         * @brief Assignment addition operator
-         * @param Aeu addendum
-         * @return Aeu&
-         */
-        gpu constexpr auto operator+=(const Aeu& addendum) noexcept -> Aeu& {
-            addLine(blocks, addendum.blocks); return *this;
-        }
     /* --------------------------------------------------------------------------- */
 
 

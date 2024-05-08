@@ -316,8 +316,8 @@ public:
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator-(Unsigned addendum) const noexcept -> Aeu {
-            Aeu result = *this; result->operator-=(addendum); return result;
+        gpu constexpr auto operator-(Unsigned subtrahend) const noexcept -> Aeu {
+            Aeu result = *this; result->operator-=(subtrahend); return result;
         }
 
         /**
@@ -336,7 +336,7 @@ public:
          * @return Aeu&
          */ /* TODO: Complete */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator-=(Unsigned addendum) noexcept -> Aeu& = delete;
+        gpu constexpr auto operator-=(Unsigned subtrahend) noexcept -> Aeu& = delete;
 
         /**
          * @brief Assignment subtraction operator
@@ -356,8 +356,8 @@ public:
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator*(Unsigned addendum) const noexcept -> Aeu {
-            Aeu result = *this; result->operator*=(addendum); return result;
+        gpu constexpr auto operator*(Unsigned factor) const noexcept -> Aeu {
+            Aeu result = *this; result->operator*=(factor); return result;
         }
 
         /**
@@ -376,7 +376,7 @@ public:
          * @return Aeu&
          */ /* TODO: Complete */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator*=(Unsigned addendum) noexcept -> Aeu& = delete;
+        gpu constexpr auto operator*=(Unsigned factor) noexcept -> Aeu& = delete;
 
         /**
          * @brief Assignment multiplication operator
@@ -423,8 +423,8 @@ public:
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator/(Unsigned addendum) const noexcept -> Aeu {
-            Aeu result = *this; result->operator/=(addendum); return result;
+        gpu constexpr auto operator/(Unsigned divisor) const noexcept -> Aeu {
+            Aeu result = *this; result->operator/=(divisor); return result;
         }
 
         /**
@@ -443,7 +443,7 @@ public:
          * @return Aeu&
          */ /* TODO: Complete */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator/=(Unsigned addendum) noexcept -> Aeu& = delete;
+        gpu constexpr auto operator/=(Unsigned divisor) noexcept -> Aeu& = delete;
 
         /**
          * @brief Assignment division operator
@@ -463,8 +463,8 @@ public:
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator%(Unsigned addendum) const noexcept -> Aeu {
-            Aeu result = *this; result->operator%=(addendum); return result;
+        gpu constexpr auto operator%(Unsigned modulo) const noexcept -> Aeu {
+            Aeu result = *this; result->operator%=(modulo); return result;
         }
 
         /**
@@ -483,7 +483,7 @@ public:
          * @return Aeu&
          */ /* TODO: Complete */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator%=(Unsigned addendum) noexcept -> Aeu& = delete;
+        gpu constexpr auto operator%=(Unsigned modulo) noexcept -> Aeu& = delete;
 
         /**
          * @brief Assignment modulo operator
@@ -1115,7 +1115,7 @@ public:
         if(base == 1u) 
             return base;
         if(base == 0u)
-            return { 0u };
+            return { 1u };
 
         Aeu output = 1;
         auto [_, b] = divide(base, mod);

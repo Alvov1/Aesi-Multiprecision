@@ -120,8 +120,9 @@ public:
     /**
      * @brief Integral constructor
      * @param value Integral
-     * @details Accepts built-in integral types unsigned only
-     */
+     * @details Accepts both signed and unsigned built-in integral types. When calling this constructor on negative value, final blocks would be inverted.
+     * @note Be aware of calling this constructor explicitly
+    */
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr Aeu(Integral value) noexcept {
         if(value != 0) {
@@ -374,26 +375,37 @@ public:
          * @brief Assignment multiplication operator for built-in integral types
          * @param Unsigned factor
          * @return Aeu&
+         * @details Works with the greatest performance with types smaller than uint64_t
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
         gpu constexpr auto operator*=(Unsigned factor) noexcept -> Aeu& {
-            unsigned i = 0;
-            for (unsigned j = 0; j < blocksNumber; ++j) {
-                const auto product = static_cast<uint64_t>(factor) * static_cast<uint64_t>(blocks[j]);
-                auto tBlock = static_cast<block>(product % blockBase),
-                    carry = static_cast<block>(product / blockBase);
+            if constexpr (std::is_same_v<Unsigned, uint64_t>) {
+                const auto longerLength = filledBlocksNumber(), smallerLength = (factor > blockMax ? 2UL : 1UL);
+                blockLine buffer {};
 
-                for(unsigned ii = 0; tBlock != 0 && ii < blocksNumber; ++ii) {
-                    const auto sum = static_cast<uint64_t>(blocks[ii]) + tBlock;
-                    blocks[i] = static_cast<block>(sum % blockBase);
-                    tBlock = static_cast<block>(sum / blockBase);
+                for(std::size_t i = 0; i < longerLength; ++i) {
+                    uint64_t tBlock = blocks[i], carryOut = 0;
+
+                    for(std::size_t j = 0; j < smallerLength && i + j < buffer.size(); ++j) {
+                        const auto product = tBlock * ((factor >> blockBitLength * j) & 0x00'00'00'00'ff'ff'ff'ff) + carryOut;
+                        const auto block = static_cast<uint64_t>(buffer[i + j]) + (product % blockBase);
+                        carryOut = product / blockBase + block / blockBase;
+                        buffer[i + j] = block % blockBase;
+                    }
+
+                    if(smallerLength + i < buffer.size())
+                        buffer[smallerLength + i] += carryOut;
                 }
 
-                for(unsigned ii = 0; carry != 0 && ii < blocksNumber; ++ii) {
-                    const auto sum = static_cast<uint64_t>(blocks[ii]) + carry;
-                    blocks[ii] = static_cast<block>(sum % blockBase);
-                    carry = static_cast<block>(sum / blockBase);
+                blocks = buffer;
+                return *this;
+            } else {
+                uint64_t carryOut = 0;
+                for (std::size_t i = 0; i < blocksNumber; ++i) {
+                    const auto product = static_cast<uint64_t>(factor) * static_cast<uint64_t>(blocks[i]) + carryOut;
+                    blocks[i] = product % blockBase; carryOut = product / blockBase;
                 }
+                return *this;
             }
         };
 

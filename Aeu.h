@@ -374,9 +374,28 @@ public:
          * @brief Assignment multiplication operator for built-in integral types
          * @param Unsigned factor
          * @return Aeu&
-         */ /* TODO: Complete */
+         */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator*=(Unsigned factor) noexcept -> Aeu& = delete;
+        gpu constexpr auto operator*=(Unsigned factor) noexcept -> Aeu& {
+            unsigned i = 0;
+            for (unsigned j = 0; j < blocksNumber; ++j) {
+                const auto product = static_cast<uint64_t>(factor) * static_cast<uint64_t>(blocks[j]);
+                auto tBlock = static_cast<block>(product % blockBase),
+                    carry = static_cast<block>(product / blockBase);
+
+                for(unsigned ii = 0; tBlock != 0 && ii < blocksNumber; ++ii) {
+                    const auto sum = static_cast<uint64_t>(blocks[ii]) + tBlock;
+                    blocks[i] = static_cast<block>(sum % blockBase);
+                    tBlock = static_cast<block>(sum / blockBase);
+                }
+
+                for(unsigned ii = 0; carry != 0 && ii < blocksNumber; ++ii) {
+                    const auto sum = static_cast<uint64_t>(blocks[ii]) + carry;
+                    blocks[ii] = static_cast<block>(sum % blockBase);
+                    carry = static_cast<block>(sum / blockBase);
+                }
+            }
+        };
 
         /**
          * @brief Assignment multiplication operator

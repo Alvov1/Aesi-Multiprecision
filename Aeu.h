@@ -953,7 +953,7 @@ public:
     }
 
 #ifdef __CUDACC__
-    __device__ constexpr auto bitCountDevice() const noexcept -> std::size_t {
+    __device__ constexpr auto bitCount() const noexcept -> std::size_t {
         std::size_t lastBlockIdx = blocksNumber - 1;
         for(; lastBlockIdx > 0 && blocks[lastBlockIdx] == 0; --lastBlockIdx);
 

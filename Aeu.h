@@ -948,13 +948,8 @@ public:
         std::size_t lastBlockIdx = blocksNumber - 1;
         for(; lastBlockIdx > 0 && blocks[lastBlockIdx] == 0; --lastBlockIdx);
 
-#ifndef __CUDACC__
         const block lastBlock = blocks[lastBlockIdx], bitsInBlock = (sizeof(block) * 8 - std::countl_zero(lastBlock));
         return lastBlockIdx * sizeof(block) * bitsInByte + bitsInBlock;
-#else
-        const block lastBlock = blocks[lastBlockIdx], bitsInBlock = (sizeof(block) * 8 - __clz(lastBlock));
-        return lastBlockIdx * sizeof(block) * bitsInByte + bitsInBlock;
-#endif
     }
 
 #ifdef __CUDACC__

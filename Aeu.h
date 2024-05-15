@@ -944,7 +944,7 @@ public:
      * @return Size_t
      */
     [[nodiscard]]
-    gpu constexpr auto bitCount() const noexcept -> std::size_t {
+    constexpr auto bitCount() const noexcept -> std::size_t {
         std::size_t lastBlockIdx = blocksNumber - 1;
         for(; lastBlockIdx > 0 && blocks[lastBlockIdx] == 0; --lastBlockIdx);
 
@@ -956,6 +956,16 @@ public:
         return lastBlockIdx * sizeof(block) * bitsInByte + bitsInBlock;
 #endif
     }
+
+#ifdef __CUDACC__
+    __device__ constexpr auto bitCount() const noexcept -> std::size_t {
+        std::size_t lastBlockIdx = blocksNumber - 1;
+        for(; lastBlockIdx > 0 && blocks[lastBlockIdx] == 0; --lastBlockIdx);
+
+        const block lastBlock = blocks[lastBlockIdx], bitsInBlock = (sizeof(block) * 8 - __clz(lastBlock));
+        return lastBlockIdx * sizeof(block) * bitsInByte + bitsInBlock;
+    }
+#endif
 
     /**
      * @brief Check whether number is odd

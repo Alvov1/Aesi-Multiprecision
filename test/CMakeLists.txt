@@ -15,8 +15,7 @@ find_package (SQLite3)
 enable_testing()
 
 file(GLOB Tests *.cpp)
-add_executable(AesiMultiprecision ${Tests} ../Aesi.h
-        bitwise/shift/signed.cpp)
+add_executable(AesiMultiprecision ${Tests} ../Aeu.h ../Aesi.h )
 add_subdirectory(arithmetic)
 add_subdirectory(operations)
 add_subdirectory(bitwise)

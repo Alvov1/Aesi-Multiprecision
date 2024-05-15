@@ -6,13 +6,14 @@
 #include <cassert>
 
 #ifdef __CUDACC__
-#define gpu __host__ __device__
+    #define gpu __host__ __device__
     #include <cuda/std/utility>
     #include <cuda/std/array>
 #else
-#define gpu
-#include <utility>
-#include <array>
+    #define gpu
+    #include <utility>
+    #include <array>
+    #include <bit>
 #endif
 /// @endcond
 
@@ -384,17 +385,17 @@ public:
                 blockLine buffer {};
 
                 for(std::size_t i = 0; i < longerLength; ++i) {
-                    uint64_t tBlock = blocks[i], carryOut = 0;
+                    uint64_t tBlock = static_cast<uint64_t>(blocks[i]), carryOut = 0;
 
                     for(std::size_t j = 0; j < smallerLength && i + j < buffer.size(); ++j) {
                         const auto product = tBlock * ((factor >> blockBitLength * j) & 0x00'00'00'00'ff'ff'ff'ff) + carryOut;
                         const auto block = static_cast<uint64_t>(buffer[i + j]) + (product % blockBase);
                         carryOut = product / blockBase + block / blockBase;
-                        buffer[i + j] = block % blockBase;
+                        buffer[i + j] = static_cast<::block>(block % blockBase);
                     }
 
                     if(smallerLength + i < buffer.size())
-                        buffer[smallerLength + i] += carryOut;
+                        buffer[smallerLength + i] += static_cast<block>(carryOut);
                 }
 
                 blocks = buffer;
@@ -403,7 +404,8 @@ public:
                 uint64_t carryOut = 0;
                 for (std::size_t i = 0; i < blocksNumber; ++i) {
                     const auto product = static_cast<uint64_t>(factor) * static_cast<uint64_t>(blocks[i]) + carryOut;
-                    blocks[i] = product % blockBase; carryOut = product / blockBase;
+                    blocks[i] = static_cast<block>(product % blockBase);
+                    carryOut = product / blockBase;
                 }
                 return *this;
             }
@@ -420,17 +422,17 @@ public:
                 blockLine buffer {};
 
                 for(std::size_t i = 0; i < longerLength; ++i) {
-                    uint64_t tBlock = longerLine[i], carryOut = 0;
+                    uint64_t tBlock = static_cast<uint64_t>(longerLine[i]), carryOut = 0;
 
                     for(std::size_t j = 0; j < smallerLength && i + j < buffer.size(); ++j) {
                         const auto product = tBlock * static_cast<uint64_t>(smallerLine[j]) + carryOut;
                         const auto block = static_cast<uint64_t>(buffer[i + j]) + (product % blockBase);
                         carryOut = product / blockBase + block / blockBase;
-                        buffer[i + j] = block % blockBase;
+                        buffer[i + j] = static_cast<::block>(block % blockBase);
                     }
 
                     if(smallerLength < blocksNumber && smallerLength + i < buffer.size())
-                        buffer[smallerLength + i] += carryOut;
+                        buffer[smallerLength + i] += static_cast<block>(carryOut);
                 }
 
                 return buffer;
@@ -943,21 +945,16 @@ public:
      */
     [[nodiscard]]
     gpu constexpr auto bitCount() const noexcept -> std::size_t {
-        std::size_t lastBlock = blocksNumber - 1;
-        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock);
+        std::size_t lastBlockIdx = blocksNumber - 1;
+        for(; lastBlockIdx > 0 && blocks[lastBlockIdx] == 0; --lastBlockIdx);
 
-        for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
-            const auto byte = (blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte);
-            if(!byte) continue;
-
-            for(int8_t bitN = bitsInByte - 1; bitN >= 0; --bitN) {
-                const auto bit = (byte & (0x1u << bitN)) >> bitN;
-                if(bit)
-                    return (lastBlock * sizeof(block) + byteN) * bitsInByte + bitN + 1;
-            }
-            return ((lastBlock - 1) * sizeof(block) + byteN) * bitsInByte;
-        }
-        return lastBlock * sizeof(block);
+#ifndef __CUDACC__
+        const block lastBlock = blocks[lastBlockIdx], bitsInBlock = (sizeof(block) * 8 - std::countl_zero(lastBlock));
+        return lastBlockIdx * sizeof(block) * bitsInByte + bitsInBlock;
+#else
+        const block lastBlock = blocks[lastBlockIdx], bitsInBlock = (sizeof(block) * 8 - __clz(lastBlock));
+        return lastBlockIdx * sizeof(block) * bitsInByte + bitsInBlock;
+#endif
     }
 
     /**

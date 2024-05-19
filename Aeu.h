@@ -11,8 +11,8 @@
     #include <cuda/std/array>
 #else
 #define gpu
-#include <utility>
-#include <array>
+    #include <utility>
+    #include <array>
 #endif
 /// @endcond
 
@@ -358,7 +358,7 @@ public:
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
         gpu constexpr auto operator*(Unsigned factor) const noexcept -> Aeu {
-            Aeu result = *this; result->operator*=(factor); return result;
+            Aeu result = *this; result.operator*=(factor); return result;
         }
 
         /**

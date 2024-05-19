@@ -1166,11 +1166,6 @@ public:
 
     [[nodiscard]]
     gpu static constexpr auto powm(const Aeu& base, const Aeu& power, const Aeu& mod) noexcept -> Aeu {
-        if(base == 1u)
-            return base;
-        if(base == 0u)
-            return { 1u };
-
         Aeu output = 1;
         auto [_, b] = divide(base, mod);
 

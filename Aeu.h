@@ -1169,7 +1169,7 @@ public:
         Aeu output = 1;
         auto [_, b] = divide(base, mod);
 
-        for(unsigned iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
+        for(std::size_t iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
             if(power.getBit(iteration)) {
                 const auto [quotient, remainder] = divide(output * b, mod);
                 output = remainder;

@@ -61,6 +61,7 @@ class Aeu final {
     using blockLine = std::array<block, blocksNumber>;
 #endif
 
+public:
     /* -------------------------- @name Class members. ----------------------- */
     /**
      * @brief Block line of the number
@@ -68,6 +69,7 @@ class Aeu final {
     blockLine blocks;
     /* ----------------------------------------------------------------------- */
 
+private:
     /* ------------------------ @name Helper functions. ---------------------- */
     /**
      * @brief Makes line addition

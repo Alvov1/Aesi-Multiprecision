@@ -1143,28 +1143,28 @@ public:
      * @note Be aware of overflow
      * @details Accepts power of different precision rather than base and modulo
      */
-//    template <std::size_t powerBitness = bitness> [[nodiscard]]
-//    gpu static constexpr auto powm(const Aeu& base, const Aeu<powerBitness>& power, const Aeu& mod) noexcept -> Aeu {
-//        if(base == 1u)
-//            return base;
-//        if(base == 0u)
-//            return { 1u };
-//
-//        Aeu output = 1;
-//        auto [_, b] = divide(base, mod);
-//
-//        for(unsigned iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
-//            if(power.getBit(iteration)) {
-//                const auto [quotient, remainder] = divide(output * b, mod);
-//                output = remainder;
-//            }
-//
-//            const auto [quotient, remainder] = divide(b * b, mod);
-//            b = remainder;
-//        }
-//
-//        return output;
-//    }
+    template <std::size_t powerBitness = bitness> [[nodiscard]]
+    gpu static constexpr auto powm(const Aeu& base, const Aeu<powerBitness>& power, const Aeu& mod) noexcept -> Aeu {
+        if(base == 1u)
+            return base;
+        if(base == 0u)
+            return { 1u };
+
+        Aeu output = 1;
+        auto [_, b] = divide(base, mod);
+
+        for(unsigned iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
+            if(power.getBit(iteration)) {
+                const auto [quotient, remainder] = divide(output * b, mod);
+                output = remainder;
+            }
+
+            const auto [quotient, remainder] = divide(b * b, mod);
+            b = remainder;
+        }
+
+        return output;
+    }
 
     [[nodiscard]]
     gpu static constexpr auto powm(const Aeu& base, const Aeu& power, const Aeu& mod) noexcept -> Aeu {

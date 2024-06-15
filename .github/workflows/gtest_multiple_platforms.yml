@@ -57,8 +57,7 @@ jobs:
         run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
       - name: Compile
-        working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: make -j 8
+        run: cd ${{ steps.strings.outputs.build-output-dir }} && make -j8
 
       - name: Run generated tests
         working-directory: ${{ steps.strings.outputs.build-output-dir }}

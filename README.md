@@ -1,4 +1,8 @@
-# Aesi Multiprecision
+# Aesi Multiprecision ![Commits][last-commit-badge] ![Linux][linux-badge] ![Windows][windows-badge] ![Mac OS][macos-badge]
+
+
+
+
 The goal of this project is to develop a fast and handy multi-precision library that can be used with GPU parallelization frameworks such as CUDA, OpenCL, and Metal. The library should correspond to modern C++ standards, support constexpr expressions, and move semantics.
 
 ## Project status
@@ -87,3 +91,8 @@ std::cout << Aesi<256>::powm(base, power, modulo) << std::endl; // Fine
 - Both bitshift operators do not make any effort if the shift value is greater than the bitness of the number. If the shift is negative, the opposite operator is called with the absolute value of the shift. 
 - Be careful with exponentiation overflow when using the __POWM__ function and similar.  
 - Both display methods (stream operator, getString()) work significantly faster for hexadecimal notation.
+
+[last-commit-badge]: https://img.shields.io/github/last-commit/alvov1/Aesi-Multiprecision
+[linux-badge]: https://img.shields.io/badge/OS-linux-blue
+[macos-badge]: https://img.shields.io/badge/OS-macOS-blue
+[windows-badge]: https://img.shields.io/badge/OS-windows-blue

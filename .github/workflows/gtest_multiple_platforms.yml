@@ -58,7 +58,7 @@ jobs:
 
       - name: Compile
         working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: ls && make -j 8
+        run: make -j 8
 
       - name: Run generated tests
         working-directory: ${{ steps.strings.outputs.build-output-dir }}

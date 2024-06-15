@@ -50,14 +50,15 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -S ${{ github.workspace }} && ls ${{ steps.strings.outputs.build-output-dir }}
+          -S ${{ github.workspace }} && ls ${{ steps.strings.outputs.build-output-dir }} && ls ${{ steps.strings.outputs.build-output-dir }}/CMakeFiles
 
       #- name: Build
         # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
         #run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
       - name: Compile
-        run: make -f ${{ steps.strings.outputs.build-output-dir }}/Makefile
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: make
 
       - name: Run generated tests
         working-directory: ${{ steps.strings.outputs.build-output-dir }}

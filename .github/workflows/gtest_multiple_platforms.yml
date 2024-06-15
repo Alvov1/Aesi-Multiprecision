@@ -40,7 +40,7 @@ jobs:
         id: strings
         shell: bash
         run: |
-          echo "build-output-dir=${{ github.workspace }}/gtest_cmake_build_release" >> "$GITHUB_OUTPUT"
+          echo "build-output-dir=${{ github.workspace }}/test/gtest_cmake_build_release" >> "$GITHUB_OUTPUT"
 
       - name: Compile
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.

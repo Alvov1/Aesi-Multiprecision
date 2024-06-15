@@ -4,12 +4,8 @@ Aesi Multiprecision
 <p align="center">
     <a href="https://alvov1.github.io/Aesi-Multiprecision/">
         <img src="https://img.shields.io/badge/Documentation-8A2BE2" alt="Documentation"></a>
-    <a href="https://google.com">
-        <img src="https://img.shields.io/badge/OS-linux-blue" alt="Linux Compatibility"></a>
-    <a href="https://google.com">
-        <img src="https://img.shields.io/badge/OS-macOS-blue" alt="Linux Compatibility"></a>
-    <a href="https://google.com">
-        <img src="https://img.shields.io/badge/OS-windows-blue" alt="Linux Compatibility"></a>
+    <a href="https://github.com/Alvov1/Aesi-Multiprecision/actions/workflows/gtest_multiple_platforms.yml">
+        <img src="https://img.shields.io/github/actions/workflow/status/Alvov1/Aesi-Multiprecision/gtest_multiple_platforms.yml" alt="Workflow build status"/></a>
     <a href="https://github.com/Alvov1/Aesi-Multiprecision/actions">
         <img src="https://img.shields.io/github/last-commit/alvov1/Aesi-Multiprecision" alt="Last Commit"></a>
     <a href="https://github.com/Alvov1/Aesi-Multiprecision/commits/main/">
@@ -19,13 +15,6 @@ Aesi Multiprecision
     <a href="https://google.com" >
         <img src="https://img.shields.io/badge/try%20on-godbolt-green" alt="Try on Godbolt Compiler Explorer"/></a>
 </p>
-
-
-[last-commit-badge]: https://img.shields.io/github/last-commit/alvov1/Aesi-Multiprecision
-[docs-badge]: https://img.shields.io/badge/Documentation-8A2BE2
-[linux-badge]: https://img.shields.io/badge/OS-linux-blue
-[macos-badge]: https://img.shields.io/badge/OS-macOS-blue
-[windows-badge]: https://img.shields.io/badge/OS-windows-blue
 
 The goal of this project is to develop a fast and handy multi-precision library that can be used with GPU parallelization frameworks such as CUDA, OpenCL, and Metal. The library should correspond to modern C++ standards, support constexpr expressions, and move semantics.
 

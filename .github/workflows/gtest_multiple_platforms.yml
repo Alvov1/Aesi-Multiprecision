@@ -53,9 +53,12 @@ jobs:
           -S ${{ github.workspace }}
 
       - name: Build
-        working-directory: ${{ steps.strings.outputs.build-output-dir }}
         # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-        run: make -j 8 #cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+      - name: Compile
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: ls && make -j 8
 
       - name: Run generated tests
         working-directory: ${{ steps.strings.outputs.build-output-dir }}

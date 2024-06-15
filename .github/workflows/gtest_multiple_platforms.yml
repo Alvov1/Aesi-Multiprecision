@@ -57,7 +57,7 @@ jobs:
         run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
       - name: Compile
-        run: cd ${{ steps.strings.outputs.build-output-dir }} && make
+        run: make -f ${{ steps.strings.outputs.build-output-dir }}/Makefile
 
       - name: Run generated tests
         working-directory: ${{ steps.strings.outputs.build-output-dir }}

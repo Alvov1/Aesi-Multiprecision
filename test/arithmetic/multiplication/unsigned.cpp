@@ -3,40 +3,40 @@
 #include "../../benchmarks/benchmarks.h"
 
 TEST(Unsigned_Multiplication, Basic) {
-    Aeu128 zero = 0, one = 1;
-    Aeu128 m0 = 10919396;
-    EXPECT_EQ(m0 * 0, 0);
-    EXPECT_EQ(0 * m0, 0);
-    EXPECT_EQ(m0 * 1, 10919396);
-    EXPECT_EQ(1 * m0, 10919396);
+    Aeu128 zero = 0u, one = 1u;
+    Aeu128 m0 = 10919396u;
+    EXPECT_EQ(m0 * 0u, 0u);
+    EXPECT_EQ(0u * m0, 0u);
+    EXPECT_EQ(m0 * 1u, 10919396u);
+    EXPECT_EQ(1u * m0, 10919396u);
 
-    EXPECT_EQ(m0 * zero, 0);
-    EXPECT_EQ(m0 * +zero, 0);
-    EXPECT_EQ(m0 * one, 10919396);
-    EXPECT_EQ(m0 * +one, 10919396);
+    EXPECT_EQ(m0 * zero, 0u);
+    EXPECT_EQ(m0 * +zero, 0u);
+    EXPECT_EQ(m0 * one, 10919396u);
+    EXPECT_EQ(m0 * +one, 10919396u);
 
-    EXPECT_EQ(zero * m0, 0);
-    EXPECT_EQ(zero * +m0, 0);
-    EXPECT_EQ(one * m0, 10919396);
-    EXPECT_EQ(one * +m0, 10919396);
+    EXPECT_EQ(zero * m0, 0u);
+    EXPECT_EQ(zero * +m0, 0u);
+    EXPECT_EQ(one * m0, 10919396u);
+    EXPECT_EQ(one * +m0, 10919396u);
 
-    EXPECT_EQ(+zero * m0, 0);
-    EXPECT_EQ(+zero * +m0, 0);
-    EXPECT_EQ(+one * m0, 10919396);
-    EXPECT_EQ(+one * +m0, 10919396);
+    EXPECT_EQ(+zero * m0, 0u);
+    EXPECT_EQ(+zero * +m0, 0u);
+    EXPECT_EQ(+one * m0, 10919396u);
+    EXPECT_EQ(+one * +m0, 10919396u);
 
-    m0 *= 0; EXPECT_EQ(m0, 0); m0 = 10919396;
-    m0 *= zero; EXPECT_EQ(m0, 0); m0 = 10919396;
-    m0 *= +zero; EXPECT_EQ(m0, 0); m0 = 10919396;
-    zero *= m0; EXPECT_EQ(zero, 0);
-    zero *= +m0; EXPECT_EQ(zero, 0);
+    m0 *= 0u; EXPECT_EQ(m0, 0u); m0 = 10919396u;
+    m0 *= zero; EXPECT_EQ(m0, 0u); m0 = 10919396u;
+    m0 *= +zero; EXPECT_EQ(m0, 0u); m0 = 10919396u;
+    zero *= m0; EXPECT_EQ(zero, 0u);
+    zero *= +m0; EXPECT_EQ(zero, 0u);
 
-    m0 *= 1; EXPECT_EQ(m0, 10919396);
+    m0 *= 1u; EXPECT_EQ(m0, 10919396u);
 
-    m0 *= one; EXPECT_EQ(m0, 10919396);
-    m0 *= +one; EXPECT_EQ(m0, 10919396);
-    one *= m0; EXPECT_EQ(one, 10919396); one = 1;
-    one *= +m0; EXPECT_EQ(one, 10919396);
+    m0 *= one; EXPECT_EQ(m0, 10919396u);
+    m0 *= +one; EXPECT_EQ(m0, 10919396u);
+    one *= m0; EXPECT_EQ(one, 10919396u); one = 1u;
+    one *= +m0; EXPECT_EQ(one, 10919396u);
 
     Aeu<128> v = "155224914605719640152163633212502418720"; v *= 962355u; v *= 1001198u; v *= 338858154u;
     EXPECT_EQ(v, "50679771797195426729761095894027301438286084702511325315200");

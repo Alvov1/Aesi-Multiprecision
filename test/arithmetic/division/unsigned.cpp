@@ -2,10 +2,10 @@
 #include "../../../Aeu.h"
 
 TEST(Unsigned_Division, Basic) {
-    Aeu128 one = 1, zero = 0, ten = 10, two = 2;
+    Aeu128 one = 1u, zero = 0u, ten = 10u, two = 2u;
     EXPECT_EQ(zero / one, zero);
-    EXPECT_EQ(ten / two, 5);
-    EXPECT_EQ(two / ten, 0);
+    EXPECT_EQ(ten / two, 5u);
+    EXPECT_EQ(two / ten, 0u);
 }
 
 TEST(Unsigned_Division, Huge) {

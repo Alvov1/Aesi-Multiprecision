@@ -2,29 +2,29 @@
 #include "../../../Aeu.h"
 
 TEST(Unsigned_Subtraction, Basic) {
-    Aeu128 zero = 0;
-    Aeu128 m0 = 14377898;
-    EXPECT_EQ(m0 - 0, 14377898);
-    EXPECT_EQ(m0 + 0, 14377898);
-    EXPECT_EQ(m0 + zero, 14377898);
-    EXPECT_EQ(m0 - zero, 14377898);
-    EXPECT_EQ(m0 + +zero, 14377898);
-    EXPECT_EQ(m0 - +zero, 14377898);
-    m0 -= 0; EXPECT_EQ(m0, 14377898);
-    m0 -= zero; EXPECT_EQ(m0, 14377898);
-    m0 -= -zero; EXPECT_EQ(m0, 14377898);
-    m0 -= +zero; EXPECT_EQ(m0, 14377898);
+    Aeu128 zero = 0u;
+    Aeu128 m0 = 14377898u;
+    EXPECT_EQ(m0 - 0u, 14377898u);
+    EXPECT_EQ(m0 + 0u, 14377898u);
+    EXPECT_EQ(m0 + zero, 14377898u);
+    EXPECT_EQ(m0 - zero, 14377898u);
+    EXPECT_EQ(m0 + +zero, 14377898u);
+    EXPECT_EQ(m0 - +zero, 14377898u);
+    m0 -= 0u; EXPECT_EQ(m0, 14377898u);
+    m0 -= zero; EXPECT_EQ(m0, 14377898u);
+    m0 -= -zero; EXPECT_EQ(m0, 14377898u);
+    m0 -= +zero; EXPECT_EQ(m0, 14377898u);
 
-    Aeu128 m1 = 42824647;
-    EXPECT_EQ(m1 - 0, 42824647);
-    EXPECT_EQ(m1 + 0, 42824647);
-    EXPECT_EQ(m1 + zero, 42824647);
-    EXPECT_EQ(m1 - zero, 42824647);
-    EXPECT_EQ(m1 + +zero, 42824647);
-    EXPECT_EQ(m1 - +zero, 42824647);
-    m1 -= 0; EXPECT_EQ(m1, 42824647);
-    m1 -= zero; EXPECT_EQ(m1, 42824647);
-    m1 -= +zero; EXPECT_EQ(m1, 42824647);
+    Aeu128 m1 = 42824647u;
+    EXPECT_EQ(m1 - 0u, 42824647u);
+    EXPECT_EQ(m1 + 0u, 42824647u);
+    EXPECT_EQ(m1 + zero, 42824647u);
+    EXPECT_EQ(m1 - zero, 42824647u);
+    EXPECT_EQ(m1 + +zero, 42824647u);
+    EXPECT_EQ(m1 - +zero, 42824647u);
+    m1 -= 0u; EXPECT_EQ(m1, 42824647u);
+    m1 -= zero; EXPECT_EQ(m1, 42824647u);
+    m1 -= +zero; EXPECT_EQ(m1, 42824647u);
 }
 
 TEST(Unsigned_Subtraction, Huge) {
@@ -434,15 +434,15 @@ TEST(Unsigned_Subtraction, HugeAssignment) {
 }
 
 TEST(Unsigned_Subtraction, Decrement) {
-    Aeu128 m1 = 28310193;
+    Aeu128 m1 = 28310193u;
     --m1; --m1; --m1; m1--; --m1; m1--; --m1; m1--; --m1; --m1; --m1;
-    EXPECT_EQ(m1, 28310182);
+    EXPECT_EQ(m1, 28310182u);
     Aeu128 t1 = m1--, u1 = --m1;
-    EXPECT_EQ(t1, 28310182); EXPECT_EQ(u1, 28310180); EXPECT_EQ(m1, 28310180);
+    EXPECT_EQ(t1, 28310182u); EXPECT_EQ(u1, 28310180u); EXPECT_EQ(m1, 28310180u);
 
-    Aeu128 m2 = 57075809;
+    Aeu128 m2 = 57075809u;
     --m2; m2--; m2--; m2--; m2--; --m2; --m2; --m2; --m2;
-    EXPECT_EQ(m2, 57075800);
+    EXPECT_EQ(m2, 57075800u);
     Aeu128 t2 = m2--, u2 = --m2;
-    EXPECT_EQ(t2, 57075800); EXPECT_EQ(u2, 57075798); EXPECT_EQ(m2, 57075798);
+    EXPECT_EQ(t2, 57075800u); EXPECT_EQ(u2, 57075798u); EXPECT_EQ(m2, 57075798u);
 }

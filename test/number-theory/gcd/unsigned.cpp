@@ -1,186 +1,19 @@
 #include <gtest/gtest.h>
 #include "../../../Aeu.h"
+#include "../../generation.h"
 
 TEST(Unsigned_NumberTheory, GreatestCommonDivisor) {
-    Aeu768 l, r, bezoutX, bezoutY, gcd;
-    {
-        l = "0x3df2883efcd560f4f213a3b7d414dbd9e5045c74aecf27870566cc18d05947f4e69a4a22e5e0f0847eb10b90b1913bc54bf9a7e9814d7f28d87e64fc0c8d14e96c8585c4592c5b603deef73db71eef386513561d9edb649d2ff002",
-                r = "0x62cc3db91175168b8b7dafabe3ad403899e932e31da530d040cd77a09ab4b277ead53319eef5ae9349420e47c77505b2e13c9b358c39b280104ce58663298b80668b11349b715b3cadbb0c5fc0793f5de2143e622942d71caed00a";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0xd5b3428c026c2d89cdd31c8f56553f082d582");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0xd5b3428c026c2d89cdd31c8f56553f082d582");
-    }
-    {
-        l = "0x16613a30eb3fe70cea3c9a1f80532461604ebdb736a665471aa9ab3305fdb1ac9116ebb039c5b6724c1a75e40d4e2b0692e1b260eb5a7f3319637a6c919697c32aac84a9154a826eb24fdbf3e6b8abd603d655bd428d333528f54df",
-                r = "0x389e95cdefd1d8fed3fe1a1a221f874d3bebcb4b6dc66dd619cf38c973603e2f472aae11de2ada1af4a864f1cc2aa2b73dcedc676862317c1041c72f5232d424c102976bf2333b6e6bc1e7f87f15d466cbd4e8078703a1d724f6fbf";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x3daadc4e0c54be1b110d1891001f9f618c91d3");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x3daadc4e0c54be1b110d1891001f9f618c91d3");
-    }
-    {
-        l = "0x11f16c650c7a09e4a5318d24f246bebdaeccf7b11588271f8d8984cd0d783f1d36d71dd3f78b4b1374e2306270b2d951c3b9c4fe00f15bacc604c9711faf4fd8aa14e7ad33ce2348d14584af479546c74cdc72863d150752b0fbaae",
-                r = "0x1302a1d4117a8fb6d9afee062b03d2c7bf8ee7884cf54983d5eac5858e24c05f4466fee2c1a3a065770d13bba296b6d60e2a46aef75a4fbe519235b9183cf7ec1adbfb9858d417f723168e67b8d287c1758db03449a2d047c547e4e";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x18f697815b1a3ef4a7d8ef3f7daa05a8628c02");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x18f697815b1a3ef4a7d8ef3f7daa05a8628c02");
-    }
-    {
-        l = "0x8e3b86b9602b4b421f3eb20f0c1695c769edff855a45ad8512e2c4680ea94918abdcc2d59ab488c12c05e8a5089b307c73b883be5e5fc7937344c618215096d690fbf03ff10e8445cdaa2c10d3b75b47413f3b2b367bfadeee96ec",
-                r = "0x4cfc26e1787112542393428817b8183264741d454ab1c606c60e6dbec239d1c1b703908669e47440f5e49100538b5df7508f8e47bde86c3cf8101e428211f4b156466e77fdb327193a2748607bbcbbea8420c536f8324baf62ba64";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x94a25fadb92303ad218a6f39adabc96a30b7c");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x94a25fadb92303ad218a6f39adabc96a30b7c");
-    }
-    {
-        l = "0xb94707c5a121728934aa17705d0c14c4f2c3a4b1f5a6e0006be85773fa196506dacb43b8239aba00ed812a326bd0b9e380c49d74683e0d16b6b9c6d0a9f1110879323caf1f1e16fcd6623f5d66918c4019f582f525caeb4e84e805",
-                r = "0x1a9bc32c33c5cfd0e90be68d213732cebac02561ba71f85be8ec75af2078b18235b7236a81b1be6fa426646af140554a528284349866df85caaa4261ee99d9a4aae163117e5b285134a083e8e148baf74aea92012875c7043648107";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x390a287e3594aa4101d02487c4fd66eeb59509");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x390a287e3594aa4101d02487c4fd66eeb59509");
-    }
-    {
-        l = "0x5de94caf2e8eadb67b26394008da6f85273e981105fd75afa261583d4a2a746992effcfd4b4811d9b358d7665548d97a63d2e922cad956ffc218e739b5493fb58448995168120a180bba69fc76f17d9cd7cde3759b8b4bc3f9d50c",
-                r = "0xc4ba8df89bdb3166a9025871663a34dbd2a4fdc4c33e63bc3dd79a23056f8f4635defdcb847670a52c9dbcbafaa74beee215b58d3ed985d74285f5a6341c70f91fdc761842ca140092352d97b648f677c2d107ad5f0192d817c9c";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x7317ee653e0706728c7258aebf2e6ef4e076c");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x7317ee653e0706728c7258aebf2e6ef4e076c");
-    }
-    {
-        l = "0x12378edd0c920dfb8780aca14d089b57cf72406f37486ee61e29c5916cf9aca5c5d07f0dd8b2beebb45651b55ec8672fea63d42e51ff793148e23679d1d010b0a8f75626487d1512cab54fece541e3b9cf25f853dca6b728cba87e3",
-                r = "0x183bc74d9161059a2b9c48fc5889f6d497ac778aac9f53fc16b4e979756876405a6c82e3d5949c6633179e9860428a4d43cd366a65af4dea2badef21c06d35bc161ab862b816cd9b5688bf3650668097077354a91607af8931cb131";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x28f550318b9f34798038bafc6c0dc1c6806b4b");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x28f550318b9f34798038bafc6c0dc1c6806b4b");
-    }
-    {
-        l = "0x28fb75e2f5c08bb027600946c18d700f9c76e19ebb9f41178af9f858e946cb13d1d7b755d8bcda02e13c7a0840a71564653145b2a1b6bb3a85a2e497d166215b3ae4ff1585550e07ab1755ad17df7acf2cf437b2be069e1deb27159",
-                r = "0xc3766ea6a383b4e949c5cf5a2b3f38c1db3c3f973d61e16ea9e022189328f2f3faa3041b7f8d539e94f89cb88e929252efe02e2cbd8ef06c1f00514ddebeeac466dd4cec6cb61efbc6f1459c8e326e1c085b1154447f0ef5d40763";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x38cbe653b9d9dfcd33c897bc1916004bc72985");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x38cbe653b9d9dfcd33c897bc1916004bc72985");
-    }
-    {
-        l = "0x191bbfbf8e8fc36af5ba9be5a44ff1124813663d95fbd9672515c0a3513402b520740c6885b2d8ebe62f2a5c30cf0a4f6572e24d3d87c31a14fce6fd2e977e73978b6258627d978d42285351a1ac1e9b526aa154a6d4138300f6bf0",
-                r = "0x1167a365aa71292b7f7b622d1baa7dd2f40bcb8c0544a867a2ed0cd1e7acd46f9d18316fa884b40f797b5585158da18a82e3cc83b9029a8e26c3f8667526514cbe0618e075c8e9eb9bacbfc473d5109f7fcca5f09ea6ded78be3f70";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x1de9abd125a067d939a8b0a2afde3aa03681b0");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x1de9abd125a067d939a8b0a2afde3aa03681b0");
-    }
-    {
-        l = "0x112ce2ce80a6b050896a80dba99f6d3d8d284e1d5c1933427b79a7f6136d55a13483a3f314a4b05b3820bdad9569fd48461da61d7548fed164fefc27588112c95e5175e18c1e8553907f82333743cef8f73eecb7c59f0b6a43549aa",
-                r = "0x1beea090e4fc50950a1d1cbebeec3a9e81e6c4d9cb6ac733c1dc8d8cdd8fceb28a26b7ebd44239a5b358b35e2519e3cce6460afd5d705ca1d353275c1f9d8ca13eb8d100e1829ace69b4e3130cae67ee3ba403b75186317890de766";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x3351e1da6fc3059f2249c8462de8149f544a62");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x3351e1da6fc3059f2249c8462de8149f544a62");
-    }
-    {
-        l = "0xedc51da6e4435f8e9ac8b5113a27f04d8dd55fe2df7fb0dd7f4105e41311d8925d63885f6af258dd0d095f669755aeca1471638da20947043f51fe6e3874fa150584f6c607dbfd5a2b460213dede92507dde952e17b2a56fb53aeb",
-                r = "0x10db32e4595c3d8e7dd1af483be25680a2c6848e831254198c890b9f1ecf46bcd8de2a3a1ff154b6bc44ba91ee96c5b59ff6cbacd907458cee94dd6f2747ab3c4da8521d4f741f7bfb139353b479d8ea571602bfd23c19173add7b5";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x3b2c599af5b526527875094abbca90ff1bc137");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x3b2c599af5b526527875094abbca90ff1bc137");
-    }
-    {
-        l = "0x3057c6486f516094f80ff75bd3f32d321046deeba27d168c75d2277b28f65d7fd996a3e0a251d7308e1a302a8178974e9dfac1af8c62baf6dd435d6e848e119b8c115751f5a83f4632b41d39b50620a17249f7824caed061f8bbcfc",
-                r = "0x28fd970418971ac2e2b6738b330c1530e7841bf68661e9ba7aae0b967fcc8becd6578be66b9c01714fff1728928b1731e092cd09292a539c35bd20ce197f1139e4684cf6f4d5d2ced88608e82295c4ba632ffa6ae136c9739d16f74";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x3e2b79e9bb9fc6ab964cbbc155051a3174d6fc");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x3e2b79e9bb9fc6ab964cbbc155051a3174d6fc");
-    }
-    {
-        l = "0x12962b6298a3073881df0818c328c5ae0c3e8925a0a5a4d8ec7d5f8fefd09473ace4e3e3ccc70e4a9b8a1a382910d05c1e30dbfaf7aa753bdadbdec3b389ca353832e5a42600fd6aa6e2187d9efa0811a75bcaa475a5375893b58a",
-                r = "0x2b864891651493e9ecc3cd992cf9568f3935a55222c2b5373add839353ff519ab4643550c8b5e2ee4616c89554fe7d5e89547119394165e6914ee92531878405b2dc0f8cd8ccfeafc92dea7a1998423b09d6db3eeb1fe6384eb99a";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x4d390e4f472f10aa2f144ccaac51697536952");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x4d390e4f472f10aa2f144ccaac51697536952");
-    }
-    {
-        l = "0x12a71bc861a9b01c2ac91fbd437041d4bd8443c924c793e8b89d3f1607a9f876abc921363c36be4015159a37a924de35cf2e3942d0e979daee80b250db44212f883e16e3d97fa8d7ee73d67161ad0faec031ca24108dd83bcb35478",
-                r = "0xf1107e5f87ae8c5039be9ce80c85e2f9327823ca77a61bc6a7b96c7cfb929868d0c174c7293df811dbac2b88222295fe531661da325d1a3c36c9ef1f0f093d9753b337703c5ce68e6f23fc1e60d4873b587a1975a2ba7e04a954a8";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x291098cf74716fb88797e484c4a8bb83f39608");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x291098cf74716fb88797e484c4a8bb83f39608");
-    }
-    {
-        l = "0x23c225f6706e287046e91b30e737e9df6d3a4eb2f9856d810d2113f46659b7f17ad33963d56c69634e31084d39bad69b0fa933da2d7938dc795faf028bfe212e5bbcc75bfca108e312becb9b5286f43174a07ee3c2063896c0f7f15",
-                r = "0x187f87575c4b9fcbe521e9f9318454c5cdd48d3d77cde3ed32ff0adf8890be752d1183cc130fa9742c7e64fe1570f0a51c9db8f0cecab2a100b47a96e795b8ab075367fd26c534483346cd22f59a46853e5d66aaeb0c5dd54f8b9fb";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x30fc3bdb43ce6184b92e749be5dfd1193095d3");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x30fc3bdb43ce6184b92e749be5dfd1193095d3");
-    }
-    {
-        l = "0x3ade9c72dea15aad7003144951d7014afc20230ad13bd37ccf6c569ad911fca7252bf763e85430f7c74817f3aa5778d8cf5297c957a59f4170ef29ff78b0490f1e191784699f3ed0ace974b9d0ed7009de6d1c9b26d87b6a893e80",
-                r = "0x168cbb6cd7e3cf8e8ca17ee2296d9493bdc13a715f9bf2f63218ff579c82473f2f567e0adbab5e2ead39e94b99fdb9f8734b7914f3ef26d061a0f9bdccca1678a292728c04895b775e8af0cc4341eb5fc928e230113ece4ed4fa080";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x20c584d8dd0a41b1a897fa2d4c97164e9e8080");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x20c584d8dd0a41b1a897fa2d4c97164e9e8080");
-    }
-    {
-        l = "0x25b6130c6f23c724e58b5e006cfd2f419a65510270bdc9190cca01c47066b29f2fbdca43a28d37861c116c22714528de7aa4702359574d7ddda0d250f358b020802227f94e3c88ea782dd917abd9316fa9e4916f98c7c9c9b526b80",
-                r = "0xc23fe68dd53bc0892cedb58c5d7c5db171a1df5905a9467ad7ca3ce38a0ef7a150e1bcc7e2eb30d093db17cba89acb1198da865d6b0e220eb83ee5cb3ff28b87ced1d7f1945a95eec1665bd4a6f2c295d5be8f26f5c11e8a212380";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x3b65c46eabcb4b436b92a2c8c9d62dca504f80");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x3b65c46eabcb4b436b92a2c8c9d62dca504f80");
-    }
-    {
-        l = "0x286306b691dbf68f8165d3d82ab2a4efeee4b029268d32f2140058221df1bb50a3ecbef56316de3b9af7c20c5baafabc844251118152026c660bde16f23ff227fb4e8f2c7c1cfc2d039e6dc0f94551dcdeb6d943c88c9df201c96e9",
-                r = "0x1135782538c264071b5109882674b156fc0efaeb6df7fbeffcaa960c76d99cdb8c8413aef1aad96e723098d2c1c37791dab2ecd569196ee5e50bd8b33bf01d7b208619b7c725a04071ca02d270971ae777a3b99baa4232192f920d";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x34e4dfb0c0a0026d4fb9e1da4d024fadf88055");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x34e4dfb0c0a0026d4fb9e1da4d024fadf88055");
-    }
-    {
-        l = "0x74caf1d9c17271e2235edee52aecfd0554f67fbc0a48bb25a47ca481dca5a3dbee72a8d38836f4628d9425263d9f62b7c573b60f4c239c8668869ee2dbee57bc27cf9f8e6b3d9b37da762591aab4a7d783fb87d7daffacd6eb1edb",
-                r = "0xc9678e1db00b097ce4011746ff1285560ed59bd662ffb979a61713a9867fb16b6a5772825125d2e74266b1a8d7933aec96a134d338d134b4ce391912b510ecd446d4cba01cd849eddf500c1425c064078721fba3b7a6c527e7d617";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x113b3677eb8d14ef13cda1ecdb681602f8f5c1");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x113b3677eb8d14ef13cda1ecdb681602f8f5c1");
-    }
-    {
-        l = "0x34ab704d2e8a5ff54112c362c55a60fc58773803c49926a0719d8e395204204256904bc87862360b3cc3f2d812c7353a22ad35bdde798aa25e8fb3fb23ce756e04273a23c496f8acfad29ca6f03179c8949cb5d35f02122c0c23465",
-                r = "0x15a61785c8a72633fda729a6aa2ff3bb930e2f9dd744c28e97ebde654c886766a1dcb958e0024c2b3011cea1e028a7473dc1a6505bc2fc0c21b95149174f464de64ab558a06d09c9444a52859a776e2bed97b430262fea7a46c12f7";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x34c1f94aaa9ff0ab1aebc0405a1c07a85ea67f");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x34c1f94aaa9ff0ab1aebc0405a1c07a85ea67f");
-    }
-    {
-        l = "0x221e8f6f41cc91c9e8900b723b0b538de5315025b32b3205d5e2e1a15b0ab389f63ecd9fe2c3d932bfadbc8c487cdb5915e439b1420a366338e3884b713f1c2981d332077e91dda904b04e3a565551e51fe67ee93d368ff5cc18267",
-                r = "0x1d1ceb8a1d716f7f5eb59b061e8292cbd2024977159c7259c887d17db83b40f4e99b4ac9ee7839a5c0fa273d42d7eeaf48ecbcb1fd9ca28fe8852f344db724da5db18cba521368f5dd2dd11c762bd322318f22e43e8f6ada2a127b1";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x27599cbde16c7089adad4b60e1cf9022fbd531");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x27599cbde16c7089adad4b60e1cf9022fbd531");
-    }
-    {
-        l = "0xfbf86d1a1aca0661a1c2cc3fff90cfb8cd26f5892bc9139975fef0104ab1896e72655d06b1376665845610a6cd13925c9d2a70149eec83c5cda42aa729ba06e42c37561df802ea397b7f478051f611bc832fe1153bb314280f9f6b",
-                r = "0x606f9b6e67734e6ff2180b8d6a5df7e44277a61c4b09c994cd8d8dd04c329c9e1dfcd5e696713328d6b00baa29eaf0adcaee878bdf6aabd0e9d69df4abe7a7b80214c68ede3f253f5b297dcf9273e33877c2e6b11f3181636cc8bf";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x12b22f71c5e5669ad10b7290abd223b627b655");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x12b22f71c5e5669ad10b7290abd223b627b655");
-    }
-    {
-        l = "0x68b43d96556f77fdc3c96555dc293e1deab7a8791ba8bdfd5d807eaae409c3b76dd128b9a7f371f7b645b88a0d6875aa8e21e24b05b85a2749de8228cc06fb5a5d5ee7155d7a69e0dd510bfaa0a2c5c7ca70829e6fef0161a38250",
-                r = "0x1b7549e77b5687414cfada74e76e124fe2cb7e62c559d177df70230c2c74c9ea3058b4d5a3451329893f04ef146e2088fc74c591d94b06037bfab78b15ebf75275dd4765a7c19cf0fd7598c850592ca88c948fc8e4d9a5e393c310";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x1546307a8b5a238d84b1e7d20f47d7bb9604b0");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x1546307a8b5a238d84b1e7d20f47d7bb9604b0");
-    }
-    {
-        l = "0x28cea6c7363e048881a8c423613e75f74902283189495feb0d444e2145fcad9a12bf8eaba4af2c17f5179d5b44d9557c150f278e7eb133eeb93c65baf21d7c4f8c91617c29a7c3b2a37a506208081569d4907482554b2b94f19f29",
-                r = "0x64328f2eb880d708da6fb64e9f8834df065f47e688d451ba05ed13a1f77760655552547b4f4c49675a5ae34870e2ac7e90c710d735d8f0654c670dff31f8aaafc6cd2d016c9c438267d1940c0555465b494608202d491db1dffc13";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x6c1f410098c52b7142f9fbacea5b57f0064c1");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x6c1f410098c52b7142f9fbacea5b57f0064c1");
-    }
-    {
-        l = "0x231b09fd68cf88af4b1e172c6d8eb9641327096b3c0599ecba3df74e58a7db4bf7fae84cda515e5023c6e8cc1cc03335f2c1f9a876a577b8765dc4f54dfefe7e4834c2817abb567fbcd3910b64541fd425b96155a6603e1ba05f2ea",
-                r = "0x1de615b7860443828ca935f232ec54bf9c25b2ac90d69ed9c45ddab0d0eaed04e5ff0a2f5428595e66ed95f979536e3f1e56cb7aef4bab489dabb2f6d17819e77a83d7f35d30f422c5e17f7623a277d81ae5457f37a08e855c49b0a";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x38b94d74c12d928d489d8bbd944ccee0b7cc9a");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x38b94d74c12d928d489d8bbd944ccee0b7cc9a");
-    }
-    {
-        l = "0x691fd805d943811b42d75861c5207b9faa952c2790eeccc6a0825a2cdece87900606fbc8f602dbb077bfe9814cb6bd5802f74381c7d1005c9aebaef64d8a5e6ca87366515c60dda02f2af92bd28aec612cc0b57ff04a78d0dbf990",
-                r = "0xd7a322084578dba5674e1765f43f0a29905cabe668bc1424ba1e26caa4d4e7da603193c727381f8bd7488372197d3835daee9cd6c98b87124d0b93173086b854be44f7c4f0af1e99395604de8384e6d3718c9cbdea5aaf06011570";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0xfb9a697374f8b707018cbbba9243432021d90");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0xfb9a697374f8b707018cbbba9243432021d90");
-    }
-    {
-        l = "0x151cfd88053bb57b528a83942bae1b3866d54baa378cf0e4b01283e1744becbd6b6bee5a0bec509d56e9859f3c81eb0321b3dbed3f44900cbeb077ffd007e08d18ac5d2c576624305c2a7f2db85c141088d68ddc9c8356a18f1c094",
-                r = "0x2df125c1a5702ce7db02148e7296d9f0366eebf266aa816411b398d460bf618cd1e1e565cb7eced1d54ccb6e37b077efc45e9a471ad62987a7fd7e2043a751ba7358a4c2b72184153c7a3c35eee155ffdee8e7ea3e7c1575dfc20e4";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x3d2f7b6bfb588fd87fcabac7089c3e6fb0e444");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x3d2f7b6bfb588fd87fcabac7089c3e6fb0e444");
-    }
-    {
-        l = "0x7be7a36bf8839ae1dfdc43c01d2b75d9e24ce50f9086c140dd34e3c6cc046188ff5c5460582650a23cef619055ee615da705f1bb1addd950ea9e270166239eb0c74f106dc5651f4684b2401be352c951fb6d89961abce947673495",
-                r = "0xcc08b9e7701c01e59a028905e8079ccca3377312a40cbd3fba5516ee87226a691e59790ce7e1b80f43ad8028ad3857fb06406a2ca829f9debb62cf90e35013ca92c80b1ebfd72af1909156150aac755e1e5ebd66e892ba5fa7a31d";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x1002e980c054f64ff400fc8889672ee6eb0cf3");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x1002e980c054f64ff400fc8889672ee6eb0cf3");
-    }
-    {
-        l = "0x4e5c74ce977c5d733f2784c9e172eb1358e3b5409708e0c9059a555f04f6747c541bf4778c8a86a7740be9150dc7e210ced08d0960b5bc03f82869daf0aa8dbd39452567e97cee10cdd0c23e095d685e6539337593fa7b316e4f7",
-                r = "0x31c33ac2646f657f1c47a9f5b87b56bb234c8c46f753797ce838ea0e2a01945d597f1d087c34774412f053c5ceb66e1208421658cad8be5eece0093708bdcf178b6330b03ec0f3aa10df63caf8dfa93e4a32a2bc111306535c2f8f";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x344a33ac0ec5238f2b265de69196b91db6f33");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x344a33ac0ec5238f2b265de69196b91db6f33");
-    }
-    {
-        l = "0x3c0e14ceeebcf671274349542e184e3b8974585b72a9798bcdda736353da378d98caddffd683c6f47d67f70866ca781fed2456c93be36abe64ca103b298df6d2795cc87e74398ad506dddc9ebc327ab7d02dd485194f0b6a423a43f",
-                r = "0x38dc7e79f1a6f12836c8586ca8d595f919de61919696e7dbf82b692906e5c1c38833fd8203c38f18ddc5a268e26a2c6d9e9ff7a0d961dc2d9097e18b377a80ca5ee074ef1c80ed9f51bd135e6237e9ae714296966277c710b98b937";
-        EXPECT_EQ(Aeu768::gcd(l, r, bezoutX, bezoutY), "0x3e2152ca2ac0ffd9c599ba79b6ec48c79a34bb");
-        EXPECT_EQ(l * bezoutX + r * bezoutY, "0x3e2152ca2ac0ffd9c599ba79b6ec48c79a34bb");
+    constexpr auto testsAmount = 256, blocksNumber = 64;
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto common = Generation::getRandomWithBits(blocksNumber * 8 - 10),
+                left = common * Generation::getRandomWithBits(blocksNumber * 24 - 10),
+                right = common * Generation::getRandomWithBits(blocksNumber * 24 - 10);
+        std::stringstream leftS, rightS, gcdS;
+        leftS << "0x" << std::hex << left;
+        rightS << "0x" << std::hex << right;
+        gcdS << "0x" << std::hex << CryptoPP::GCD(left, right);
+
+        Aeu<blocksNumber * 32> l = leftS.str(), r = rightS.str();
+        EXPECT_EQ(Aeu<blocksNumber * 32>::gcd(l, r), gcdS.str());
     }
 }

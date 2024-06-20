@@ -3,45 +3,45 @@
 
 TEST(Unsigned_Addition, Basic) {
     {
-        Aeu128 zero = 0, m0 = 26359343;
-        EXPECT_EQ(zero + m0, 26359343);
-        EXPECT_EQ(m0 + zero, 26359343);
-        EXPECT_EQ(zero + +m0, 26359343);
-        EXPECT_EQ(m0 + +zero, 26359343);
-        EXPECT_EQ(+zero + m0, 26359343);
-        EXPECT_EQ(+m0 + zero, 26359343);
-        EXPECT_EQ(+zero + +m0, 26359343);
-        EXPECT_EQ(+m0 + +zero, 26359343);
-        m0 += zero; EXPECT_EQ(m0, 26359343); m0 += +zero; EXPECT_EQ(m0, 26359343); +m0 += zero; EXPECT_EQ(m0, 26359343); +m0 += +zero; EXPECT_EQ(m0, 26359343);
+        Aeu128 zero = 0u, m0 = 26359343u;
+        EXPECT_EQ(zero + m0, 26359343u);
+        EXPECT_EQ(m0 + zero, 26359343u);
+        EXPECT_EQ(zero + +m0, 26359343u);
+        EXPECT_EQ(m0 + +zero, 26359343u);
+        EXPECT_EQ(+zero + m0, 26359343u);
+        EXPECT_EQ(+m0 + zero, 26359343u);
+        EXPECT_EQ(+zero + +m0, 26359343u);
+        EXPECT_EQ(+m0 + +zero, 26359343u);
+        m0 += zero; EXPECT_EQ(m0, 26359343u); m0 += +zero; EXPECT_EQ(m0, 26359343u); +m0 += zero; EXPECT_EQ(m0, 26359343u); +m0 += +zero; EXPECT_EQ(m0, 26359343u);
     }
     {
-        Aeu128 zero = 0, m1 = 14670384, m2 = 55908622;
-        EXPECT_EQ(m1 + 0, 14670384); EXPECT_EQ(0 + m1, 14670384); EXPECT_EQ(m1 + zero, 14670384); EXPECT_EQ(m1 + +zero, 14670384);
-        EXPECT_EQ(m1 + +zero, 14670384); EXPECT_EQ(zero + m1, 14670384); EXPECT_EQ(+zero + m1, 14670384); m1 += 0; EXPECT_EQ(m1, 14670384);
-        m1 += zero; EXPECT_EQ(m1, 14670384); m1 += +zero; EXPECT_EQ(m1, 14670384);
+        Aeu128 zero = 0u, m1 = 14670384u, m2 = 55908622u;
+        EXPECT_EQ(m1 + 0u, 14670384u); EXPECT_EQ(0u + m1, 14670384u); EXPECT_EQ(m1 + zero, 14670384u); EXPECT_EQ(m1 + +zero, 14670384u);
+        EXPECT_EQ(m1 + +zero, 14670384u); EXPECT_EQ(zero + m1, 14670384u); EXPECT_EQ(+zero + m1, 14670384u); m1 += 0u; EXPECT_EQ(m1, 14670384u);
+        m1 += zero; EXPECT_EQ(m1, 14670384u); m1 += +zero; EXPECT_EQ(m1, 14670384u);
 
-        EXPECT_EQ(m2 + 0, 55908622); EXPECT_EQ(0 + m2, 55908622); EXPECT_EQ(m2 + zero, 55908622); EXPECT_EQ(m2 + +zero, 55908622);
-        EXPECT_EQ(m2 + +zero, 55908622); EXPECT_EQ(zero + m2, 55908622); EXPECT_EQ(+zero + m2, 55908622); m2 += 0; EXPECT_EQ(m2, 55908622);
-        m2 += zero; EXPECT_EQ(m2, 55908622); m2 += +zero; EXPECT_EQ(m2, 55908622);
+        EXPECT_EQ(m2 + 0u, 55908622u); EXPECT_EQ(0u + m2, 55908622u); EXPECT_EQ(m2 + zero, 55908622u); EXPECT_EQ(m2 + +zero, 55908622u);
+        EXPECT_EQ(m2 + +zero, 55908622u); EXPECT_EQ(zero + m2, 55908622u); EXPECT_EQ(+zero + m2, 55908622u); m2 += 0u; EXPECT_EQ(m2, 55908622u);
+        m2 += zero; EXPECT_EQ(m2, 55908622u); m2 += +zero; EXPECT_EQ(m2, 55908622u);
     }
     {
-        Aeu128 s1 = 0x24DFBE889, s2 = 0x193E161C, s3 = 0x51CDFC6, s4 = 0x1706808355;
-        EXPECT_EQ(s1 + s1, 0x49BF7D112);
-        EXPECT_EQ(s1 + s2, 0x26739fea5);
-        EXPECT_EQ(s1 + s3, 0x25318c84f);
-        EXPECT_EQ(s1 + s4, 0x19547c6bde);
-        EXPECT_EQ(s2 + s1, 0x26739fea5);
-        EXPECT_EQ(s2 + s2, 0x327c2c38);
-        EXPECT_EQ(s2 + s3, 0x1e5af5e2);
-        EXPECT_EQ(s2 + s4, 0x171fbe9971);
-        EXPECT_EQ(s3 + s1, 0x25318c84f);
-        EXPECT_EQ(s3 + s2, 0x1e5af5e2);
-        EXPECT_EQ(s3 + s3, 0xa39bf8c);
-        EXPECT_EQ(s3 + s4, 0x170b9d631b);
-        EXPECT_EQ(s4 + s1, 0x19547c6bde);
-        EXPECT_EQ(s4 + s2, 0x171fbe9971);
-        EXPECT_EQ(s4 + s3, 0x170b9d631b);
-        EXPECT_EQ(s4 + s4, 0x2e0d0106aa);
+        Aeu128 s1 = 0x24DFBE889u, s2 = 0x193E161Cu, s3 = 0x51CDFC6u, s4 = 0x1706808355u;
+        EXPECT_EQ(s1 + s1, 0x49BF7D112u);
+        EXPECT_EQ(s1 + s2, 0x26739fea5u);
+        EXPECT_EQ(s1 + s3, 0x25318c84fu);
+        EXPECT_EQ(s1 + s4, 0x19547c6bdeu);
+        EXPECT_EQ(s2 + s1, 0x26739fea5u);
+        EXPECT_EQ(s2 + s2, 0x327c2c38u);
+        EXPECT_EQ(s2 + s3, 0x1e5af5e2u);
+        EXPECT_EQ(s2 + s4, 0x171fbe9971u);
+        EXPECT_EQ(s3 + s1, 0x25318c84fu);
+        EXPECT_EQ(s3 + s2, 0x1e5af5e2u);
+        EXPECT_EQ(s3 + s3, 0xa39bf8cu);
+        EXPECT_EQ(s3 + s4, 0x170b9d631bu);
+        EXPECT_EQ(s4 + s1, 0x19547c6bdeu);
+        EXPECT_EQ(s4 + s2, 0x171fbe9971u);
+        EXPECT_EQ(s4 + s3, 0x170b9d631bu);
+        EXPECT_EQ(s4 + s4, 0x2e0d0106aau);
     }
 }
 
@@ -452,21 +452,21 @@ TEST(Unsigned_Addition, HugeAssignment) {
 }
 
 TEST(Unsigned_Addition, Increment) {
-    Aeu512 m0 = 62492992;
+    Aeu512 m0 = 62492992u;
     ++m0; ++m0; m0++; ++m0; m0++; ++m0; m0++; ++m0; m0++; ++m0;
-    EXPECT_EQ(m0, 62493002);
+    EXPECT_EQ(m0, 62493002u);
     Aeu512 t0 = m0++, u0 = ++m0;
-    EXPECT_EQ(t0, 62493002); EXPECT_EQ(u0, 62493004); EXPECT_EQ(m0, 62493004);
+    EXPECT_EQ(t0, 62493002u); EXPECT_EQ(u0, 62493004u); EXPECT_EQ(m0, 62493004u);
 
-    Aeu512 m2 = 77428594;
+    Aeu512 m2 = 77428594u;
     m2++; m2++; ++m2; m2++; m2++; m2++; ++m2; m2++; m2++; m2++; ++m2; m2++; ++m2; ++m2;
-    EXPECT_EQ(m2, 77428608);
+    EXPECT_EQ(m2, 77428608u);
     Aeu512 t2 = m2++, u2 = ++m2;
-    EXPECT_EQ(t2, 77428608); EXPECT_EQ(u2, 77428610); EXPECT_EQ(m2, 77428610);
+    EXPECT_EQ(t2, 77428608u); EXPECT_EQ(u2, 77428610u); EXPECT_EQ(m2, 77428610u);
 
-    Aeu512 m3 = 77677795;
+    Aeu512 m3 = 77677795u;
     ++m3; ++m3; ++m3; m3++; ++m3; m3++; ++m3; ++m3; m3++; ++m3; m3++; ++m3; m3++; m3++; m3++; m3++; m3++; ++m3;
-    EXPECT_EQ(m3, 77677813);
+    EXPECT_EQ(m3, 77677813u);
     Aeu512 t3 = m3++, u3 = ++m3;
-    EXPECT_EQ(t3, 77677813); EXPECT_EQ(u3, 77677815); EXPECT_EQ(m3, 77677815);
+    EXPECT_EQ(t3, 77677813u); EXPECT_EQ(u3, 77677815u); EXPECT_EQ(m3, 77677815u);
 }

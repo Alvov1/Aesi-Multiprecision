@@ -2,12 +2,12 @@
 #include "../../../Aeu.h"
 
 TEST(Unsigned_Modulo, Basic) {
-    Aeu128 one = 1, zero = 0, ten = 10, two = 2;
+    Aeu128 one = 1u, zero = 0u, ten = 10u, two = 2u;
     EXPECT_EQ(zero % one, zero);
-    EXPECT_EQ(ten % two, 0);
-    EXPECT_EQ(two % ten, 2);
-    EXPECT_EQ(ten % one, 0);
-    EXPECT_EQ(one % ten, 1);
+    EXPECT_EQ(ten % two, 0u);
+    EXPECT_EQ(two % ten, 2u);
+    EXPECT_EQ(ten % one, 0u);
+    EXPECT_EQ(one % ten, 1u);
 }
 
 TEST(Unsigned_Modulo, Huge) {

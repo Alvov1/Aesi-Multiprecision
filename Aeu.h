@@ -125,7 +125,7 @@ public:
      * @details Accepts both signed and unsigned built-in integral types. When calling this constructor on negative value, final blocks would be inverted.
      * @note Be aware of calling this constructor explicitly
     */
-    template <typename Integral> requires (std::is_integral_v<Integral>)
+    template <typename Integral> requires (std::is_unsigned_v<Integral>)
     gpu constexpr Aeu(Integral value) noexcept {
         if(value != 0) {
             uint64_t tValue = (value < 0 ? static_cast<uint64_t>(value * -1) : static_cast<uint64_t>(value));
@@ -165,27 +165,27 @@ public:
                 switch (ptr[position + 1]) {
                     case characters[8]:
                     case characters[9]:
-                        position += 2; return 2;
+                        position += 2; return 2u;
                     case characters[6]:
                     case characters[7]:
-                        position += 2; return 8;
+                        position += 2; return 8u;
                     case characters[10]:
                     case characters[11]:
-                        position += 2; return 16;
+                        position += 2; return 16u;
                     default:
-                        return 10;
+                        return 10u;
                 }
-            } else return 10;
+            } else return 10u;
         } ();
         for(; position < size; ++position) {
             const auto digit = [&characters] (Char ch) {
                 if(characters[0] <= ch && ch <= characters[1])
-                    return static_cast<int>(ch) - static_cast<int>(characters[0]);
+                    return static_cast<unsigned>(ch) - static_cast<unsigned>(characters[0]);
                 if(characters[2] <= ch && ch <= characters[4])
-                    return static_cast<int>(ch) - static_cast<int>(characters[2]) + 10;
+                    return static_cast<unsigned>(ch) - static_cast<unsigned>(characters[2]) + 10u;
                 if(characters[3] <= ch && ch <= characters[5])
-                    return static_cast<int>(ch) - static_cast<int>(characters[3]) + 10;
-                return 99;
+                    return static_cast<unsigned>(ch) - static_cast<unsigned>(characters[3]) + 10u;
+                return 99u;
             } (ptr[position]);
 
             if(digit < base) {
@@ -214,6 +214,10 @@ public:
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
             typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
     gpu constexpr Aeu(String&& stringView) noexcept : Aeu(stringView.data(), stringView.size()) {}
+
+    template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
+            typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
+    gpu constexpr Aeu(const String& stringView) noexcept : Aeu(stringView.data(), stringView.size()) {}
     /* ----------------------------------------------------------------------- */
 
 
@@ -240,7 +244,7 @@ public:
          * @brief Prefix increment
          * @return Aeu&
          */
-        gpu constexpr auto operator++() noexcept -> Aeu& { return this->operator+=(1); }
+        gpu constexpr auto operator++() noexcept -> Aeu& { return this->operator+=(1u); }
 
         /**
          * @brief Postfix increment
@@ -254,7 +258,7 @@ public:
          * @brief Prefix decrement
          * @return Aeu&
          */
-        gpu constexpr auto operator--() noexcept -> Aeu& { return this->operator-=(1); }
+        gpu constexpr auto operator--() noexcept -> Aeu& { return this->operator-=(1u); }
 
         /**
          * @brief Postfix decrement
@@ -274,7 +278,7 @@ public:
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
         gpu constexpr auto operator+(Unsigned addendum) const noexcept -> Aeu {
-            Aeu result = *this; result->operator+=(addendum); return result;
+            Aeu result = *this; result.operator+=(addendum); return result;
         }
 
         /**
@@ -320,7 +324,7 @@ public:
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
         gpu constexpr auto operator-(Unsigned subtrahend) const noexcept -> Aeu {
-            Aeu result = *this; result->operator-=(subtrahend); return result;
+            Aeu result = *this; result.operator-=(subtrahend); return result;
         }
 
         /**
@@ -338,8 +342,8 @@ public:
          * @param Unsigned subtrahend
          * @return Aeu&
          */ /* TODO: Complete */
-        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator-=(Unsigned subtrahend) noexcept -> Aeu& = delete;
+//        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
+//        gpu constexpr auto operator-=(Unsigned subtrahend) noexcept -> Aeu& = delete;
 
         /**
          * @brief Assignment subtraction operator
@@ -696,7 +700,9 @@ public:
          * @param Aeu other
          * @return Bool
          */
-        gpu constexpr auto operator==(const Aeu& other) const noexcept -> bool { return blocks == other.blocks; };
+        gpu constexpr auto operator==(const Aeu& other) const noexcept -> bool {
+            return blocks == other.blocks;
+        };
 
         /**
          * @brief Templated Equality check operator for numbers of different precision
@@ -1047,7 +1053,7 @@ public:
                 }
             }
         } else if(ratio == Comparison::less)
-            remainder = number; else quotient = 1;
+            remainder = number; else quotient = 1u;
     }
 
     /**
@@ -1082,8 +1088,8 @@ public:
             divide(second, first, quotient, remainder);
         }
 
-        bezoutX = 0; bezoutY = 1;
-        for(Aeu tX = 1, tY = 0; remainder != 0; ) {
+        bezoutX = 0u; bezoutY = 1u;
+        for(Aeu tX = 1u, tY = 0u; remainder != 0u; ) {
             tGcd = gcd; gcd = remainder;
 
             Aeu t = bezoutX; bezoutX = tX - quotient * bezoutX; tX = t;
@@ -1117,7 +1123,7 @@ public:
             divide(second, first, quotient, remainder);
         }
 
-        for(Aeu tX = 1, tY = 0; remainder != 0; ) {
+        for(Aeu tX = 1u, tY = 0u; remainder != 0u; ) {
             tGcd = gcd; gcd = remainder;
             divide(tGcd, gcd, quotient, remainder);
         }
@@ -1168,7 +1174,7 @@ public:
 
     [[nodiscard]]
     gpu static constexpr auto powm(const Aeu& base, const Aeu& power, const Aeu& mod) noexcept -> Aeu {
-        Aeu output = 1;
+        Aeu output = 1u;
         auto [_, b] = divide(base, mod);
 
         for(std::size_t iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
@@ -1286,12 +1292,13 @@ public:
                 }
                 copy = quotient;
             }
-
-            for (std::size_t i = startPosition; i * 2 < position; ++i) {
-                Char t = buffer[i]; buffer[i] = buffer[position - 1 - i]; buffer[position - 1 - i] = t;
+            const auto digitsTotal = position - startPosition;
+            for (std::size_t i = 0; i * 2 < digitsTotal; ++i) {
+                Char t = buffer[startPosition + i];
+                buffer[startPosition + i] = buffer[startPosition + digitsTotal - 1 - i];
+                buffer[startPosition + digitsTotal - 1 - i] = t;
             }
         }
-
         buffer[position++] = Char {};
         return position;
     }
@@ -1312,7 +1319,7 @@ public:
         auto flags = ss.flags();
 
         const auto base = [] (long baseField, std::basic_ostream<Char>& ss, bool showbase) {
-            auto base = (baseField == std::ios::hex ? 16 : (baseField == std::ios::oct ? 8 : 10));
+            auto base = (baseField == std::ios::hex ? 16u : (baseField == std::ios::oct ? 8u : 10u));
             if(showbase && base != 10)
                 ss << [&base] { if constexpr (std::is_same_v<Char, char>) { return base == 8 ? "0o" : "0x"; } else { return base == 8 ? L"0o" : L"0x"; }} () << std::noshowbase ;
             return base;

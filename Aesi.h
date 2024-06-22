@@ -39,7 +39,7 @@ public:
     gpu constexpr Aesi& operator=(const Aesi& other) noexcept {}
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr Aesi(Integral value) noexcept : base(static_cast<uint64_t>(abs(value))){}
+    gpu constexpr Aesi(Integral value) noexcept {}
 
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
     gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) {}
@@ -182,6 +182,15 @@ public:
 
 
     /* --------------------- @name Comparison operators. --------------------- */
+    template <typename Integral> requires (std::is_integral_v<Integral>)
+    gpu constexpr auto operator==(Integral value) const noexcept -> bool {
+        if(value < 0)
+            return sign == Sign::Negative && base == static_cast<uint64_t>(abs(static_cast<long long>(value)));
+        else if(value > 0)
+            return sign == Sign::Positive && base == static_cast<uint64_t>(value);
+        else return sign == Sign::Zero;
+    }
+
     gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool { return sign == other.sign && base == other.base; };
 
     [[nodiscard]]

@@ -4,7 +4,18 @@
 #include "../../../Aesi.h"
 #include "../../generation.h"
 
-TEST(Signed_IntegralCast, IntegralCast) { EXPECT_TRUE(false); }
+TEST(Signed_IntegralCast, IntegralCast) {
+    constexpr auto testsAmount = 2048;
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        auto value = Generation::getRandom<int64_t>();
+        Aesi<128> aesi = value;
+        EXPECT_EQ(aesi.integralCast<int64_t>(), value);
+
+        value = Generation::getRandom<int32_t>();
+        aesi = value;
+        EXPECT_EQ(aesi.integralCast<int32_t>(), value);
+    }
+}
 
 TEST(Unsigned_IntegralCast, IntegralCast) {
     constexpr auto testsAmount = 2048;

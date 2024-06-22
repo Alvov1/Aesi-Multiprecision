@@ -8,12 +8,8 @@ TEST(Unsigned_NumberTheory, GreatestCommonDivisor) {
         const auto common = Generation::getRandomWithBits(blocksNumber * 8 - 10),
                 left = common * Generation::getRandomWithBits(blocksNumber * 24 - 10),
                 right = common * Generation::getRandomWithBits(blocksNumber * 24 - 10);
-        std::stringstream leftS, rightS, gcdS;
-        leftS << "0x" << std::hex << left;
-        rightS << "0x" << std::hex << right;
-        gcdS << "0x" << std::hex << CryptoPP::GCD(left, right);
 
-        Aeu<blocksNumber * 32> l = leftS.str(), r = rightS.str();
-        EXPECT_EQ(Aeu<blocksNumber * 32>::gcd(l, r), gcdS.str());
+        Aeu<blocksNumber * 32> l = left, r = right;
+        EXPECT_EQ(Aeu<blocksNumber * 32>::gcd(l, r), CryptoPP::GCD(left, right));
     }
 }

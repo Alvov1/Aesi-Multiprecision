@@ -57,12 +57,12 @@ Aesi<1024> factorial(unsigned n) {
 }
 
 int main() {
-    Aesi<1024> f100 = factorial(100);
-    std::cout << std::hex << f100 << std::endl;
+    Aesi<1024> f50 = factorial(50);
+    std::cout << std::hex << f50 << std::endl;
     return 0;
 }
 ```
-> 1b30964ec395dc24069528d54bbda40d16e966ef9a70eb21b5b2943a321cdf10391745570cca9420c6ecb3b72ed2ee8b02ea2735c61a000000000000000000000000
+> 0x49eebc961ed279b02b1ef4f28d19a84f5973a1d2c7800000000000
 
 ### Cuda kernel:
 ```cpp

@@ -82,6 +82,8 @@ TEST(Unsigned_Initialization, Binary) {
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandom<uint64_t>();
+        record = value; EXPECT_EQ(record, value);
+
         std::stringstream ss {}; ss << "0b" << std::bitset<64>(value);
         record = ss.str(); EXPECT_EQ(record, value);
     }
@@ -93,6 +95,8 @@ TEST(Unsigned_Initialization, Decimal) {
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandom<uint64_t>();
+        record = value; EXPECT_EQ(record, value);
+
         std::stringstream ss {}; ss << std::dec << value;
         record = ss.str(); EXPECT_EQ(record, value);
     }
@@ -104,6 +108,8 @@ TEST(Unsigned_Initialization, Octal) {
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandom<uint64_t>();
+        record = value; EXPECT_EQ(record, value);
+
         std::stringstream ss {}; ss << "0o" << std::oct << value;
         record = ss.str(); EXPECT_EQ(record, value);
     }
@@ -115,12 +121,12 @@ TEST(Unsigned_Initialization, Hexadecimal) {
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandom<uint64_t>();
-        std::stringstream ss {};
+        record = value; EXPECT_EQ(record, value);
 
+        std::stringstream ss {};
         if(i % 2 == 0)
             ss << "0x" << std::hex << std::uppercase << value;
         else ss << "0x" << std::hex << std::nouppercase << value;
-
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }

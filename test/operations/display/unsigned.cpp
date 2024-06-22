@@ -1,5 +1,9 @@
 #include <gtest/gtest.h>
 #include <format>
+
+#ifndef AESI_CRYPTOPP_INTEGRATION
+#define AESI_CRYPTOPP_INTEGRATION
+#endif
 #include "../../../Aeu.h"
 #include "../../generation.h"
 
@@ -64,20 +68,19 @@ TEST(Unsigned_Display, DecimalStreams) {
     constexpr auto testsAmount = 30, blocksNumber = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
-        std::stringstream ss, ss2; ss << std::dec << std::noshowbase << value;
+        const Aeu<blocksNumber * 32> aeu = value;
 
-        Aeu<blocksNumber * 32> aeu (ss.str());
+        std::stringstream ss, ss2; ss << std::dec << std::noshowbase << value;
         ss2 << std::dec << std::noshowbase << aeu;
         EXPECT_EQ(ss2.str(), ss.str());
     }
 
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const Aeu<blocksNumber * 32> aeu = value;
+
         std::stringstream ss; ss << std::dec << std::noshowbase << value;
-
-        Aeu<blocksNumber * 32> aeu (ss.str());
         std::wstringstream ss2; ss2 << std::dec << std::noshowbase << aeu;
-
         const auto& ref = ss.str();
         std::wstring wstring (ref.begin(), ref.end());
         EXPECT_EQ(ss2.str(), wstring);
@@ -89,20 +92,19 @@ TEST(Unsigned_Display, OctalStreams) {
     constexpr auto testsAmount = 30, blocksNumber = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
-        std::stringstream ss, ss2; ss << "0o" << std::oct << std::noshowbase << value;
+        const Aeu<blocksNumber * 32> aeu = value;
 
-        Aeu<blocksNumber * 32> aeu (ss.str());
+        std::stringstream ss, ss2; ss << "0o" << std::oct << std::noshowbase << value;
         ss2 << "0o" << std::oct << std::noshowbase << aeu;
         EXPECT_EQ(ss2.str(), ss.str());
     }
 
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const Aeu<blocksNumber * 32> aeu = value;
+
         std::stringstream ss; ss << "0o" << std::oct << std::noshowbase << value;
-
-        Aeu<blocksNumber * 32> aeu (ss.str());
         std::wstringstream ss2; ss2 << "0o" << std::oct << std::noshowbase << aeu;
-
         const auto& ref = ss.str();
         std::wstring wstring (ref.begin(), ref.end());
         EXPECT_EQ(ss2.str(), wstring);
@@ -114,20 +116,19 @@ TEST(Unsigned_Display, HexadecimalStreams) {
     constexpr auto testsAmount = 30, blocksNumber = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
-        std::stringstream ss, ss2; ss << "0x" << std::hex << std::noshowbase << value;
+        const Aeu<blocksNumber * 32> aeu = value;
 
-        Aeu<blocksNumber * 32> aeu (ss.str());
+        std::stringstream ss, ss2; ss << "0x" << std::hex << std::noshowbase << value;
         ss2 << "0x" << std::hex << std::noshowbase << aeu;
         EXPECT_EQ(ss2.str(), ss.str());
     }
 
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const Aeu<blocksNumber * 32> aeu = value;
+
         std::stringstream ss; ss << "0x" << std::hex << std::noshowbase << value;
-
-        Aeu<blocksNumber * 32> aeu (ss.str());
         std::wstringstream ss2; ss2 << "0x" << std::hex << std::noshowbase << aeu;
-
         const auto& ref = ss.str();
         std::wstring wstring (ref.begin(), ref.end());
         EXPECT_EQ(ss2.str(), wstring);
@@ -149,32 +150,29 @@ TEST(Unsigned_Display, FormatAskii) {
 
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
         std::stringstream ss;
+        const Aeu<blocksNumber * 32> aeu = value;
 
         switch(i % 5) {
             case 0: {   /* Octal */
                 ss << "0o" << std::oct << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 askii[0] = '0'; askii[1] = 'o';
                 const auto size = aeu.getString<8>(askii.data() + 2, askii.size() - 2, false);
                 break;
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 askii[0] = '0'; askii[1] = 'x';
                 const auto size = aeu.getString<16>(askii.data() + 2, askii.size() - 2, false, false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 askii[0] = '0'; askii[1] = 'x';
                 const auto size = aeu.getString<16>(askii.data() + 2, askii.size() - 2, false, true);
                 break;
             }
             case 3: {  /* Decimal */
                 ss << std::dec << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<10>(askii.data(), askii.size(), false);
                 break;
             }
@@ -182,7 +180,6 @@ TEST(Unsigned_Display, FormatAskii) {
                 ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
                 for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 askii[0] = L'0'; askii[1] = L'b';
                 aeu.getString<2>(askii.data() + 2, askii.size() - 2, false);
             }
@@ -207,32 +204,29 @@ TEST(Unsigned_Display, FormatUtf) {
 
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
         std::stringstream ss;
+        const Aeu<blocksNumber * 32> aeu = value;
 
         switch (i % 5) {
             case 0: {   /* Octal */
                 ss << "0o" << std::oct << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 utf[0] = L'0'; utf[1] = L'o';
                 const auto size = aeu.getString<8>(utf.data() + 2, utf.size() - 2, false);
                 break;
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 utf[0] = L'0'; utf[1] = L'x';
                 const auto size = aeu.getString<16>(utf.data() + 2, utf.size() - 2, false, false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 utf[0] = L'0'; utf[1] = L'x';
                 const auto size = aeu.getString<16>(utf.data() + 2, utf.size() - 2, false, true);
                 break;
             }
             case 3: {  /* Decimal */
                 ss << std::dec << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<10>(utf.data(), utf.size(), false);
                 break;
             }
@@ -240,7 +234,6 @@ TEST(Unsigned_Display, FormatUtf) {
                 ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
                 for (long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 utf[0] = L'0'; utf[1] = L'b';
                 aeu.getString<2>(utf.data() + 2, utf.size() - 2, false);
             }
@@ -272,60 +265,53 @@ TEST(Unsigned_Display, ShowBaseAskii) {
 
         const auto value = CryptoPP::Integer(0b101100111111000100111010010010);//Generation::getRandomWithBits(blocksNumber * 32 - 32);
         std::stringstream ss, ss2;
+        const Aeu<blocksNumber * 32> aeu = value;
 
         switch (i % 9) {
             case 0: {   /* Std::streams octal */
                 ss << "0o" << std::oct << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 ss2 << std::oct << std::showbase << aeu;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
             }
             case 1: {   /* Std::streams hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 ss2 << std::hex << std::showbase << std::nouppercase << aeu;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
             }
             case 2: {   /* Std::streams hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 ss2 << std::hex << std::showbase << std::uppercase << aeu;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
             }
             case 3: {   /* Std::streams decimal */
                 ss << std::dec << value;
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 ss2 << std::dec << std::showbase << aeu;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
             }
             case 4: {   /* C-style ASKII Octal */
                 ss << "0o" << std::oct << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<8>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<16>(askii.data(), askii.size(), true, false);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<16>(askii.data(), askii.size(), true, false);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 7: {   /* C-style ASKII Decimal */
                 ss << std::dec << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<10>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
@@ -334,7 +320,6 @@ TEST(Unsigned_Display, ShowBaseAskii) {
                 ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
                 for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 aeu.getString<2>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
             }
@@ -363,11 +348,11 @@ TEST(Unsigned_Display, ShowBaseUtf) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
         std::stringstream ss;
         std::wstringstream ss2;
+        const Aeu<blocksNumber * 32> aeu = value;
 
         switch (i % 9) {
             case 0: {   /* Std::streams octal */
                 ss << "0o" << std::oct << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 ss2 << std::oct << std::showbase << aeu;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -376,7 +361,6 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 1: {   /* Std::streams hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 ss2 << std::hex << std::showbase << std::nouppercase << aeu;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -385,7 +369,6 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 2: {   /* Std::streams hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 ss2 << std::hex << std::showbase << std::uppercase << aeu;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -394,7 +377,6 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 3: {   /* Std::streams decimal */
                 ss << std::dec << value;
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 ss2 << std::dec << std::showbase << aeu;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -403,7 +385,6 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 4: {   /* C-style ASKII Octal */
                 ss << "0o" << std::oct << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<8>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
@@ -412,7 +393,6 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<16>(utf.data(), utf.size(), true, false);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
@@ -421,7 +401,6 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<16>(utf.data(), utf.size(), true, false);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
@@ -430,7 +409,6 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 7: {   /* C-style ASKII Decimal */
                 ss << std::dec << std::noshowbase << value;
-                Aeu<blocksNumber * 32> aeu(ss.str());
                 const auto size = aeu.getString<10>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
@@ -441,7 +419,6 @@ TEST(Unsigned_Display, ShowBaseUtf) {
                 ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
                 for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
-                Aeu<blocksNumber * 32> aeu (ss.str());
                 aeu.getString<2>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());

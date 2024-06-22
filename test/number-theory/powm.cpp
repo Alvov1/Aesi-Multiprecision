@@ -7,15 +7,11 @@ TEST(Unsigned_NumberTheory, PowerByModulo) {
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto base = Generation::getRandomWithBits(blocksNumber * 12 - 10),
             power = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-            modulo = Generation::getRandomWithBits(blocksNumber * 16 - 10);
-        std::stringstream baseS, powerS, moduloS, powmS;
-        baseS << "0x" << std::hex << base;
-        powerS << "0x" << std::hex << power;
-        moduloS << "0x" << std::hex << modulo;
-        powmS << "0x" << std::hex << CryptoPP::ModularExponentiation(base, power, modulo);
+            modulo = Generation::getRandomWithBits(blocksNumber * 16 - 10),
+            powm = CryptoPP::ModularExponentiation(base, power, modulo);
 
-        Aeu<blocksNumber * 32> b = baseS.str(), p = powerS.str(), m = moduloS.str();
-        EXPECT_EQ(Aeu<blocksNumber * 32>::powm(b, p, m), powmS.str());
+        Aeu<blocksNumber * 32> b = base, p = power, m = modulo;
+        EXPECT_EQ(Aeu<blocksNumber * 32>::powm(b, p, m), powm);
     }
 }
 
@@ -94,14 +90,10 @@ TEST(Unsigned_NumberTheory, PowerByModuloHuge) {
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto base = Generation::getRandomWithBits(blocksNumber * 16 - 10),
                 power = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-                modulo = Generation::getRandomWithBits(blocksNumber * 16 - 10);
-        std::stringstream baseS, powerS, moduloS, powmS;
-        baseS << "0x" << std::hex << base;
-        powerS << "0x" << std::hex << power;
-        moduloS << "0x" << std::hex << modulo;
-        powmS << "0x" << std::hex << CryptoPP::ModularExponentiation(base, power, modulo);
+                modulo = Generation::getRandomWithBits(blocksNumber * 16 - 10),
+                powm = CryptoPP::ModularExponentiation(base, power, modulo);
 
-        Aeu<blocksNumber * 32> b = baseS.str(), p = powerS.str(), m = moduloS.str();
-        EXPECT_EQ(Aeu<blocksNumber * 32>::powm(b, p, m), powmS.str());
+        Aeu<blocksNumber * 32> b = base, p = power, m = modulo;
+        EXPECT_EQ(Aeu<blocksNumber * 32>::powm(b, p, m), powm);
     }
 }

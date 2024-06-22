@@ -22,718 +22,246 @@ namespace {
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Aesi final {
     /* -------------------------- @name Class members. ----------------------- */
-    /**
-     * @brief Number's sign
-     */
     Sign sign;
 
-    /**
-     * @brief Number's unsigned base
-     */
     using Base = Aeu<bitness>;
     Base base;
     /* ----------------------------------------------------------------------- */
 
-    /**
-     * @brief Private constructor with members
-     */
     gpu constexpr Aesi(Sign withSign, Base withBase): sign { withSign }, base { withBase } {};
 
 public:
     /* --------------------- @name Different constructors. ------------------- */
-    /**
-     * @brief Default constructor
-     */
     gpu constexpr Aesi() noexcept = default;
 
-    /**
-     * @brief Copy constructor
-     */
-    gpu constexpr Aesi(const Aesi& copy) noexcept {
-        sign = copy.sign; if(copy.sign != Sign::Zero) base = copy.base;
-    }
+    gpu constexpr Aesi(const Aesi& copy) noexcept {}
 
-    /**
-     * @brief Copy assignment operator
-     */
-    gpu constexpr Aesi& operator=(const Aesi& other) noexcept {
-        sign = other.sign; if(other.sign != Sign::Zero) base = other.base; return *this;
-    }
+    gpu constexpr Aesi& operator=(const Aesi& other) noexcept {}
 
-    /**
-     * @brief Integral constructor
-     * @param value Integral
-     * @details Accepts built-in integral types signed and unsigned.
-     */
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr Aesi(Integral value) noexcept : base(static_cast<uint64_t>(abs(value))){
-        if(value == 0)
-            sign = Sign::Zero;
-        else if(value < 0)
-            sign = Sign::Negative; else sign = Sign::Positive;
-    }
+    gpu constexpr Aesi(Integral value) noexcept : base(static_cast<uint64_t>(abs(value))){}
 
-    /**
-     * @brief Pointer-based character constructor
-     * @param Char* pointer
-     * @param Size_t size
-     * @details Accepts decimal literals along with binary (starting with 0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
-     */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) {
-        if(size > 0 && ptr[0] == [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ())
-            sign = Sign::Negative;
-        else sign = Sign::Positive;
+    gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) {}
 
-        if(base.isZero())
-            sign = Sign::Zero;
-    }
-
-    /**
-     * @brief C-style string literal constructor
-     * @param Char[] literal
-     */
     template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
     gpu constexpr Aesi(const Char (&literal)[arrayLength]) noexcept : Aesi(literal, arrayLength) {}
 
-    /**
-     * @brief String or string-view based constructor
-     * @param String/String-View sv
-     * @details Constructs object from STD::Basic_String or STD::Basic_String_View. Accepts objects based on char or wchar_t
-     */
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
             typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
     gpu constexpr Aesi(String&& stringView) noexcept : Aesi(stringView.data(), stringView.size()) {}
+
+    explicit gpu constexpr Aesi(const Aeu<bitness>& value) : base(value), sign(Sign::Positive) {}
+
+#ifdef AESI_CRYPTOPP_INTEGRATION
+    constexpr Aesi(const CryptoPP::Integer& value) : base(value) { if(value.IsNegative()) sign = Sign::Positive; }
+#endif
+
+#ifdef AESI_GMP_INTEGRATION
+    constexpr Aesi(const mpz_class& value) : base(value) {}
+#endif
     /* ----------------------------------------------------------------------- */
 
 
     /* --------------------- @name Arithmetic operators. --------------------- */
-    /**
-    * @brief Unary plus operator
-    * @return Aesi
-    * @note Does basically nothing
-    */
-    gpu constexpr auto operator+() const noexcept -> Aesi { return *this; }
+    /* ------------------------- @name Unary operators. -------------------------- */
+        gpu constexpr auto operator+() const noexcept -> Aesi { return *this; }
 
-    /**
-     * @brief Unary minus operator
-     * @return Aesi
-     */
-    [[nodiscard]]
-    gpu constexpr auto operator-() const noexcept -> Aesi {
-        Aesi result = *this; result.inverse(); return result;
-    }
+        [[nodiscard]]
+        gpu constexpr auto operator-() const noexcept -> Aesi {}
 
-    /**
-     * @brief Prefix increment
-     * @return Aesi&
-     */
-    gpu constexpr auto operator++() noexcept -> Aesi& { return this->operator+=(1); }
+        gpu constexpr auto operator++() noexcept -> Aesi& {}
 
-    /**
-     * @brief Postfix increment
-     * @return Aesi
-     */
-    gpu constexpr auto operator++(int) & noexcept -> Aesi { Aesi old = *this; operator++(); return old; }
+        gpu constexpr auto operator++(int) & noexcept -> Aesi {}
 
-    /**
-     * @brief Prefix decrement
-     * @return Aesi&
-     */
-    gpu constexpr auto operator--() noexcept -> Aesi& { return this->operator-=(1); }
+        gpu constexpr auto operator--() noexcept -> Aesi& {}
 
-    /**
-     * @brief Postfix decrement
-     * @return Aesi
-     */
-    gpu constexpr auto operator--(int) & noexcept -> Aesi { Aesi old = *this; operator--(); return old; }
+        gpu constexpr auto operator--(int) & noexcept -> Aesi {}
+    /* --------------------------------------------------------------------------- */
 
-    /**
-     * @brief Addition operator
-     * @param Aesi addendum
-     * @return Aesi
-     */
-    [[nodiscard]]
-    gpu constexpr auto operator+(const Aesi& addendum) const noexcept -> Aesi {
-        if(sign == Sign::Zero) return addendum;         // 0 + 10 = 10;
-        if(addendum.sign == Sign::Zero) return *this;   // 10 + 0 = 10;
+    /* ------------------------ @name Addition operators. ------------------------ */
+        template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
+        gpu constexpr auto operator+(Integral addendum) const noexcept -> Aesi {}
 
-        Aesi result = *this;
-        if(sign != addendum.sign) {
-            // TODO: Figure out with complements
-        } else
-            base.operator+=(addendum.base);
+        [[nodiscard]]
+        gpu constexpr auto operator+(const Aesi& addendum) const noexcept -> Aesi {}
 
-        if(base.isZero())
-            result.sign = Sign::Zero;
-    }
+        template <typename Integral> requires (std::is_integral_v<Integral>)
+        gpu constexpr auto operator+=(Integral addendum) noexcept -> Aesi& {}
 
-    /**
-     * @brief Assignment addition operator
-     * @param Aesi addendum
-     * @return Aesi&
-     */
-    gpu constexpr auto operator+=(const Aesi& addendum) noexcept -> Aesi& {
-        return this->operator=(this->operator+(addendum));
-    }
+        gpu constexpr auto operator+=(const Aesi& addendum) noexcept -> Aesi& {}
+    /* --------------------------------------------------------------------------- */
 
-    /**
-     * @brief Subtraction operator
-     * @param Aesi subtrahend
-     * @return Aesi
-     */
-    [[nodiscard]]
-    gpu constexpr auto operator-(const Aesi& subtrahend) const noexcept -> Aesi {
-        if(sign == Sign::Zero) return Aesi { Sign::Negative, subtrahend.base };     // 0 - (10) = -10;
-        if(subtrahend.sign == Sign::Zero) return *this;                             // 10 - 0 = 10;
-        return this->operator+(-subtrahend);
-    }
+    /* ----------------------- @name Subtraction operators. ---------------------- */
+        template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
+        gpu constexpr auto operator-(Integral subtrahend) const noexcept -> Aesi {}
 
-    /**
-     * @brief Assignment subtraction operator
-     * @param Aesi subtrahend
-     * @return Aesi&
-     */
-    gpu constexpr auto operator-=(const Aesi& subtrahend) noexcept -> Aesi& {
-        return this->operator=(this->operator-(subtrahend));
-    }
+        [[nodiscard]]
+        gpu constexpr auto operator-(const Aesi& subtrahend) const noexcept -> Aesi {}
 
-    /**
-     * @brief Multiplication operator
-     * @param Aesi factor
-     * @return Aesi
-     */
-    [[nodiscard]]
-    gpu constexpr auto operator*(const Aesi& factor) const noexcept -> Aesi {
-        if(sign == Sign::Zero || factor.sign == Sign::Zero) return Aesi { Sign::Zero }; // 0 * 10 = 0; 10 * 0 = 0;
+        template <typename Integral> requires (std::is_integral_v<Integral>)
+        gpu constexpr auto operator-=(Integral subtrahend) noexcept -> Aesi& {}
 
-        Aesi result = *this; result.base->operator*=(factor.base);
+        gpu constexpr auto operator-=(const Aesi& subtrahend) noexcept -> Aesi& {}
+    /* --------------------------------------------------------------------------- */
 
-        if(!result.base.isZero()){
-            if (sign != factor.sign) {
-                result.sign = Sign::Negative;
-            } else
-                result.sign = Sign::Positive;
-        } else result.sign = Sign::Zero;
+    /* --------------------- @name Multiplication operators. --------------------- */
+        template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
+        gpu constexpr auto operator*(Integral factor) const noexcept -> Aesi {}
 
-        return result;
-    }
+        [[nodiscard]]
+        gpu constexpr auto operator*(const Aesi& factor) const noexcept -> Aesi {}
 
-    /**
-     * @brief Assignment multiplication operator
-     * @param Aesi factor
-     * @return Aesi&
-     */
-    gpu constexpr auto operator*=(const Aesi& factor) noexcept -> Aesi& {
-        return this->operator=(this->operator*(factor));
-    }
+        template <typename Integral> requires (std::is_integral_v<Integral>)
+        gpu constexpr auto operator*=(Integral factor) noexcept -> Aesi& {}
 
-    /**
-     * @brief Division operator
-     * @param Aesi divisor
-     * @return Aesi
-     * @note Returns zero in case of division by zero
-     */
-    [[nodiscard]]
-    gpu constexpr auto operator/(const Aesi& divisor) const noexcept -> Aesi {
-        Aesi quotient, _; divide(this, divisor, quotient, _); return quotient;
-    }
+        gpu constexpr auto operator*=(const Aesi& factor) noexcept -> Aesi& {}
+    /* --------------------------------------------------------------------------- */
 
-    /**
-     * @brief Assignment division operator
-     * @param Aesi divisor
-     * @return Aesi&
-     */
-    gpu constexpr auto operator/=(const Aesi& divisor) noexcept -> Aesi& {
-        Aesi quotient, _; divide(this, divisor, quotient, _); return this->operator=(quotient);
-    }
+    /* ------------------------ @name Division operators. ------------------------ */
+        template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
+        gpu constexpr auto operator/(Integral divisor) const noexcept -> Aesi {}
 
-    /**
-     * @brief Modulo operator
-     * @param Aesi modulo
-     * @return Aesi
-     */
-    [[nodiscard]]
-    gpu constexpr auto operator%(const Aesi& modulo) const noexcept -> Aesi {
-        Aesi _, remainder; divide(this, modulo, _, remainder); return remainder;
-    }
+        [[nodiscard]]
+        gpu constexpr auto operator/(const Aesi& divisor) const noexcept -> Aesi {}
 
-    /**
-     * @brief Assignment modulo operator
-     * @param Aesi modulo
-     * @return Aesi&
-     */
-    gpu constexpr auto operator%=(const Aesi& modulo) noexcept -> Aesi& {
-        Aesi _, remainder; divide(this, modulo, _, remainder); return this->operator=(remainder);
-    }
+        template <typename Integral> requires (std::is_integral_v<Integral>)
+        gpu constexpr auto operator/=(Integral factor) noexcept -> Aesi& {}
+
+        gpu constexpr auto operator/=(const Aesi& divisor) noexcept -> Aesi& {}
+    /* --------------------------------------------------------------------------- */
+
+    /* ------------------------- @name Modulo operators. ------------------------- */
+        template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
+        gpu constexpr auto operator%(Integral modulo) const noexcept -> Aesi {}
+
+        [[nodiscard]]
+        gpu constexpr auto operator%(const Aesi& modulo) const noexcept -> Aesi {}
+
+        template <typename Integral> requires (std::is_integral_v<Integral>)
+        gpu constexpr auto operator%=(Integral modulo) noexcept -> Aesi& {}
+
+        gpu constexpr auto operator%=(const Aesi& modulo) noexcept -> Aesi& {}
+    /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
 
 
     /* ----------------------- @name Bitwise operators. ---------------------- */
-    /**
-     * @brief Bitwise complement operator
-     * @return Aesi
-     * @note Does not affect the sign
-     */
+#define BitwiseDisabled "For bitwise operations use unsigned integer class"
+
     [[nodiscard]]
-    gpu constexpr auto operator~() const noexcept -> Aesi {
-        Aesi result { sign, base.operator~() };
-        if(result.base.isZero())
-            result.sign = Sign::Zero;
-        return result;
-    }
+    gpu constexpr auto operator~() const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
 
-    /**
-     * @brief Bitwise XOR operator
-     * @param Aesi other
-     * @return Aesi
-     * @note Does not affect the sign
-     */
     [[nodiscard]]
-    gpu constexpr auto operator^(const Aesi& other) const noexcept -> Aesi {
-        Aesi result = *this; result.base.operator^=(other.base); return result;
-    }
+    gpu constexpr auto operator^(const Aesi& other) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
 
-    /**
-     * @brief Assignment bitwise XOR operator
-     * @param Aesi other
-     * @return Aesi&
-     * @note Does not affect the sign
-     */
-    gpu constexpr auto operator^=(const Aesi& other) noexcept -> Aesi& {
-        base.operator^=(other.base);
-        if(base.isZero())
-            sign = Sign::Zero;
-        else if(sign == Sign::Zero)
-            sign = Sign::Positive;
+    gpu constexpr auto operator^=(const Aesi& other) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
 
-        return *this;
-    }
-
-    /**
-     * @brief Bitwise AND operator
-     * @param Aesi other
-     * @return Aesi
-     * @note Does not affect the sign
-     */
     [[nodiscard]]
-    gpu constexpr auto operator&(const Aesi& other) const noexcept -> Aesi {
-        Aesi result = *this; result.base.operator&=(other.base); return result;
-    }
+    gpu constexpr auto operator&(const Aesi& other) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
 
-    /**
-     * @brief Assignment bitwise AND operator
-     * @param Aesi other
-     * @return Aesi&
-     * @note Does not affect the sign
-     */
-    gpu constexpr auto operator&=(const Aesi& other) noexcept -> Aesi& {
-        base.operator&=(other.base); if(base.isZero()) sign = Sign::Zero; return *this;
-    }
+    gpu constexpr auto operator&=(const Aesi& other) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
 
-    /**
-     * @brief Bitwise OR operator
-     * @param Aesi other
-     * @return Aesi
-     * @note Does not affect the sign
-     */
     [[nodiscard]]
-    gpu constexpr auto operator|(const Aesi& other) const noexcept -> Aesi {
-        Aesi result = *this; result.base.operator|=(other.base); return result;
-    }
+    gpu constexpr auto operator|(const Aesi& other) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
 
-    /**
-     * @brief Assignment bitwise OR operator
-     * @param Aesi other
-     * @return Aesi&
-     * @note Does not affect the sign
-     */
-    gpu constexpr auto operator|=(const Aesi& other) noexcept -> Aesi& {
-        base.operator|=(other.base); if(sign == Sign::Zero && !base.isZero()) sign = Sign::Positive; return *this;
-    }
+    gpu constexpr auto operator|=(const Aesi& other) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
 
-    /**
-     * @brief Left shift operator
-     * @param Integral bit_shift
-     * @return Aesi
-     * @note Does right shift (>>) for negative bit_shift value, and nothing for positive shift greater than precision
-     */
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-    gpu constexpr auto operator<<(Integral bitShift) const noexcept -> Aesi {
-        Aesi result = *this; result.base.operator<<=(bitShift); return result;
-    }
+    gpu constexpr auto operator<<(Integral bitShift) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
 
-    /**
-     * @brief Left shift assignment operator
-     * @param Integral bit_shift
-     * @return Aesi&
-     * @note Does right shift (>>=) for negative bit_shift value, and nothing for positive shift greater than precision
-     */
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr auto operator<<=(Integral bitShift) noexcept -> Aesi& {
-        base.operator<<=(bitShift);
-        if(sign == Sign::Zero && !base.isZero())
-            sign = Sign::Positive;
-        return *this;
-    }
+    gpu constexpr auto operator<<=(Integral bitShift) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
 
-    /**
-     * @brief Right shift operator
-     * @param Integral bit_shift
-     * @return Aesi
-     * @note Does left shift (<<) for negative bit_shift value, and nothing for positive shift greater than precision
-     */
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-    gpu constexpr auto operator>>(Integral bitShift) const noexcept -> Aesi {
-        Aesi result = *this; result.base.operator>>=(bitShift); return result;
-    }
+    gpu constexpr auto operator>>(Integral bitShift) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
 
-    /**
-     * @brief Right shift assignment operator
-     * @param Integral bit_shift
-     * @return Aesi&
-     * @note Does left shift (<<=) for negative bit_shift value, and nothing for positive shift greater than precision
-     */
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr auto operator>>=(Integral bitShift) noexcept -> Aesi& {
-        base.operator>>=(bitShift);
-        if(sign != Sign::Zero && base.isZero())
-            sign = Sign::Zero;
-        return *this;
-    }
+    gpu constexpr auto operator>>=(Integral bitShift) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
     /* ----------------------------------------------------------------------- */
 
 
     /* --------------------- @name Comparison operators. --------------------- */
-    /**
-     * @brief Comparison operator
-     * @param Aesi other
-     * @return Bool
-     */
-    gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool {
-        return sign == other.sign && base == other.base;
-    };
+    gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool { return sign == other.sign && base == other.base; };
 
-    /**
-     * @brief Internal comparison operator
-     * @param Aesi other
-     * @return Comparison
-     * @note Should almost never return Comparison::Equivalent
-     */
     [[nodiscard]]
-    gpu constexpr auto compareTo(const Aesi& other) const noexcept -> Comparison {
-        if(sign == Sign::Zero && other.sign == Sign::Zero)
-            return Comparison::equal;
-
-        if(sign == other.sign)
-            return base.compareTo(other.base);
-        else if(sign == Sign::Positive)
-            return Comparison::greater;     // (positive, negative) -> greater; (positive, zero) -> greater
-        else if(sign == Sign::Negative)
-            return Comparison::less;        // (negative, positive) -> less; (negative, zero) -> less
-        else if(other.sign == Sign::Positive)
-            return Comparison::less;        // (0, positive) -> less
-        else
-            return Comparison::greater;     // (0, negative) -> greater;
-    };
+    gpu constexpr auto compareTo(const Aesi& other) const noexcept -> Comparison { return Comparison::equal; };
     /* ----------------------------------------------------------------------- */
 
 
     /* ---------------------- @name Supporting methods. ---------------------- */
-    /**
-     * @brief Set bit in number by index starting from the right
-     * @param Size_t index
-     * @param Bool bit
-     * @note Does nothing for index out of range
-     */
-    gpu constexpr auto setBit(std::size_t index, bool bit) noexcept -> void {
-        base.setBit(index, bit);
-        if(!bit && sign != Sign::Zero && base.isZero()) // Positive/Negative, set 0 -> 0
-            sign = Sign::Zero;
-        if(bit && sign == Sign::Zero && !base.isZero()) // Zero, set 1 -> Positive
-            sign = Sign::Positive;
-    }
+    gpu constexpr auto setBit(std::size_t index, bool bit) noexcept -> void {}
 
-    /**
-     * @brief Get bit in number by index staring from the right
-     * @param Size_t index
-     * @return Bool
-     * @note Returns zero for index out of range
-     */
     [[nodiscard]]
     gpu constexpr auto getBit(std::size_t index) const noexcept -> bool { return base.getBit(index); }
 
-    /**
- * @brief Set byte in number by index starting from the right
- * @param Size_t index
- * @param Byte byte
- * @note Does nothing for index out of range
- */
-    gpu constexpr auto setByte(std::size_t index, byte byte) noexcept -> void {
-        base.setByte(index, byte);
-        if(byte == 0 && sign != Sign::Zero && base.isZero())    // Positive/Negative, set Zero -> 0
-            sign = Sign::Zero;
-        if(byte != 0 && sign == Sign::Zero && !base.isZero())   // Zero, set Positive -> Positive
-            sign = Sign::Positive;
-    }
+    gpu constexpr auto setByte(std::size_t index, byte byte) noexcept -> void {}
 
-    /**
-     * @brief Get byte in number by index starting from the right
-     * @param Size_t index
-     * @return Byte
-     * @note Returns zero for index out of range
-     */
     [[nodiscard]]
     gpu constexpr auto getByte(std::size_t index) const noexcept -> byte { return base.getByte(index); }
 
-    /**
-     * @brief Set block in number by index starting from the right
-     * @param Size_t index
-     * @param Block byte
-     * @note Does nothing for index out of range
-     */
-    gpu constexpr auto setBlock(std::size_t index, block block) noexcept -> void {
-        base.setBlock(index, block);
-        if(block == 0 && sign != Sign::Zero && base.isZero())    // Positive/Negative, set Zero -> 0
-            sign = Sign::Zero;
-        if(block != 0 && sign == Sign::Zero && !base.isZero())   // Zero, set Positive -> Positive
-            sign = Sign::Positive;
-    }
+    gpu constexpr auto setBlock(std::size_t index, block block) noexcept -> void {}
 
-    /**
-     * @brief Get block in number by index starting from the right
-     * @param Size_t index
-     * @return Block
-     * @note Returns zero for index out of range
-     */
     [[nodiscard]]
     gpu constexpr auto getBlock(std::size_t index) const noexcept -> block { return base.getBlock(index); }
 
-    /**
-     * @brief Get amount of non-empty bytes in number right to left
-     * @return Size_t
-     */
     [[nodiscard]]
     gpu constexpr auto byteCount() const noexcept -> std::size_t { return base.byteCount(); }
 
-    /**
-     * @brief Get amount of non-empty bits in number right to left
-     * @return Size_t
-     */
     [[nodiscard]]
     gpu constexpr auto bitCount() const noexcept -> std::size_t { return base.bitCount(); }
 
-    /**
-     * @brief Check whether number is odd
-     * @return Bool - true is number is odd and false otherwise
-     */
     [[nodiscard]]
     gpu constexpr auto isOdd() const noexcept -> bool { return base.isOdd(); }
 
-    /**
-     * @brief Check whether number is even
-     * @return Bool - true is number is even and false otherwise
-     */
     [[nodiscard]]
     gpu constexpr auto isEven() const noexcept -> bool { return base.isEven(); }
 
-    /**
- * @brief Check whether number is zero
- * @return Bool - true is number is zero and false otherwise
- */
     [[nodiscard]]
     gpu constexpr auto isZero() const noexcept -> bool { return sign == Sign::Zero; }
 
-    /**
-     * @brief Get number's precision
-     * @return Size_t
-     */
     [[nodiscard]]
     gpu static constexpr auto getBitness() noexcept -> std::size_t { return bitness; }
 
-    /**
-     * @brief Get number of blocks inside object
-     * @return Size_t
-     */
     [[nodiscard]]
     gpu static constexpr auto getBlocksNumber() noexcept -> std::size_t { return Aeu<bitness>::totalBlocksNumber(); }
 
-    /**
-     * @brief Make swap between two objects
-     * @param Aesi other
-     */
-    gpu constexpr auto swap(Aesi& other) noexcept -> void {
-        Sign t = sign; sign = other.sign; other.sign = t; base.swap(other.base);
-    }
+    gpu constexpr auto swap(Aesi& other) noexcept -> void {}
 
-    /**
-     * @brief Inverse number's sign
-     */
-    gpu constexpr auto inverse() noexcept -> void {
-        if(sign != Sign::Zero)
-            sign = (sign == Sign::Positive ? Sign::Negative : Sign::Positive);
-    }
+    gpu constexpr auto inverse() noexcept -> void {}
     /* ----------------------------------------------------------------------- */
 
 
     /* -------------- @name Public arithmetic and number theory. ------------- */
-    /**
-     * @brief Integer division. Returns results by reference
-     * @param Aesi number
-     * @param Aesi divisor
-     * @param Aesi quotient OUT
-     * @param Aesi remainder OUT
-     * @return Returns Quotient and remainder by reference
-     */
-    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor, Aesi& quotient, Aesi& remainder) noexcept -> void {
-        /*  (0, Pos). Quotient: 0, Remainder: 0     - done
-            (0, Neg). Quotient: 0, Remainder: 0     - done
-            (0, 0).   Quotient: 0, Remainder: 0     - done
-            (Pos, 0). Quotient: 0, Remainder: 105   - done
-            (Neg, 0). Quotient: 0, Remainder: -105  - done */
+    gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor, Aesi& quotient, Aesi& remainder) noexcept -> void {}
 
-        if(number.sign == Sign::Zero)
-            return [&quotient, &remainder] { quotient.sign = Sign::Zero; remainder.sign = Sign::Zero; } ();
-        if(divisor.sign == Sign::Zero)
-            return [&number, &quotient, &remainder] { quotient.sign = Sign::Zero; remainder = number; } ();
-
-        Aeu<bitness>::divide(number.base, divisor.base, quotient.base, remainder.base);
-
-        /*  (Neg, Pos). Quotient: -10, Remainder: -5    - done
-            (Pos, Neg). Quotient: -10, Remainder: 5     - done
-            (Pos, Pos). Quotient: 10, Remainder: 5      - done
-            (Neg, Neg). Quotient: 10, Remainder: -5     - done */
-
-        if(number.sign != divisor.sign)
-            return [&number, &quotient, &remainder] { quotient.sign = Sign::Negative; remainder.sign = number.sign; } ();
-        quotient.sign = Sign::Positive; remainder.sign = divisor.sign;
-    }
-
-    /**
-     * @brief Extended Euclidean algorithm for greatest common divisor
-     * @param Aesi first
-     * @param Aesi second
-     * @param Aesi bezoutX OUT
-     * @param Aesi bezoutY OUT
-     * @return Aesi
-     * @details Counts Bézout coefficients along with the greatest common divisor. Returns coefficients by reference. Their signs are positive
-     */
     [[nodiscard]]
-    gpu static constexpr auto gcd(const Aesi& first, const Aesi& second, Aesi& bezoutX, Aesi& bezoutY) noexcept -> Aesi {
-        Aeu<bitness>::gcd(first.base, second.base, bezoutX.base, bezoutY.base);
-        bezoutX.sign = Sign::Positive; bezoutY.sign = Sign::Positive;
-    }
+    gpu static constexpr auto gcd(const Aesi& first, const Aesi& second, Aesi& bezoutX, Aesi& bezoutY) noexcept -> Aesi {}
 
-    /**
-     * @brief Least common multiplier
-     * @param Aesi first
-     * @param Aesi second
-     * @return Aesi
-     * @details Return value's sign is always positive
-     */
     [[nodiscard]]
-    gpu static constexpr auto lcm(const Aesi& first, const Aesi& second) noexcept -> Aesi {
-        return Aesi { Sign::Positive, Aeu<bitness>::lcm(first.base, second.base) };
-    }
+    gpu static constexpr auto lcm(const Aesi& first, const Aesi& second) noexcept -> Aesi {}
 
-    /**
-     * @brief Fast exponentiation for powers of 2
-     * @param Size_t power
-     * @return Aesi
-     * @details Returns zero for power greater than current bitness
-     */
     [[nodiscard]]
-    gpu static constexpr auto power2(std::size_t e) noexcept -> Aesi {
-        Aesi result { Sign::Positive, {} }; result.setBit(e, true); return result;
-    }
+    gpu static constexpr auto power2(std::size_t e) noexcept -> Aesi {}
 
-    /**
-     * @brief Get square root
-     * @return Aesi
-     * @note Returns zero for negative value or zero
-     */
     [[nodiscard]]
-    gpu constexpr auto squareRoot() const noexcept -> Aesi {
-        if(sign == Sign::Positive)
-            return Aesi { Sign::Positive, base.squareRoot() };
-        return Aesi { Sign::Zero };
-    }
+    gpu constexpr auto squareRoot() const noexcept -> Aesi {}
     /* ----------------------------------------------------------------------- */
 
-    /**
-     * @brief Built-in integral type cast operator
-     * @param Type integral_type TEMPLATE
-     * @return Integral
-     * @details Takes the lowes part of Aesi for conversion. Accepts signed and unsigned types
-     */
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-    gpu constexpr auto integralCast() const noexcept -> Integral {
-        if(sign == Sign::Zero)
-            return Integral();
-        if constexpr (std::is_signed_v<Integral>) {
-            if(sign == Sign::Negative)
-                return base.template integralCast<Integral>() * -1;
-        } else {
-            return base.template integralCast<Integral>();
-        }
-    }
+    gpu constexpr auto integralCast() const noexcept -> Integral {}
 
-    /**
-     * @brief Precision cast operator
-     * @param Size_t new_bitness TEMPLATE
-     * @return Aesi<new_bitness>
-     * @details If required precision greater than current precision, remaining blocks are filled with zeros.
-     * Otherwise - number is cropped inside smaller blocks array
-     * @note This method is used in all manipulations between numbers of different precision. Using this method is not recommended,
-     * cause it leads to redundant copying and may be slow
-     */
     template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
-    gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> { return Aesi { sign, base.template precisionCast<newBitness>() }; }
+    gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {}
+
+    gpu constexpr auto unsignedCast() const noexcept -> Aeu<bitness> { return base; };
 
     /* ----------------- @name Public input-output operators. ---------------- */
-    /**
-     * @brief Character buffer output operator
-     * @param Byte base TEMPLATE
-     * @param Char* buffer
-     * @param Size_t buffer_size
-     * @param Bool show_number_base
-     * @param Bool use_hexadecimal_uppercase
-     * @return Size_t - amount of symbols written
-     * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10, or 16
-     * @note Works significantly faster for hexadecimal notation
-     */
     template <byte notation, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> && (notation == 2 || notation == 8 || notation == 10 || notation == 16))
-    gpu constexpr auto getString(Char* const buffer, std::size_t bufferSize, bool showBase = false, bool hexUppercase = false) const noexcept -> std::size_t {
-        if(bufferSize < 2) return 0;
+    gpu constexpr auto getString(Char* const buffer, std::size_t bufferSize, bool showBase = false, bool hexUppercase = false) const noexcept -> std::size_t { return 0; }
 
-        if(sign == Sign::Zero)
-            return [&buffer] { buffer[0] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } }(); buffer[1] = Char(); } ();
-        else if(sign == Sign::Negative)
-            [&buffer, &bufferSize] { *(buffer++) = [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } }(); --bufferSize; } ();
-
-        return base.getString(buffer, bufferSize, showBase, hexUppercase);
-    }
-
-    /**
-     * @brief STD stream output operator
-     * @param Ostream stream
-     * @param Aesi number
-     * @return Ostream
-     * @details Writes number in stream. Accepts STD streams based on char or wchar_t. Supports stream manipulators:
-     * - Number's notation (std::hex, std::dec, std::oct);
-     * - Number's base (std::showbase);
-     * - Hexadecimal letters case (std::uppercase, std::lowercase)
-     * @note Works significantly faster for hexadecimal notation
-     */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    friend constexpr auto operator<<(std::basic_ostream<Char>& ss, const Aesi& value) -> std::basic_ostream<Char>& {
-        if(value.sign == Sign::Zero)
-            return ss << [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } ();
-        else
-            if(value.sign == Sign::Negative)
-                ss << [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ();
-        return ss << value.base;
-    }
+    friend constexpr auto operator<<(std::basic_ostream<Char>& ss, const Aesi& value) -> std::basic_ostream<Char>& {}
     /* ----------------------------------------------------------------------- */
 
 #if defined __CUDACC__ || defined DOXYGEN_SKIP
@@ -743,9 +271,7 @@ public:
      * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for assigning encapsulated class members atomically one by one
      */
-    __device__ constexpr auto tryAtomicSet(const Aesi& value) noexcept -> void {
-        sign = value.sign; base.tryAtomicSet(value.base);
-    }
+    __device__ constexpr auto tryAtomicSet(const Aesi& value) noexcept -> void {}
 
     /**
      * @brief Atomicity-oriented object exchangement operator
@@ -753,10 +279,7 @@ public:
      * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for exchanging encapsulated class members atomically one by one
      */
-    __device__ constexpr auto tryAtomicExchange(const Aesi& value) noexcept -> void {
-        Sign tSign = sign; sign = value.sign; value.sign = tSign;
-        base.tryAtomicExchange(value.base);
-    }
+    __device__ constexpr auto tryAtomicExchange(const Aesi& value) noexcept -> void {}
 #endif
 };
 

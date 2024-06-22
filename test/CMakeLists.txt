@@ -29,6 +29,7 @@ add_subdirectory(number-theory)
 add_subdirectory(boolean)
 
 add_compile_definitions(CRYPTOPP_USE_STD_SHOWBASE)
+add_compile_definitions(AESI_CRYPTOPP_INTEGRATION)
 add_subdirectory(${cryptopplib_SOURCE_DIR} ${cryptopplib_BINARY_DIR})
 
 if (PREPROCESSOR_UNSAFE)

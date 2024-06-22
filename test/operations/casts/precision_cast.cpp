@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "../../../Aeu.h"
-//#include "../../../Aesi.h"
+#include "../../../Aesi.h"
 #include "../../generation.h"
 
 TEST(Signed_PrecisionCast, PrecisionCast) { EXPECT_TRUE(false);  }
@@ -8,11 +8,7 @@ TEST(Signed_PrecisionCast, PrecisionCast) { EXPECT_TRUE(false);  }
 TEST(Unsigned_PrecisionCast, PrecisionCast) {
     constexpr auto testsAmount = 2048;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto init0 = [] {
-            std::stringstream ss;
-            ss << "0x" << std::hex << Generation::getRandomWithBits(250);
-            return ss.str();
-        } ();
+        const auto init0 = Generation::getRandomWithBits(250);
         const Aeu<256> aeu = init0;
         EXPECT_EQ(aeu.precisionCast<288>(), init0); EXPECT_EQ(aeu.precisionCast<320>(), init0); EXPECT_EQ(aeu.precisionCast<352>(), init0); EXPECT_EQ(aeu.precisionCast<384>(), init0);
         EXPECT_EQ(aeu.precisionCast<416>(), init0); EXPECT_EQ(aeu.precisionCast<448>(), init0); EXPECT_EQ(aeu.precisionCast<480>(), init0); EXPECT_EQ(aeu.precisionCast<512>(), init0);

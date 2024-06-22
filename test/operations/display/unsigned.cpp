@@ -177,8 +177,8 @@ TEST(Unsigned_Display, FormatAskii) {
                 break;
             }
             default: {  /* Binary */
-                ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
-                for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
+                ss << "0b" << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
+                for(long long j = value.ByteCount() - 2; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
                 askii[0] = L'0'; askii[1] = L'b';
                 aeu.getString<2>(askii.data() + 2, askii.size() - 2, false);

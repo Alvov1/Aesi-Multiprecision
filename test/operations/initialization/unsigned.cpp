@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <bitset>
+#include <format>
 #include "../../../Aeu.h"
 #include "../../generation.h"
 
@@ -81,10 +82,13 @@ TEST(Unsigned_Initialization, Binary) {
 
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandom<uint64_t>();
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
-        std::stringstream ss {}; ss << "0b" << std::bitset<64>(value);
+        std::stringstream ss {};
+        ss << "0b" << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
+        for(long long j = value.ByteCount() - 2; j >= 0; --j)
+            ss << std::bitset<8>(value.GetByte(j));
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }
@@ -94,7 +98,7 @@ TEST(Unsigned_Initialization, Decimal) {
 
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandom<uint64_t>();
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
         std::stringstream ss {}; ss << std::dec << value;
@@ -107,7 +111,7 @@ TEST(Unsigned_Initialization, Octal) {
 
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandom<uint64_t>();
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
         std::stringstream ss {}; ss << "0o" << std::oct << value;
@@ -120,7 +124,7 @@ TEST(Unsigned_Initialization, Hexadecimal) {
 
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandom<uint64_t>();
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
         std::stringstream ss {};

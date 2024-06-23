@@ -1174,7 +1174,7 @@ public:
         if(base == 0u)
             return { 1u };
 
-        Aeu output = 1;
+        Aeu output = 1u;
         auto [_, b] = divide(base, mod);
 
         for(unsigned iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {

@@ -34,7 +34,7 @@ FetchContent_MakeAvailable(AesiMultiprecision)
 ...
 target_include_directories(Target PRIVATE ${AesiMultiprecision_SOURCE_DIR})
 ```
-Further it could be included with standard preprocessor command:
+Further it could be included in project with standard preprocessor command:
 > #include <Aeu.h>
 
 ## Usage:

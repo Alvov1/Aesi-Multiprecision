@@ -36,7 +36,7 @@ public:
 
     gpu constexpr Aesi(const Aesi& copy) noexcept {}
 
-    gpu constexpr Aesi& operator=(const Aesi& other) noexcept {}
+    gpu constexpr Aesi& operator=(const Aesi& other) noexcept { return *this; }
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr Aesi(Integral value) noexcept {}
@@ -58,7 +58,7 @@ public:
 #endif
 
 #ifdef AESI_GMP_INTEGRATION
-    constexpr Aesi(const mpz_class& value) : base(value) {}
+    constexpr Aesi(const mpz_class& value) : base(value) { if(value < 0) sign = Sign::Positive; }
 #endif
     /* ----------------------------------------------------------------------- */
 
@@ -94,15 +94,15 @@ public:
 
     /* ----------------------- @name Subtraction operators. ---------------------- */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator-(Integral subtrahend) const noexcept -> Aesi {}
+        gpu constexpr auto operator-(Integral subtrahend) const noexcept -> Aesi { return *this; }
 
         [[nodiscard]]
-        gpu constexpr auto operator-(const Aesi& subtrahend) const noexcept -> Aesi {}
+        gpu constexpr auto operator-(const Aesi& subtrahend) const noexcept -> Aesi { return *this; }
 
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator-=(Integral subtrahend) noexcept -> Aesi& {}
+        gpu constexpr auto operator-=(Integral subtrahend) noexcept -> Aesi& { return *this; }
 
-        gpu constexpr auto operator-=(const Aesi& subtrahend) noexcept -> Aesi& {}
+        gpu constexpr auto operator-=(const Aesi& subtrahend) noexcept -> Aesi& { return *this; }
     /* --------------------------------------------------------------------------- */
 
     /* --------------------- @name Multiplication operators. --------------------- */
@@ -145,56 +145,79 @@ public:
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
 
-
-    /* ----------------------- @name Bitwise operators. ---------------------- */
-#define BitwiseDisabled "For bitwise operations use unsigned integer class"
-
-    [[nodiscard]]
-    gpu constexpr auto operator~() const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
-
-    [[nodiscard]]
-    gpu constexpr auto operator^(const Aesi& other) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
-
-    gpu constexpr auto operator^=(const Aesi& other) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
-
-    [[nodiscard]]
-    gpu constexpr auto operator&(const Aesi& other) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
-
-    gpu constexpr auto operator&=(const Aesi& other) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
-
-    [[nodiscard]]
-    gpu constexpr auto operator|(const Aesi& other) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
-
-    gpu constexpr auto operator|=(const Aesi& other) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
-
-    template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-    gpu constexpr auto operator<<(Integral bitShift) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
-
-    template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr auto operator<<=(Integral bitShift) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
-
-    template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-    gpu constexpr auto operator>>(Integral bitShift) const noexcept -> Aesi { static_assert(false, BitwiseDisabled); }
-
-    template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr auto operator>>=(Integral bitShift) noexcept -> Aesi& { static_assert(false, BitwiseDisabled); }
-    /* ----------------------------------------------------------------------- */
-
-
     /* --------------------- @name Comparison operators. --------------------- */
-    template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr auto operator==(Integral value) const noexcept -> bool {
-        if(value < 0)
-            return sign == Sign::Negative && base == static_cast<uint64_t>(abs(static_cast<long long>(value)));
-        else if(value > 0)
-            return sign == Sign::Positive && base == static_cast<uint64_t>(value);
-        else return sign == Sign::Zero;
-    }
+    /* ------------------------ @name Equality operators. ------------------------ */
+        template <typename Integral> requires (std::is_integral_v<Integral>)
+        gpu constexpr auto operator==(Integral value) const noexcept -> bool { return compareTo(value) == Comparison::equal; }
 
-    gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool { return sign == other.sign && base == other.base; };
+        gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool { return sign == other.sign && base == other.base; }
 
-    [[nodiscard]]
-    gpu constexpr auto compareTo(const Aesi& other) const noexcept -> Comparison { return Comparison::equal; };
+        template <std::size_t otherBitness> requires (otherBitness != bitness)
+        gpu constexpr auto operator==(const Aesi<otherBitness>& other) const noexcept -> bool { return compareTo(other) == Comparison::equal; }
+    /* --------------------------------------------------------------------------- */
+
+
+    /* ----------------------- @name Comparison operators. ----------------------- */
+        template <typename Integral> requires (std::is_integral_v<Integral>)
+        gpu constexpr auto compareTo(Integral value) const noexcept -> Comparison { return Comparison::equal; }
+
+        template <std::size_t otherBitness = bitness> [[nodiscard]]
+        gpu constexpr auto compareTo(const Aesi<otherBitness>& other) const noexcept -> Comparison { return Comparison::equal; };
+    /* --------------------------------------------------------------------------- */
+
+    /* ------------------------ @name Spaceship operators. ----------------------- */
+#if (defined(__CUDACC__) || __cplusplus < 202002L || defined (PRE_CPP_20)) && !defined DOXYGEN_SKIP
+        /**
+         * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on preCpp20
+         */
+        gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool { return !this->operator==(value); }
+        gpu constexpr auto operator<(const Aeu& value) const noexcept -> bool { return this->compareTo(value) == Comparison::less; }
+        gpu constexpr auto operator<=(const Aeu& value) const noexcept -> bool { return !this->operator>(value); }
+        gpu constexpr auto operator>(const Aeu& value) const noexcept -> bool { return this->compareTo(value) == Comparison::greater; }
+        gpu constexpr auto operator>=(const Aeu& value) const noexcept -> bool { return !this->operator<(value); }
+#else
+        /**
+         * @brief Three-way comparison operator
+         * @param Aeu other
+         * @return Std::Strong_ordering
+         * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
+         */
+        gpu constexpr auto operator<=>(const Aesi& other) const noexcept -> std::strong_ordering {
+            const auto ratio = this->compareTo(other);
+            switch(ratio) {
+            case Comparison::less:
+                return std::strong_ordering::less;
+            case Comparison::greater:
+                return std::strong_ordering::greater;
+            case Comparison::equal:
+                return std::strong_ordering::equal;
+            default:
+                return std::strong_ordering::equivalent;
+        }
+        };
+
+        /**
+         * @brief Three-way comparison operator for numbers of different precision and built-in integral types
+         * @param Aeu<diffPrec>/Unsigned other
+         * @return Std::Strong_ordering
+         * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
+         */
+        template <typename Unsigned>
+        gpu constexpr auto operator<=>(const Unsigned& other) const noexcept -> std::strong_ordering {
+            const auto ratio = this->compareTo(other);
+            switch(ratio) {
+                case Comparison::less:
+                    return std::strong_ordering::less;
+                case Comparison::greater:
+                    return std::strong_ordering::greater;
+                case Comparison::equal:
+                    return std::strong_ordering::equal;
+                default:
+                    return std::strong_ordering::equivalent;
+            }
+        };
+#endif
+    /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
 
 
@@ -245,20 +268,11 @@ public:
     gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor, Aesi& quotient, Aesi& remainder) noexcept -> void {}
 
     [[nodiscard]]
-    gpu static constexpr auto gcd(const Aesi& first, const Aesi& second, Aesi& bezoutX, Aesi& bezoutY) noexcept -> Aesi {}
-
-    [[nodiscard]]
-    gpu static constexpr auto lcm(const Aesi& first, const Aesi& second) noexcept -> Aesi {}
-
-    [[nodiscard]]
-    gpu static constexpr auto power2(std::size_t e) noexcept -> Aesi {}
-
-    [[nodiscard]]
-    gpu constexpr auto squareRoot() const noexcept -> Aesi {}
+    gpu constexpr auto squareRoot() const noexcept -> Aesi { return Aesi {}; }
     /* ----------------------------------------------------------------------- */
 
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-    gpu constexpr auto integralCast() const noexcept -> Integral {}
+    gpu constexpr auto integralCast() const noexcept -> Integral { return Integral(); }
 
     template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
     gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {}
@@ -270,7 +284,7 @@ public:
     gpu constexpr auto getString(Char* const buffer, std::size_t bufferSize, bool showBase = false, bool hexUppercase = false) const noexcept -> std::size_t { return 0; }
 
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    friend constexpr auto operator<<(std::basic_ostream<Char>& ss, const Aesi& value) -> std::basic_ostream<Char>& {}
+    friend constexpr auto operator<<(std::basic_ostream<Char>& ss, const Aesi& value) -> std::basic_ostream<Char>& { return ss; }
     /* ----------------------------------------------------------------------- */
 
 #if defined __CUDACC__ || defined DOXYGEN_SKIP

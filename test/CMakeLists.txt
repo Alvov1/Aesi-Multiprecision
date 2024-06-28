@@ -15,21 +15,21 @@ FetchContent_Declare(
 )
 FetchContent_Populate(CryptoPPLib)
 
-find_package (SQLite3)
+find_package(PkgConfig)
+pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp)
 
 enable_testing()
 
 file(GLOB Tests *.cpp)
-add_executable(AesiMultiprecision ${Tests} ../Aesi.h
-        bitwise/shift/signed.cpp)
+add_executable(AesiMultiprecision ${Tests})
 add_subdirectory(arithmetic)
 add_subdirectory(operations)
 add_subdirectory(bitwise)
-add_subdirectory(number-theory)
 add_subdirectory(boolean)
 
 add_compile_definitions(CRYPTOPP_USE_STD_SHOWBASE)
 add_compile_definitions(AESI_CRYPTOPP_INTEGRATION)
+add_compile_definitions(AESI_GMP_INTEGRATION)
 add_subdirectory(${cryptopplib_SOURCE_DIR} ${cryptopplib_BINARY_DIR})
 
 if (PREPROCESSOR_UNSAFE)
@@ -40,9 +40,8 @@ if (PREPROCESSOR_PRE_CPP_20)
     add_definitions(-DPRE_CPP_20=1)
 endif (PREPROCESSOR_PRE_CPP_20)
 
-include_directories(${SQLite3_INCLUDE_DIRS})
-
-target_link_libraries(AesiMultiprecision GTest::gtest_main ${SQLite3_LIBRARIES} cryptopp)
+target_link_libraries(AesiMultiprecision GTest::gtest_main cryptopp PkgConfig::GMP)
+target_include_directories(AesiMultiprecision PUBLIC PkgConfig::GMP)
 
 include(GoogleTest)
 gtest_discover_tests(AesiMultiprecision)

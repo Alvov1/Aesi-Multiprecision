@@ -154,21 +154,18 @@ TEST(Unsigned_Display, FormatAskii) {
 
         switch(i % 5) {
             case 0: {   /* Octal */
-                ss << "0o" << std::oct << std::noshowbase << value;
-                askii[0] = '0'; askii[1] = 'o';
-                const auto size = aeu.getString<8>(askii.data() + 2, askii.size() - 2, false);
+                ss << std::oct << std::noshowbase << value;
+                const auto size = aeu.getString<8>(askii.data(), askii.size(), false);
                 break;
             }
             case 1: {   /* Hexadecimal, lowercase */
-                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                askii[0] = '0'; askii[1] = 'x';
-                const auto size = aeu.getString<16>(askii.data() + 2, askii.size() - 2, false, false);
+                ss << std::hex << std::noshowbase << std::nouppercase << value;
+                const auto size = aeu.getString<16>(askii.data(), askii.size(), false, false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
-                ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
-                askii[0] = '0'; askii[1] = 'x';
-                const auto size = aeu.getString<16>(askii.data() + 2, askii.size() - 2, false, true);
+                ss << std::hex << std::noshowbase << std::uppercase << value;
+                const auto size = aeu.getString<16>(askii.data(), askii.size(), false, true);
                 break;
             }
             case 3: {  /* Decimal */
@@ -177,11 +174,10 @@ TEST(Unsigned_Display, FormatAskii) {
                 break;
             }
             default: {  /* Binary */
-                ss << "0b" << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
+                ss << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
                 for(long long j = value.ByteCount() - 2; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
-                askii[0] = L'0'; askii[1] = L'b';
-                aeu.getString<2>(askii.data() + 2, askii.size() - 2, false);
+                aeu.getString<2>(askii.data(), askii.size(), false);
             }
         }
 
@@ -208,21 +204,18 @@ TEST(Unsigned_Display, FormatUtf) {
 
         switch (i % 5) {
             case 0: {   /* Octal */
-                ss << "0o" << std::oct << std::noshowbase << value;
-                utf[0] = L'0'; utf[1] = L'o';
-                const auto size = aeu.getString<8>(utf.data() + 2, utf.size() - 2, false);
+                ss << std::oct << std::noshowbase << value;
+                const auto size = aeu.getString<8>(utf.data(), utf.size(), false);
                 break;
             }
             case 1: {   /* Hexadecimal, lowercase */
-                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                utf[0] = L'0'; utf[1] = L'x';
-                const auto size = aeu.getString<16>(utf.data() + 2, utf.size() - 2, false, false);
+                ss << std::hex << std::noshowbase << std::nouppercase << value;
+                const auto size = aeu.getString<16>(utf.data(), utf.size(), false, false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
-                ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
-                utf[0] = L'0'; utf[1] = L'x';
-                const auto size = aeu.getString<16>(utf.data() + 2, utf.size() - 2, false, true);
+                ss << std::hex << std::noshowbase << std::uppercase << value;
+                const auto size = aeu.getString<16>(utf.data(), utf.size(), false, true);
                 break;
             }
             case 3: {  /* Decimal */
@@ -231,11 +224,10 @@ TEST(Unsigned_Display, FormatUtf) {
                 break;
             }
             default: {  /* Binary */
-                ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                ss << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
                 for (long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
-                utf[0] = L'0'; utf[1] = L'b';
-                aeu.getString<2>(utf.data() + 2, utf.size() - 2, false);
+                aeu.getString<2>(utf.data(), utf.size(), false);
             }
         }
 

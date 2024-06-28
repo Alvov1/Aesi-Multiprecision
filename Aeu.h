@@ -24,6 +24,10 @@
 #include <cryptopp/integer.h>
 #endif
 
+#ifdef AESI_GMP_INTEGRATION
+#include <gmpxx.h>
+#endif
+
 /**
  * @file Aeu.h
  * @brief Long precision unsigned integer with arithmetic operations
@@ -65,7 +69,6 @@ class Aeu final {
     using blockLine = std::array<block, blocksNumber>;
 #endif
 
-public:
     /* -------------------------- @name Class members. ----------------------- */
     /**
      * @brief Block line of the number
@@ -73,7 +76,6 @@ public:
     blockLine blocks;
     /* ----------------------------------------------------------------------- */
 
-private:
     /* ------------------------ @name Helper functions. ---------------------- */
     /**
      * @brief Makes line addition
@@ -224,7 +226,7 @@ public:
     gpu constexpr Aeu(const String& stringView) noexcept : Aeu(stringView.data(), stringView.size()) {}
 
 #ifdef AESI_CRYPTOPP_INTEGRATION
-    constexpr Aeu(const CryptoPP::Integer& value) : Aeu {} {
+    constexpr Aeu(const CryptoPP::Integer& value): Aeu {} {
         const auto byteCount = value.ByteCount();
         if(byteCount * 8 > bitness)
             throw std::invalid_argument("Accessed overflow on construction object from CryptoPP::Integer");
@@ -234,7 +236,9 @@ public:
 #endif
 
 #ifdef AESI_GMP_INTEGRATION
-    constexpr Aeu(const mpz_class& value) : base(value) {}
+    constexpr Aeu(const mpz_class& value) : Aeu {} {
+        
+    }
 #endif
     /* ----------------------------------------------------------------------- */
 
@@ -361,7 +365,7 @@ public:
          * @return Aeu&
          */ /* TODO: Complete */
 //        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-//        gpu constexpr auto operator-=(Unsigned subtrahend) noexcept -> Aeu& = delete;
+//        gpu constexpr auto operator-=(Unsigned subtrahend) noexcept -> Aeu& { return *this; };
 
         /**
          * @brief Assignment subtraction operator
@@ -497,8 +501,8 @@ public:
          * @param Unsigned divisor
          * @return Aeu&
          */ /* TODO: Complete */
-        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator/=(Unsigned divisor) noexcept -> Aeu& = delete;
+//        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
+//        gpu constexpr auto operator/=(Unsigned divisor) noexcept -> Aeu& { return *this; };
 
         /**
          * @brief Assignment division operator
@@ -537,8 +541,8 @@ public:
          * @param Unsigned modulo
          * @return Aeu&
          */ /* TODO: Complete */
-        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator%=(Unsigned modulo) noexcept -> Aeu& = delete;
+//        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
+//        gpu constexpr auto operator%=(Unsigned modulo) noexcept -> Aeu& { return *this; };
 
         /**
          * @brief Assignment modulo operator
@@ -718,9 +722,7 @@ public:
          * @param Aeu other
          * @return Bool
          */
-        gpu constexpr auto operator==(const Aeu& other) const noexcept -> bool {
-            return blocks == other.blocks;
-        };
+        gpu constexpr auto operator==(const Aeu& other) const noexcept -> bool { return blocks == other.blocks; };
 
         /**
          * @brief Templated Equality check operator for numbers of different precision
@@ -748,7 +750,7 @@ public:
             else if(blocks[0] < cmp)
                 return Comparison::less; else return Comparison::equal;
         }
-    
+
         /**
          * @brief Internal comparison operator for type uint64_t
          * @param uint64_t other
@@ -762,14 +764,14 @@ public:
             if(base > other)
                 return Comparison::greater; else if(base < other) return Comparison::less; else return Comparison::equal;
         }
-    
+
         /**
          * @brief Internal comparison operator
          * @param Aeu other
          * @return Comparison
          * @note Should almost never return Comparison::Equivalent
          */
-        template <std::size_t otherBitness = bitness> [[nodiscard]]
+        template <std::size_t otherBitness = bitness> /*requires (otherBitness != bitness)*/ [[nodiscard]]
         gpu constexpr auto compareTo(const Aeu<otherBitness>& other) const noexcept -> Comparison {
             /* First compare in common precision. */
             const auto lowerBlockBorder = (blocksNumber < other.totalBlocksNumber() ? blocksNumber : other.totalBlocksNumber());
@@ -778,7 +780,7 @@ public:
                 if(thisBlock != otherBlock)
                     return (thisBlock > otherBlock ? Comparison::greater : Comparison::less);
             }
-    
+
             if constexpr (otherBitness != blocksNumber * blockBitLength) {
                 /* If larger number contains data out of lower number's range, it's greater. */
                 if (other.totalBlocksNumber() > blocksNumber) {
@@ -791,7 +793,7 @@ public:
                             return Comparison::greater;
                 }
             }
-    
+
             return Comparison::equal;
         }
     /* --------------------------------------------------------------------------- */
@@ -827,7 +829,7 @@ public:
                     return std::strong_ordering::equivalent;
             }
         };
-    
+
         /**
          * @brief Three-way comparison operator for numbers of different precision and built-in integral types
          * @param Aeu<diffPrec>/Unsigned other
@@ -1301,7 +1303,7 @@ public:
             const auto startPosition = position;
 
             Aeu copy = *this;
-            while (copy != 0 && position < bufferSize) {
+            while (!copy.isZero() && position < bufferSize) {
                 auto [quotient, remainder] = divide(copy, base);
                 if constexpr (std::is_same_v<Char, char>) {
                     buffer[position++] = '0' + remainder.template integralCast<byte>();

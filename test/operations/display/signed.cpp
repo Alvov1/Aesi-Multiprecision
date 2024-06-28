@@ -1,244 +1,421 @@
 #include <gtest/gtest.h>
-#include <bitset>
 #include <format>
+
+#ifndef AESI_CRYPTOPP_INTEGRATION
+#define AESI_CRYPTOPP_INTEGRATION
+#endif
 #include "../../../Aesi.h"
 #include "../../generation.h"
 
-TEST(Unsigned_Initialization, Basic) {
-    Aesi512 m0 {};
-    EXPECT_EQ(m0, 0);
+/* Output tester for zero values */
+TEST(Signed_Display, Zero) {
+    Aesi128 m = 0u;
 
-    Aesi512 m1(0);
-    EXPECT_EQ(m1, 0);
-
-    Aesi512 m2 = 0;
-    EXPECT_EQ(m2, 0);
-
-    auto m3 = Aesi512(0);
-    EXPECT_EQ(m3, 0);
-
-    Aesi512 m4 = {};
-    EXPECT_EQ(m4, 0);
-
-    Aesi512 m5 = "0";
-    EXPECT_EQ(m5, 0);
-
-    Aesi512 m6 = "0";
-    EXPECT_EQ(m6, 0);
-
-    Aesi512 m7 = "Somebody once told me The world is gonna roll me I ain't the sharpest tool in the shed";
-    EXPECT_EQ(m7, 0);
-
-    Aesi512 i01 = 1;
-    EXPECT_EQ(i01, 1);
-
-    Aesi512 i02 = -1, i03 = 127, i04 = -127, i05 = -128, i06 = +127;
-    EXPECT_EQ(i02, -1); EXPECT_EQ(i03, 127); EXPECT_EQ(i04, -127); EXPECT_EQ(i05, -128); EXPECT_EQ(i06, 127);
-
-    Aesi512 ten = "10", negativeTen = "-10";
-    EXPECT_EQ(ten, 10);
-    EXPECT_EQ(negativeTen, -10);
-
-    Aesi512 hexTenLC = "0xa", hexTenHC = "0xA", negativeHexTenLC = "-0xa", negativeHexTenHC = "-0xA";
-    EXPECT_EQ(hexTenLC, 10);
-    EXPECT_EQ(hexTenHC, 10); EXPECT_EQ(negativeHexTenLC, -10); EXPECT_EQ(negativeHexTenHC, -10);
-
-    using namespace std::string_literals;
-    using namespace std::string_view_literals;
-
-    Aesi512 d0 = "489133282872437279"s;
-    EXPECT_EQ(d0, 489133282872437279);
-    Aesi512 d1 = "63018038201"sv;
-    EXPECT_EQ(d1, 63018038201);
-    Aesi512 d2 = "-489133282872437279"s;
-    EXPECT_EQ(d2, -489133282872437279);
-    Aesi512 d3 = "-63018038201"sv;
-    EXPECT_EQ(d3, -63018038201);
-
-    Aesi512 b0 = "0b11011001001110000000010000100010101011011101010101000011111"s;
-    EXPECT_EQ(b0, 489133282872437279);
-    Aesi512 b1 = "0b111010101100001010101111001110111001"sv;
-    EXPECT_EQ(b1, 63018038201);
-    Aesi512 b2 = "-0b11011001001110000000010000100010101011011101010101000011111"s;
-    EXPECT_EQ(b2, -489133282872437279);
-    Aesi512 b3 = "-0b111010101100001010101111001110111001"sv;
-    EXPECT_EQ(b3, -63018038201);
-
-    Aesi512 o0 = "0o106274176273174613"s;
-    EXPECT_EQ(o0, 2475842268363147);
-    Aesi512 o1 = "0o642054234601645202742"sv;
-    EXPECT_EQ(o1, 7531577461358003682);
-    Aesi512 o2 = "-0o106274176273174613"s;
-    EXPECT_EQ(o2, -2475842268363147);
-    Aesi512 o3 = "-0o642054234601645202742"sv;
-    EXPECT_EQ(o3, -7531577461358003682);
-
-    Aesi512 h0 = "0x688589CC0E9505E2"s;
-    EXPECT_EQ(h0, 7531577461358003682);
-    Aesi512 h1 = "0x3C9D4B9CB52FE"sv;
-    EXPECT_EQ(h1, 1066340417491710);
-    Aesi512 h2 = "-0x688589CC0E9505E2"s;
-    EXPECT_EQ(h2, -7531577461358003682);
-    Aesi512 h3 = "-0x3C9D4B9CB52FE"sv;
-    EXPECT_EQ(h3, -1066340417491710);
-    Aesi512 h4 = "0x688589cc0e9505e2"s;
-    EXPECT_EQ(h4, 7531577461358003682);
-    Aesi512 h5 = "0x3c9d4b9cb52fe"sv;
-    EXPECT_EQ(h5, 1066340417491710);
-    Aesi512 h6 = "-0x688589cc0e9505e2"s;
-    EXPECT_EQ(h6, -7531577461358003682);
-    Aesi512 h7 = "-0x3c9d4b9cb52fe"sv;
-    EXPECT_EQ(h7, -1066340417491710);
-
-    d0 = L"489133282872437279"s;
-    EXPECT_EQ(d0, 489133282872437279);
-    d1 = L"63018038201"sv;
-    EXPECT_EQ(d1, 63018038201);
-    d2 = L"-489133282872437279"s;
-    EXPECT_EQ(d2, -489133282872437279);
-    d3 = L"-63018038201"sv;
-    EXPECT_EQ(d3, -63018038201);
-
-    b0 = L"0b11011001001110000000010000100010101011011101010101000011111"s;
-    EXPECT_EQ(b0, 489133282872437279);
-    b1 = L"0b111010101100001010101111001110111001"sv;
-    EXPECT_EQ(b1, 63018038201);
-    b2 = L"-0b11011001001110000000010000100010101011011101010101000011111"s;
-    EXPECT_EQ(b2, -489133282872437279);
-    b3 = L"-0b111010101100001010101111001110111001"sv;
-    EXPECT_EQ(b3, -63018038201);
-
-    o0 = L"0o106274176273174613"s;
-    EXPECT_EQ(o0, 2475842268363147);
-    o1 = L"0o642054234601645202742"sv;
-    EXPECT_EQ(o1, 7531577461358003682);
-    o2 = L"-0o106274176273174613"s;
-    EXPECT_EQ(o2, -2475842268363147);
-    o3 = L"-0o642054234601645202742"sv;
-    EXPECT_EQ(o3, -7531577461358003682);
-
-    h0 = L"0x688589CC0E9505E2"s;
-    EXPECT_EQ(h0, 7531577461358003682);
-    h1 = L"0x3C9D4B9CB52FE"sv;
-    EXPECT_EQ(h1, 1066340417491710);
-    h2 = L"-0x688589CC0E9505E2"s;
-    EXPECT_EQ(h2, -7531577461358003682);
-    h3 = L"-0x3C9D4B9CB52FE"sv;
-    EXPECT_EQ(h3, -1066340417491710);
-    h4 = L"0x688589cc0e9505e2"s;
-    EXPECT_EQ(h4, 7531577461358003682);
-    h5 = L"0x3c9d4b9cb52fe"sv;
-    EXPECT_EQ(h5, 1066340417491710);
-    h6 = L"-0x688589cc0e9505e2"s;
-    EXPECT_EQ(h6, -7531577461358003682);
-    h7 = L"-0x3c9d4b9cb52fe"sv;
-    EXPECT_EQ(h7, -1066340417491710);
-}
-
-TEST(Unsigned_Initialization, Different_precisions) {
-    {
-        int64_t iValue0 = 3218136182342442422ll;
-        Aesi < 96 > o00 = iValue0;
-        Aesi < 96 > o01 = iValue0;
-
-        Aesi < 128 > o02 = iValue0; Aesi < 160 > o03 = iValue0; Aesi < 192 > o04 = iValue0; Aesi < 224 > o05 = iValue0; Aesi < 256 > o06 = iValue0; Aesi < 288 > o07 = iValue0; Aesi < 320 > o08 = iValue0; Aesi < 352 > o09 = iValue0;
-        Aesi < 384 > o010 = iValue0; Aesi < 416 > o011 = iValue0; Aesi < 448 > o012 = iValue0; Aesi < 480 > o013 = iValue0; Aesi < 512 > o014 = iValue0; Aesi < 544 > o015 = iValue0; Aesi < 576 > o016 = iValue0; Aesi < 608 > o017 = iValue0; Aesi < 640 > o018 = iValue0;
-        Aesi < 672 > o019 = iValue0; Aesi < 704 > o020 = iValue0; Aesi < 736 > o021 = iValue0; Aesi < 768 > o022 = iValue0; Aesi < 800 > o023 = iValue0; Aesi < 832 > o024 = iValue0; Aesi < 864 > o025 = iValue0; Aesi < 896 > o026 = iValue0; Aesi < 928 > o027 = iValue0;
-        Aesi < 960 > o028 = iValue0; Aesi < 992 > o029 = iValue0; Aesi < 1024 > o030 = iValue0; Aesi < 1056 > o031 = iValue0; Aesi < 1088 > o032 = iValue0; Aesi < 1120 > o033 = iValue0; Aesi < 1152 > o034 = iValue0; Aesi < 1184 > o035 = iValue0; Aesi < 1216 > o036 = iValue0;
-        Aesi < 1248 > o037 = iValue0; Aesi < 1280 > o038 = iValue0; Aesi < 1312 > o039 = iValue0;
-
-        EXPECT_EQ(o00, iValue0);
-        EXPECT_EQ(o01, iValue0); EXPECT_EQ(o02, iValue0); EXPECT_EQ(o03, iValue0); EXPECT_EQ(o04, iValue0); EXPECT_EQ(o05, iValue0); EXPECT_EQ(o06, iValue0); EXPECT_EQ(o07, iValue0); EXPECT_EQ(o08, iValue0); EXPECT_EQ(o09, iValue0);
-        EXPECT_EQ(o010, iValue0); EXPECT_EQ(o011, iValue0); EXPECT_EQ(o012, iValue0); EXPECT_EQ(o013, iValue0); EXPECT_EQ(o014, iValue0); EXPECT_EQ(o015, iValue0); EXPECT_EQ(o016, iValue0); EXPECT_EQ(o017, iValue0); EXPECT_EQ(o018, iValue0);
-        EXPECT_EQ(o019, iValue0); EXPECT_EQ(o020, iValue0); EXPECT_EQ(o021, iValue0); EXPECT_EQ(o022, iValue0); EXPECT_EQ(o023, iValue0); EXPECT_EQ(o024, iValue0); EXPECT_EQ(o025, iValue0); EXPECT_EQ(o026, iValue0); EXPECT_EQ(o027, iValue0);
-        EXPECT_EQ(o028, iValue0); EXPECT_EQ(o029, iValue0); EXPECT_EQ(o030, iValue0); EXPECT_EQ(o031, iValue0); EXPECT_EQ(o032, iValue0); EXPECT_EQ(o033, iValue0); EXPECT_EQ(o034, iValue0); EXPECT_EQ(o035, iValue0); EXPECT_EQ(o036, iValue0);
-        EXPECT_EQ(o037, iValue0); EXPECT_EQ(o038, iValue0); EXPECT_EQ(o039, iValue0);
-    }
+    { std::stringstream ss1{}; ss1 << m << +m; EXPECT_EQ(ss1.str(), "00"); }
+    { std::stringstream ss2{}; ss2 << std::dec << m << +m; EXPECT_EQ(ss2.str(), "00"); }
+    { std::stringstream ss3{}; ss3 << std::oct << m << +m; EXPECT_EQ(ss3.str(), "00"); }
+    { std::stringstream ss4{}; ss4 << std::hex << m << +m; EXPECT_EQ(ss4.str(), "00"); }
+    { std::stringstream ss5{}; m = 8u; ss5 << m - 8u << +(m - 8u); m -= 8u; ss5 << m; EXPECT_EQ(ss5.str(), "000"); }
 
     {
-        int64_t iValue0 = -3218136182342442422ll;
-        Aesi < 96 > o00 = iValue0;
-        Aesi < 96 > o01 = iValue0;
+        m = 0u;
+        using namespace std::string_view_literals;
 
-        Aesi < 128 > o02 = iValue0; Aesi < 160 > o03 = iValue0; Aesi < 192 > o04 = iValue0; Aesi < 224 > o05 = iValue0; Aesi < 256 > o06 = iValue0; Aesi < 288 > o07 = iValue0; Aesi < 320 > o08 = iValue0; Aesi < 352 > o09 = iValue0;
-        Aesi < 384 > o010 = iValue0; Aesi < 416 > o011 = iValue0; Aesi < 448 > o012 = iValue0; Aesi < 480 > o013 = iValue0; Aesi < 512 > o014 = iValue0; Aesi < 544 > o015 = iValue0; Aesi < 576 > o016 = iValue0; Aesi < 608 > o017 = iValue0; Aesi < 640 > o018 = iValue0;
-        Aesi < 672 > o019 = iValue0; Aesi < 704 > o020 = iValue0; Aesi < 736 > o021 = iValue0; Aesi < 768 > o022 = iValue0; Aesi < 800 > o023 = iValue0; Aesi < 832 > o024 = iValue0; Aesi < 864 > o025 = iValue0; Aesi < 896 > o026 = iValue0; Aesi < 928 > o027 = iValue0;
-        Aesi < 960 > o028 = iValue0; Aesi < 992 > o029 = iValue0; Aesi < 1024 > o030 = iValue0; Aesi < 1056 > o031 = iValue0; Aesi < 1088 > o032 = iValue0; Aesi < 1120 > o033 = iValue0; Aesi < 1152 > o034 = iValue0; Aesi < 1184 > o035 = iValue0; Aesi < 1216 > o036 = iValue0;
-        Aesi < 1248 > o037 = iValue0; Aesi < 1280 > o038 = iValue0; Aesi < 1312 > o039 = iValue0;
+        std::array<char, 10> askii{};
+        std::array<wchar_t, 10> utf{};
+        auto size = m.getString<10>(askii.data(), 10, false);
+        EXPECT_EQ(std::string_view(askii.data()), "0"sv);
 
-        EXPECT_EQ(o00, iValue0);
-        EXPECT_EQ(o01, iValue0); EXPECT_EQ(o02, iValue0); EXPECT_EQ(o03, iValue0); EXPECT_EQ(o04, iValue0); EXPECT_EQ(o05, iValue0); EXPECT_EQ(o06, iValue0); EXPECT_EQ(o07, iValue0); EXPECT_EQ(o08, iValue0); EXPECT_EQ(o09, iValue0);
-        EXPECT_EQ(o010, iValue0); EXPECT_EQ(o011, iValue0); EXPECT_EQ(o012, iValue0); EXPECT_EQ(o013, iValue0); EXPECT_EQ(o014, iValue0); EXPECT_EQ(o015, iValue0); EXPECT_EQ(o016, iValue0); EXPECT_EQ(o017, iValue0); EXPECT_EQ(o018, iValue0);
-        EXPECT_EQ(o019, iValue0); EXPECT_EQ(o020, iValue0); EXPECT_EQ(o021, iValue0); EXPECT_EQ(o022, iValue0); EXPECT_EQ(o023, iValue0); EXPECT_EQ(o024, iValue0); EXPECT_EQ(o025, iValue0); EXPECT_EQ(o026, iValue0); EXPECT_EQ(o027, iValue0);
-        EXPECT_EQ(o028, iValue0); EXPECT_EQ(o029, iValue0); EXPECT_EQ(o030, iValue0); EXPECT_EQ(o031, iValue0); EXPECT_EQ(o032, iValue0); EXPECT_EQ(o033, iValue0); EXPECT_EQ(o034, iValue0); EXPECT_EQ(o035, iValue0); EXPECT_EQ(o036, iValue0);
-        EXPECT_EQ(o037, iValue0); EXPECT_EQ(o038, iValue0); EXPECT_EQ(o039, iValue0);
+        askii = {};
+        size = m.getString<2>(askii.data(), 10, true);
+        EXPECT_EQ(std::string_view(askii.data()), "0b0"sv);
+
+        askii = {};
+        size = m.getString<8>(askii.data(), 10, true);
+        EXPECT_EQ(std::string_view(askii.data()), "0o0"sv);
+
+        askii = {};
+        size = m.getString<10>(askii.data(), 10, true);
+        EXPECT_EQ(std::string_view(askii.data()), "0"sv);
+
+        askii = {};
+        size = m.getString<16>(askii.data(), 10, true);
+        EXPECT_EQ(std::string_view(askii.data()), "0x0"sv);
+
+        size = m.getString<10>(utf.data(), 10);
+        EXPECT_EQ(std::wstring_view(utf.data()), L"0"sv);
+
+        utf = {};
+        size = m.getString<2>(utf.data(), 10, true);
+        EXPECT_EQ(std::wstring_view(utf.data()), L"0b0"sv);
+
+        utf = {};
+        size = m.getString<8>(utf.data(), 10, true);
+        EXPECT_EQ(std::wstring_view(utf.data()), L"0o0"sv);
+
+        utf = {};
+        size = m.getString<10>(utf.data(), 10, true);
+        EXPECT_EQ(std::wstring_view(utf.data()), L"0"sv);
+
+        utf = {};
+        size = m.getString<16>(utf.data(), 10, true);
+        EXPECT_EQ(std::wstring_view(utf.data()), L"0x0"sv);
     }
 }
 
-TEST(Unsigned_Initialization, Binary) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
-
-    Aesi<blocksNumber * 32> record {};
+/* Output tester for std::streams and std::wstreams with decimal notation */
+TEST(Signed_Display, DecimalStreams) {
+    constexpr auto testsAmount = 30, blocksNumber = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const Aesi<blocksNumber * 32> Aesi = value;
 
-        std::stringstream ss {};
-        ss << (i % 2 == 0 ? "0b" : "-0b") << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
-        for(long long j = value.ByteCount() - 2; j >= 0; --j)
-            ss << std::bitset<8>(value.GetByte(j));
-        record = ss.str(); EXPECT_EQ(record, value);
+        std::stringstream ss, ss2; ss << std::dec << std::noshowbase << value;
+        ss2 << std::dec << std::noshowbase << Aesi;
+        EXPECT_EQ(ss2.str(), ss.str());
+    }
+
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const Aesi<blocksNumber * 32> Aesi = value;
+
+        std::stringstream ss; ss << std::dec << std::noshowbase << value;
+        std::wstringstream ss2; ss2 << std::dec << std::noshowbase << Aesi;
+        const auto& ref = ss.str();
+        std::wstring wstring (ref.begin(), ref.end());
+        EXPECT_EQ(ss2.str(), wstring);
     }
 }
 
-TEST(Unsigned_Initialization, Decimal) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
-
-    Aesi<blocksNumber * 32> record {};
+/* Output tester for std::streams and std::wstreams with octal notation */
+TEST(Signed_Display, OctalStreams) {
+    constexpr auto testsAmount = 30, blocksNumber = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const Aesi<blocksNumber * 32> aesi = value;
 
-        std::stringstream ss {}; ss << std::dec << value;
-        record = ss.str(); EXPECT_EQ(record, value);
+        std::stringstream ss, ss2; ss << std::oct << std::noshowbase << value;
+        ss2 << std::oct << std::noshowbase << aesi;
+        EXPECT_EQ(ss2.str(), ss.str());
+    }
+
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const Aesi<blocksNumber * 32> Aesi = value;
+
+        std::stringstream ss; ss << std::oct << std::noshowbase << value;
+        std::wstringstream ss2; ss2 << std::oct << std::noshowbase << Aesi;
+        const auto& ref = ss.str();
+        std::wstring wstring (ref.begin(), ref.end());
+        EXPECT_EQ(ss2.str(), wstring);
     }
 }
 
-TEST(Unsigned_Initialization, Octal) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
-
-    Aesi<blocksNumber * 32> record {};
+/* Output tester for std::streams and std::wstreams with hexadecimal notation */
+TEST(Signed_Display, HexadecimalStreams) {
+    constexpr auto testsAmount = 30, blocksNumber = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const Aesi<blocksNumber * 32> Aesi = value;
 
-        std::stringstream ss {}; ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << value;
-        record = ss.str(); EXPECT_EQ(record, value);
+        std::stringstream ss, ss2; ss << std::hex << std::noshowbase << value;
+        ss2 << std::hex << std::noshowbase << Aesi;
+        EXPECT_EQ(ss2.str(), ss.str());
+    }
+
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const Aesi<blocksNumber * 32> Aesi = value;
+
+        std::stringstream ss; ss << std::hex << std::noshowbase << value;
+        std::wstringstream ss2; ss2 << std::hex << std::noshowbase << Aesi;
+        const auto& ref = ss.str();
+        std::wstring wstring (ref.begin(), ref.end());
+        EXPECT_EQ(ss2.str(), wstring);
     }
 }
 
-TEST(Unsigned_Initialization, Hexadecimal) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
-
-    Aesi<blocksNumber * 32> record {};
+/* Output tester for ASKII c-style arrays with different notations
+ * Generates:
+ *  - ASKII Octal
+ *  - ASKII Hexadecimal, lowercase
+ *  - ASKII Hexadecimal, uppercase
+ *  - ASKII Decimal
+ *  - ASKII Binary
+ *  */
+TEST(Signed_Display, FormatAskii) {
+    constexpr auto testsAmount = 20, blocksNumber = 2;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
+        static std::array<char, blocksNumber * 32 + 2> askii {};
 
-        std::stringstream ss {};
-        switch(i % 4) {
-            case 0:
-                ss << "0x" << std::hex << std::uppercase << value;
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        std::stringstream ss;
+        const Aesi<blocksNumber * 32> Aesi = value;
+
+        switch(i % 5) {
+            case 0: {   /* Octal */
+                ss << std::oct << std::noshowbase << value;
+                const auto size = Aesi.getString<8>(askii.data(), askii.size(), false);
                 break;
-            case 1:
-                ss << "-0x" << std::hex << std::uppercase << value;
+            }
+            case 1: {   /* Hexadecimal, lowercase */
+                ss << std::hex << std::noshowbase << std::nouppercase << value;
+                const auto size = Aesi.getString<16>(askii.data(), askii.size(), false, false);
                 break;
-            case 2:
-                ss << "0x" << std::hex << std::nouppercase << value;
+            }
+            case 2: {   /* Hexadecimal, uppercase */
+                ss << std::hex << std::noshowbase << std::uppercase << value;
+                const auto size = Aesi.getString<16>(askii.data(), askii.size(), false, true);
                 break;
-            default:
-                ss << "-0x" << std::hex << std::nouppercase << value;
+            }
+            case 3: {  /* Decimal */
+                ss << std::dec << std::noshowbase << value;
+                const auto size = Aesi.getString<10>(askii.data(), askii.size(), false);
+                break;
+            }
+            default: {  /* Binary */
+                ss << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
+                for(long long j = value.ByteCount() - 2; j >= 0; --j)
+                    ss << std::bitset<8>(value.GetByte(j));
+                Aesi.getString<2>(askii.data(), askii.size(), false);
+            }
         }
-        record = ss.str(); EXPECT_EQ(record, value);
+
+        EXPECT_EQ(std::string_view(askii.data()), ss.str());
+    }
+}
+
+/* Output tester for UTF c-style arrays with different notations
+ * Generates:
+ *  - UTF Octal
+ *  - UTF Hexadecimal, lowercase
+ *  - UTF Hexadecimal, uppercase
+ *  - UTF Decimal
+ *  - UTF Binary
+ *  */
+TEST(Signed_Display, FormatUtf) {
+    constexpr auto testsAmount = 20, blocksNumber = 2;
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        static std::array<wchar_t, blocksNumber * 32 + 2> utf{};
+
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        std::stringstream ss;
+        const Aesi<blocksNumber * 32> Aesi = value;
+
+        switch (i % 5) {
+            case 0: {   /* Octal */
+                ss << std::oct << std::noshowbase << value;
+                const auto size = Aesi.getString<8>(utf.data(), utf.size(), false);
+                break;
+            }
+            case 1: {   /* Hexadecimal, lowercase */
+                ss << std::hex << std::noshowbase << std::nouppercase << value;
+                const auto size = Aesi.getString<16>(utf.data(), utf.size(), false, false);
+                break;
+            }
+            case 2: {   /* Hexadecimal, uppercase */
+                ss << std::hex << std::noshowbase << std::uppercase << value;
+                const auto size = Aesi.getString<16>(utf.data(), utf.size(), false, true);
+                break;
+            }
+            case 3: {  /* Decimal */
+                ss << std::dec << std::noshowbase << value;
+                const auto size = Aesi.getString<10>(utf.data(), utf.size(), false);
+                break;
+            }
+            default: {  /* Binary */
+                ss << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                for (long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
+                    ss << std::bitset<8>(value.GetByte(j));
+                Aesi.getString<2>(utf.data(), utf.size(), false);
+            }
+        }
+
+        const auto &ref = ss.str();
+        const std::wstring comparative(ref.begin(), ref.end());
+        EXPECT_EQ(std::wstring_view(utf.data()), comparative);
+    }
+}
+
+/* Output tester for SHOWBASE option for ASKII
+ * Generates:
+ * - Std::streams octal
+ * - Std::streams hexadecimal, lowercase
+ * - Std::streams hexadecimal, uppercase
+ * - Std::streams decimal
+ *
+ *  - C-style ASKII Octal
+ *  - C-style ASKII Hexadecimal, lowercase
+ *  - C-style ASKII Hexadecimal, uppercase
+ *  - C-style ASKII Decimal
+ *  - C-style ASKII Binary
+ *  */
+TEST(Signed_Display, ShowBaseAskii) {
+    constexpr auto testsAmount = 36, blocksNumber = 2;
+    for (std::size_t i = 8; i < testsAmount; ++i) {
+        static std::array<char, blocksNumber * 32 + 2> askii {};
+
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        std::stringstream ss, ss2;
+        const Aesi<blocksNumber * 32> Aesi = value;
+
+        switch (i % 9) {
+            case 0: {   /* Std::streams octal */
+                ss << "0o" << std::oct << std::noshowbase << value;
+                ss2 << std::oct << std::showbase << Aesi;
+                EXPECT_EQ(ss2.str(), ss.str());
+                break;
+            }
+            case 1: {   /* Std::streams hexadecimal, lowercase */
+                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                ss2 << std::hex << std::showbase << std::nouppercase << Aesi;
+                EXPECT_EQ(ss2.str(), ss.str());
+                break;
+            }
+            case 2: {   /* Std::streams hexadecimal, uppercase */
+                ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
+                ss2 << std::hex << std::showbase << std::uppercase << Aesi;
+                EXPECT_EQ(ss2.str(), ss.str());
+                break;
+            }
+            case 3: {   /* Std::streams decimal */
+                ss << std::dec << value;
+                ss2 << std::dec << std::showbase << Aesi;
+                EXPECT_EQ(ss2.str(), ss.str());
+                break;
+            }
+            case 4: {   /* C-style ASKII Octal */
+                ss << "0o" << std::oct << std::noshowbase << value;
+                const auto size = Aesi.getString<8>(askii.data(), askii.size(), true);
+                EXPECT_EQ(std::string_view(askii.data()), ss.str());
+                break;
+            }
+            case 5: {   /* C-style ASKII Hexadecimal, lowercase */
+                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
+                EXPECT_EQ(std::string_view(askii.data()), ss.str());
+                break;
+            }
+            case 6: {   /* C-style ASKII Hexadecimal, uppercase */
+                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
+                EXPECT_EQ(std::string_view(askii.data()), ss.str());
+                break;
+            }
+            case 7: {   /* C-style ASKII Decimal */
+                ss << std::dec << std::noshowbase << value;
+                const auto size = Aesi.getString<10>(askii.data(), askii.size(), true);
+                EXPECT_EQ(std::string_view(askii.data()), ss.str());
+                break;
+            }
+            default: {   /* C-style ASKII Binary */
+                ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
+                    ss << std::bitset<8>(value.GetByte(j));
+                Aesi.getString<2>(askii.data(), askii.size(), true);
+                EXPECT_EQ(std::string_view(askii.data()), ss.str());
+            }
+        }
+    }
+}
+
+/* Output tester for SHOWBASE option for UTF
+ * Generates:
+ * - Std::Wstreams octal
+ * - Std::Wstreams hexadecimal, lowercase
+ * - Std::Wstreams hexadecimal, uppercase
+ * - Std::Wstreams decimal
+ *
+ *  - C-style UTF Octal
+ *  - C-style UTF Hexadecimal, lowercase
+ *  - C-style UTF Hexadecimal, uppercase
+ *  - C-style UTF Decimal
+ *  - C-style UTF Binary
+ *  */
+TEST(Signed_Display, ShowBaseUtf) {
+    constexpr auto testsAmount = 36, blocksNumber = 64;
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        static std::array<wchar_t, blocksNumber * 32 + 2> utf {};
+
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        std::stringstream ss;
+        std::wstringstream ss2;
+        const Aesi<blocksNumber * 32> Aesi = value;
+
+        switch (i % 9) {
+            case 0: {   /* Std::streams octal */
+                ss << "0o" << std::oct << std::noshowbase << value;
+                ss2 << std::oct << std::showbase << Aesi;
+                const auto& ref = ss.str();
+                std::wstring wstring (ref.begin(), ref.end());
+                EXPECT_EQ(ss2.str(), wstring);
+                break;
+            }
+            case 1: {   /* Std::streams hexadecimal, lowercase */
+                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                ss2 << std::hex << std::showbase << std::nouppercase << Aesi;
+                const auto& ref = ss.str();
+                std::wstring wstring (ref.begin(), ref.end());
+                EXPECT_EQ(ss2.str(), wstring);
+                break;
+            }
+            case 2: {   /* Std::streams hexadecimal, uppercase */
+                ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
+                ss2 << std::hex << std::showbase << std::uppercase << Aesi;
+                const auto& ref = ss.str();
+                std::wstring wstring (ref.begin(), ref.end());
+                EXPECT_EQ(ss2.str(), wstring);
+                break;
+            }
+            case 3: {   /* Std::streams decimal */
+                ss << std::dec << value;
+                ss2 << std::dec << std::showbase << Aesi;
+                const auto& ref = ss.str();
+                std::wstring wstring (ref.begin(), ref.end());
+                EXPECT_EQ(ss2.str(), wstring);
+                break;
+            }
+            case 4: {   /* C-style ASKII Octal */
+                ss << "0o" << std::oct << std::noshowbase << value;
+                const auto size = Aesi.getString<8>(utf.data(), utf.size(), true);
+                const auto &ref = ss.str();
+                const std::wstring comparative(ref.begin(), ref.end());
+                EXPECT_EQ(std::wstring_view(utf.data()), comparative);
+                break;
+            }
+            case 5: {   /* C-style ASKII Hexadecimal, lowercase */
+                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
+                const auto &ref = ss.str();
+                const std::wstring comparative(ref.begin(), ref.end());
+                EXPECT_EQ(std::wstring_view(utf.data()), comparative);
+                break;
+            }
+            case 6: {   /* C-style ASKII Hexadecimal, uppercase */
+                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
+                const auto &ref = ss.str();
+                const std::wstring comparative(ref.begin(), ref.end());
+                EXPECT_EQ(std::wstring_view(utf.data()), comparative);
+                break;
+            }
+            case 7: {   /* C-style ASKII Decimal */
+                ss << std::dec << std::noshowbase << value;
+                const auto size = Aesi.getString<10>(utf.data(), utf.size(), true);
+                const auto &ref = ss.str();
+                const std::wstring comparative(ref.begin(), ref.end());
+                EXPECT_EQ(std::wstring_view(utf.data()), comparative);
+                break;
+            }
+            default: {   /* C-style ASKII Binary */
+                ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
+                    ss << std::bitset<8>(value.GetByte(j));
+                Aesi.getString<2>(utf.data(), utf.size(), true);
+                const auto &ref = ss.str();
+                const std::wstring comparative(ref.begin(), ref.end());
+                EXPECT_EQ(std::wstring_view(utf.data()), comparative);
+            }
+        }
     }
 }

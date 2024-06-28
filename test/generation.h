@@ -9,7 +9,8 @@
 
 namespace Generation {
     using CryptoPP::Integer;
-    using Unsigned = Integer;
+    using UnsPP = Integer;
+    using UnsGmp = mpz_class;
 
     static std::random_device dev;
     static std::mt19937 rng(dev());
@@ -21,18 +22,30 @@ namespace Generation {
         return dist(rng);
     }
 
-    inline Unsigned getRandomWithBits(std::size_t bitLength, bool prime = false) {
+    inline UnsPP getRandomWithBits(std::size_t bitLength, bool prime = false) {
         static CryptoPP::AutoSeededRandomPool prng;
 
-        Unsigned value{};
+        UnsPP value{};
         value.Randomize(prng,
-                        Unsigned::Zero(),
-                        Unsigned::Power2(bitLength),
+                        UnsPP::Zero(),
+                        UnsPP::Power2(bitLength),
                         prime ?
-                        Unsigned::RandomNumberType::PRIME
+                        UnsPP::RandomNumberType::PRIME
                               :
-                        Unsigned::RandomNumberType::ANY);
+                        UnsPP::RandomNumberType::ANY);
         return value;
+    }
+
+    inline gmp_randstate_t& getRandstate() {
+        static gmp_randstate_t state;
+        gmp_randinit_default (state);
+        return state;
+    }
+
+    inline UnsGmp getRandom(std::size_t bitLength) {
+        mpz_class result {};
+        mpz_rrandomb(result.get_mpz_t(), getRandstate(), bitLength);
+        return result;
     }
 }
 

@@ -34,6 +34,7 @@ int main() {
 
     Aeu<512> base = 2u;
     Aeu<2048> power = 1u;
+
     for(unsigned short prime : primes) {
         const auto primeF = static_cast<long double>(prime),
             boarder = static_cast<long double>(std::numeric_limits<uint64_t>::max());

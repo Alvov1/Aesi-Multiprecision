@@ -18,8 +18,9 @@ Aesi Multiprecision
 
 The goal of this project is to develop a fast and handy multi-precision library that can be used with GPU parallelization frameworks such as CUDA, OpenCL, and Metal. The library should correspond to modern C++ standards, support constexpr expressions, and move semantics.
 
-## Project status
-<u>__Project is currently in the testing and development stage to support the *Cuda* framework. Please be aware that errors and problems may occur.__</u> OpenCL support is next in line for development. Metal support is scheduled after some time, due to the presence of significant differences in the framework from Cuda and OpenCL.
+> [!IMPORTANT]
+> Project is currently in the testing and development stage to support the *Cuda* framework. Please be aware that errors and problems may occur.__</u> OpenCL support is next in line for development. Metal support is scheduled after some time, due to the presence of significant differences in the framework from Cuda and OpenCL.
+>
 
 ## Functionality
 Library supports each arithmetic (binary and unary), bitwise, and boolean operations. Various functions from number theory are being added to the library, among which the greatest common divisor, the least common multiplier, and exponentiation by modulo have already been implemented.

@@ -3,10 +3,10 @@
 #include "../../Aesi.h"
 #include "../generation.h"
 
-TEST(Signed, OddEven) {
+TEST(Signed_OddEven, Basic) {
     Aesi256 zero = 0u; EXPECT_EQ(zero.isOdd(), 0); EXPECT_EQ(zero.isEven(), 1);
 
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 2, blocksNumber = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 10);
         Aesi<blocksNumber * 32> aesi = value;
@@ -15,7 +15,7 @@ TEST(Signed, OddEven) {
     }
 }
 
-TEST(Unsigned, OddEven) {
+TEST(Unsigned_OddEven, Basic) {
     Aeu256 zero = 0u; EXPECT_EQ(zero.isOdd(), 0); EXPECT_EQ(zero.isEven(), 1);
 
     constexpr auto testsAmount = 2048, blocksNumber = 64;

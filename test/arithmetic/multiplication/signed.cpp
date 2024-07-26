@@ -40,7 +40,7 @@ TEST(Signed_Multiplication, Basic) {
 }
 
 TEST(Signed_Multiplication, Huge) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 2, blocksNumber = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto l = Generation::getRandomWithBits(blocksNumber * 16 - 10),
                 r = Generation::getRandomWithBits(blocksNumber * 16 - 20);

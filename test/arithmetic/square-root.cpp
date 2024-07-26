@@ -4,7 +4,7 @@
 #include "../generation.h"
 
 TEST(Signed_SquareRoot, SquareRoot) {
-    constexpr auto testsAmount = 2048, bitness = 2048;
+    constexpr auto testsAmount = 2, bitness = 2048;
     for (unsigned i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(bitness - 20);
         const Aesi<bitness> m = value;

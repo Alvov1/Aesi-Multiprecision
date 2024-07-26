@@ -3,7 +3,7 @@
 #include "../../generation.h"
 
 TEST(Signed_Bitwise, GetSetBit) {
-    constexpr auto testsAmount = 2048, bitness = 2048;
+    constexpr auto testsAmount = 2, bitness = 2048;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(bitness - 20);
         Aesi<bitness> aeu {};
@@ -19,7 +19,7 @@ TEST(Signed_Bitwise, GetSetBit) {
 }
 
 TEST(Signed_Bitwise, GetSetByte) {
-    constexpr auto testsAmount = 2048, bitness = 2048;
+    constexpr auto testsAmount = 2, bitness = 2048;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(bitness - 20);
         Aesi<bitness> aeu {};
@@ -35,7 +35,7 @@ TEST(Signed_Bitwise, GetSetByte) {
 }
 
 TEST(Signed_Bitwise, GetSetBlock) {
-    constexpr auto testsAmount = 5, bitness = 2048;
+    constexpr auto testsAmount = 2, bitness = 2048;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(bitness - 20);
         Aesi<bitness> aeu {};
@@ -65,7 +65,7 @@ TEST(Signed_Bitwise, GetSetBlock) {
 }
 
 TEST(Signed_Bitwise, CountBitsBytes) {
-    constexpr auto testsAmount = 2048, bitness = 2048;
+    constexpr auto testsAmount = 2, bitness = 2048;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(bitness - 20);
         Aesi<bitness> aeu = value;

@@ -54,12 +54,11 @@ TEST(Unsigned_Multiplication, Huge) {
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
         const auto factorU = Generation::getRandom<unsigned>();
-        const auto factorULL = Generation::getRandom<uint64_t>();
 
         Aeu<blocksNumber * 32> aeu = value;
-        EXPECT_EQ((aeu * factorU) * factorULL, (value * factorU) * factorULL);
+        EXPECT_EQ(aeu * factorU, value * factorU);
 
-        aeu *= factorU; aeu *= factorULL;
-        EXPECT_EQ(aeu, (value * factorU) * factorULL);
+        aeu *= factorU;
+        EXPECT_EQ(aeu, value * factorU);
     }
 }

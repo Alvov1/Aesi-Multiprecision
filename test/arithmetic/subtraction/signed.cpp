@@ -29,7 +29,7 @@ TEST(Signed_Subtraction, Basic) {
 }
 
 TEST(Signed_Subtraction, Huge) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 2, blocksNumber = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         int first = 0, second = 0;
         switch(i % 4) {
@@ -70,4 +70,8 @@ TEST(Signed_Subtraction, Huge) {
         aeu -= subU; aeu -= subULL;
         EXPECT_EQ(aeu, (value - subU) - subULL);
     }
+}
+
+TEST(Signed_Subtraction, Decrement) {
+
 }

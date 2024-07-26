@@ -4,6 +4,7 @@
 /// @cond HIDE_INCLUDES
 #include <iostream>
 #include <cassert>
+#include <vector>
 
 #ifdef __CUDACC__
 #define gpu __host__ __device__
@@ -37,9 +38,9 @@ namespace {
     using byte = uint8_t;
     using block = uint32_t;
 
-    constexpr std::size_t bitsInByte = 8, blockBitLength = sizeof(block) * bitsInByte;
-    constexpr uint64_t blockBase = 1ULL << blockBitLength;
-    constexpr block blockMax = 0xff'ff'ff'ffu;
+    constexpr inline std::size_t bitsInByte = 8, blockBitLength = sizeof(block) * bitsInByte;
+    constexpr inline uint64_t blockBase = 1ULL << blockBitLength;
+    constexpr inline block blockMax = 0xff'ff'ff'ffu;
 
     /**
      * @enum Comparison
@@ -56,7 +57,7 @@ namespace {
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Aeu final {
     static_assert(bitness > sizeof(uint64_t), "Use built-in types for numbers 64-bit or less.");
-
+    
     static constexpr std::size_t blocksNumber = bitness / blockBitLength;
 
 #ifdef __CUDACC__
@@ -79,8 +80,8 @@ class Aeu final {
     /* ------------------------ @name Helper functions. ---------------------- */
     /**
      * @brief Makes line addition
-     * @param BlockLine dst
-     * @param BlockLine src
+     * @param dst BlockLine
+     * @param src BlockLine
      * @return Uint64 - carry out from addition
      */
     gpu static constexpr auto addLine(blockLine& dst, const blockLine& src) noexcept -> uint64_t {
@@ -94,7 +95,7 @@ class Aeu final {
 
     /**
      * @brief Makes complement block line for line
-     * @param BlockLine line
+     * @param line BlockLine
      * @return BlockLine
      */
     gpu static constexpr auto makeComplement(blockLine& line) noexcept -> uint64_t {
@@ -121,7 +122,7 @@ public:
 
     /**
      * @brief Copy assignment operator
-     * @param Aeu other
+     * @param other Aeu
      */
     gpu constexpr Aeu& operator=(const Aeu& other) noexcept { blocks = other.blocks; return *this; }
 
@@ -147,12 +148,12 @@ public:
 
     /**
      * @brief Pointer-based character constructor
-     * @param Char* pointer
-     * @param Size_t size
+     * @param data Char*
+     * @param size Size_t
      * @details Accepts decimal strings along with binary (starting with 0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    gpu constexpr Aeu(const Char* ptr, std::size_t size) noexcept : Aeu {} {
+    gpu constexpr Aeu(const Char* data, std::size_t size) noexcept : Aeu {} {
         if(size == 0) return;
 
         constexpr const Char* characters = [] {
@@ -163,12 +164,12 @@ public:
             }
         } ();
         std::size_t position = 0;
-        const auto negative = (ptr[0] == [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ());
+        const auto negative = (data[0] == [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ());
         if(negative) ++position;
 
-        const auto base = [&ptr, &size, &position, &characters] {
-            if (ptr[position] == characters[0] && size > position + 1) {
-                switch (ptr[position + 1]) {
+        const auto base = [&data, &size, &position, &characters] {
+            if (data[position] == characters[0] && size > position + 1) {
+                switch (data[position + 1]) {
                     case characters[8]:
                     case characters[9]:
                         position += 2; return 2u;
@@ -192,7 +193,7 @@ public:
                 if(characters[3] <= ch && ch <= characters[5])
                     return static_cast<unsigned>(ch) - static_cast<unsigned>(characters[3]) + 10u;
                 return 99u;
-            } (ptr[position]);
+            } (data[position]);
 
             if(digit < base) {
                 this->operator*=(base);
@@ -206,7 +207,7 @@ public:
 
     /**
      * @brief C-style string literal constructor
-     * @param Char[] literal
+     * @param literal Char[]
      * @details Accepts decimal literals along with binary (starting with 0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
      */
     template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
@@ -214,7 +215,7 @@ public:
 
     /**
      * @brief String or string-view based constructor
-     * @param String/String-View sv
+     * @param stringView String/String-View
      * @details Constructs object from STD::Basic_String or STD::Basic_String_View. Accepts objects based on char or wchar_t
      */
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
@@ -226,6 +227,10 @@ public:
     gpu constexpr Aeu(const String& stringView) noexcept : Aeu(stringView.data(), stringView.size()) {}
 
 #ifdef AESI_CRYPTOPP_INTEGRATION
+    /**
+     * @brief Constructor from the CryptoPP library integer value
+     * @param value CryptoPP::Integer
+     */
     constexpr Aeu(const CryptoPP::Integer& value): Aeu {} {
         const auto byteCount = value.ByteCount();
         if(byteCount * 8 > bitness)
@@ -236,8 +241,19 @@ public:
 #endif
 
 #ifdef AESI_GMP_INTEGRATION
+    /**
+     * @brief Constructor from the GMP library integer value
+     * @param value mpz_class
+     */
     constexpr Aeu(const mpz_class& value) : Aeu {} {
-        
+        const auto bitLength = mpz_sizeinbase(value.get_mpz_t(), 2);
+        auto tBlocksNumber = static_cast<std::size_t>(1 + ((bitLength - 1) / sizeof(block) * 8));
+
+        std::basic_string<block> buffer (tBlocksNumber, 0u);
+        mpz_export(buffer.data(), &tBlocksNumber, -1, sizeof(block), -1, 0, value.get_mpz_t());
+
+        for (std::size_t i = 0; i < tBlocksNumber; ++i)
+            setBlock(i, buffer[i]);
     }
 #endif
     /* ----------------------------------------------------------------------- */
@@ -295,7 +311,7 @@ public:
     /* ------------------------ @name Addition operators. ------------------------ */
         /**
          * @brief Addition operator for built-in integral types
-         * @param Unsigned addendum
+         * @param addendum Unsigned
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
@@ -305,7 +321,7 @@ public:
 
         /**
          * @brief Addition operator
-         * @param Aeu addendum
+         * @param addendum Aeu
          * @return Aeu
          */
         [[nodiscard]]
@@ -315,7 +331,7 @@ public:
 
         /**
          * @brief Assignment addition operator for built-in integral types
-         * @param Unsigned addendum
+         * @param addendum Unsigned
          * @return Aeu&
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
@@ -329,7 +345,7 @@ public:
 
         /**
          * @brief Assignment addition operator
-         * @param Aeu addendum
+         * @param addendum Aeu
          * @return Aeu&
          */
         gpu constexpr auto operator+=(const Aeu& addendum) noexcept -> Aeu& {
@@ -341,7 +357,7 @@ public:
     /* ----------------------- @name Subtraction operators. ---------------------- */
         /**
          * @brief Subtraction operator for built-in integral types
-         * @param Unsigned subtrahend
+         * @param subtrahend Unsigned
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
@@ -351,7 +367,7 @@ public:
 
         /**
          * @brief Subtraction operator
-         * @param Aeu subtrahend
+         * @param subtrahend Aeu
          * @return Aeu
          */
         [[nodiscard]]
@@ -361,7 +377,7 @@ public:
 
         /**
          * @brief Assignment subtraction operator for built-in integral types
-         * @param Unsigned subtrahend
+         * @param subtrahend Unsigned
          * @return Aeu&
          */ /* TODO: Complete */
 //        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
@@ -369,7 +385,7 @@ public:
 
         /**
          * @brief Assignment subtraction operator
-         * @param Aeu subtrahend
+         * @param subtrahend Aeu
          * @return Aeu&
          */
         gpu constexpr auto operator-=(const Aeu& subtrahend) noexcept -> Aeu& {
@@ -381,7 +397,7 @@ public:
     /* --------------------- @name Multiplication operators. --------------------- */
         /**
          * @brief Multiplication operator for built-in integral types
-         * @param Unsigned factor
+         * @param factor Unsigned
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
@@ -391,7 +407,7 @@ public:
 
         /**
          * @brief Multiplication operator
-         * @param Aeu factor
+         * @param factor Aeu
          * @return Aeu
          */
         [[nodiscard]]
@@ -401,7 +417,7 @@ public:
 
         /**
          * @brief Assignment multiplication operator for built-in integral types
-         * @param Unsigned factor
+         * @param factor Unsigned
          * @return Aeu&
          * @details Works with the greatest performance with types smaller than uint64_t
          */
@@ -439,7 +455,7 @@ public:
 
         /**
          * @brief Assignment multiplication operator
-         * @param Aeu factor
+         * @param factor Aeu
          * @return Aeu&
          */
         gpu constexpr auto operator*=(const Aeu& factor) noexcept -> Aeu& {
@@ -478,7 +494,7 @@ public:
     /* ------------------------ @name Division operators. ------------------------ */
         /**
          * @brief Division operator for built-in integral types
-         * @param Unsigned divisor
+         * @param divisor Unsigned
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
@@ -488,7 +504,7 @@ public:
 
         /**
          * @brief Division operator
-         * @param Aeu divisor
+         * @param divisor Aeu
          * @return Aeu
          */
         [[nodiscard]]
@@ -498,7 +514,7 @@ public:
 
         /**
          * @brief Assignment division operator for built-in integral types
-         * @param Unsigned divisor
+         * @param divisor Unsigned
          * @return Aeu&
          */ /* TODO: Complete */
 //        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
@@ -506,7 +522,7 @@ public:
 
         /**
          * @brief Assignment division operator
-         * @param Aeu divisor
+         * @param divisor Aeu
          * @return Aeu&
          */
         gpu constexpr auto operator/=(const Aeu& divisor) noexcept -> Aeu& {
@@ -518,7 +534,7 @@ public:
     /* ------------------------- @name Modulo operators. ------------------------- */
         /**
          * @brief Modulo operator for built-in integral types
-         * @param Unsigned modulo
+         * @param modulo Unsigned
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
@@ -528,7 +544,7 @@ public:
 
         /**
          * @brief Modulo operator
-         * @param Aeu modulo
+         * @param modulo Aeu
          * @return Aeu
          */
         [[nodiscard]]
@@ -538,7 +554,7 @@ public:
 
         /**
          * @brief Assignment modulo operator for built-in integral types
-         * @param Unsigned modulo
+         * @param modulo Unsigned
          * @return Aeu&
          */ /* TODO: Complete */
 //        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
@@ -546,7 +562,7 @@ public:
 
         /**
          * @brief Assignment modulo operator
-         * @param Aeu modulo
+         * @param modulo Aeu
          * @return Aeu&
          */
         gpu constexpr auto operator%=(const Aeu& modulo) noexcept -> Aeu& {
@@ -571,7 +587,7 @@ public:
 
     /**
      * @brief Bitwise XOR operator
-     * @param Aeu other
+     * @param other Aeu
      * @return Aeu
      */
     [[nodiscard]]
@@ -581,7 +597,7 @@ public:
 
     /**
      * @brief Assignment bitwise XOR operator
-     * @param Aeu other
+     * @param other Aeu
      * @return Aeu&
      */
     gpu constexpr auto operator^=(const Aeu& other) noexcept -> Aeu& {
@@ -592,7 +608,7 @@ public:
 
     /**
      * @brief Bitwise AND operator
-     * @param Aeu other
+     * @param other Aeu
      * @return Aeu
      */
     [[nodiscard]]
@@ -602,7 +618,7 @@ public:
 
     /**
      * @brief Assignment bitwise AND operator
-     * @param Aeu other
+     * @param other Aeu
      * @return Aeu&
      */
     gpu constexpr auto operator&=(const Aeu& other) noexcept -> Aeu& {
@@ -613,7 +629,7 @@ public:
 
     /**
      * @brief Bitwise OR operator
-     * @param Aeu other
+     * @param other Aeu
      * @return Aeu
      */
     [[nodiscard]]
@@ -623,7 +639,7 @@ public:
 
     /**
      * @brief Assignment bitwise OR operator
-     * @param Aeu other
+     * @param other Aeu
      * @return Aeu&
      */
     gpu constexpr auto operator|=(const Aeu& other) noexcept -> Aeu& {
@@ -634,7 +650,7 @@ public:
 
     /**
      * @brief Left shift operator
-     * @param Unsigned bit_shift
+     * @param bitShift Unsigned
      * @return Aeu
      * @note Does nothing for shift greater than precision
      */
@@ -645,7 +661,7 @@ public:
 
     /**
      * @brief Left shift assignment operator
-     * @param Unsigned bit_shift
+     * @param bitShift Unsigned
      * @return Aeu&
      * @note Does nothing for shift greater than precision
      */
@@ -668,7 +684,7 @@ public:
 
     /**
      * @brief Right shift operator
-     * @param Unsigned bit_shift
+     * @param bitShift Unsigned
      * @return Aeu
      * @note Does nothing for shift greater than precision
      */
@@ -679,7 +695,7 @@ public:
 
     /**
      * @brief Right shift assignment operator
-     * @param Unsigned bit_shift
+     * @param bitShift Unsigned
      * @return Aeu&
      * @note Does nothing for shift greater than precision
      */
@@ -706,8 +722,8 @@ public:
     /* ------------------------ @name Equality operators. ------------------------ */
         /**
          * @brief Equality check operator for built-in types uint8_t, uint16_t, uint32_t
-         * @param Unsigned other
-         * @return Bool
+         * @param other Unsigned
+         * @return Boolean
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned> && sizeof(Unsigned) < 8)
         gpu constexpr auto operator==(Unsigned other) const noexcept -> bool {
@@ -719,15 +735,15 @@ public:
 
         /**
          * @brief Equality check operator for numbers of the same precision
-         * @param Aeu other
-         * @return Bool
+         * @param other Aeu
+         * @return Boolean
          */
         gpu constexpr auto operator==(const Aeu& other) const noexcept -> bool { return blocks == other.blocks; };
 
         /**
          * @brief Templated Equality check operator for numbers of different precision
-         * @param Aeu other
-         * @return Bool
+         * @param other Aeu
+         * @return Boolean
          */
         template <std::size_t otherBitness> requires (otherBitness != bitness)
         gpu constexpr auto operator==(const Aeu<otherBitness>& other) const noexcept -> bool { return compareTo(other) == Comparison::equal; };
@@ -737,7 +753,7 @@ public:
     /* ----------------------- @name Comparison operators. ----------------------- */
         /**
          * @brief Internal comparison operator for built-in integral types uint8_t, uint16_t, uint32_t
-         * @param Unsigned other
+         * @param other Unsigned
          * @return Comparison
          * @note Should almost never return Comparison::Equivalent
          */
@@ -753,7 +769,7 @@ public:
 
         /**
          * @brief Internal comparison operator for type uint64_t
-         * @param uint64_t other
+         * @param other uint64_t
          * @return Comparison
          * @note Should almost never return Comparison::Equivalent
          */
@@ -767,7 +783,7 @@ public:
 
         /**
          * @brief Internal comparison operator
-         * @param Aeu other
+         * @param other Aeu
          * @return Comparison
          * @note Should almost never return Comparison::Equivalent
          */
@@ -812,7 +828,7 @@ public:
 #else
         /**
          * @brief Three-way comparison operator
-         * @param Aeu other
+         * @param other Aeu
          * @return Std::Strong_ordering
          * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
          */
@@ -832,7 +848,7 @@ public:
 
         /**
          * @brief Three-way comparison operator for numbers of different precision and built-in integral types
-         * @param Aeu<diffPrec>/Unsigned other
+         * @param other Integral
          * @return Std::Strong_ordering
          * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
          */
@@ -858,8 +874,8 @@ public:
     /* ---------------------- @name Supporting methods. ---------------------- */
     /**
      * @brief Set bit in number by index starting from the right
-     * @param Size_t index
-     * @param Bool bit
+     * @param index Size_t
+     * @param bit Boolean
      * @note Does nothing for index out of range. Index check is disabled in unsafe mode
      */
     gpu constexpr auto setBit(std::size_t index, bool bit) noexcept -> void {
@@ -876,8 +892,8 @@ public:
 
     /**
      * @brief Get bit in number by index staring from the right
-     * @param Size_t index
-     * @return Bool
+     * @param index Size_t
+     * @return Boolean
      * @note Returns zero for index out of range. Index check is disabled in unsafe mode
      */
     [[nodiscard]]
@@ -892,8 +908,8 @@ public:
 
     /**
      * @brief Set byte in number by index starting from the right
-     * @param Size_t index
-     * @param Byte byte
+     * @param index Size_t
+     * @param byte Byte
      * @note Does nothing for index out of range. Index check is disabled in unsafe mode.
      */
     gpu constexpr auto setByte(std::size_t index, byte byte) noexcept -> void {
@@ -907,7 +923,7 @@ public:
 
     /**
      * @brief Get byte in number by index starting from the right
-     * @param Size_t index
+     * @param index Size_t
      * @return Byte
      * @note Returns zero for index out of range. Index check is disabled in unsafe mode.
      */
@@ -923,8 +939,8 @@ public:
 
     /**
      * @brief Set block in number by index starting from the right
-     * @param Size_t index
-     * @param Block byte
+     * @param index Size_t
+     * @param block Block
      * @note Does nothing for index out of range. Index check is disabled in unsafe mode.
      */
     gpu constexpr auto setBlock(std::size_t index, block block) noexcept -> void {
@@ -936,7 +952,7 @@ public:
 
     /**
      * @brief Get block in number by index starting from the right
-     * @param Size_t index
+     * @param index Size_t
      * @return Block
      * @note Returns zero for index out of range. Index check is disabled in unsafe mode.
      */
@@ -955,7 +971,7 @@ public:
     [[nodiscard]]
     gpu constexpr auto byteCount() const noexcept -> std::size_t {
         std::size_t lastBlock = blocksNumber - 1;
-        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock);
+        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock) ;
 
         for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
             const auto byte = (blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte);
@@ -990,21 +1006,21 @@ public:
 
     /**
      * @brief Check whether number is odd
-     * @return Bool - true is number is odd and false otherwise
+     * @return Boolean - true is number is odd and false otherwise
      */
     [[nodiscard]]
     gpu constexpr auto isOdd() const noexcept -> bool { return (0x1 & blocks[0]) == 1; }
 
     /**
      * @brief Check whether number is even
-     * @return Bool - true is number is even and false otherwise
+     * @return Boolean - true is number is even and false otherwise
      */
     [[nodiscard]]
     gpu constexpr auto isEven() const noexcept -> bool { return (0x1 & blocks[0]) == 0; }
 
     /**
  * @brief Check whether number is zero
- * @return Bool - true is number is zero and false otherwise
+ * @return Boolean - true is number is zero and false otherwise
  */
     [[nodiscard]]
     gpu constexpr auto isZero() const noexcept -> bool { return filledBlocksNumber() == 0; }
@@ -1038,7 +1054,7 @@ public:
 
     /**
      * @brief Make swap between two objects
-     * @param Aeu other
+     * @param other Aeu
      */
     gpu constexpr auto swap(Aeu& other) noexcept -> void {
         Aeu t = other; other.operator=(*this); this->operator=(t);
@@ -1049,10 +1065,10 @@ public:
     /* -------------- @name Public arithmetic and number theory. ------------- */
     /**
      * @brief Integer division. Returns results by reference
-     * @param Aeu number
-     * @param Aeu divisor
-     * @param Aeu quotient OUT
-     * @param Aeu remainder OUT
+     * @param number Aeu
+     * @param divisor Aeu
+     * @param quotient Aeu OUT
+     * @param remainder Aeu OUT
      * @return Quotient and remainder by reference
      */
     gpu static constexpr auto divide(const Aeu& number, const Aeu& divisor, Aeu& quotient, Aeu& remainder) noexcept -> void {
@@ -1078,8 +1094,8 @@ public:
 
     /**
     * @brief Integer division. Returns results by value
-    * @param Aeu number
-    * @param Aeu divisor
+    * @param number Aeu
+    * @param divisor Aeu
     * @return Pair(Quotient, Remainder)
     */
     [[nodiscard]]
@@ -1089,10 +1105,10 @@ public:
     
     /**
      * @brief Extended Euclidean algorithm for greatest common divisor
-     * @param Aeu first
-     * @param Aeu second
-     * @param Aeu bezoutX OUT
-     * @param Aeu bezoutY OUT
+     * @param first Aeu
+     * @param second Aeu
+     * @param bezoutX Aeu OUT
+     * @param bezoutY Aeu OUT
      * @return Aeu
      * @details Counts Bézout coefficients along with the greatest common divisor. Returns coefficients by reference
      */
@@ -1126,8 +1142,8 @@ public:
 
     /**
      * @brief Greatest common divisor
-     * @param Aeu first
-     * @param Aeu second
+     * @param first Aeu
+     * @param second Aeu
      * @return Aeu
      * @details Faster version, ignoring bezout coefficients
      */
@@ -1153,8 +1169,8 @@ public:
 
     /**
      * @brief Least common multiplier
-     * @param Aeu first
-     * @param Aeu second
+     * @param first Aeu
+     * @param second Aeu
      * @return Aeu
      */
     [[nodiscard]]
@@ -1162,30 +1178,30 @@ public:
     
     /**
      * @brief Exponentiation by modulo
-     * @param Aeu base
-     * @param Aeu power
-     * @param Aeu modulo
+     * @param base Aeu
+     * @param power Aeu
+     * @param modulo Aeu
      * @return Aeu
      * @note Be aware of overflow
      * @details Accepts power of different precision rather than base and modulo
      */
     template <std::size_t powerBitness = bitness> [[nodiscard]]
-    gpu static constexpr auto powm(const Aeu& base, const Aeu<powerBitness>& power, const Aeu& mod) noexcept -> Aeu {
+    gpu static constexpr auto powm(const Aeu& base, const Aeu<powerBitness>& power, const Aeu& modulo) noexcept -> Aeu {
         if(base == 1u)
             return base;
         if(base == 0u)
             return { 1u };
 
         Aeu output = 1u;
-        auto [_, b] = divide(base, mod);
+        auto [_, b] = divide(base, modulo);
 
         for(unsigned iteration = 0; power.filledBlocksNumber() * blockBitLength != iteration; iteration++) {
             if(power.getBit(iteration)) {
-                const auto [quotient, remainder] = divide(output * b, mod);
+                const auto [quotient, remainder] = divide(output * b, modulo);
                 output = remainder;
             }
 
-            const auto [quotient, remainder] = divide(b * b, mod);
+            const auto [quotient, remainder] = divide(b * b, modulo);
             b = remainder;
         }
 
@@ -1212,12 +1228,12 @@ public:
 
     /**
      * @brief Fast exponentiation for powers of 2
-     * @param Size_t power
+     * @param power Size_t
      * @return Aeu
      * @details Returns zero for power greater than current bitness
      */
     [[nodiscard]]
-    gpu static constexpr auto power2(std::size_t e) noexcept -> Aeu { Aeu result {}; result.setBit(e, true); return result; }
+    gpu static constexpr auto power2(std::size_t power) noexcept -> Aeu { Aeu result {}; result.setBit(power, true); return result; }
     
     /**
      * @brief Get square root
@@ -1241,11 +1257,10 @@ public:
     /* ----------------- @name Public input-output operators. ---------------- */
     /**
      * @brief Character buffer output operator
-     * @param Byte base TEMPLATE
-     * @param Char* buffer
-     * @param Size_t buffer_size
-     * @param Bool show_number_base
-     * @param Bool use_hexadecimal_uppercase
+     * @param buffer Char*
+     * @param bufferSize Size_t
+     * @param showBase Boolean 
+     * @param hexUppercase Boolean
      * @return Size_t - amount of symbols written
      * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10, or 16
      * @note Works significantly faster for hexadecimal notation
@@ -1325,8 +1340,8 @@ public:
 
     /**
      * @brief STD stream output operator
-     * @param Ostream stream
-     * @param Aeu number
+     * @param os Ostream
+     * @param number Aeu
      * @return Ostream
      * @details Writes number in stream. Accepts STD streams based on char or wchar_t. Supports stream manipulators:
      * - Number's notation (std::hex, std::dec, std::oct);
@@ -1335,27 +1350,27 @@ public:
      * @note Works significantly faster for hexadecimal notation
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    friend constexpr auto operator<<(std::basic_ostream<Char>& ss, const Aeu& value) -> std::basic_ostream<Char>& {
-        auto flags = ss.flags();
+    friend constexpr auto operator<<(std::basic_ostream<Char>& os, const Aeu& number) -> std::basic_ostream<Char>& {
+        auto flags = os.flags();
 
         const auto base = [] (long baseField, std::basic_ostream<Char>& ss, bool showbase) {
             auto base = (baseField == std::ios::hex ? 16u : (baseField == std::ios::oct ? 8u : 10u));
             if(showbase && base != 10)
                 ss << [&base] { if constexpr (std::is_same_v<Char, char>) { return base == 8 ? "0o" : "0x"; } else { return base == 8 ? L"0o" : L"0x"; }} () << std::noshowbase ;
             return base;
-        } (flags & std::ios::basefield, ss, flags & std::ios::showbase);
+        } (flags & std::ios::basefield, os, flags & std::ios::showbase);
 
-        if(value.isZero())
-            return ss << '0';
+        if(number.isZero())
+            return os << '0';
 
         if(base == 16) {
-            long long iter = value.blocks.size() - 1;
-            for(; value.blocks[iter] == 0 && iter >= 0; --iter);
+            long long iter = number.blocks.size() - 1;
+            for(; number.blocks[iter] == 0 && iter >= 0; --iter);
 
-            ss << value.blocks[iter--];
+            os << number.blocks[iter--];
             for (; iter >= 0; --iter) {
-                ss.fill([] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } ());
-                ss.width(8); ss << std::right << value.blocks[iter];
+                os.fill([] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } ());
+                os.width(8); os << std::right << number.blocks[iter];
             }
         } else {
             /* Well, here we use a pre-calculated magic number to ratio the length of numbers in decimal or octal notation according to bitness.
@@ -1363,7 +1378,7 @@ public:
             constexpr auto bufferSize = static_cast<std::size_t>(static_cast<double>(bitness) / 2.95);
             Char buffer [bufferSize] {}; std::size_t filled = 0;
 
-            Aeu copy = value;
+            Aeu copy = number;
             while(!copy.isZero() && filled < bufferSize) {
                 const auto [quotient, remainder] = divide(copy, base);
                 buffer[filled++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } () + remainder.template integralCast<byte>();
@@ -1371,48 +1386,48 @@ public:
             }
 
             for(; filled > 0; --filled)
-                ss << buffer[filled - 1];
+                os << buffer[filled - 1];
         }
 
-        return ss;
+        return os;
     }
 
 
     /**
      * @brief STD stream binary reading operator
-     * @param Istream stream
-     * @param Boolean big_endian
+     * @param is Istream
+     * @param bigEndian Boolean
      * @return Aeu
      * @details Reads number from stream using .read method. Accepts STD streams based on char or wchar_t.
      * @note Fills empty bits with 0s on EOF of the stream
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    constexpr auto readBinary(std::basic_istream<Char>& istream, bool bigEndian = true) -> void {
+    constexpr auto readBinary(std::basic_istream<Char>& is, bool bigEndian = true) -> void {
         blocks = {};
         if(bigEndian) {
             for(auto it = blocks.rbegin(); it != blocks.rend(); ++it)
-                if(!istream.read(reinterpret_cast<char*>(&*it), sizeof(block))) break;
+                if(!is.read(reinterpret_cast<char*>(&*it), sizeof(block))) break;
         } else {
             for(auto& tBlock: blocks)
-                if(!istream.read(reinterpret_cast<char*>(&tBlock), sizeof(block))) break;
+                if(!is.read(reinterpret_cast<char*>(&tBlock), sizeof(block))) break;
         }
     }
 
 
     /**
      * @brief STD stream binary writing operator
-     * @param Ostream stream
-     * @param Boolean big_endian
+     * @param os Ostream
+     * @param bigEndian Boolean
      * @details Writes number in stream using .write method. Accepts STD streams based on char or wchar_t.
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    constexpr auto writeBinary(std::basic_ostream<Char>& ostream, bool bigEndian = true) const noexcept -> void {
+    constexpr auto writeBinary(std::basic_ostream<Char>& os, bool bigEndian = true) const noexcept -> void {
         if(bigEndian) {
             for(auto it = blocks.rbegin(); it != blocks.rend(); ++it)
-                if(!ostream.write(reinterpret_cast<const char*>(&*it), sizeof(block))) break;
+                if(!os.write(reinterpret_cast<const char*>(&*it), sizeof(block))) break;
         } else {
             for(auto& block: blocks)
-                if(!ostream.write(reinterpret_cast<const char*>(&block), sizeof(block))) break;
+                if(!os.write(reinterpret_cast<const char*>(&block), sizeof(block))) break;
         }
     }
     /* ----------------------------------------------------------------------- */
@@ -1420,10 +1435,9 @@ public:
 
     /* -------------------- @name Public casting operators. ------------------ */
     /**
-     * @brief Built-in integral type cast operator
-     * @param Type integral_type TEMPLATE
+     * @brief Integral type cast operator for built-in types
      * @return Integral
-     * @details Takes the lowes part of Aeu for conversion. Accepts signed and unsigned types
+     * @details Takes the lowest part of Aeu for conversion. Accepts signed and unsigned types
      */
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
     gpu constexpr auto integralCast() const noexcept -> Integral {
@@ -1433,7 +1447,6 @@ public:
 
     /**
      * @brief Precision cast operator
-     * @param Size_t new_bitness TEMPLATE
      * @return Aeu<new_bitness>
      * @details If required precision greater than current precision, remaining blocks are filled with zeros.
      * Otherwise - number is cropped inside smaller blocks array
@@ -1457,7 +1470,7 @@ public:
     /* ------------------- @name Atomic-like CUDA operators. ----------------- */
     /**
      * @brief Atomicity-oriented object assignment operator
-     * @param Aeu assigning
+     * @param assigning Aeu
      * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for assigning encapsulated class members atomically one by one
      */
@@ -1468,7 +1481,7 @@ public:
 
     /**
      * @brief Atomicity-oriented object exchangement operator
-     * @param Aeu exchangeable
+     * @param exchangeable Aeu
      * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for exchanging encapsulated class members atomically one by one
      */
@@ -1540,8 +1553,8 @@ using Aeu8192 = Aeu<8192>;
 /* ------------------------------------------ @name Integral conversions  ----------------------------------------- */
 /**
  * @brief Integral conversion addition operator
- * @param Integral number
- * @param Aeu value
+ * @param number Integral
+ * @param value Aeu
  * @return Aeu
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
@@ -1549,8 +1562,8 @@ gpu constexpr auto operator+(Integral number, const Aeu<bitness>& value) noexcep
 
 /**
  * @brief Integral conversion subtraction operator
- * @param Integral number
- * @param Aeu value
+ * @param number Integral
+ * @param value Aeu
  * @return Aeu
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
@@ -1558,8 +1571,8 @@ gpu constexpr auto operator-(Integral number, const Aeu<bitness>& value) noexcep
 
 /**
  * @brief Integral conversion multiplication operator
- * @param Integral number
- * @param Aeu value
+ * @param number Integral
+ * @param value Aeu
  * @return Aeu
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
@@ -1567,8 +1580,8 @@ gpu constexpr auto operator*(Integral number, const Aeu<bitness>& value) noexcep
 
 /**
  * @brief Integral conversion division operator
- * @param Integral number
- * @param Aeu value
+ * @param number Integral
+ * @param value Aeu
  * @return Aeu
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
@@ -1576,8 +1589,8 @@ gpu constexpr auto operator/(Integral number, const Aeu<bitness>& value) noexcep
 
 /**
  * @brief Integral conversion modulo operator
- * @param Integral number
- * @param Aeu value
+ * @param number Integral
+ * @param value Aeu
  * @return Aeu
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
@@ -1585,8 +1598,8 @@ gpu constexpr auto operator%(Integral number, const Aeu<bitness>& value) noexcep
 
 /**
  * @brief Integral conversion bitwise XOR operator
- * @param Integral number
- * @param Aeu value
+ * @param number Integral
+ * @param value Aeu
  * @return Aeu
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
@@ -1594,8 +1607,8 @@ gpu constexpr auto operator^(Integral number, const Aeu<bitness>& value) noexcep
 
 /**
  * @brief Integral conversion bitwise AND operator
- * @param Integral number
- * @param Aeu value
+ * @param number Integral
+ * @param value Aeu
  * @return Aeu
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)
@@ -1603,8 +1616,8 @@ gpu constexpr auto operator&(Integral number, const Aeu<bitness>& value) noexcep
 
 /**
  * @brief Integral conversion bitwise OR operator
- * @param Integral number
- * @param Aeu value
+ * @param number Integral
+ * @param value Aeu
  * @return Aeu
  */
 template <std::size_t bitness, typename Integral> requires (std::is_integral_v<Integral>)

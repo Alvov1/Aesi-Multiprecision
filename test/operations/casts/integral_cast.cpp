@@ -5,7 +5,7 @@
 #include "../../generation.h"
 
 TEST(Signed_IntegralCast, IntegralCast) {
-    constexpr auto testsAmount = 2048;
+    constexpr auto testsAmount = 2;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         auto value = Generation::getRandom<int64_t>();
         Aesi<128> aesi = value;

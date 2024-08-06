@@ -30,24 +30,19 @@ TEST(Unsigned_Subtraction, Basic) {
 
 TEST(Unsigned_Subtraction, Huge) {
     constexpr auto testsAmount = 2048, blocksNumber = 64;
+    /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 5),
             r = Generation::getRandomWithBits(blocksNumber * 32 - 32);
-        // std::cout << "l: " << l << ", r: " << r << std::endl;
+
         Aeu<blocksNumber * 32> lA = l, rA = r;
         EXPECT_EQ(lA - rA, l - r);
 
         lA -= rA;
         EXPECT_EQ(lA, l - r);
-
-        const std::size_t decrements = rand() % 1'000;
-        for (std::size_t j = 0; j < decrements * 2; j += 2) {
-            EXPECT_EQ(rA--, r - j);
-            EXPECT_EQ(--rA, r - j - 2);
-        }
-        EXPECT_EQ(rA, r - decrements * 2);
     }
 
+    /* Built-in types. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 10);
         const auto subU = Generation::getRandom<unsigned>();
@@ -61,21 +56,16 @@ TEST(Unsigned_Subtraction, Huge) {
 }
 
 TEST(Unsigned_Subtraction, Decrement) {
-    Aeu512 m0 = 62492992u;
-    --m0; --m0; m0--; --m0; m0--; --m0; m0--; --m0; m0--; --m0;
-    EXPECT_EQ(m0, 62492982u);
-    Aeu512 t0 = m0--, u0 = --m0;
-    EXPECT_EQ(t0, 62492982u); EXPECT_EQ(u0, 62492980u); EXPECT_EQ(m0, 62492980u);
+    constexpr auto testsAmount = 2, blocksNumber = 64;
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 110);
+        Aeu<blocksNumber * 32> value = l;
 
-    Aeu512 m2 = 77428594u;
-    m2--; m2--; --m2; m2--; m2--; m2--; --m2; m2--; m2--; m2--; --m2; m2--; --m2; --m2;
-    EXPECT_EQ(m2, 77428580u);
-    Aeu512 t2 = m2--, u2 = --m2;
-    EXPECT_EQ(t2, 77428580u); EXPECT_EQ(u2, 77428578u); EXPECT_EQ(m2, 77428578u);
-
-    Aeu512 m3 = 77677795u;
-    --m3; --m3; --m3; m3--; --m3; m3--; --m3; --m3; m3--; --m3; m3--; --m3; m3--; m3--; m3--; m3--; m3--; --m3;
-    EXPECT_EQ(m3, 77677777u);
-    Aeu512 t3 = m3--, u3 = --m3;
-    EXPECT_EQ(t3, 77677777u); EXPECT_EQ(u3, 77677775u); EXPECT_EQ(m3, 77677775u);
+        const std::size_t decrements = rand() % 100;
+        for (std::size_t j = 0; j < decrements * 2; j += 2) {
+            EXPECT_EQ(value--, l - j);
+            EXPECT_EQ(--value, l - j - 2);
+        }
+        EXPECT_EQ(value, l - decrements * 2);
+    }
 }

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../../../Aeu.h"
+#include "../../generation.h"
 
 TEST(Unsigned_Division, Basic) {
     Aeu128 one = 1u, zero = 0u, ten = 10u, two = 2u;
@@ -9,17 +10,28 @@ TEST(Unsigned_Division, Basic) {
 }
 
 TEST(Unsigned_Division, Huge) {
-    {
-        Aeu512 l = "26798225348274056972938246750634409042300118548029753178688918538921246745965062080208195936268051570559256721952774348347597310192441914363134413.",
-                r = "14848174508235532944.";
-        EXPECT_EQ(l / r, "1804816163320981579388403504226331702370491441953754518106499184836919057540135315245317190025441606331823765598845887159809989."); //420 bits
-    }
-}
+    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    /* Composite numbers. */
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 5),
+            r = Generation::getRandomWithBits(blocksNumber * 16 - 32);
 
-TEST(Unsigned_Division, HugeAssignment) {
-    {
-        Aeu512 l = "1561887125123927869065399443905819287402853216284668279505212512528242566537138622627640923823742177340459597123715326947243254974803644465105044208.",
-                r = "1140496372038586241.";
-        l /= r; EXPECT_EQ(l, "1369480134629560030328505766480067553189519140338849911994270533428056229814192770428627980206784441044111785080309696923081681363."); //429 bits
+        Aeu<blocksNumber * 32> lA = l, rA = r;
+        EXPECT_EQ(lA / rA, l / r);
+
+        lA /= rA;
+        EXPECT_EQ(lA, l / r);
+    }
+
+    /* Built-in types. */
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 10);
+        const auto subU = Generation::getRandom<unsigned>();
+
+        Aeu<blocksNumber * 32> aeu = value;
+        EXPECT_EQ(aeu / subU, value / subU);
+
+        aeu /= subU;
+        EXPECT_EQ(aeu, value / subU);
     }
 }

@@ -499,7 +499,7 @@ public:
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
         gpu constexpr auto operator/(Unsigned divisor) const noexcept -> Aeu {
-            Aeu result = *this; result->operator/=(divisor); return result;
+            Aeu result = *this; result.operator/=(divisor); return result;
         }
 
         /**
@@ -538,9 +538,7 @@ public:
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator%(Unsigned modulo) const noexcept -> Aeu {
-            Aeu result = *this; result->operator%=(modulo); return result;
-        }
+        gpu constexpr auto operator%(Unsigned modulo) const noexcept -> Aeu { return integralCast<Unsigned>() % modulo; }
 
         /**
          * @brief Modulo operator
@@ -556,9 +554,9 @@ public:
          * @brief Assignment modulo operator for built-in integral types
          * @param modulo Unsigned
          * @return Aeu&
-         */ /* TODO: Complete */
-//        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-//        gpu constexpr auto operator%=(Unsigned modulo) noexcept -> Aeu& { return *this; };
+         */
+        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
+        gpu constexpr auto operator%=(Unsigned modulo) noexcept -> Aeu& { return this->operator=(integralCast<Unsigned>() % modulo); }
 
         /**
          * @brief Assignment modulo operator

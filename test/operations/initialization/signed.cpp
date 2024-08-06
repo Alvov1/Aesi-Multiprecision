@@ -2,7 +2,7 @@
 #include <bitset>
 #include <format>
 #include "../../../Aesi.h"
-#include "../generation.h"
+#include "../../generation.h"
 
 TEST(Signed_Initialization, Basic) {
     {
@@ -109,7 +109,7 @@ TEST(Signed_Initialization, Binary) {
         record = value; EXPECT_EQ(record, value);
 
         std::stringstream ss {};
-        ss << (i % 2 == 0 ? '' : '-') << "0b" << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
+        ss << (i % 2 == 0 ? "" : "-") << "0b" << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
         for(long long j = value.ByteCount() - 2; j >= 0; --j)
             ss << std::bitset<8>(value.GetByte(j));
         record = ss.str(); EXPECT_EQ(record, value);
@@ -124,7 +124,7 @@ TEST(Signed_Initialization, Decimal) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
-        std::stringstream ss {}; ss << std::dec << (i % 2 == 0 ? '' : '-') << value;
+        std::stringstream ss {}; ss << std::dec << (i % 2 == 0 ? "" : "-") << value;
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }
@@ -137,7 +137,7 @@ TEST(Signed_Initialization, Octal) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
-        std::stringstream ss {}; ss << (i % 2 == 0 ? '' : '-') << "0o" << std::oct << value;
+        std::stringstream ss {}; ss << (i % 2 == 0 ? "" : "-") << "0o" << std::oct << value;
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }
@@ -152,8 +152,8 @@ TEST(Signed_Initialization, Hexadecimal) {
 
         std::stringstream ss {};
         if(i % 2 == 0)
-            ss << (i % 2 == 0 ? '' : '-') << "0x" << std::hex << std::uppercase << value;
-        else ss << (i % 2 == 0 ? '' : '-') << "0x" << std::hex << std::nouppercase << value;
+            ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::uppercase << value;
+        else ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::nouppercase << value;
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }

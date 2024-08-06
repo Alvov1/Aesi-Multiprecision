@@ -338,7 +338,7 @@ public:
         gpu constexpr auto operator+=(Unsigned addendum) noexcept -> Aeu& {
             for(std::size_t i = 0; i < blocksNumber; ++i) {
                 const auto currentSum = static_cast<uint64_t>(blocks[i]) + static_cast<uint64_t>(addendum);
-                addendum = currentSum / blockMax; blocks[i] = currentSum % blockMax;
+                addendum = currentSum / blockBase; blocks[i] = currentSum % blockBase;
             }
             return *this;
         }
@@ -537,8 +537,8 @@ public:
          * @param modulo Unsigned
          * @return Aeu
          */
-        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator%(Unsigned modulo) const noexcept -> Aeu { return integralCast<Unsigned>() % modulo; }
+        // template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
+        // gpu constexpr auto operator%(Unsigned modulo) const noexcept -> Aeu { return integralCast<Unsigned>() % modulo; }
 
         /**
          * @brief Modulo operator
@@ -555,8 +555,8 @@ public:
          * @param modulo Unsigned
          * @return Aeu&
          */
-        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator%=(Unsigned modulo) noexcept -> Aeu& { return this->operator=(integralCast<Unsigned>() % modulo); }
+        // template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
+        // gpu constexpr auto operator%=(Unsigned modulo) noexcept -> Aeu& { return this->operator=(integralCast<Unsigned>() % modulo); }
 
         /**
          * @brief Assignment modulo operator

@@ -27,13 +27,13 @@ TEST(Unsigned_Modulo, Huge) {
 
     /* Built-in types. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 10);
-        const auto subU = Generation::getRandom<unsigned>();
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
+        const auto mod = Generation::getRandom<unsigned>();
 
         Aeu<blocksNumber * 32> aeu = value;
-        EXPECT_EQ(aeu % subU, value % subU);
+        EXPECT_EQ(aeu % mod, value % mod);
 
-        aeu %= subU;
-        EXPECT_EQ(aeu, value % subU);
+        aeu %= mod;
+        EXPECT_EQ(aeu, value % mod);
     }
 }

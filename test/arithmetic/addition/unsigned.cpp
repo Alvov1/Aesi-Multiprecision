@@ -50,7 +50,7 @@ TEST(Unsigned_Addition, Huge) {
     constexpr auto testsAmount = 2048, blocksNumber = 64;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto l = Generation::getRandomWithBits(blocksNumber * 31 - 5),
+        const auto l = Generation::getRandomWithBits(blocksNumber * 16 - 32),
             r = Generation::getRandomWithBits(blocksNumber * 16 - 32);
 
         Aeu<blocksNumber * 32> lA = l, rA = r;
@@ -62,14 +62,14 @@ TEST(Unsigned_Addition, Huge) {
 
     /* Built-in types. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 10);
-        const auto subU = Generation::getRandom<unsigned>();
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
+        const auto add = Generation::getRandom<unsigned>();
 
         Aeu<blocksNumber * 32> aeu = value;
-        EXPECT_EQ(aeu + subU, value + subU);
+        EXPECT_EQ(aeu + add, value + add);
 
-        aeu += subU;
-        EXPECT_EQ(aeu, value + subU);
+        aeu += add;
+        EXPECT_EQ(aeu, value + add);
     }
 }
 

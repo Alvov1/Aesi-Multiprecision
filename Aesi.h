@@ -39,10 +39,43 @@ public:
     gpu constexpr Aesi& operator=(const Aesi& other) noexcept { base = other.base; sign = other.sign; return *this; }
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr Aesi(Integral value) noexcept { /* TODO: Complete. */ }
+    gpu constexpr Aesi(Integral value) noexcept {
+        if(value < 0) {
+            value *= -1;
+            base = Base(static_cast<unsigned long long>(value));
+            sign = Sign::Negative;
+        } else if(value > 0) {
+            base = Base(static_cast<unsigned long long>(value));
+            sign = Sign::Positive;
+        } else
+            sign = Sign::Zero;
+    }
 
+    /**
+     * @brief Pointer-based character constructor
+     * @param ptr Char*
+     * @param size Size_t
+     * @details Accepts decimal strings (no prefix), binary (0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
+     * @note An odd number of dashes makes the number negative
+     */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) { /* TODO: Complete. */ }
+    gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) {
+        if(!base.isZero()) {
+            uint8_t positive = 1;
+
+            const auto dash = [] {
+                if constexpr (std::is_same_v<Char, char>) {
+                    return '-';
+                } else {
+                    return L'-';
+                }
+            } ();
+            for(std::size_t i = 0; i < size; ++i)
+                if(ptr[i] == dash) positive ^= 1;
+
+            sign = (positive ? Sign::Positive : Sign::Negative);
+        } else sign = Sign::Zero;
+    }
 
     template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
     gpu constexpr Aesi(const Char (&literal)[arrayLength]) noexcept : Aesi(literal, arrayLength) {}
@@ -55,14 +88,32 @@ public:
             typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
     gpu constexpr Aesi(const String& stringView) noexcept : Aesi(stringView.data(), stringView.size()) {}
 
-    explicit gpu constexpr Aesi(const Aeu<bitness>& value) : base(value), sign(Sign::Positive) {}
+    explicit gpu constexpr Aesi(const Aeu<bitness>& value) : sign(Sign::Positive), base(value) {}
 
 #ifdef AESI_CRYPTOPP_INTEGRATION
-    constexpr Aesi(const CryptoPP::Integer& value) : base(value) { if(value.IsNegative()) sign = Sign::Positive; }
+    constexpr Aesi(const CryptoPP::Integer& value) {
+        if(value.IsZero())
+            sign = Sign::Zero;
+        else {
+            base = value;
+            if(value.IsNegative())
+                sign = Sign::Negative;
+            else sign = Sign::Positive;
+        }
+    }
 #endif
 
 #ifdef AESI_GMP_INTEGRATION
-    constexpr Aesi(const mpz_class& value) : base(value) { if(value < 0) sign = Sign::Positive; }
+    constexpr Aesi(const mpz_class& value) {
+        if(value == 0)
+            sign = Sign::Zero;
+        else {
+            base = value;
+            if(value < 0)
+                sign = Sign::Negative;
+            else sign = Sign::Positive;
+        }
+    }
 #endif
     /* ----------------------------------------------------------------------- */
 
@@ -72,15 +123,29 @@ public:
         gpu constexpr auto operator+() const noexcept -> Aesi { return *this; }
 
         [[nodiscard]]
-        gpu constexpr auto operator-() const noexcept -> Aesi { return {}; }
+        gpu constexpr auto operator-() const noexcept -> Aesi { Aesi copy = *this; copy.inverse(); return copy; }
 
-        gpu constexpr auto operator++() noexcept -> Aesi& { return *this; }
+        gpu constexpr auto operator++() noexcept -> Aesi& {
+            if(sign == Sign::Negative) {
+                ++base; if(base.isZero()) sign = Sign::Zero;
+            } else if(sign == Sign::Positive) {
+                --base;
+            } else { base = 1u; sign = Sign::Positive; }
+            return *this;
+    }
 
-        gpu constexpr auto operator++(int) & noexcept -> Aesi { return {}; }
+        gpu constexpr auto operator++(int) & noexcept -> Aesi { Aesi old = *this; operator++(); return old; }
 
-        gpu constexpr auto operator--() noexcept -> Aesi& { return *this; }
+        gpu constexpr auto operator--() noexcept -> Aesi& {
+            if(sign == Sign::Negative) {
+                ++base;
+            } else if(sign == Sign::Positive) {
+                --base; if(base.isZero()) sign = Sign::Zero;
+            } else { base = 1u; sign = Sign::Negative; }
+            return *this;
+        }
 
-        gpu constexpr auto operator--(int) & noexcept -> Aesi { return {}; }
+        gpu constexpr auto operator--(int) & noexcept -> Aesi { Aesi old = *this; operator--(); return old; }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------ @name Addition operators. ------------------------ */

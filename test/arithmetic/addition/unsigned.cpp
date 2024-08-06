@@ -86,4 +86,15 @@ TEST(Unsigned_Addition, Increment) {
         }
         EXPECT_EQ(value, l + increments * 2);
     }
+
+    Aeu<blocksNumber * 32> test = 0u; ++test;
+    EXPECT_EQ(test, 1u);
+    EXPECT_FALSE(test.isZero());
+    EXPECT_GT(test, 0u);
+
+    test = 0u; test++;
+    EXPECT_EQ(test, 1u);
+    EXPECT_FALSE(test.isZero());
+    EXPECT_GT(test, 0u);
 }
+

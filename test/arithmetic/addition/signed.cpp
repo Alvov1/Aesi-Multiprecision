@@ -97,4 +97,24 @@ TEST(Signed_Addition, Increment) {
         }
         EXPECT_EQ(value, l + increments * 2);
     }
+
+    Aesi<blocksNumber * 32> test = 0; ++test;
+    EXPECT_EQ(test, 1);
+    EXPECT_FALSE(test.isZero());
+    EXPECT_GT(test, 0);
+
+    test = 0; test++;
+    EXPECT_EQ(test, 1);
+    EXPECT_FALSE(test.isZero());
+    EXPECT_GT(test, 0);
+
+    test = -1; ++test;
+    EXPECT_EQ(test, 0);
+    EXPECT_TRUE(test.isZero());
+    EXPECT_GT(test, -1);
+
+    test = -1; test++;
+    EXPECT_EQ(test, 0);
+    EXPECT_TRUE(test.isZero());
+    EXPECT_GT(test, -1);
 }

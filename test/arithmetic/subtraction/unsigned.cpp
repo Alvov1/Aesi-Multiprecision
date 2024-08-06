@@ -68,4 +68,14 @@ TEST(Unsigned_Subtraction, Decrement) {
         }
         EXPECT_EQ(value, l - decrements * 2);
     }
+
+    Aeu<blocksNumber * 32> test = 1u; --test;
+    EXPECT_EQ(test, 0u);
+    EXPECT_TRUE(test.isZero());
+    EXPECT_LT(test, 1u);
+
+    test = 1u; test--;
+    EXPECT_EQ(test, 0u);
+    EXPECT_TRUE(test.isZero());
+    EXPECT_LT(test, 1u);
 }

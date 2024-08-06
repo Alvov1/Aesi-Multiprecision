@@ -150,7 +150,7 @@ public:
      * @brief Pointer-based character constructor
      * @param data Char*
      * @param size Size_t
-     * @details Accepts decimal strings along with binary (starting with 0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
+     * @details Accepts decimal strings (no prefix), binary (0b/0B), octal (0o/0O) and hexadecimal (0x/0X)
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
     gpu constexpr Aeu(const Char* data, std::size_t size) noexcept : Aeu {} {
@@ -164,8 +164,12 @@ public:
             }
         } ();
         std::size_t position = 0;
-        const auto negative = (data[0] == [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ());
-        if(negative) ++position;
+
+        if constexpr (std::is_same_v<Char, char>) {
+            for(; !std::isalnum(data[position]) && position < size; ++position) ;
+        } else {
+            for(; !std::iswalnum(data[position]) && position < size; ++position) ;
+        }
 
         const auto base = [&data, &size, &position, &characters] {
             if (data[position] == characters[0] && size > position + 1) {
@@ -182,7 +186,7 @@ public:
                     default:
                         return 10u;
                 }
-            } else return 10u;
+            } return 10u;
         } ();
         for(; position < size; ++position) {
             const auto digit = [&characters] (Char ch) {
@@ -200,9 +204,6 @@ public:
                 this->operator+=(digit);
             }
         }
-
-        if(negative && !isZero())
-            makeComplement(blocks);
     }
 
     /**
@@ -282,29 +283,31 @@ public:
          * @brief Prefix increment
          * @return Aeu&
          */
-        gpu constexpr auto operator++() noexcept -> Aeu& { return this->operator+=(1u); }
+        gpu constexpr auto operator++() noexcept -> Aeu& {
+            /* TODO: Change knowing the predetermination of the addendum. */
+            return this->operator+=(1u);
+        }
 
         /**
          * @brief Postfix increment
          * @return Aeu
          */
-        gpu constexpr auto operator++(int) & noexcept -> Aeu {
-            Aeu old = *this; operator++(); return old;
-        }
+        gpu constexpr auto operator++(int) & noexcept -> Aeu { Aeu old = *this; operator++(); return old; }
 
         /**
          * @brief Prefix decrement
          * @return Aeu&
          */
-        gpu constexpr auto operator--() noexcept -> Aeu& { return this->operator-=(1u); }
+        gpu constexpr auto operator--() noexcept -> Aeu& {
+            /* TODO: Change knowing the predetermination of the subtrahend. */
+            return this->operator-=(1u);
+        }
 
         /**
          * @brief Postfix decrement
          * @return Aeu
          */
-        gpu constexpr auto operator--(int) & noexcept -> Aeu {
-            Aeu old = *this; operator--(); return old;
-        }
+        gpu constexpr auto operator--(int) & noexcept -> Aeu { Aeu old = *this; operator--(); return old; }
     /* --------------------------------------------------------------------------- */
 
 

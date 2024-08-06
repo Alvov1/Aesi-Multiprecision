@@ -79,4 +79,24 @@ TEST(Signed_Subtraction, Decrement) {
         }
         EXPECT_EQ(value, l - decrements * 2);
     }
+
+    Aesi<blocksNumber * 32> test = 0; --test;
+    EXPECT_EQ(test, -1);
+    EXPECT_FALSE(test.isZero());
+    EXPECT_LT(test, 0);
+
+    test = 0; test--;
+    EXPECT_EQ(test, -1);
+    EXPECT_FALSE(test.isZero());
+    EXPECT_LT(test, 0);
+
+    test = 1; --test;
+    EXPECT_EQ(test, 0);
+    EXPECT_TRUE(test.isZero());
+    EXPECT_LT(test, 1);
+
+    test = 1; test--;
+    EXPECT_EQ(test, 0);
+    EXPECT_TRUE(test.isZero());
+    EXPECT_LT(test, 1);
 }

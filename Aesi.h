@@ -34,15 +34,15 @@ public:
     /* --------------------- @name Different constructors. ------------------- */
     gpu constexpr Aesi() noexcept = default;
 
-    gpu constexpr Aesi(const Aesi& copy) noexcept {}
+    gpu constexpr Aesi(const Aesi& copy) noexcept = default;
 
-    gpu constexpr Aesi& operator=(const Aesi& other) noexcept { return *this; }
+    gpu constexpr Aesi& operator=(const Aesi& other) noexcept { base = other.base; sign = other.sign; return *this; }
 
     template <typename Integral> requires (std::is_integral_v<Integral>)
-    gpu constexpr Aesi(Integral value) noexcept {}
+    gpu constexpr Aesi(Integral value) noexcept { /* TODO: Complete. */ }
 
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
-    gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) {}
+    gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) { /* TODO: Complete. */ }
 
     template <typename Char, std::size_t arrayLength> requires (arrayLength > 1 && (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>))
     gpu constexpr Aesi(const Char (&literal)[arrayLength]) noexcept : Aesi(literal, arrayLength) {}
@@ -50,6 +50,10 @@ public:
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
             typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
     gpu constexpr Aesi(String&& stringView) noexcept : Aesi(stringView.data(), stringView.size()) {}
+
+    template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
+            typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
+    gpu constexpr Aesi(const String& stringView) noexcept : Aesi(stringView.data(), stringView.size()) {}
 
     explicit gpu constexpr Aesi(const Aeu<bitness>& value) : base(value), sign(Sign::Positive) {}
 
@@ -68,28 +72,28 @@ public:
         gpu constexpr auto operator+() const noexcept -> Aesi { return *this; }
 
         [[nodiscard]]
-        gpu constexpr auto operator-() const noexcept -> Aesi {}
+        gpu constexpr auto operator-() const noexcept -> Aesi { return {}; }
 
-        gpu constexpr auto operator++() noexcept -> Aesi& {}
+        gpu constexpr auto operator++() noexcept -> Aesi& { return *this; }
 
-        gpu constexpr auto operator++(int) & noexcept -> Aesi {}
+        gpu constexpr auto operator++(int) & noexcept -> Aesi { return {}; }
 
-        gpu constexpr auto operator--() noexcept -> Aesi& {}
+        gpu constexpr auto operator--() noexcept -> Aesi& { return *this; }
 
-        gpu constexpr auto operator--(int) & noexcept -> Aesi {}
+        gpu constexpr auto operator--(int) & noexcept -> Aesi { return {}; }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------ @name Addition operators. ------------------------ */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator+(Integral addendum) const noexcept -> Aesi {}
+        gpu constexpr auto operator+(Integral addendum) const noexcept -> Aesi { return {}; }
 
         [[nodiscard]]
-        gpu constexpr auto operator+(const Aesi& addendum) const noexcept -> Aesi {}
+        gpu constexpr auto operator+(const Aesi& addendum) const noexcept -> Aesi { return {}; }
 
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator+=(Integral addendum) noexcept -> Aesi& {}
+        gpu constexpr auto operator+=(Integral addendum) noexcept -> Aesi& { return *this; }
 
-        gpu constexpr auto operator+=(const Aesi& addendum) noexcept -> Aesi& {}
+        gpu constexpr auto operator+=(const Aesi& addendum) noexcept -> Aesi& { return *this; }
     /* --------------------------------------------------------------------------- */
 
     /* ----------------------- @name Subtraction operators. ---------------------- */
@@ -107,41 +111,41 @@ public:
 
     /* --------------------- @name Multiplication operators. --------------------- */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator*(Integral factor) const noexcept -> Aesi {}
+        gpu constexpr auto operator*(Integral factor) const noexcept -> Aesi { return {}; }
 
         [[nodiscard]]
-        gpu constexpr auto operator*(const Aesi& factor) const noexcept -> Aesi {}
+        gpu constexpr auto operator*(const Aesi& factor) const noexcept -> Aesi { return {}; }
 
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator*=(Integral factor) noexcept -> Aesi& {}
+        gpu constexpr auto operator*=(Integral factor) noexcept -> Aesi& { return *this; }
 
-        gpu constexpr auto operator*=(const Aesi& factor) noexcept -> Aesi& {}
+        gpu constexpr auto operator*=(const Aesi& factor) noexcept -> Aesi& { return *this; }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------ @name Division operators. ------------------------ */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator/(Integral divisor) const noexcept -> Aesi {}
+        gpu constexpr auto operator/(Integral divisor) const noexcept -> Aesi { return {}; }
 
         [[nodiscard]]
-        gpu constexpr auto operator/(const Aesi& divisor) const noexcept -> Aesi {}
+        gpu constexpr auto operator/(const Aesi& divisor) const noexcept -> Aesi { return {}; }
 
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator/=(Integral factor) noexcept -> Aesi& {}
+        gpu constexpr auto operator/=(Integral factor) noexcept -> Aesi& { return *this; }
 
-        gpu constexpr auto operator/=(const Aesi& divisor) noexcept -> Aesi& {}
+        gpu constexpr auto operator/=(const Aesi& divisor) noexcept -> Aesi& { return *this; }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------- @name Modulo operators. ------------------------- */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator%(Integral modulo) const noexcept -> Aesi {}
+        gpu constexpr auto operator%(Integral modulo) const noexcept -> Aesi { return {}; }
 
         [[nodiscard]]
-        gpu constexpr auto operator%(const Aesi& modulo) const noexcept -> Aesi {}
+        gpu constexpr auto operator%(const Aesi& modulo) const noexcept -> Aesi { return {}; }
 
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator%=(Integral modulo) noexcept -> Aesi& {}
+        gpu constexpr auto operator%=(Integral modulo) noexcept -> Aesi& { return *this; }
 
-        gpu constexpr auto operator%=(const Aesi& modulo) noexcept -> Aesi& {}
+        gpu constexpr auto operator%=(const Aesi& modulo) noexcept -> Aesi& { return *this; }
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
 
@@ -269,13 +273,16 @@ public:
 
     [[nodiscard]]
     gpu constexpr auto squareRoot() const noexcept -> Aesi { return Aesi {}; }
+
+    [[nodiscard]]
+    gpu static constexpr auto power2(std::size_t power) noexcept -> Aesi { Aesi result { Sign::Positive, Aeu<bitness>::power2(power) }; return result; }
     /* ----------------------------------------------------------------------- */
 
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
     gpu constexpr auto integralCast() const noexcept -> Integral { return Integral(); }
 
     template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
-    gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {}
+    gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> { return {}; }
 
     gpu constexpr auto unsignedCast() const noexcept -> Aeu<bitness> { return base; };
 

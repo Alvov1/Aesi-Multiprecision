@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../../../Aeu.h"
+#include "../../generation.h"
 
 TEST(Unsigned_Addition, Basic) {
     {
@@ -46,37 +47,43 @@ TEST(Unsigned_Addition, Basic) {
 }
 
 TEST(Unsigned_Addition, Huge) {
-    {
-        Aeu512 l = "2326333277280079839475608346577929682764367222989747129677338493683526466858744456372666943713731781165063938406187762357596980704175585567928997948.",
-                r = "2347185060395110497228274602933431846575460587905408209843081337301055068653709470534007082503369374603958788874525927790259452449305937699479895621.";
-        EXPECT_EQ(l + r, "4673518337675190336703882949511361529339827810895155339520419830984581535512453926906674026217101155769022727280713690147856433153481523267408893569."); //491 bits
-    }
-}
+    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    /* Composite numbers. */
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto l = Generation::getRandomWithBits(blocksNumber * 31 - 5),
+            r = Generation::getRandomWithBits(blocksNumber * 16 - 32);
 
-TEST(Unsigned_Addition, HugeAssignment) {
-    {
-        Aeu512 l = "157398389073863840544417511339818273758723060248753121479191002097450222704310077442881094234123139987464824792910688568012737816097137929407927199.",
-                r = "339236136114602883445460178280566088250454247752207806981592701628313330682609000687580799034495264485601116317383081025729148676917836219827284915.";
-        l += r; EXPECT_EQ(l, "496634525188466723989877689620384362009177308000960928460783703725763553386919078130461893268618404473065941110293769593741886493014974149235212114."); //488 bits
+        Aeu<blocksNumber * 32> lA = l, rA = r;
+        EXPECT_EQ(lA + rA, l + r);
+
+        lA += rA;
+        EXPECT_EQ(lA, l + r);
+    }
+
+    /* Built-in types. */
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 10);
+        const auto subU = Generation::getRandom<unsigned>();
+
+        Aeu<blocksNumber * 32> aeu = value;
+        EXPECT_EQ(aeu + subU, value + subU);
+
+        aeu += subU;
+        EXPECT_EQ(aeu, value + subU);
     }
 }
 
 TEST(Unsigned_Addition, Increment) {
-    Aeu512 m0 = 62492992u;
-    ++m0; ++m0; m0++; ++m0; m0++; ++m0; m0++; ++m0; m0++; ++m0;
-    EXPECT_EQ(m0, 62493002u);
-    Aeu512 t0 = m0++, u0 = ++m0;
-    EXPECT_EQ(t0, 62493002u); EXPECT_EQ(u0, 62493004u); EXPECT_EQ(m0, 62493004u);
+    constexpr auto testsAmount = 2, blocksNumber = 64;
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 110);
+        Aeu<blocksNumber * 32> value = l;
 
-    Aeu512 m2 = 77428594u;
-    m2++; m2++; ++m2; m2++; m2++; m2++; ++m2; m2++; m2++; m2++; ++m2; m2++; ++m2; ++m2;
-    EXPECT_EQ(m2, 77428608u);
-    Aeu512 t2 = m2++, u2 = ++m2;
-    EXPECT_EQ(t2, 77428608u); EXPECT_EQ(u2, 77428610u); EXPECT_EQ(m2, 77428610u);
-
-    Aeu512 m3 = 77677795u;
-    ++m3; ++m3; ++m3; m3++; ++m3; m3++; ++m3; ++m3; m3++; ++m3; m3++; ++m3; m3++; m3++; m3++; m3++; m3++; ++m3;
-    EXPECT_EQ(m3, 77677813u);
-    Aeu512 t3 = m3++, u3 = ++m3;
-    EXPECT_EQ(t3, 77677813u); EXPECT_EQ(u3, 77677815u); EXPECT_EQ(m3, 77677815u);
+        const std::size_t increments = rand() % 100;
+        for (std::size_t j = 0; j < increments * 2; j += 2) {
+            EXPECT_EQ(value++, l + j);
+            EXPECT_EQ(++value, l + j + 2);
+        }
+        EXPECT_EQ(value, l + increments * 2);
+    }
 }

@@ -3,8 +3,8 @@
 #include "../../generation.h"
 
 TEST(Signed_Multiplication, Basic) {
-    Aeu128 zero = 0u, one = 1u;
-    Aeu128 m0 = 10919396u;
+    Aesi128 zero = 0u, one = 1u;
+    Aesi128 m0 = 10919396u;
     EXPECT_EQ(m0 * 0u, 0u);
     EXPECT_EQ(0u * m0, 0u);
     EXPECT_EQ(m0 * 1u, 10919396u);
@@ -41,25 +41,38 @@ TEST(Signed_Multiplication, Basic) {
 
 TEST(Signed_Multiplication, Huge) {
     constexpr auto testsAmount = 2, blocksNumber = 64;
+    /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto l = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-                r = Generation::getRandomWithBits(blocksNumber * 16 - 20);
-        Aeu<blocksNumber * 32> lA = l, rA = r;
+        int first = 0, second = 0;
+        switch(i % 4) {
+        case 0:
+            first = 1, second = 1; break;
+        case 1:
+            first = -1, second = -1; break;
+        case 2:
+            first = -1, second = 1; break;
+        default:
+            first = 1, second = -1;
+        }
+        const auto l = first * Generation::getRandomWithBits(blocksNumber * 16 - 110),
+                r = second * Generation::getRandomWithBits(blocksNumber * 16 - 110);
+
+        Aesi<blocksNumber * 32> lA = l, rA = r;
         EXPECT_EQ(lA * rA, l * r);
 
         lA *= rA;
         EXPECT_EQ(lA, l * r);
     }
 
+    /* Built-in types. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
-        const auto factorU = Generation::getRandom<unsigned>();
-        const auto factorULL = Generation::getRandom<uint64_t>();
+        const auto factor = Generation::getRandom<long long>();
 
-        Aeu<blocksNumber * 32> aeu = value;
-        EXPECT_EQ((aeu * factorU) * factorULL, (value * factorU) * factorULL);
+        Aesi<blocksNumber * 32> aeu = value;
+        EXPECT_EQ((aeu * factor) * factor, (value * factor) * factor);
 
-        aeu *= factorU; aeu *= factorULL;
-        EXPECT_EQ(aeu, (value * factorU) * factorULL);
+        aeu *= factor; aeu *= factor;
+        EXPECT_EQ(aeu, (value * factor) * factor);
     }
 }

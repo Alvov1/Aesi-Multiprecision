@@ -499,6 +499,7 @@ public:
          * @brief Division operator for built-in integral types
          * @param divisor Unsigned
          * @return Aeu
+         * @note Undefined behaviour for division by zero
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
         gpu constexpr auto operator/(Unsigned divisor) const noexcept -> Aeu {
@@ -509,6 +510,7 @@ public:
          * @brief Division operator
          * @param divisor Aeu
          * @return Aeu
+         * @note Undefined behaviour for division by zero
          */
         [[nodiscard]]
         gpu constexpr auto operator/(const Aeu& divisor) const noexcept -> Aeu {
@@ -519,6 +521,7 @@ public:
          * @brief Assignment division operator for built-in integral types
          * @param divisor Unsigned
          * @return Aeu&
+         * @note Undefined behaviour for division by zero
          */ /* TODO: Complete */
 //        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
 //        gpu constexpr auto operator/=(Unsigned divisor) noexcept -> Aeu& { return *this; };
@@ -527,6 +530,7 @@ public:
          * @brief Assignment division operator
          * @param divisor Aeu
          * @return Aeu&
+         * @note Undefined behaviour for division by zero
          */
         gpu constexpr auto operator/=(const Aeu& divisor) noexcept -> Aeu& {
             return this->operator=(this->operator/(divisor));
@@ -877,7 +881,7 @@ public:
      * @brief Set bit in number by index starting from the right
      * @param index Size_t
      * @param bit Boolean
-     * @note Does nothing for index out of range. Index check is disabled in unsafe mode
+     * @note Does nothing for index out of range
      */
     gpu constexpr auto setBit(std::size_t index, bool bit) noexcept -> void {
 #ifndef AESI_UNSAFE
@@ -895,7 +899,7 @@ public:
      * @brief Get bit in number by index staring from the right
      * @param index Size_t
      * @return Boolean
-     * @note Returns zero for index out of range. Index check is disabled in unsafe mode
+     * @note Returns zero for index out of range
      */
     [[nodiscard]]
     gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
@@ -911,7 +915,7 @@ public:
      * @brief Set byte in number by index starting from the right
      * @param index Size_t
      * @param byte Byte
-     * @note Does nothing for index out of range. Index check is disabled in unsafe mode.
+     * @note Does nothing for index out of range
      */
     gpu constexpr auto setByte(std::size_t index, byte byte) noexcept -> void {
 #ifndef AESI_UNSAFE
@@ -926,7 +930,7 @@ public:
      * @brief Get byte in number by index starting from the right
      * @param index Size_t
      * @return Byte
-     * @note Returns zero for index out of range. Index check is disabled in unsafe mode.
+     * @note Returns zero for index out of range
      */
     [[nodiscard]]
     gpu constexpr auto getByte(std::size_t index) const noexcept -> byte {
@@ -1007,22 +1011,22 @@ public:
 
     /**
      * @brief Check whether number is odd
-     * @return Boolean - true is number is odd and false otherwise
+     * @return Boolean: true is number is odd and false otherwise
      */
     [[nodiscard]]
     gpu constexpr auto isOdd() const noexcept -> bool { return (0x1 & blocks[0]) == 1; }
 
     /**
      * @brief Check whether number is even
-     * @return Boolean - true is number is even and false otherwise
+     * @return Boolean: true if the number is even and false otherwise
      */
     [[nodiscard]]
     gpu constexpr auto isEven() const noexcept -> bool { return (0x1 & blocks[0]) == 0; }
 
     /**
- * @brief Check whether number is zero
- * @return Boolean - true is number is zero and false otherwise
- */
+     * @brief Check whether number is zero
+     * @return Boolean: true if the number is zero and false otherwise
+     */
     [[nodiscard]]
     gpu constexpr auto isZero() const noexcept -> bool { return filledBlocksNumber() == 0; }
 
@@ -1040,7 +1044,6 @@ public:
     /**
      * @brief Get number's precision
      * @return Size_t
-     
      */
     [[nodiscard]]
     gpu static constexpr auto getBitness() noexcept -> std::size_t { return bitness; }
@@ -1048,7 +1051,6 @@ public:
     /**
      * @brief Get the number of blocks (length of array of uint32_t integers) inside object
      * @return Size_t
-     
      */
     [[nodiscard]]
     gpu static constexpr auto totalBlocksNumber() noexcept -> std::size_t { return blocksNumber; }
@@ -1366,7 +1368,7 @@ public:
 
         if(base == 16) {
             long long iter = number.blocks.size() - 1;
-            for(; number.blocks[iter] == 0 && iter >= 0; --iter);
+            for(; number.blocks[iter] == 0 && iter >= 0; --iter) ;
 
             os << number.blocks[iter--];
             for (; iter >= 0; --iter) {
@@ -1456,7 +1458,7 @@ public:
      */
     template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
     gpu constexpr auto precisionCast() const noexcept -> Aeu<newBitness> {
-        Aeu<newBitness> result {};
+        Aeu<newBitness> result;
 
         const std::size_t blockBoarder = (newBitness > bitness ? Aeu<bitness>::blocksNumber : Aeu<newBitness>::totalBlocksNumber());
         for(std::size_t blockIdx = 0; blockIdx < blockBoarder; ++blockIdx)

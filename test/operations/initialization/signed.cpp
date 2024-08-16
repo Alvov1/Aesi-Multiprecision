@@ -6,9 +6,18 @@
 
 TEST(Signed_Initialization, Basic) {
     {
-        Aesi128 m0 {}, m1(0), m2 = 0, m3 = Aesi128(0), m4 = {}, m5 = "0", m6 = "-0", m7 = "Somebody once told me...";
+        Aesi128 m0 {},
+            m1(0),
+            m2 = 0,
+            m3 = Aesi128(0),
+            m4 = {},
+            m5 = "0",
+            m6 = "-0",
+            m7 = "Somebody once told me...",
+            m8 = Aesi128(),
+            m9;
         EXPECT_EQ(m0, 0); EXPECT_EQ(m1, 0); EXPECT_EQ(m2, 0); EXPECT_EQ(m3, 0);
-        EXPECT_EQ(m4, 0); EXPECT_EQ(m5, 0); EXPECT_EQ(m6, 0); EXPECT_EQ(m7, 0);
+        EXPECT_EQ(m4, 0); EXPECT_EQ(m5, 0); EXPECT_EQ(m6, 0); EXPECT_EQ(m7, 0); EXPECT_EQ(m8, 0); EXPECT_NE(m9, 0);
     }
     {
         Aesi128 i01 = 1, i02 = -1, i03 = 127, i04 = -127, i05 = -128, i06 = +127;

@@ -44,6 +44,6 @@ target_link_libraries(AesiMultiprecision GTest::gtest_main cryptopp PkgConfig::G
 target_include_directories(AesiMultiprecision PUBLIC PkgConfig::GMP)
 
 include(GoogleTest)
-gtest_discover_tests(AesiMultiprecision)
+gtest_discover_tests(AesiMultiprecision XML_OUTPUT_DIR ${CMAKE_BINARY_DIR})
 
 

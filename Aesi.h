@@ -135,9 +135,9 @@ public:
 
         gpu constexpr auto operator++() noexcept -> Aesi& {
             if(sign == Sign::Negative) {
-                ++base; if(base.isZero()) sign = Sign::Zero;
+                --base; if(base.isZero()) sign = Sign::Zero;
             } else if(sign == Sign::Positive) {
-                --base;
+                ++base;
             } else { base = 1u; sign = Sign::Positive; }
             return *this;
     }
@@ -423,10 +423,14 @@ public:
         template <typename Integral> requires (std::is_integral_v<Integral>)
         gpu constexpr auto operator==(Integral value) const noexcept -> bool { return compareTo(value) == Comparison::equal; }
 
-        gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool { return sign == other.sign && base == other.base; }
+        gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool {
+            return sign == other.sign && base == other.base;
+        }
 
         template <std::size_t otherBitness> requires (otherBitness != bitness)
-        gpu constexpr auto operator==(const Aesi<otherBitness>& other) const noexcept -> bool { return precisionCast<otherBitness>() == other; }
+        gpu constexpr auto operator==(const Aesi<otherBitness>& other) const noexcept -> bool {
+            return precisionCast<otherBitness>() == other;
+        }
     /* --------------------------------------------------------------------------- */
 
 
@@ -742,7 +746,12 @@ public:
     }
 
     [[nodiscard]]
-    gpu static constexpr auto power2(std::size_t power) noexcept -> Aesi { Aesi result { Sign::Positive, Aeu<bitness>::power2(power) }; return result; }
+    gpu static constexpr auto power2(std::size_t power) noexcept -> Aesi {
+        Aesi result { Sign::Positive, Aeu<bitness>::power2(power) };
+        if(result.base.isZero())
+            result.sign = Sign::Zero;
+        return result;
+    }
     /* ----------------------------------------------------------------------- */
 
     /* TODO: COMPLETED! */

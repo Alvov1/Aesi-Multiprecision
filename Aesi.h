@@ -157,85 +157,139 @@ public:
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------ TODO: Complete @name Addition operators. ------------------------ */
-        template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator+(Integral addendum) const noexcept -> Aesi { Aesi result = *this; result += addendum; return result; }
-
         [[nodiscard]]
         gpu constexpr auto operator+(const Aesi& addendum) const noexcept -> Aesi { Aesi result = *this; result += addendum; return result; }
 
-        template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator+=(Integral addendum) noexcept -> Aesi& {
-            if(addendum == 0)
-                return *this;
-            if(sign == Sign::Zero)
-                return this->operator=(addendum);
-
-            if(sign == Sign::Positive && addendum > 0) {
-                base += addendum;
-                return *this;
-            }
-
-            if(sign == Sign::Negative && addendum < 0) {
-                base += (addendum * -1);
-                return *this;
-            }
-
-            /* TODO: Complete. */
-        }
-
         gpu constexpr auto operator+=(const Aesi& addendum) noexcept -> Aesi& {
-            if(addendum.sign == Sign::Zero)
+            if(addendum.sign == Sign::Zero) /* Any += Zero; */
                 return *this;
-            if(sign == Sign::Zero)
+            if(sign == Sign::Zero) /* Zero += Any; */
                 return this->operator=(addendum);
 
-            if(sign == addendum.sign) {
+            if(sign == addendum.sign) { /* Positive += Positive; */
                 base += addendum.base;
                 return *this;
-            } else {
-                /* TODO: Complete. */
+            }
+
+            if(sign == Sign::Positive) { /* Positive += Negative; */
+                /*  +       -
+                 * 100 + (-80) -> 20
+                 * 100 + (-150) -> -50
+                 * 100 + (-100) -> 0
+                 * TODO: REMOVE COMMENT
+                 */
+                const auto ratio = base.compareTo(addendum.base);
+                switch(ratio) {
+                    case Comparison::greater: {
+                        base -= addendum.base;
+                        return *this;
+                    }
+                    case Comparison::less: {
+                        base = addendum.base - base;
+                        sign = Sign::Negative;
+                        return *this;
+                    }
+                    default: {
+                        sign = Sign::Zero;
+                        return *this;
+                    }
+                }
+            } else { /* Negative += Positive; */
+                /*    -      +
+                 * (-150) + 100 -> -50
+                 * (-80) + 100 -> 20
+                 * (-100) + 100 -> 0
+                 * TODO: REMOVE COMMENT
+                 */
+                const auto ratio = base.compareTo(addendum.base);
+                switch(ratio) {
+                    case Comparison::greater: {
+                        base -= addendum.base;
+                        return *this;
+                    }
+                    case Comparison::less: {
+                        base = addendum.base - base;
+                        sign = Sign::Positive;
+                        return *this;
+                    }
+                    default: {
+                        sign = Sign::Zero;
+                        return *this;
+                    }
+                }
             }
         }
     /* --------------------------------------------------------------------------- */
 
     /* ----------------------- TODO: Complete @name Subtraction operators. ---------------------- */
-        template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator-(Integral subtrahend) const noexcept -> Aesi { Aesi result = *this; result -= subtrahend; return result; }
-
         [[nodiscard]]
         gpu constexpr auto operator-(const Aesi& subtrahend) const noexcept -> Aesi { Aesi result = *this; result -= subtrahend; return result; }
 
-        template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator-=(Integral subtrahend) noexcept -> Aesi& {
-            if(subtrahend == 0)
-                return *this;
-            if(sign == Sign::Zero)
-                return this->operator=(subtrahend);
-
-            if(sign == Sign::Positive && subtrahend < 0) {
-                base += (subtrahend * -1);
-                return *this;
-            }
-
-            if(sign == Sign::Negative && subtrahend > 0) {
-                base += subtrahend;
-                return *this;
-            }
-
-            /* TODO: Complete. */
-        }
-
         gpu constexpr auto operator-=(const Aesi& subtrahend) noexcept -> Aesi& {
-            if(subtrahend.sign == Sign::Zero)
+            if(subtrahend.sign == Sign::Zero) /* Any -= Zero; */
                 return *this;
-            if(sign == Sign::Zero)
-                *this = Aesi { (subtrahend.sign == Sign::Positive ? Sign::Negative : Sign::Positive), subtrahend.base };
+            if(sign == Sign::Zero) { /* Zero -= Any; */
+                *this = subtrahend;
+                this->inverse();
+                return *this;
+            }
 
-            if(sign != subtrahend.sign) {
-                base += subtrahend.base;
-                return *this;
+            if(sign == Sign::Positive) {
+                if(subtrahend.sign == Sign::Positive) { /* Positive -= Positive; */
+                    /*  +       +
+                     * 100 - (80) -> 20
+                     * 100 - (150) -> -50
+                     * 100 - (100) -> 0
+                     * TODO: REMOVE COMMENT
+                     */
+                    const auto ratio = base.compareTo(subtrahend.base);
+                    switch(ratio) {
+                        case Comparison::greater: {
+                            base -= subtrahend.base;
+                            return *this;
+                        }
+                        case Comparison::less: {
+                            base = subtrahend.base - base;
+                            sign = Sign::Negative;
+                            return *this;
+                        }
+                        default: {
+                            sign = Sign::Zero;
+                            return *this;
+                        }
+                    }
+                } else { /* Positive -= Negative; */
+                    base += subtrahend.base;
+                    return *this;
+                }
             } else {
-                /* TODO: Complete. */
+                if(subtrahend.sign == Sign::Negative) { /* Negative -= Negative; */
+                    /*    -      -
+                     * (-150) - (-100) -> -50
+                     * (-80) - (-100) -> 20
+                     * (-100) - (-100) -> 0
+                     * TODO: REMOVE COMMENT
+                     */
+                    const auto ratio = base.compareTo(subtrahend.base);
+                    switch(ratio) {
+                        case Comparison::greater: {
+                            base -= subtrahend.base;
+                            return *this;
+                        }
+                        case Comparison::less: {
+                            base = subtrahend.base - base;
+                            sign = Sign::Positive;
+                            return *this;
+                        }
+                        default: {
+                            sign = Sign::Zero;
+                            return *this;
+                        }
+                    }
+                } else { /* Negative -= Positive; */
+                    base += subtrahend.base;
+                    return *this;
+                }
             }
         }
     /* --------------------------------------------------------------------------- */

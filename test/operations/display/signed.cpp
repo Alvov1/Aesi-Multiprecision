@@ -174,7 +174,7 @@ TEST(Signed_Display, FormatAskii) {
                 break;
             }
             default: {  /* Binary */
-                ss << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
+                ss << (i % 2 == 0 ? "" : "-") << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
                 for(long long j = value.ByteCount() - 2; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
                 Aesi.getString<2>(askii.data(), askii.size(), false);
@@ -224,7 +224,7 @@ TEST(Signed_Display, FormatUtf) {
                 break;
             }
             default: {  /* Binary */
-                ss << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                ss << (i % 2 == 0 ? "" : "-") << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
                 for (long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
                 Aesi.getString<2>(utf.data(), utf.size(), false);
@@ -261,19 +261,19 @@ TEST(Signed_Display, ShowBaseAskii) {
 
         switch (i % 9) {
             case 0: {   /* Std::streams octal */
-                ss << "0o" << std::oct << std::noshowbase << value;
+                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << (i % 2 == 0 ? value : value * -1);
                 ss2 << std::oct << std::showbase << Aesi;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
             }
             case 1: {   /* Std::streams hexadecimal, lowercase */
-                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
                 ss2 << std::hex << std::showbase << std::nouppercase << Aesi;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
             }
             case 2: {   /* Std::streams hexadecimal, uppercase */
-                ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::uppercase << (i % 2 == 0 ? value : value * -1);
                 ss2 << std::hex << std::showbase << std::uppercase << Aesi;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
@@ -285,19 +285,19 @@ TEST(Signed_Display, ShowBaseAskii) {
                 break;
             }
             case 4: {   /* C-style ASKII Octal */
-                ss << "0o" << std::oct << std::noshowbase << value;
+                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << (i % 2 == 0 ? value : value * -1);
                 const auto size = Aesi.getString<8>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
-                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
                 const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
-                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
                 const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
@@ -309,7 +309,7 @@ TEST(Signed_Display, ShowBaseAskii) {
                 break;
             }
             default: {   /* C-style ASKII Binary */
-                ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                ss << (i % 2 == 0 ? "0b" : "-0b") << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
                 for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
                 Aesi.getString<2>(askii.data(), askii.size(), true);
@@ -344,7 +344,7 @@ TEST(Signed_Display, ShowBaseUtf) {
 
         switch (i % 9) {
             case 0: {   /* Std::streams octal */
-                ss << "0o" << std::oct << std::noshowbase << value;
+                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << (i % 2 == 0 ? value : value * -1);
                 ss2 << std::oct << std::showbase << Aesi;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -352,7 +352,7 @@ TEST(Signed_Display, ShowBaseUtf) {
                 break;
             }
             case 1: {   /* Std::streams hexadecimal, lowercase */
-                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                ss << (i % 2 == 0 ? "0x" : "-0x")  << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
                 ss2 << std::hex << std::showbase << std::nouppercase << Aesi;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -360,7 +360,7 @@ TEST(Signed_Display, ShowBaseUtf) {
                 break;
             }
             case 2: {   /* Std::streams hexadecimal, uppercase */
-                ss << "0x" << std::hex << std::noshowbase << std::uppercase << value;
+                ss << (i % 2 == 0 ? "0x" : "-0x")  << std::hex << std::noshowbase << std::uppercase << (i % 2 == 0 ? value : value * -1);
                 ss2 << std::hex << std::showbase << std::uppercase << Aesi;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -376,7 +376,7 @@ TEST(Signed_Display, ShowBaseUtf) {
                 break;
             }
             case 4: {   /* C-style ASKII Octal */
-                ss << "0o" << std::oct << std::noshowbase << value;
+                ss << (i % 2 == 0 ? "0o" : "-0o")  << std::oct << std::noshowbase << (i % 2 == 0 ? value : value * -1);
                 const auto size = Aesi.getString<8>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
@@ -384,7 +384,7 @@ TEST(Signed_Display, ShowBaseUtf) {
                 break;
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
-                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                ss << (i % 2 == 0 ? "0x" : "-0x")  << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
                 const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
@@ -392,7 +392,7 @@ TEST(Signed_Display, ShowBaseUtf) {
                 break;
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
-                ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
+                ss << (i % 2 == 0 ? "0x" : "-0x")  << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
                 const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
@@ -408,7 +408,7 @@ TEST(Signed_Display, ShowBaseUtf) {
                 break;
             }
             default: {   /* C-style ASKII Binary */
-                ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                ss << (i % 2 == 0 ? "0b" : "-0b")  << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
                 for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
                 Aesi.getString<2>(utf.data(), utf.size(), true);

@@ -366,6 +366,7 @@ public:
                     divisor *= -1;
                 }
                 base.operator/=(static_cast<unsigned long long>(divisor));
+                if(base.isZero()) sign = Sign::Zero;
             }
             return *this;
         }
@@ -383,6 +384,7 @@ public:
                 if(divisor < 0)
                     this->inverse();
                 base.operator/=(divisor.base);
+                if(base.isZero()) sign = Sign::Zero;
             }
             return *this;
         }

@@ -4,15 +4,27 @@
 
 TEST(Signed_Division, Basic) {
     Aesi128 one = 1, mOne = -1, zero = 0, ten = 10, two = 2;
-    EXPECT_EQ(one / mOne, 0); EXPECT_EQ(one / zero, 1); EXPECT_EQ(one / ten, 1); EXPECT_EQ(one / two, 1);
-    EXPECT_EQ(mOne / zero, -1); EXPECT_EQ(mOne / ten, -1); EXPECT_EQ(mOne / two, -1);
-    EXPECT_EQ(zero / ten, 0); EXPECT_EQ(zero / two, 0);
-    EXPECT_EQ(ten / two, 0);
+    EXPECT_EQ(one / mOne, -1);
+    EXPECT_EQ(one / zero, 0);
+    EXPECT_EQ(one / ten, 0);
+    EXPECT_EQ(one / two, 0);
+    EXPECT_EQ(mOne / zero, 0);
+    EXPECT_EQ(mOne / ten, 0);
+    EXPECT_EQ(mOne / two, 0);
+    EXPECT_EQ(zero / ten, 0);
+    EXPECT_EQ(zero / two, 0);
+    EXPECT_EQ(ten / two, 5);
 
-    EXPECT_EQ(two / ten, 2); EXPECT_EQ(two / zero, 2); EXPECT_EQ(two / mOne, 0); EXPECT_EQ(two / one, 0);
-    EXPECT_EQ(ten / zero, 10); EXPECT_EQ(ten / mOne, 0); EXPECT_EQ(ten / one, 0);
-    EXPECT_EQ(zero / mOne, 0); EXPECT_EQ(zero / one, 0);
-    EXPECT_EQ(mOne / one, 0);
+    EXPECT_EQ(two / ten, 0);
+    EXPECT_EQ(two / zero, 0);
+    EXPECT_EQ(two / mOne, -2);
+    EXPECT_EQ(two / one, 2);
+    EXPECT_EQ(ten / zero, 0);
+    EXPECT_EQ(ten / mOne, -10);
+    EXPECT_EQ(ten / one, 10);
+    EXPECT_EQ(zero / mOne, 0);
+    EXPECT_EQ(zero / one, 0);
+    EXPECT_EQ(mOne / one, -1);
 }
 
 TEST(Signed_Division, Huge) {

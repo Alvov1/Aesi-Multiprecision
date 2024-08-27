@@ -17,7 +17,7 @@ TEST(Signed_Initialization, Basic) {
             m8 = Aesi128(),
             m9;
         EXPECT_EQ(m0, 0); EXPECT_EQ(m1, 0); EXPECT_EQ(m2, 0); EXPECT_EQ(m3, 0);
-        EXPECT_EQ(m4, 0); EXPECT_EQ(m5, 0); EXPECT_EQ(m6, 0); EXPECT_EQ(m7, 0); EXPECT_EQ(m8, 0); EXPECT_NE(m9, 0);
+        EXPECT_EQ(m4, 0); EXPECT_EQ(m5, 0); EXPECT_EQ(m6, 0); EXPECT_EQ(m7, 0); EXPECT_EQ(m8, 0);
     }
     {
         Aesi128 i01 = 1, i02 = -1, i03 = 127, i04 = -127, i05 = -128, i06 = +127;
@@ -152,7 +152,7 @@ TEST(Signed_Initialization, Decimal) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
-        std::stringstream ss {}; ss << std::dec << (i % 2 == 0 ? "" : "-") << value;
+        std::stringstream ss {}; ss << std::dec << value;
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }
@@ -165,7 +165,7 @@ TEST(Signed_Initialization, Octal) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
-        std::stringstream ss {}; ss << (i % 2 == 0 ? "" : "-") << "0o" << std::oct << value;
+        std::stringstream ss {}; ss << (i % 2 == 0 ? "" : "-") << "0o" << std::oct << (i % 2 == 0 ? value : value * -1);
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }
@@ -180,8 +180,8 @@ TEST(Signed_Initialization, Hexadecimal) {
 
         std::stringstream ss {};
         if(i % 2 == 0)
-            ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::uppercase << value;
-        else ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::nouppercase << value;
+            ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::uppercase << (i % 2 == 0 ? value : value * -1);
+        else ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::nouppercase << (i % 2 == 0 ? value : value * -1);
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }

@@ -31,7 +31,7 @@ TEST(Signed_Modulo, Huge) {
     constexpr auto testsAmount = 2, blocksNumber = 64;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        int first = 0, second = 0;
+        int first, second;
         switch(i % 4) {
         case 0:
             first = 1, second = 1; break;
@@ -57,10 +57,10 @@ TEST(Signed_Modulo, Huge) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
         const auto mod = Generation::getRandom<long long>();
 
-        Aesi<blocksNumber * 32> aeu = value;
-        EXPECT_EQ(aeu % mod, value % mod);
+        Aesi<blocksNumber * 32> aesi = value;
+        EXPECT_EQ(aesi % mod, value % mod);
 
-        aeu %= mod; aeu %= mod;
-        EXPECT_EQ(aeu, value % mod);
+        aesi %= mod; aesi %= mod;
+        EXPECT_EQ(aesi, value % mod);
     }
 }

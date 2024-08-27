@@ -38,29 +38,31 @@ TEST(Signed_Bitwise, GetSetBlock) {
     constexpr auto testsAmount = 2, bitness = 2048;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? -1 : 1) * Generation::getRandomWithBits(bitness - 20);
-        Aesi<bitness> aeu = 1;
+        Aesi<bitness> aesi = 1;
 
         const auto totalBlocks = value.ByteCount() / 4,
                 remainingBytes = value.ByteCount() % 4;
         for (std::size_t j = 0; j < totalBlocks; ++j) {
             uint32_t block = 0;
-            for (std::size_t k = 0; k < 4; ++k) {
-                block |= value.GetByte(j * 4 + k);
+            for (std::size_t k = 0; k < 5; ++k) {
+                const auto byte = static_cast<uint32_t>(value.GetByte((j + 1) * 4 - k));
                 block <<= 8;
+                block |= byte;
             }
-            aeu.setBlock(j, block);
+            aesi.setBlock(j, block);
         }
 
         uint32_t block = 0;
-        for (std::size_t j = 0; j < remainingBytes; ++j) {
-            block |= value.GetByte(totalBlocks * 4 + j);
+        for (std::size_t j = value.ByteCount() - 1; j >= totalBlocks * 4; --j) {
+            const auto byte = static_cast<uint32_t>(value.GetByte(j));
             block <<= 8;
+            block |= byte;
         }
-        aeu.setBlock(totalBlocks, block);
+        aesi.setBlock(totalBlocks, block);
 
-        if(i % 2 == 0) aeu.inverse();
+        if(i % 2 == 0) aesi.inverse();
 
-        EXPECT_EQ(aeu, value);
+        EXPECT_EQ(aesi, value);
     }
 }
 

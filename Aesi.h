@@ -320,10 +320,10 @@ public:
         }
 
         gpu constexpr auto operator*=(const Aesi& factor) noexcept -> Aesi& {
-            if(factor == 0) {
+            if(factor.isZero()) {
                 sign = Sign::Zero;
             } else {
-                if(factor < 0)
+                if(factor.isNegative())
                     this->inverse();
                 base.operator*=(factor.base);
             }
@@ -378,10 +378,10 @@ public:
          * @note Undefined behaviour for division by zero
          */
         gpu constexpr auto operator/=(const Aesi& divisor) noexcept -> Aesi& {
-            if(divisor == 0) {
+            if(divisor.isZero()) {
                 sign = Sign::Zero;
             } else {
-                if(divisor < 0)
+                if(divisor.isNegative())
                     this->inverse();
                 base.operator/=(divisor.base);
                 if(base.isZero()) sign = Sign::Zero;
@@ -415,7 +415,7 @@ public:
             if(modulo.isZero())
                 return *this;
 
-            if(modulo < 0)
+            if(modulo.isNegative())
                 this->inverse();
             base.operator%=(modulo.base);
             if(base.isZero())
@@ -676,6 +676,20 @@ public:
      */
     [[nodiscard]]
     gpu constexpr auto isZero() const noexcept -> bool { return sign == Sign::Zero; }
+
+    /**
+     * @brief Check whether number is positive
+     * @return Boolean: true if the number is positive and false otherwise
+     */
+    [[nodiscard]]
+    gpu constexpr auto isPositive() const noexcept -> bool { return sign == Sign::Positive; }
+
+    /**
+     * @brief Check whether number is negative
+     * @return Boolean: true if the number is negative and false otherwise
+     */
+    [[nodiscard]]
+    gpu constexpr auto isNegative() const noexcept -> bool { return sign == Sign::Negative; }
 
     /**
      * @brief Get number of non-empty blocks inside object starting from the right

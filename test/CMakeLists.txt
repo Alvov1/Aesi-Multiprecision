@@ -40,7 +40,7 @@ if (PREPROCESSOR_PRE_CPP_20)
     add_definitions(-DPRE_CPP_20=1)
 endif (PREPROCESSOR_PRE_CPP_20)
 
-target_link_libraries(AesiMultiprecision GTest::gtest_main cryptopp PkgConfig::GMP)
+target_link_libraries(AesiMultiprecision PUBLIC GTest::gtest_main cryptopp PkgConfig::GMP)
 target_include_directories(AesiMultiprecision PUBLIC PkgConfig::GMP)
 
 include(GoogleTest)

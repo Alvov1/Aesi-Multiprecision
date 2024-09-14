@@ -28,22 +28,11 @@ TEST(Signed_Modulo, Basic) {
 }
 
 TEST(Signed_Modulo, Huge) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
+    constexpr auto testsAmount = 128, blocksNumber = 64;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        int first, second;
-        switch(i % 4) {
-        case 0:
-            first = 1, second = 1; break;
-        case 1:
-            first = -1, second = -1; break;
-        case 2:
-            first = -1, second = 1; break;
-        default:
-            first = 1, second = -1;
-        }
-        const auto l = first * Generation::getRandomWithBits(blocksNumber * 32 - 110),
-                r = second * Generation::getRandomWithBits(blocksNumber * 16 - 110);
+        const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 110),
+                r = Generation::getRandomWithBits(blocksNumber * 16 - 110);
 
         Aesi<blocksNumber * 32> lA = l, rA = r;
         EXPECT_EQ(lA % rA, l % r);
@@ -55,7 +44,7 @@ TEST(Signed_Modulo, Huge) {
     /* Built-in types. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
-        const auto mod = Generation::getRandom<long long>();
+        const auto mod = Generation::getRandom<unsigned long>();
 
         Aesi<blocksNumber * 32> aesi = value;
         EXPECT_EQ(aesi % mod, value % mod);

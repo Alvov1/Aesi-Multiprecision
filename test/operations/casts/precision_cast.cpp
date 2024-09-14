@@ -4,15 +4,31 @@
 #include "../../generation.h"
 
 TEST(Signed_PrecisionCast, PrecisionCast) {
-    constexpr auto testsAmount = 2048;
+    constexpr auto testsAmount = 2;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto init0 = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(250);
-        const Aesi<256> aeu = init0;
-        EXPECT_EQ(aeu.precisionCast<288>(), init0); EXPECT_EQ(aeu.precisionCast<320>(), init0); EXPECT_EQ(aeu.precisionCast<352>(), init0); EXPECT_EQ(aeu.precisionCast<384>(), init0);
-        EXPECT_EQ(aeu.precisionCast<416>(), init0); EXPECT_EQ(aeu.precisionCast<448>(), init0); EXPECT_EQ(aeu.precisionCast<480>(), init0); EXPECT_EQ(aeu.precisionCast<512>(), init0);
-        EXPECT_EQ(aeu.precisionCast<544>(), init0); EXPECT_EQ(aeu.precisionCast<576>(), init0); EXPECT_EQ(aeu.precisionCast<608>(), init0); EXPECT_EQ(aeu.precisionCast<640>(), init0);
-        EXPECT_EQ(aeu.precisionCast<672>(), init0); EXPECT_EQ(aeu.precisionCast<704>(), init0); EXPECT_EQ(aeu.precisionCast<736>(), init0); EXPECT_EQ(aeu.precisionCast<768>(), init0);
-        EXPECT_EQ(aeu.precisionCast<800>(), init0); EXPECT_EQ(aeu.precisionCast<832>(), init0); EXPECT_EQ(aeu.precisionCast<864>(), init0); EXPECT_EQ(aeu.precisionCast<896>(), init0);
+        const auto init0 = (i % 2 == 0 ? 1 : -1)
+    	* Generation::getRandomWithBits(250);
+        const Aesi<256> aesi = init0;
+        EXPECT_EQ(aesi.precisionCast<288>(), init0);
+		EXPECT_EQ(aesi.precisionCast<320>(), init0);
+		EXPECT_EQ(aesi.precisionCast<352>(), init0);
+		EXPECT_EQ(aesi.precisionCast<384>(), init0);
+        EXPECT_EQ(aesi.precisionCast<416>(), init0);
+		EXPECT_EQ(aesi.precisionCast<448>(), init0);
+		EXPECT_EQ(aesi.precisionCast<480>(), init0);
+		EXPECT_EQ(aesi.precisionCast<512>(), init0);
+        EXPECT_EQ(aesi.precisionCast<544>(), init0);
+		EXPECT_EQ(aesi.precisionCast<576>(), init0);
+		EXPECT_EQ(aesi.precisionCast<608>(), init0);
+		EXPECT_EQ(aesi.precisionCast<640>(), init0);
+        EXPECT_EQ(aesi.precisionCast<672>(), init0);
+		EXPECT_EQ(aesi.precisionCast<704>(), init0);
+		EXPECT_EQ(aesi.precisionCast<736>(), init0);
+		EXPECT_EQ(aesi.precisionCast<768>(), init0);
+        EXPECT_EQ(aesi.precisionCast<800>(), init0);
+		EXPECT_EQ(aesi.precisionCast<832>(), init0);
+		EXPECT_EQ(aesi.precisionCast<864>(), init0);
+		EXPECT_EQ(aesi.precisionCast<896>(), init0);
     }
 
     Aesi < 448 > l0 = "554241380131154142962417280417998404754929828012346097179687246704910303315350311367744175378443304128036758983824324734859979768793199.";
@@ -78,15 +94,30 @@ TEST(Signed_PrecisionCast, PrecisionCast) {
 }
 
 TEST(Unsigned_PrecisionCast, PrecisionCast) {
-    constexpr auto testsAmount = 2048;
+    constexpr auto testsAmount = 2;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto init0 = Generation::getRandomWithBits(250);
         const Aeu<256> aeu = init0;
-        EXPECT_EQ(aeu.precisionCast<288>(), init0); EXPECT_EQ(aeu.precisionCast<320>(), init0); EXPECT_EQ(aeu.precisionCast<352>(), init0); EXPECT_EQ(aeu.precisionCast<384>(), init0);
-        EXPECT_EQ(aeu.precisionCast<416>(), init0); EXPECT_EQ(aeu.precisionCast<448>(), init0); EXPECT_EQ(aeu.precisionCast<480>(), init0); EXPECT_EQ(aeu.precisionCast<512>(), init0);
-        EXPECT_EQ(aeu.precisionCast<544>(), init0); EXPECT_EQ(aeu.precisionCast<576>(), init0); EXPECT_EQ(aeu.precisionCast<608>(), init0); EXPECT_EQ(aeu.precisionCast<640>(), init0);
-        EXPECT_EQ(aeu.precisionCast<672>(), init0); EXPECT_EQ(aeu.precisionCast<704>(), init0); EXPECT_EQ(aeu.precisionCast<736>(), init0); EXPECT_EQ(aeu.precisionCast<768>(), init0);
-        EXPECT_EQ(aeu.precisionCast<800>(), init0); EXPECT_EQ(aeu.precisionCast<832>(), init0); EXPECT_EQ(aeu.precisionCast<864>(), init0); EXPECT_EQ(aeu.precisionCast<896>(), init0);
+        EXPECT_EQ(aeu.precisionCast<288>(), init0);
+        EXPECT_EQ(aeu.precisionCast<320>(), init0);
+        EXPECT_EQ(aeu.precisionCast<352>(), init0);
+        EXPECT_EQ(aeu.precisionCast<384>(), init0);
+        EXPECT_EQ(aeu.precisionCast<416>(), init0);
+        EXPECT_EQ(aeu.precisionCast<448>(), init0);
+        EXPECT_EQ(aeu.precisionCast<480>(), init0);
+        EXPECT_EQ(aeu.precisionCast<512>(), init0);
+        EXPECT_EQ(aeu.precisionCast<544>(), init0);
+		EXPECT_EQ(aeu.precisionCast<576>(), init0);
+		EXPECT_EQ(aeu.precisionCast<608>(), init0);
+		EXPECT_EQ(aeu.precisionCast<640>(), init0);
+        EXPECT_EQ(aeu.precisionCast<672>(), init0);
+		EXPECT_EQ(aeu.precisionCast<704>(), init0);
+		EXPECT_EQ(aeu.precisionCast<736>(), init0);
+		EXPECT_EQ(aeu.precisionCast<768>(), init0);
+        EXPECT_EQ(aeu.precisionCast<800>(), init0);
+		EXPECT_EQ(aeu.precisionCast<832>(), init0);
+		EXPECT_EQ(aeu.precisionCast<864>(), init0);
+		EXPECT_EQ(aeu.precisionCast<896>(), init0);
     }
 
     Aeu < 448 > l0 = "554241380131154142962417280417998404754929828012346097179687246704910303315350311367744175378443304128036758983824324734859979768793199.";

@@ -78,4 +78,7 @@ TEST(Unsigned_Subtraction, Decrement) {
     EXPECT_EQ(test, 0u);
     EXPECT_TRUE(test.isZero());
     EXPECT_LT(test, 1u);
+
+    Aeu<4 * 32> test2 = "0x0000_0001'0000_0000'0000_0000'0000_0000";
+    EXPECT_EQ(--test2,  "0x0000_0000'FFFF_FFFF'FFFF_FFFF'FFFF_FFFF");
 }

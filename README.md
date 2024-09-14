@@ -26,7 +26,7 @@ The goal of this project is to develop a fast and handy multi-precision library 
 Library supports each arithmetic (binary and unary), bitwise, and boolean operations. Various functions from number theory are being added to the library, among which the greatest common divisor, the least common multiplier, and exponentiation by modulo have already been implemented.
 
 ## Installation:
-Library could be downloaded or accessed directly through CMake:
+Package could be downloaded to project's directory, or accessed directly through CMake:
 ```include(FetchContent)
 FetchContent_Declare(AesiMultiprecision
     GIT_REPOSITORY https://github.com/Alvov1/Aesi-Multiprecision.git
@@ -35,7 +35,7 @@ FetchContent_MakeAvailable(AesiMultiprecision)
 ...
 target_include_directories(Target PRIVATE ${AesiMultiprecision_SOURCE_DIR})
 ```
-Further it could be included in project with standard preprocessor command:
+Further library could be included in project with standard preprocessor command:
 > #include <Aeu.h>
 
 ## Usage:

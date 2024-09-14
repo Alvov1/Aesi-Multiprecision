@@ -284,8 +284,13 @@ public:
          * @return Aeu&
          */
         gpu constexpr auto operator++() noexcept -> Aeu& {
-            /* TODO: Change knowing the predetermination of the addendum. */
-            return this->operator+=(1u);
+            for(std::size_t i = 0; i < blocksNumber; ++i) {
+                if(blocks[i] < blockMax) {
+                    ++blocks[i];
+                    break;
+                } else blocks[i] = 0u;
+            }
+            return *this;
         }
 
         /**
@@ -299,8 +304,13 @@ public:
          * @return Aeu&
          */
         gpu constexpr auto operator--() noexcept -> Aeu& {
-            /* TODO: Change knowing the predetermination of the subtrahend. */
-            return this->operator-=(1u);
+            for(std::size_t i = 0; i < blocksNumber; ++i) {
+                if(blocks[i] > 0u) {
+                    --blocks[i];
+                    break;
+                } else blocks[i] = blockMax;
+            }
+            return *this;
         }
 
         /**
@@ -359,16 +369,6 @@ public:
 
     /* ----------------------- @name Subtraction operators. ---------------------- */
         /**
-         * @brief Subtraction operator for built-in integral types
-         * @param subtrahend Unsigned
-         * @return Aeu
-         */
-        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator-(Unsigned subtrahend) const noexcept -> Aeu {
-            Aeu result = *this; result.operator-=(subtrahend); return result;
-        }
-
-        /**
          * @brief Subtraction operator
          * @param subtrahend Aeu
          * @return Aeu
@@ -377,14 +377,6 @@ public:
         gpu constexpr auto operator-(const Aeu& subtrahend) const noexcept -> Aeu {
             Aeu result = *this; result -= subtrahend; return result;
         }
-
-        /**
-         * @brief Assignment subtraction operator for built-in integral types
-         * @param subtrahend Unsigned
-         * @return Aeu&
-         */ /* TODO: Complete */
-//        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-//        gpu constexpr auto operator-=(Unsigned subtrahend) noexcept -> Aeu& { return *this; };
 
         /**
          * @brief Assignment subtraction operator
@@ -496,17 +488,6 @@ public:
 
     /* ------------------------ @name Division operators. ------------------------ */
         /**
-         * @brief Division operator for built-in integral types
-         * @param divisor Unsigned
-         * @return Aeu
-         * @note Undefined behaviour for division by zero
-         */
-        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator/(Unsigned divisor) const noexcept -> Aeu {
-            Aeu result = *this; result.operator/=(divisor); return result;
-        }
-
-        /**
          * @brief Division operator
          * @param divisor Aeu
          * @return Aeu
@@ -516,15 +497,6 @@ public:
         gpu constexpr auto operator/(const Aeu& divisor) const noexcept -> Aeu {
             Aeu quotient, _; divide(*this, divisor, quotient, _); return quotient;
         }
-
-        /**
-         * @brief Assignment division operator for built-in integral types
-         * @param divisor Unsigned
-         * @return Aeu&
-         * @note Undefined behaviour for division by zero
-         */ /* TODO: Complete */
-//        template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-//        gpu constexpr auto operator/=(Unsigned divisor) noexcept -> Aeu& { return *this; };
 
         /**
          * @brief Assignment division operator
@@ -540,14 +512,6 @@ public:
 
     /* ------------------------- @name Modulo operators. ------------------------- */
         /**
-         * @brief Modulo operator for built-in integral types
-         * @param modulo Unsigned
-         * @return Aeu
-         */
-        // template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        // gpu constexpr auto operator%(Unsigned modulo) const noexcept -> Aeu { return integralCast<Unsigned>() % modulo; }
-
-        /**
          * @brief Modulo operator
          * @param modulo Aeu
          * @return Aeu
@@ -556,14 +520,6 @@ public:
         gpu constexpr auto operator%(const Aeu& modulo) const noexcept -> Aeu {
             Aeu _, remainder; divide(*this, modulo, _, remainder); return remainder;
         }
-
-        /**
-         * @brief Assignment modulo operator for built-in integral types
-         * @param modulo Unsigned
-         * @return Aeu&
-         */
-        // template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        // gpu constexpr auto operator%=(Unsigned modulo) noexcept -> Aeu& { return this->operator=(integralCast<Unsigned>() % modulo); }
 
         /**
          * @brief Assignment modulo operator
@@ -1075,7 +1031,6 @@ public:
      * @return Quotient and remainder by reference
      */
     gpu static constexpr auto divide(const Aeu& number, const Aeu& divisor, Aeu& quotient, Aeu& remainder) noexcept -> void {
-        /* TODO Попробовать ускорить divide для работы со встроенными типами. */
         const auto ratio = number.compareTo(divisor);
 
         quotient = Aeu {}; remainder = Aeu {};
@@ -1458,11 +1413,11 @@ public:
      */
     template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
     gpu constexpr auto precisionCast() const noexcept -> Aeu<newBitness> {
-        Aeu<newBitness> result;
+        Aeu<newBitness> result {};
 
-        const std::size_t blockBoarder = (newBitness > bitness ? Aeu<bitness>::blocksNumber : Aeu<newBitness>::totalBlocksNumber());
+        const std::size_t blockBoarder = (newBitness > bitness ? Aeu<bitness>::totalBlocksNumber() : Aeu<newBitness>::totalBlocksNumber());
         for(std::size_t blockIdx = 0; blockIdx < blockBoarder; ++blockIdx)
-            result.setBlock(blockIdx, blocks[blockIdx]);
+            result.setBlock(blockIdx, getBlock(blockIdx));
 
         return result;
     }

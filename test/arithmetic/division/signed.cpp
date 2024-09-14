@@ -28,10 +28,10 @@ TEST(Signed_Division, Basic) {
 }
 
 TEST(Signed_Division, Huge) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
+    constexpr auto testsAmount = 128, blocksNumber = 64;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        int first = 0, second = 0;
+        int first, second;
         switch(i % 4) {
         case 0:
             first = 1, second = 1; break;
@@ -43,19 +43,25 @@ TEST(Signed_Division, Huge) {
             first = 1, second = -1;
         }
         const auto l = first * Generation::getRandomWithBits(blocksNumber * 32 - 110),
-                r = second * Generation::getRandomWithBits(blocksNumber * 16 - 110);
+        r = second * Generation::getRandomWithBits(blocksNumber * 16 - 110);
 
         Aesi<blocksNumber * 32> lA = l, rA = r;
-        EXPECT_EQ(lA / rA, l / r);
-
-        lA /= rA;
-        EXPECT_EQ(lA, l / r);
+        if(first == 1) {
+            EXPECT_EQ(lA / rA, l / r );
+            lA /= rA;
+            EXPECT_EQ(lA, l / r);
+        } else {
+            auto result = -1 * ((l * -1) / r); // Cryptopp thank you!!!
+            EXPECT_EQ(lA / rA, result);
+            lA /= rA;
+            EXPECT_EQ(lA, result);
+        }
     }
 
     /* Built-in types. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
-        const auto mod = Generation::getRandom<long long>();
+        const auto mod = Generation::getRandom<unsigned long>();
 
         Aesi<blocksNumber * 32> aeu = value;
         EXPECT_EQ(aeu / mod, value / mod);

@@ -176,12 +176,6 @@ public:
             }
 
             if(sign == Sign::Positive) { /* Positive += Negative; */
-                /*  +       -
-                 * 100 + (-80) -> 20
-                 * 100 + (-150) -> -50
-                 * 100 + (-100) -> 0
-                 * TODO: REMOVE COMMENT
-                 */
                 const auto ratio = base.compareTo(addendum.base);
                 switch(ratio) {
                     case Comparison::greater: {
@@ -199,12 +193,6 @@ public:
                     }
                 }
             } else { /* Negative += Positive; */
-                /*    -      +
-                 * (-150) + 100 -> -50
-                 * (-80) + 100 -> 20
-                 * (-100) + 100 -> 0
-                 * TODO: REMOVE COMMENT
-                 */
                 const auto ratio = base.compareTo(addendum.base);
                 switch(ratio) {
                     case Comparison::greater: {
@@ -240,12 +228,6 @@ public:
 
             if(sign == Sign::Positive) {
                 if(subtrahend.sign == Sign::Positive) { /* Positive -= Positive; */
-                    /*  +       +
-                     * 100 - (80) -> 20
-                     * 100 - (150) -> -50
-                     * 100 - (100) -> 0
-                     * TODO: REMOVE COMMENT
-                     */
                     const auto ratio = base.compareTo(subtrahend.base);
                     switch(ratio) {
                         case Comparison::greater: {
@@ -268,12 +250,6 @@ public:
                 }
             } else {
                 if(subtrahend.sign == Sign::Negative) { /* Negative -= Negative; */
-                    /*    -      -
-                     * (-150) - (-100) -> -50
-                     * (-80) - (-100) -> 20
-                     * (-100) - (-100) -> 0
-                     * TODO: REMOVE COMMENT
-                     */
                     const auto ratio = base.compareTo(subtrahend.base);
                     switch(ratio) {
                         case Comparison::greater: {
@@ -492,34 +468,32 @@ public:
             if(value.isZero()) {
                 switch(sign) {
                     case Sign::Positive:
-                        return Comparison::greater;
+                        return Comparison::greater;             // Positive > 0
                     case Sign::Negative:
-                        return Comparison::less;
+                        return Comparison::less;                // Negative < 0
                     default:
-                        return Comparison::equal;
+                        return Comparison::equal;               // 0 == 0
                 }
-            } else if(value < 0) {
+            } else if(value.isNegative()) {
                 switch(sign) {
                     case Sign::Negative:
                         switch(base.compareTo(value.base)) {
                             case Comparison::greater:
-                                return Comparison::less;
+                                return Comparison::less;        // -100 < -20
                             case Comparison::less:
-                                return Comparison::greater;
+                                return Comparison::greater;     // -20 > -100
                             default:
-                                return Comparison::equal;
+                                return Comparison::equal;       // -30 == -30
                         }
-                    case Sign::Positive:    // + > -
-                        default:            // 0 > -
-                            return Comparison::greater;
+                    default:                                    // 0 > Negative
+                        return Comparison::greater;             // Positive > Negative
                 }
             } else {
                 switch(sign) {
                     case Sign::Positive:
                         return base.compareTo(value.base);
-                    case Sign::Negative:    // - < +
-                        default:            // 0 < +
-                            return Comparison::less;
+                    default:                                    // 0 < Positive
+                            return Comparison::less;            // Negative < Positive
                 }
             }
         }

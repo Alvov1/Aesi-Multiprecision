@@ -96,5 +96,8 @@ TEST(Unsigned_Addition, Increment) {
     EXPECT_EQ(test, 1u);
     EXPECT_FALSE(test.isZero());
     EXPECT_GT(test, 0u);
+
+    Aeu<4 * 32> test2 = "0x0000_0000'FFFF_FFFF'FFFF_FFFF'FFFF_FFFF";
+    EXPECT_EQ(++test2,  "0x0000_0001'0000_0000'0000_0000'0000_0000");
 }
 

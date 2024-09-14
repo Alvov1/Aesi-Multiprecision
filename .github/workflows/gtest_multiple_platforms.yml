@@ -1,0 +1,56 @@
+name: Running GTest on multiple platforms
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os: [ubuntu-latest]
+        build_type: [Release]
+        c_compiler: [gcc, clang, cl]
+        include:
+          - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+        exclude:
+          - os: ubuntu-latest
+            c_compiler: cl
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GTest
+        run: sudo apt-get install libgtest-dev
+
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/test/gtest_cmake_build_release" >> "$GITHUB_OUTPUT"
+
+      - name: Configure
+        run: >
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -S ${{ github.workspace }}/test
+
+      - name: Build
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --target AesiMultiprecision -j 8
+
+      - name: Run generated tests
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: /${{ steps.strings.outputs.build-output-dir }}/AesiMultiprecision --gtest_filter=* --gtest_color=no

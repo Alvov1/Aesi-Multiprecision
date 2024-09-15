@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <bitset>
 
 #ifndef AESI_CRYPTOPP_INTEGRATION
 #define AESI_CRYPTOPP_INTEGRATION

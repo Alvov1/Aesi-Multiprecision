@@ -5,7 +5,7 @@
 #include "../../Aeu.h"
 
 /* Creator: Alexander Lvov
- * Details: Basic Pollard's (P-1) algorithm for integral factoring.
+ * Details: Pollard's (P-1) algorithm for integral factoring.
  * Uses: Unsigned multiplication, division, modular exponentiation and GCD. */
 
 using primeType = unsigned short;

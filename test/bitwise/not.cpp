@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <format>
 #include "../../Aeu.h"
 #include "../../Aesi.h"
 #include "../generation.h"
@@ -12,7 +11,10 @@ TEST(Unsigned_Bitwise, NOT) {
             value <<= (blocksNumber * 32 - value.BitCount());
 
         std::stringstream ss {};
-        ss << std::format("0b{:b}", static_cast<uint8_t>(~value.GetByte(value.ByteCount() - 1)));
+        std::string binary {};
+        for (auto byte = static_cast<uint8_t>(~value.GetByte(value.ByteCount() - 1)); byte; byte >>= 1)
+            binary += (byte & 1 ? '1' : '0');
+        ss << "0b" << std::string(binary.rbegin(), binary.rend());
         for(long long j = value.ByteCount() - 2; j >= 0; --j)
             ss << std::bitset<8>(~value.GetByte(j));
 

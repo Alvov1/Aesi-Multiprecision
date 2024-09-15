@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <bitset>
-#include <format>
 #include "../../../Aeu.h"
 #include "../../generation.h"
 
@@ -86,7 +85,10 @@ TEST(Unsigned_Initialization, Binary) {
         record = value; EXPECT_EQ(record, value);
 
         std::stringstream ss {};
-        ss << "0b" << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
+        std::string binary {};
+        for (auto byte = value.GetByte(value.ByteCount() - 1); byte; byte >>= 1)
+            binary += (byte & 1 ? '1' : '0');
+        ss << "0b" << std::string(binary.rbegin(), binary.rend());
         for(long long j = value.ByteCount() - 2; j >= 0; --j)
             ss << std::bitset<8>(value.GetByte(j));
         record = ss.str(); EXPECT_EQ(record, value);

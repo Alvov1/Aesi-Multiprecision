@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <bitset>
-#include <format>
 #include "../../../Aesi.h"
 #include "../../generation.h"
 
@@ -136,8 +135,11 @@ TEST(Signed_Initialization, Binary) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
+        std::string binary {};
+        for (auto byte = value.GetByte(value.ByteCount() - 1); byte; byte >>= 1)
+            binary += (byte & 1 ? '1' : '0');
         std::stringstream ss {};
-        ss << (i % 2 == 0 ? "" : "-") << "0b" << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
+        ss << (i % 2 == 0 ? "" : "-") << "0b" << std::string(binary.rbegin(), binary.rend());
         for(long long j = value.ByteCount() - 2; j >= 0; --j)
             ss << std::bitset<8>(value.GetByte(j));
         record = ss.str(); EXPECT_EQ(record, value);

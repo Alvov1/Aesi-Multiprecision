@@ -2,7 +2,7 @@ name: Speed comparison with other libraries
 
 on:
   push:
-    branches: [ "main", "ci" ]
+    branches: [ "main", "test" ]
   pull_request:
     branches: [ "main" ]
 

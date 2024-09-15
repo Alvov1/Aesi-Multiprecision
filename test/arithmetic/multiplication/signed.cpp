@@ -40,7 +40,7 @@ TEST(Signed_Multiplication, Basic) {
 }
 
 TEST(Signed_Multiplication, Huge) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
+    constexpr auto testsAmount = 2048, blocksNumber = 64;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         int first = 0, second = 0;
@@ -67,7 +67,7 @@ TEST(Signed_Multiplication, Huge) {
     /* Built-in types. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
-        const auto factor = Generation::getRandom<unsigned long>();
+        const auto factor = Generation::getRandom<unsigned>();
 
         Aesi<blocksNumber * 32> aeu = value;
         EXPECT_EQ((aeu * factor) * factor, (value * factor) * factor);

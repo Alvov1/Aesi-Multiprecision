@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <format>
 
 #ifndef AESI_CRYPTOPP_INTEGRATION
 #define AESI_CRYPTOPP_INTEGRATION
@@ -174,7 +173,10 @@ TEST(Unsigned_Display, FormatAskii) {
                 break;
             }
             default: {  /* Binary */
-                ss << std::format("{:b}", value.GetByte(value.ByteCount() - 1));
+                std::string binary {};
+                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                    binary += (byte & 1 ? '1' : '0');
+                ss << std::string(binary.rbegin(), binary.rend());
                 for(long long j = value.ByteCount() - 2; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
                 aeu.getString<2>(askii.data(), askii.size(), false);
@@ -224,7 +226,10 @@ TEST(Unsigned_Display, FormatUtf) {
                 break;
             }
             default: {  /* Binary */
-                ss << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                std::string binary {};
+                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                    binary += (byte & 1 ? '1' : '0');
+                ss << std::string(binary.rbegin(), binary.rend());
                 for (long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
                 aeu.getString<2>(utf.data(), utf.size(), false);
@@ -309,7 +314,10 @@ TEST(Unsigned_Display, ShowBaseAskii) {
                 break;
             }
             default: {   /* C-style ASKII Binary */
-                ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                std::string binary {};
+                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                    binary += (byte & 1 ? '1' : '0');
+                ss << "0b" << std::string(binary.rbegin(), binary.rend());
                 for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
                 aeu.getString<2>(askii.data(), askii.size(), true);
@@ -408,7 +416,10 @@ TEST(Unsigned_Display, ShowBaseUtf) {
                 break;
             }
             default: {   /* C-style ASKII Binary */
-                ss << "0b" << std::format("{:b}", value.GetByte((value.BitCount() - 1) / 8));
+                std::string binary {};
+                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                    binary += (byte & 1 ? '1' : '0');
+                ss << "0b" << std::string(binary.rbegin(), binary.rend());
                 for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
                     ss << std::bitset<8>(value.GetByte(j));
                 aeu.getString<2>(utf.data(), utf.size(), true);

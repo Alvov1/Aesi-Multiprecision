@@ -10,12 +10,17 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(googletest)
 
-find_package (SQLite3)
-
 enable_testing()
 
 file(GLOB Tests *.cpp)
-add_executable(AesiMultiprecision ${Tests} ../Aesi.h)
+add_executable(AesiMultiprecision ${Tests} ../Aesi.h
+        speed_comparison/addition.cpp
+        speed_comparison/multiplication.cpp
+        speed_comparison/subtraction.cpp
+        speed_comparison/division.cpp
+        speed_comparison/powm.cpp
+        speed_comparison/gcd.cpp
+)
 add_subdirectory(arithmetic)
 add_subdirectory(operations)
 add_subdirectory(bitwise)

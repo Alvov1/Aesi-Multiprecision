@@ -4,7 +4,7 @@
 #include <gmpxx.h>
 #include "../../Aesi.h"
 
-constexpr char difference[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf89884aac215f37c6418b2735a3e50e0889fac0c3ea61d"
+constexpr char division[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf89884aac215f37c6418b2735a3e50e0889fac0c3ea61d"
                             "bc829d3919e94bf714f521969e75e15f570f870ef5e086add27842cfc8cafd321d038354a97e152c0ea74df004"
                             "0a2210f92c0b71aaded40c0a1bef125c2d187a2e8ea2cbfcc4664da71734ea5683da6de60ec5a2be9374608a64"
                             "9ff89756a4f65fd78af3c3744d886a87bfc95a7ea6fdd267b64ca69f4e87d1c7f83f77aee7dc328713778f330e"
@@ -28,25 +28,25 @@ constexpr char difference[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf8988
                             "921cb77ac656f22ec33354252dc017ad31e6df7204cbdb7c73a35857d5dd520d4c6db2d1ac33a8f54ccd362837"
                             "681484de652e54eda7516e72767e6e9ac8debb68497b07dbb45c1bdb97ed6b0dbbe503";
 
-constexpr char subtrahend[] = "0x55c5374ad14e5c9bff62109df3100124f654bb11ef8fbdcc93e892fde002a462";
+constexpr char divisor[] = "0x55c5374ad14e5c9bff62109df3100124f654bb11ef8fbdcc93e892fde002a462";
 
-TEST(Subtraction, CryptoPP) {
-    Aesi<8192> left (difference), right (subtrahend);
-    for (std::size_t i = 0; i < 10'000'000; ++i)
-        left -= right;
-    if(left.isZero()) std::cout << '1';
+TEST(Modulo, CryptoPP) {
+    Aesi<8192> left (division), right (divisor), _ {};
+    for(std::size_t i = 0; i < 1024 * 16384; i += 16384)
+        _ = left % (right + i);
+    if(_.isZero()) std::cout << '1';
 }
 
-TEST(Subtraction, GMP) {
-    mpz_class left (difference), right (subtrahend);
-    for (std::size_t i = 0; i < 10'000'000; ++i)
-        left -= right;
-    if(left == 0) std::cout << '1';
+TEST(Modulo, GMP) {
+    mpz_class left (division), right (divisor), _ {};
+    for(std::size_t i = 0; i < 1024 * 16384; i += 16384)
+        _ = left % (right + i);
+    if(_ == 0) std::cout << '1';
 }
 
-TEST(Subtraction, Aesi) {
-    CryptoPP::Integer left (difference), right (subtrahend);
-    for (std::size_t i = 0; i < 10'000'000; ++i)
-        left -= right;
-    if(left.IsZero()) std::cout << '1';
+TEST(Modulo, Aesi) {
+    CryptoPP::Integer left (division), right (divisor), _ {};
+    for(long long i = 0; i < 1024 * 16384; i += 16384)
+        _ = left % (right + i);
+    if(_.IsZero()) std::cout << '1';
 }

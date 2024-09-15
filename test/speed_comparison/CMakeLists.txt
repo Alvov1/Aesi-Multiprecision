@@ -25,7 +25,8 @@ enable_testing()
 set(GTEST_OUTPUT "xml:output.xml")
 
 file(GLOB Tests *.cpp)
-add_executable(SpeedComparison ${Tests})
+add_executable(SpeedComparison ${Tests}
+        modulo.cpp)
 
 target_link_libraries(SpeedComparison GTest::gtest_main cryptopp PkgConfig::GMP)
 target_include_directories(SpeedComparison PUBLIC PkgConfig::GMP)

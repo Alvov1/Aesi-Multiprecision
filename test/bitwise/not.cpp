@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <bitset>
 #include "../../Aeu.h"
 #include "../../Aesi.h"
 #include "../generation.h"

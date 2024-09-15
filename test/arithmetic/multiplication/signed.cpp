@@ -67,7 +67,7 @@ TEST(Signed_Multiplication, Huge) {
     /* Built-in types. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
-        const auto factor = Generation::getRandom<long long>();
+        const auto factor = Generation::getRandom<unsigned long>();
 
         Aesi<blocksNumber * 32> aeu = value;
         EXPECT_EQ((aeu * factor) * factor, (value * factor) * factor);

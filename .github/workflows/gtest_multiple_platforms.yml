@@ -1,4 +1,4 @@
-name: Running GTest on multiple platforms
+name: GTest
 
 on:
   push:

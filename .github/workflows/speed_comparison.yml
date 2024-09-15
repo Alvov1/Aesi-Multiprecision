@@ -1,0 +1,43 @@
+name: Speed comparison with other libraries
+
+on:
+  push:
+    branches: [ "main", "ci" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GTest
+        run: sudo apt-get install libgtest-dev
+
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/test/speed_comparison/cmake_build_release" >> "$GITHUB_OUTPUT"
+
+      - name: Configure
+        run: >
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}
+          -DCMAKE_CXX_COMPILER=g++
+          -DCMAKE_C_COMPILER=gcc
+          -DCMAKE_BUILD_TYPE=Release
+          -S ${{ github.workspace }}/test/speed_comparison
+
+      - name: Build
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --target SpeedComparison -j 8
+
+      - name: Run generated tests
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: /${{ steps.strings.outputs.build-output-dir }}/SpeedComparison --gtest_filter=* --gtest_color=yes --gtest_output=xml:tests.xml
+
+      - name: Generate table with measures
+        working-directory: ${{ steps.strings.outputs.build-output-dir }}
+        run: cat tests.xml
+

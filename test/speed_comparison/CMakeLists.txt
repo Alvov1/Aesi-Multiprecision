@@ -9,16 +9,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-FetchContent_Declare(
-        CryptoPPLib
-        GIT_REPOSITORY https://github.com/abdes/cryptopp-cmake.git
-        GIT_TAG        master
-)
-FetchContent_Populate(CryptoPPLib)
-add_subdirectory(${cryptopplib_SOURCE_DIR})
-
 find_package(PkgConfig)
 pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp)
+
+find_package(cryptopp REQUIRED)
 
 enable_testing()
 

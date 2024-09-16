@@ -16,6 +16,9 @@ jobs:
       - name: Install GTest
         run: sudo apt-get install libgtest-dev
 
+      - name: Install Crypto++
+        run: sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
+
       - name: Set reusable strings
         id: strings
         shell: bash
@@ -35,7 +38,7 @@ jobs:
 
       - name: Run generated tests
         working-directory: ${{ steps.strings.outputs.working_directory }}/cmake-build-release
-        run: /SpeedComparison --gtest_output=xml:tests.xml
+        run: ls && /SpeedComparison --gtest_output=xml:tests.xml
 
       - name: Check for existing XML
         working-directory: ${{ steps.strings.outputs.working_directory }}/cmake-build-release

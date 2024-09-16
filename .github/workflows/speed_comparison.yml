@@ -52,5 +52,11 @@ jobs:
 
       - name: Run Python script
         working-directory: ${{ steps.strings.outputs.working_directory }}
-        run: python plot.py cmake-build-release/tests.xml output.png v1.0.0
+        run: mkdir images && python plot.py cmake-build-release/tests.xml images/tests.png v1.0.0
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./images
 

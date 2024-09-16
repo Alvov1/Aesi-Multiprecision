@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import sys
 import numpy as np
+from datetime import datetime
 
 
 def parse_xml_and_plot(xml_file, output, version):
@@ -35,8 +36,11 @@ def parse_xml_and_plot(xml_file, output, version):
     rects1 = ax.bar(x - width, cryptopp_times, width, capstyle='projecting', label='CryptoPP')
     rects2 = ax.bar(x, gmp_times, width, capstyle='round', label='GMP')
 
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+
     ax.set_ylabel('Time (seconds)')
-    ax.set_title(f'Execution Time {version}\n(generated automatically)')
+    ax.set_title(f'Execution Time {version}\n{dt_string}')
     ax.set_xticks(x)
     ax.set_xticklabels(test_names)
     ax.legend()

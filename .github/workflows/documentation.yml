@@ -37,8 +37,8 @@ jobs:
         run: sudo apt install doxygen && doxygen --version
       - name: Install Graphviz
         run: sudo apt install graphviz
-      - name: Download awesome style
-        run: wget https://raw.githubusercontent.com/jothepro/doxygen-awesome-css/main/doxygen-awesome.css && ls
+#      - name: Download awesome style
+#        run: wget https://raw.githubusercontent.com/jothepro/doxygen-awesome-css/main/doxygen-awesome.css && ls
       - name: Create documentation     
         run: doxygen
       

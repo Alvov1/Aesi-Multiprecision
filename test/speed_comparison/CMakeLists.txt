@@ -20,8 +20,6 @@ add_subdirectory(${cryptopplib_SOURCE_DIR})
 find_package(PkgConfig)
 pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp)
 
-set(GTEST_OUTPUT "xml:tests.xml")
-
 enable_testing()
 
 file(GLOB Tests *.cpp)

@@ -2,7 +2,7 @@ name: Speed comparison
 
 on:
   push:
-    branches: [ "main", "test" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 

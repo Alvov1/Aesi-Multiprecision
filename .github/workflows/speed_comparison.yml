@@ -34,10 +34,12 @@ jobs:
         run: cmake --build ${{ steps.strings.outputs.working_directory }}/cmake-build-release --target SpeedComparison -j 8
 
       - name: Run generated tests
-        run: ${{ steps.strings.outputs.working_directory }}/cmake-build-release/SpeedComparison --gtest_output=xml:tests.xml
+        working-directory: ${{ steps.strings.outputs.working_directory }}/cmake-build-release
+        run: /SpeedComparison --gtest_output=xml:tests.xml
 
       - name: Check for existing XML
-        run: ls ${{ steps.strings.outputs.working_directory }}/cmake-build-release
+        working-directory: ${{ steps.strings.outputs.working_directory }}/cmake-build-release
+        run: ls
 
 #      - name: Set up Python
 #        uses: actions/setup-python@v4

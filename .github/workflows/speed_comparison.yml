@@ -38,7 +38,7 @@ jobs:
 
       - name: Run generated tests
         working-directory: ${{ steps.strings.outputs.working_directory }}/cmake-build-release
-        run: ls && /SpeedComparison --gtest_output=xml:tests.xml
+        run: ls && ./SpeedComparison --gtest_output=xml:tests.xml
 
       - name: Check for existing XML
         working-directory: ${{ steps.strings.outputs.working_directory }}/cmake-build-release

@@ -3,7 +3,7 @@
 #include <cryptopp/integer.h>
 #include <cryptopp/nbtheory.h>
 #include <gmpxx.h>
-#include "../../Aesi.h"
+#include "../../Aeu.h"
 
 constexpr char base[] = "0x5bc934d7d1b1fd4cb5d62afd84e10ad94c030cee0f851155c94d374295228fd11d21119b4ad772673535a6c7f0fc"
                         "15a05458ac2dd14585cd663aeac277d5",
@@ -13,10 +13,10 @@ constexpr char base[] = "0x5bc934d7d1b1fd4cb5d62afd84e10ad94c030cee0f851155c94d3
                           "892041ab6f8f7be9e3b828ff39a4688402";
 
 TEST(Powm, CryptoPP) {
-    Aesi<512> baseA (base), powerA (power), moduloA (modulo), _ {};
-    for (std::size_t i = 0; i < 256 * 5; i += 3)
-        _ = Aesi<512>::powm(baseA + 8192 * i, powerA, moduloA + 16384 * i);
-    if(_.isZero()) std::cout << '1';
+    CryptoPP::Integer baseA (base), powerA (power), moduloA (modulo), _ {};
+    for (long long i = 0; i < 256 * 5; i += 3)
+        _ = CryptoPP::ModularExponentiation(baseA + 8192 * i, powerA, moduloA + 16384 * i);
+    if(_.IsZero()) std::cout << '1';
 }
 
 TEST(Powm, GMP) {
@@ -29,8 +29,8 @@ TEST(Powm, GMP) {
 }
 
 TEST(Powm, Aesi) {
-    CryptoPP::Integer baseA (base), powerA (power), moduloA (modulo), _ {};
-    for (long long i = 0; i < 256 * 5; i += 3)
-        _ = CryptoPP::ModularExponentiation(baseA + 8192 * i, powerA, moduloA + 16384 * i);
-    if(_.IsZero()) std::cout << '1';
+    Aeu<512> baseA (base), powerA (power), moduloA (modulo), _ {};
+    for (std::size_t i = 0; i < 256 * 5; i += 3)
+        _ = Aeu<512>::powm(baseA + 8192 * i, powerA, moduloA + 16384 * i);
+    if(_.isZero()) std::cout << '1';
 }

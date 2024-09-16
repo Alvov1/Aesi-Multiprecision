@@ -2,7 +2,7 @@
 #include <thread>
 #include <cryptopp/integer.h>
 #include <gmpxx.h>
-#include "../../Aesi.h"
+#include "../../Aeu.h"
 
 constexpr char division[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf89884aac215f37c6418b2735a3e50e0889fac0c3ea61d"
                             "bc829d3919e94bf714f521969e75e15f570f870ef5e086add27842cfc8cafd321d038354a97e152c0ea74df004"
@@ -32,10 +32,10 @@ constexpr char divisor[] = "0x55c5374ad14e5c9bff62109df3100124f654bb11ef8fbdcc93
 
 TEST(Division, CryptoPP) {
     for(std::size_t i = 0; i < 40; ++i) {
-        Aesi<8192> base = division, oper = divisor;
+        CryptoPP::Integer base (division), oper (divisor);
         for (std::size_t j = 0; j < 30; ++j)
             base /= oper;
-        if(base.isZero()) std::cout << '1';
+        if(base.IsZero()) std::cout << '1';
     }
 }
 
@@ -50,9 +50,9 @@ TEST(Division, GMP) {
 
 TEST(Division, Aesi) {
     for(std::size_t i = 0; i < 40; ++i) {
-        CryptoPP::Integer base (division), oper (divisor);
+        Aeu<8192> base = division, oper = divisor;
         for (std::size_t j = 0; j < 30; ++j)
             base /= oper;
-        if(base.IsZero()) std::cout << '1';
+        if(base.isZero()) std::cout << '1';
     }
 }

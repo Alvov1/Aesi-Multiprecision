@@ -3,7 +3,7 @@
 #include <cryptopp/integer.h>
 #include <cryptopp/nbtheory.h>
 #include <gmpxx.h>
-#include "../../Aesi.h"
+#include "../../Aeu.h"
 
 
 constexpr char left[] = "0xa24872afd57464d79dfeec239367995f623429772ec032eb3bc9b376d0775c956dcb330a2c4f8f0d001f62fe6e0b"
@@ -26,10 +26,10 @@ constexpr char right[] = "0xdb446efadae5960843e38dbdc26afc0c6d6633d0e3f7983b11d7
                          "ac1cdebf";
 
 TEST(GCD, CryptoPP) {
-    Aesi<4192> leftA (left), rightA (right), _ {};
-    for(std::size_t i = 0; i < 10 * 0x3143cd64e9; i += 0x3143cd64e9)
-        _ = Aesi<4192>::gcd(leftA, rightA + i);
-    if(_.isZero()) std::cout << '1';
+    CryptoPP::Integer leftA (left), rightA (right), _ {};
+    for(long long i = 0; i < 10 * 0x3143cd64e9; i += 0x3143cd64e9)
+        _ = CryptoPP::GCD(leftA, rightA + i);
+    if(_.IsZero()) std::cout << '1';
 }
 
 TEST(GCD, GMP) {
@@ -40,8 +40,8 @@ TEST(GCD, GMP) {
 }
 
 TEST(GCD, Aesi) {
-    CryptoPP::Integer leftA (left), rightA (right), _ {};
-    for(long long i = 0; i < 10 * 0x3143cd64e9; i += 0x3143cd64e9)
-        _ = CryptoPP::GCD(leftA, rightA + i);
-    if(_.IsZero()) std::cout << '1';
+    Aeu<4192> leftA (left), rightA (right), _ {};
+    for(std::size_t i = 0; i < 10 * 0x3143cd64e9; i += 0x3143cd64e9)
+        _ = Aeu<4192>::gcd(leftA, rightA + i);
+    if(_.isZero()) std::cout << '1';
 }

@@ -2,7 +2,7 @@
 #include <thread>
 #include <cryptopp/integer.h>
 #include <gmpxx.h>
-#include "../../Aesi.h"
+#include "../../Aeu.h"
 
 constexpr char left[] = "0xa24872afd57464d79dfeec239367995f623429772ec032eb3bc9b376d0775c956dcb330a2c4f8f0d001f62fe6e0b"
                         "2e3b024d8f352522f3aa0ac7fbf05e7e3a2038e4650efb641862969f2437084448a28ff14d9c1e2def670babcf65a8"
@@ -24,12 +24,13 @@ constexpr char right[] = "0xdb446efadae5960843e38dbdc26afc0c6d6633d0e3f7983b11d7
                          "ac1cdebf";
 
 TEST(Multiplication, CryptoPP) {
-    for(std::size_t i = 0; i < 20; ++i) {
-        Aesi<4192> leftA (left), rightA (right), _ {};
-        for(std::size_t j = 0; j < 16384 * 16384; j += 16384)
+    for(std::size_t i = 0; i < 15; ++i) {
+        CryptoPP::Integer leftA (left), rightA (right), _ {};
+        for(long long j = 0; j < 16384 * 16384; j += 16384)
             _ = leftA * (rightA + j);
-        if(_.isZero()) std::cout << '1';
+        if(_.IsZero()) std::cout << '1';
     }
+
 }
 
 TEST(Multiplication, GMP) {
@@ -42,10 +43,10 @@ TEST(Multiplication, GMP) {
 }
 
 TEST(Multiplication, Aesi) {
-    for(std::size_t i = 0; i < 15; ++i) {
-        CryptoPP::Integer leftA (left), rightA (right), _ {};
-        for(long long j = 0; j < 16384 * 16384; j += 16384)
+    for(std::size_t i = 0; i < 20; ++i) {
+        Aeu<4192> leftA (left), rightA (right), _ {};
+        for(std::size_t j = 0; j < 16384 * 16384; j += 16384)
             _ = leftA * (rightA + j);
-        if(_.IsZero()) std::cout << '1';
+        if(_.isZero()) std::cout << '1';
     }
 }

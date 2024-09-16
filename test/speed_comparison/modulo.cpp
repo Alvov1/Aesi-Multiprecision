@@ -2,7 +2,7 @@
 #include <thread>
 #include <cryptopp/integer.h>
 #include <gmpxx.h>
-#include "../../Aesi.h"
+#include "../../Aeu.h"
 
 constexpr char division[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf89884aac215f37c6418b2735a3e50e0889fac0c3ea61d"
                             "bc829d3919e94bf714f521969e75e15f570f870ef5e086add27842cfc8cafd321d038354a97e152c0ea74df004"
@@ -31,10 +31,10 @@ constexpr char division[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf89884a
 constexpr char divisor[] = "0x55c5374ad14e5c9bff62109df3100124f654bb11ef8fbdcc93e892fde002a462";
 
 TEST(Modulo, CryptoPP) {
-    Aesi<8192> left (division), right (divisor), _ {};
-    for(std::size_t i = 0; i < 1024 * 16384; i += 16384)
+    CryptoPP::Integer left (division), right (divisor), _ {};
+    for(long long i = 0; i < 1024 * 16384; i += 16384)
         _ = left % (right + i);
-    if(_.isZero()) std::cout << '1';
+    if(_.IsZero()) std::cout << '1';
 }
 
 TEST(Modulo, GMP) {
@@ -45,8 +45,8 @@ TEST(Modulo, GMP) {
 }
 
 TEST(Modulo, Aesi) {
-    CryptoPP::Integer left (division), right (divisor), _ {};
-    for(long long i = 0; i < 1024 * 16384; i += 16384)
+    Aeu<8192> left (division), right (divisor), _ {};
+    for(std::size_t i = 0; i < 1024 * 16384; i += 16384)
         _ = left % (right + i);
-    if(_.IsZero()) std::cout << '1';
+    if(_.isZero()) std::cout << '1';
 }

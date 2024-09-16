@@ -34,7 +34,7 @@ jobs:
         run: cmake --build ${{ steps.strings.outputs.working_directory }}/cmake-build-release --target SpeedComparison -j 8
 
       - name: Run generated tests
-        run: ${{ steps.strings.outputs.working_directory }}/cmake-build-release/SpeedComparison --gtest_filter=* --gtest_color=yes --gtest_output=xml:tests.xml
+        run: ${{ steps.strings.outputs.working_directory }}/cmake-build-release/SpeedComparison --gtest_filter=* --gtest_color=yes
 
       - name: Set up Python
         uses: actions/setup-python@v4

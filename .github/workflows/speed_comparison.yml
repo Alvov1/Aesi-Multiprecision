@@ -47,6 +47,5 @@ jobs:
           pip install matplotlib numpy
 
       - name: Run Python script
-        working-directory: ${{ steps.strings.outputs.working_wirectory }}
-        run: python plot.py cmake-build-release/tests.xml output.png v1.0.0
+        run: python ${{ steps.strings.outputs.working_directory }}/plot.py ${{ steps.strings.outputs.working_directory }}/cmake-build-release/tests.xml output.png v1.0.0
 

@@ -36,16 +36,19 @@ jobs:
       - name: Run generated tests
         run: ${{ steps.strings.outputs.working_directory }}/cmake-build-release/SpeedComparison --gtest_output=xml:tests.xml
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+      - name: Check for existing XML
+        run: ls ${{ steps.strings.outputs.working_directory }}/cmake-build-release
 
-      - name: Install python packages
-        run: |
-          python -m pip install --upgrade pip
-          pip install matplotlib numpy
-
-      - name: Run Python script
-        run: ls ${{ steps.strings.outputs.working_directory }}/plot.py ${{ steps.strings.outputs.working_directory }}/cmake-build-release && python ${{ steps.strings.outputs.working_directory }}/plot.py ${{ steps.strings.outputs.working_directory }}/cmake-build-release/tests.xml output.png v1.0.0
+#      - name: Set up Python
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: '3.10'
+#
+#      - name: Install python packages
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install matplotlib numpy
+#
+#      - name: Run Python script
+#        run: python ${{ steps.strings.outputs.working_directory }}/plot.py ${{ steps.strings.outputs.working_directory }}/cmake-build-release/tests.xml output.png v1.0.0
 

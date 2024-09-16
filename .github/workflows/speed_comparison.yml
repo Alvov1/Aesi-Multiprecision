@@ -20,22 +20,21 @@ jobs:
         id: strings
         shell: bash
         run: |
-          echo "working_wirectory=${{ github.workspace }}/test/speed_comparison" >> "$GITHUB_OUTPUT"
+          echo "working_directory=${{ github.workspace }}/test/speed_comparison" >> "$GITHUB_OUTPUT"
 
       - name: Configure
         run: >
-          cmake -B ${{ steps.strings.outputs.working_wirectory }}/cmake-build-release
+          cmake -B ${{ steps.strings.outputs.working_directory }}/cmake-build-release
           -DCMAKE_CXX_COMPILER=g++
           -DCMAKE_C_COMPILER=gcc
           -DCMAKE_BUILD_TYPE=Release
           -S ${{ github.workspace }}/test/speed_comparison
 
       - name: Build
-        run: cmake --build ${{ steps.strings.outputs.working_wirectory }}/cmake-build-release --target SpeedComparison -j 8
+        run: cmake --build ${{ steps.strings.outputs.working_directory }}/cmake-build-release --target SpeedComparison -j 8
 
       - name: Run generated tests
-        working-directory: ${{ steps.strings.outputs.working_wirectory }}/cmake-build-release
-        run: /SpeedComparison --gtest_filter=* --gtest_color=yes --gtest_output=xml:tests.xml
+        run: ${{ steps.strings.outputs.working_directory }}/cmake-build-release/SpeedComparison --gtest_filter=* --gtest_color=yes --gtest_output=xml:tests.xml
 
       - name: Set up Python
         uses: actions/setup-python@v4

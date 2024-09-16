@@ -33,6 +33,8 @@ int main() {
     std::array numbers = { Aeu<512>("0x4c6f0a38f6c296d07052b794a02317ce9758855"),       // 0xa9ab4314cf -> 2 × 3^2 × 7 × 1181 × 2083 × 2351
         Aeu<512>("0x14cd01a38ac5c55992acb21ff9665294b30f9ee578393dad147") }; // 0x2fdd8d6ba69 -> 2^3 × 3 × 5 × 647 × 2203 × 19231
 
+    int factorsFound = 0;
+
     for(auto& number: numbers) {
         std::cout << "N = " << std::showbase << std::hex << number << std::endl;
 
@@ -52,11 +54,12 @@ int main() {
                 const auto candidate = Aeu<512>::gcd(base - 1u, number);
                 if(candidate > 1u) {
                     std::cout << "Completed: " << std::showbase << std::hex << candidate << std::endl;
+                    ++factorsFound;
                     break;
                 }
             }
         }
     }
 
-    return 1;
+    return static_cast<int>(numbers.size()) - factorsFound;
 }

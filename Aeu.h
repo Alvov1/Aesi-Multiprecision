@@ -52,7 +52,7 @@ namespace {
 /**
  * @class Aeu
  * @brief Long precision unsigned integer
- * @details May be used to represent only positive integers. For negative use Aesi. Number precision is set in template parameter bitness.
+ * @details May be used to represent only positive integers. Number precision is set in template parameter bitness.
  */
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Aeu final {
@@ -1429,7 +1429,7 @@ public:
     /**
      * @brief Atomicity-oriented object assignment operator
      * @param assigning Aeu
-     * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks.
+     * @note Method itself is not fully-atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for assigning encapsulated class members atomically one by one
      */
     __device__ constexpr auto tryAtomicSet(const Aeu& value) noexcept -> void {
@@ -1440,7 +1440,7 @@ public:
     /**
      * @brief Atomicity-oriented object exchangement operator
      * @param exchangeable Aeu
-     * @note Method itself is not atomic. There may be race conditions between two consecutive atomic calls on number blocks.
+     * @note Method itself is not fully-atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for exchanging encapsulated class members atomically one by one
      */
     __device__ constexpr auto tryAtomicExchange(const Aeu& value) noexcept -> void {

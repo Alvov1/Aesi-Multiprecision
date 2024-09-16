@@ -22,11 +22,8 @@ pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp)
 
 enable_testing()
 
-set(GTEST_OUTPUT "xml:output.xml")
-
 file(GLOB Tests *.cpp)
-add_executable(SpeedComparison ${Tests}
-        modulo.cpp)
+add_executable(SpeedComparison ${Tests})
 
 target_link_libraries(SpeedComparison GTest::gtest_main cryptopp PkgConfig::GMP)
 target_include_directories(SpeedComparison PUBLIC PkgConfig::GMP)

@@ -57,5 +57,5 @@ if __name__ == '__main__':
 
     plt.rcParams['font.size'] = 10
 
-    parse_xml_and_plot(measures, output_image_path, version)
+    parse_xml_and_plot(measures, output_image_path)
 

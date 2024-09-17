@@ -52,7 +52,7 @@ jobs:
 
       - name: Run Python script
         working-directory: ${{ steps.strings.outputs.working_directory }}
-        run: python plot.py cmake-build-release/tests.xml tests.png v1.0.0
+        run: python plot.py cmake-build-release/tests.xml tests.png
 
       - name: Upload a picture
         uses: devicons/public-upload-to-imgur@v2.2.2

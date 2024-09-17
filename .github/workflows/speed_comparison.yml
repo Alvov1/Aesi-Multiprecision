@@ -52,11 +52,23 @@ jobs:
 
       - name: Run Python script
         working-directory: ${{ steps.strings.outputs.working_directory }}
-        run: mkdir images && python plot.py cmake-build-release/tests.xml images/tests.png v1.0.0
+        run: python plot.py cmake-build-release/tests.xml tests.png v1.0.0
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload a picture
+        uses: devicons/public-upload-to-imgur@v2.2.2
+        id: imgur_step
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./images
+          path: ./tests.png
+          client_id: ${{secrets.IMGUR_CLIENT_ID}}
+
+      - name: Comment on the PR about the result
+        uses: github-actions-up-and-running/pr-comment@v1.0.1
+        env:
+          IMG_URL: ${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}
+          MESSAGE: |
+                  Here is the picture that was uploaded:
+                  ![Image]({0}) # markdown syntax for displaying a picture
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          message: ${{format(env.MESSAGE, env.IMG_URL)}}  # add the url into the string
 

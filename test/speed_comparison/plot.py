@@ -5,7 +5,7 @@ import numpy as np
 from datetime import datetime
 
 
-def parse_xml_and_plot(xml_file, output, version):
+def parse_xml_and_plot(xml_file, output):
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
@@ -40,7 +40,7 @@ def parse_xml_and_plot(xml_file, output, version):
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
     ax.set_ylabel('Time (seconds)')
-    ax.set_title(f'Execution Time {version}\n{dt_string}')
+    ax.set_title(f'Execution Time\n{dt_string}')
     ax.set_xticks(x)
     ax.set_xticklabels(test_names)
     ax.legend()
@@ -52,10 +52,8 @@ def parse_xml_and_plot(xml_file, output, version):
 if __name__ == '__main__':
     measures = sys.argv[1]
     output_image_path = sys.argv[2]
-    version = sys.argv[3]
     print(f"Loading measures table from '{measures}'")
     print(f"Output image location '{output_image_path}'")
-    print(f"Version '{version}'")
 
     plt.rcParams['font.size'] = 10
 

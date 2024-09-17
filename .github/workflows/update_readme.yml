@@ -67,7 +67,7 @@ jobs:
 
       - name: Readme - Insert code
         run: |
-          cat ${{ github.workspace }}/test/operations/prezentation.cpp > intermediate.txt
+          cat ${{ github.workspace }}/test/operations/presentation.cpp > intermediate.txt
           sed -n '/{/,$p' intermediate.txt
           sed "/{{ PRESENTATION_SOURCE }}/ { r intermediate.txt; d; }" README.md
 

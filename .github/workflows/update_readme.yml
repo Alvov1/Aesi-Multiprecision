@@ -16,8 +16,9 @@ jobs:
       - name: Readme - Insert code
         run: |
           cat ${{ github.workspace }}/test/operations/presentation.cpp > intermediate.txt
-          sed -n '/#/,/.*/g' intermediate.txt
-          sed "/{{ PRESENTATION_SOURCE }}/ { r intermediate.txt; d; }" README.md
+          sed -n '/#/,/.*{/g' intermediate.txt
+          sed -n '/}/,//g' intermediate.txt
+#          sed "/{{ PRESENTATION_SOURCE }}/ { r intermediate.txt; d; }" README.md
           cat README.md
 
       - name: Install GTest

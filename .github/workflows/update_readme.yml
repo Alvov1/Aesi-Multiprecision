@@ -64,13 +64,15 @@ jobs:
       - name: Readme - Insert image
         run: |
           sed -i "s|{{ IMAGE_PATH }}|${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}|" README.md
+          cat README.md
 
       - name: Readme - Insert code
         run: |
           cat ${{ github.workspace }}/test/operations/presentation.cpp > intermediate.txt
           sed -n '/#/,/.*{/g' intermediate.txt
-          sed -n '/}/,//g' intermediate.txt
+#          sed -n '/}/,//g' intermediate.txt
           sed "/{{ PRESENTATION_SOURCE }}/ { r intermediate.txt; d; }" README.md
+          cat README.md
 
       - name: Commit changes
         run: |

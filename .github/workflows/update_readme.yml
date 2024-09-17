@@ -1,4 +1,4 @@
-name: Speed comparison
+name: Dynamic README update
 
 on:
   push:
@@ -61,9 +61,15 @@ jobs:
           path: ${{ steps.strings.outputs.working_directory }}/tests.png
           client_id: ${{secrets.IMGUR_CLIENT_ID}}
 
-      - name: Insert data into readme
+      - name: Readme - Insert image
         run: |
-          sed -i "s/{{ IMAGE_PATH }}/${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}/" README.md
+          sed -i "s|{{ IMAGE_PATH }}|${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}|" README.md
+
+      - name: Readme - Insert code
+        run: |
+          cat ${{ steps.strings.outputs.working_directory }}/../operations/prezentation.cpp > intermediate.txt
+          sed -n '/{/,$p' intermediate.txt
+          sed "/{{ PRESENTATION_SOURCE }}/ { r intermediate.txt; d; }" README.md
 
       - name: Commit changes
         run: |

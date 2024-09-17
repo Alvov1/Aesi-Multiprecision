@@ -61,14 +61,18 @@ jobs:
           path: ${{ steps.strings.outputs.working_directory }}/tests.png
           client_id: ${{secrets.IMGUR_CLIENT_ID}}
 
-      - name: Comment on the PR about the result
-        uses: github-actions-up-and-running/pr-comment@v1.0.1
-        env:
-          IMG_URL: ${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}
-          MESSAGE: |
-                  Latest test results:
-                  ![Image]({0})
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          message: ${{format(env.MESSAGE, env.IMG_URL)}}
+#      - name: Comment on the PR about the result
+#        uses: github-actions-up-and-running/pr-comment@v1.0.1
+#        env:
+#          IMG_URL: ${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}
+#          MESSAGE: |
+#                  Latest test results:
+#                  ![Image]({0})
+#        with:
+#          repo-token: ${{ secrets.GITHUB_TOKEN }}
+#          message: ${{format(env.MESSAGE, env.IMG_URL)}}
+
+      - name: Update README with image path
+        run: |
+          sed -i "s|{{ IMAGE_PATH }}|${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}|g" README.md
 

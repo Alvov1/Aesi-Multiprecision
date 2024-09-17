@@ -50,20 +50,11 @@ Library supports display operations with STD streams (char and wchar_t based onl
 #include <iostream>
 #include "Aesi.h"
 
-Aesi<1024> factorial(unsigned n) {
-    Aesi<1024> f = 1;
-    for(unsigned i = 2; i <= n; ++i)
-        f *= i;
-    return f;
-}
-
 int main() {
-    Aesi<1024> f50 = factorial(50);
-    std::cout << std::hex << f50 << std::endl;
-    return 0;
+    {{ PRESENTATION_SOURCE }}
 }
 ```
-> 0x49eebc961ed279b02b1ef4f28d19a84f5973a1d2c7800000000000
+> {{ PRESENTATION_ANSWER }}
 
 ### Cuda kernel:
 ```cpp

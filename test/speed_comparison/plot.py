@@ -57,8 +57,7 @@ if __name__ == '__main__':
     print(f"Output image location '{output_image_path}'")
     print(f"Version '{version}'")
 
-    plt.rcParams['font.family'] = 'Times New Roman'
-    plt.rcParams['font.size'] = 12
+    plt.rcParams['font.size'] = 10
 
     parse_xml_and_plot(measures, output_image_path, version)
 

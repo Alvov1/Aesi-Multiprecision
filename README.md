@@ -48,19 +48,14 @@ Library supports display operations with STD streams (char and wchar_t based onl
 ### Host:
 ```cpp
 #include <iostream>
-#include "Aesi.h"
-
-Aesi<1024> factorial(unsigned n) {
-    Aesi<1024> f = 1;
-    for(unsigned i = 2; i <= n; ++i)
-        f *= i;
-    return f;
-}
+#include "Aeu.h"
 
 int main() {
-    Aesi<1024> f50 = factorial(50);
-    std::cout << std::hex << f50 << std::endl;
-    return 0;
+    Aeu<512> f = 1u;
+    for(unsigned i = 2; i <= 50; ++i)
+        f *= i;
+
+    std::cout << std::showbase << std::hex << f << std::endl;
 }
 ```
 > 0x49eebc961ed279b02b1ef4f28d19a84f5973a1d2c7800000000000
@@ -112,9 +107,7 @@ std::cout << Aesi<256>::powm(base, power, modulo) << std::endl; // Fine
 ```
 > 201007033690655614485250957754150944769
 
-## Implementation notes:
-- Sign in bitwise operators depends on the sign of the first operand.
-- The tilde operator (~) does __NOT__ affect the sign of a number.
-- Both bitshift operators do not make any effort if the shift value is greater than the bitness of the number. If the shift is negative, the opposite operator is called with the absolute value of the shift. 
-- Be careful with exponentiation overflow when using the __POWM__ function and similar.  
-- Both display methods (stream operator, getString()) work significantly faster for hexadecimal notation.
+## Issues
+Library is relatively slow in compare to other multiple precision libraries
+<img src="https://dub.sh/jNgf79u" alt="Dynamic Image">
+

@@ -1,10 +1,8 @@
-name: Deploy documentation to Pages
+name: Documentation deployment
 
 on:
   push:
     branches: ["main"]
-  workflow_dispatch:
-
 
 permissions:
   contents: read
@@ -38,7 +36,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: './html/'
       - name: Deploy to GitHub Pages
         id: deployment

@@ -1,0 +1,67 @@
+name: Compares the execution time of the library and its analogues
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GTest
+        run: sudo apt-get install libgtest-dev
+
+      - name: Install Crypto++
+        run: sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
+
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "ci=${{ github.workspace }}/ci" >> "$GITHUB_OUTPUT"
+          echo "gtest_build=${{ github.workspace }}/ci/speed_comparison/cmake-build-release" >> "$GITHUB_OUTPUT"
+
+      - name: Configure
+        run: >
+          cmake -B ${{ steps.strings.outputs.gtest_build }}
+          -DCMAKE_CXX_COMPILER=g++
+          -DCMAKE_C_COMPILER=gcc
+          -DCMAKE_BUILD_TYPE=Release
+          -S ${{ steps.strings.outputs.ci }}/speed_comparison
+
+      - name: Build
+        run: cmake --build ${{ steps.strings.outputs.gtest_build }} --target SpeedComparison -j 8
+
+      - name: Run generated tests
+        working-directory: ${{ steps.strings.outputs.gtest_build }}
+        run: ./SpeedComparison --gtest_output=xml:tests.xml --gtest_color=yes
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib numpy requests
+
+      - name: Run Python script
+        working-directory: ${{ steps.strings.outputs.ci }}
+        run: python make_plot.py speed_comparison/cmake-build-release/tests.xml tests.png
+
+      - name: Upload a picture
+        uses: devicons/public-upload-to-imgur@v2.2.2
+        id: imgur_step
+        with:
+          path: ${{ steps.strings.outputs.ci }}/tests.png
+          client_id: ${{ secrets.IMGUR_CLIENT_ID }}
+
+      - name: Update image link
+        working-directory: ${{ steps.strings.outputs.ci }}
+        run: python update_image_link.py ${{ secrets.DUB_CO_LINK_ID }} ${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }} ${{ secrets.DUB_CO_API_KEY }}
+
+

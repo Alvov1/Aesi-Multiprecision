@@ -1,4 +1,4 @@
-name: Running GTest on multiple platforms
+name: GTest
 
 on:
   push:
@@ -53,4 +53,4 @@ jobs:
 
       - name: Run generated tests
         working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: /${{ steps.strings.outputs.build-output-dir }}/AesiMultiprecision --gtest_filter=* --gtest_color=no
+        run: /${{ steps.strings.outputs.build-output-dir }}/AesiMultiprecision --gtest_filter=* --gtest_color=yes

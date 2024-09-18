@@ -3,6 +3,12 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        default: '1.0.0'
 
 jobs:
   build:

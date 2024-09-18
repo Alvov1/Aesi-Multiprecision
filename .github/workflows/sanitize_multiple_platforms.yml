@@ -1,4 +1,4 @@
-name: GTest
+name: Running sanitizers on multiple platforms
 
 on:
   push:
@@ -31,14 +31,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install GTest
-        run: sudo apt-get install libgtest-dev
-
       - name: Set reusable strings
         id: strings
         shell: bash
         run: |
-          echo "build-output-dir=${{ github.workspace }}/test/gtest_cmake_build_release" >> "$GITHUB_OUTPUT"
+          echo "build-output-dir=${{ github.workspace }}/sanitize/unsigned/cmake_build_release" >> "$GITHUB_OUTPUT"
 
       - name: Configure
         run: >
@@ -46,11 +43,11 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-          -S ${{ github.workspace }}/test
+          -S ${{ github.workspace }}/sanitize/unsigned
 
       - name: Build
-        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --target AesiMultiprecision -j 8
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --target AesiSanitize -j 8
 
-      - name: Run generated tests
+      - name: Run sanitizing application
         working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: /${{ steps.strings.outputs.build-output-dir }}/AesiMultiprecision --gtest_filter=* --gtest_color=yes
+        run: /${{ steps.strings.outputs.build-output-dir }}/AesiSanitize

@@ -18,38 +18,43 @@ Aesi Multiprecision
 
 The goal of this project is to develop a fast and handy multi-precision library that can be used with GPU parallelization frameworks such as CUDA, OpenCL, and Metal. The library should correspond to modern C++ standards, support constexpr expressions, and move semantics.
 
-## Project status
-<u>__Project is currently in the testing and development stage to support the *Cuda* framework. Please be aware that errors and problems may occur.__</u> OpenCL support is next in line for development. Metal support is scheduled after some time, due to the presence of significant differences in the framework from Cuda and OpenCL.
+> [!IMPORTANT]
+> Project is currently in the testing and development stage to support the *Cuda* framework. Please be aware that errors and problems may occur. OpenCL support is next in line for development. Metal support is scheduled after some time, due to the presence of significant differences in the framework from Cuda and OpenCL.
+>
 
 ## Functionality
 Library supports each arithmetic (binary and unary), bitwise, and boolean operations. Various functions from number theory are being added to the library, among which the greatest common divisor, the least common multiplier, and exponentiation by modulo have already been implemented.
 
+## Installation:
+Package could be downloaded to project's directory, or accessed directly through CMake:
+```include(FetchContent)
+FetchContent_Declare(AesiMultiprecision
+    GIT_REPOSITORY https://github.com/Alvov1/Aesi-Multiprecision.git
+    GIT_TAG main)
+FetchContent_MakeAvailable(AesiMultiprecision)
+...
+target_include_directories(Target PRIVATE ${AesiMultiprecision_SOURCE_DIR})
+```
+Further library could be included in project with standard preprocessor command:
+> #include <Aeu.h>
+
 ## Usage:
 The library is a header only to avoid difficulties while building. In this case, it can be used simultaneously in C++ and CUDA projects without changing the file extension from .cu to .cpp and backwards. Library supports an object-oriented style of data management. Class operators are overloaded for use in expressions. The number's bitness is passed to the class object as a template parameter and has a default value of __*512 bits*__. It should be a multiple of 32.
 
-__1. Initialization.__ Number initialization could be done with numbers, strings, string-views, string literals, or library objects with different precision. User-defined string literals are planned to be released in the future.
+Number's initialization could be done with numbers, strings, string-views, string literals, or library objects with different precision. User-defined string literals are planned to be released in the future.
 
-__2. Display.__ Library supports STD streams (char and wchar_t based only), along with stream modifications (std::showbase, std::uppercase, std::hex, std::dec, std::oct). std::format support is planned to be released in the future.
+Library supports display operations with STD streams (char and wchar_t based only), along with stream modifications (std::showbase, std::uppercase, std::hex, std::dec, std::oct). std::format support is planned to be released in the future.
 
 ### Host:
 ```cpp
 #include <iostream>
 #include "Aesi.h"
 
-Aesi<1024> factorial(unsigned n) {
-    Aesi<1024> f = 1;
-    for(unsigned i = 2; i <= n; ++i)
-        f *= i;
-    return f;
-}
-
 int main() {
-    Aesi<1024> f100 = factorial(100);
-    std::cout << std::hex << f100 << std::endl;
-    return 0;
+    {{ PRESENTATION_SOURCE }}
 }
 ```
-> 1b30964ec395dc24069528d54bbda40d16e966ef9a70eb21b5b2943a321cdf10391745570cca9420c6ecb3b72ed2ee8b02ea2735c61a000000000000000000000000
+> {{ PRESENTATION_ANSWER }}
 
 ### Cuda kernel:
 ```cpp
@@ -98,9 +103,7 @@ std::cout << Aesi<256>::powm(base, power, modulo) << std::endl; // Fine
 ```
 > 201007033690655614485250957754150944769
 
-## Implementation notes:
-- Sign in bitwise operators depends on the sign of the first operand.
-- The tilde operator (~) does __NOT__ affect the sign of a number.
-- Both bitshift operators do not make any effort if the shift value is greater than the bitness of the number. If the shift is negative, the opposite operator is called with the absolute value of the shift. 
-- Be careful with exponentiation overflow when using the __POWM__ function and similar.  
-- Both display methods (stream operator, getString()) work significantly faster for hexadecimal notation.
+## Issues
+Library is relatively slow in compare to other multiple precision libraries
+<img src="https://dub.sh/jNgf79u" alt="Dynamic Image">
+

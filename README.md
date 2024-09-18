@@ -48,10 +48,10 @@ Library supports display operations with STD streams (char and wchar_t based onl
 ### Host:
 ```cpp
 #include <iostream>
-#include "Aesi.h"
+#include "Aeu.h"
 
 int main() {
-    Aesi<1024> f = 1;
+    Aeu<512> f = 1u;
     for(unsigned i = 2; i <= 50; ++i)
         f *= i;
 

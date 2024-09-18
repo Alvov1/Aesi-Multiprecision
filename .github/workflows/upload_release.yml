@@ -1,4 +1,4 @@
-name: Uploading a release
+name: Upload a release
 on:
   push:
     tags:

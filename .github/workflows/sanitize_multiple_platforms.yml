@@ -1,4 +1,4 @@
-name: Running sanitizers on multiple platforms
+name: Sanitize on multiple platforms
 
 on:
   push:

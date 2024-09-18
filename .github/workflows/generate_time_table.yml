@@ -1,4 +1,4 @@
-name: Compares the execution time of the library and its analogues
+name: Compare the execution time
 
 on:
   push:

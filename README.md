@@ -27,7 +27,8 @@ Library supports each arithmetic (binary and unary), bitwise, and boolean operat
 
 ## Installation:
 Package could be downloaded to project's directory, or accessed directly through CMake:
-```include(FetchContent)
+```
+include(FetchContent)
 FetchContent_Declare(AesiMultiprecision
     GIT_REPOSITORY https://github.com/Alvov1/Aesi-Multiprecision.git
     GIT_TAG main)

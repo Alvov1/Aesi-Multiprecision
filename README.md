@@ -51,10 +51,14 @@ Library supports display operations with STD streams (char and wchar_t based onl
 #include "Aesi.h"
 
 int main() {
-    {{ PRESENTATION_SOURCE }}
+    Aesi<1024> f = 1;
+    for(unsigned i = 2; i <= 50; ++i)
+        f *= i;
+
+    std::cout << std::showbase << std::hex << f << std::endl;
 }
 ```
-> {{ PRESENTATION_ANSWER }}
+> 0x49eebc961ed279b02b1ef4f28d19a84f5973a1d2c7800000000000
 
 ### Cuda kernel:
 ```cpp

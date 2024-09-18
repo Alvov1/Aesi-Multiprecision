@@ -2,8 +2,8 @@
 #include "../../Aeu.h"
 
 TEST(Prezentation, Factorial) {
-    Aeu1024 f = 1u;
-    for(unsigned i = 2; i <= 100; ++i)
+    Aesi<1024> f = 1;
+    for(unsigned i = 2; i <= 50; ++i)
         f *= i;
 
     std::cout << std::showbase << std::hex << f << std::endl;

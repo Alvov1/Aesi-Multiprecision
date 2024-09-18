@@ -105,5 +105,5 @@ std::cout << Aesi<256>::powm(base, power, modulo) << std::endl; // Fine
 
 ## Issues
 Library is relatively slow in compare to other multiple precision libraries
-<img src="{{ IMAGE_PATH }}" alt="Dynamic Image">
+<img src="https://dub.sh/jNgf79u" alt="Dynamic Image">
 

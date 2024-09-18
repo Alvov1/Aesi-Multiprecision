@@ -22,12 +22,17 @@ jobs:
         run: |
           zip Aesi_universal_${{ github.ref_name }}.zip Aesi.h Aeu.h README.md
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: archive
+          path: Aesi_universal_${{ github.ref_name }}.zip
+
       - name: Create Release
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd artifacts
           gh release create \
             --verify-tag \
             --title "Release ${{ github.ref_name }}" \

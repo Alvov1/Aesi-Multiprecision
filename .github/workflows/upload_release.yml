@@ -36,4 +36,4 @@ jobs:
           gh release create \
             --title "Release ${{ inputs.version }}" \
             "${{ github.ref_name }}" \
-            Aesi_universal_${{ inputs.version }}.zip
+            Aesi_${{ inputs.version }}.zip

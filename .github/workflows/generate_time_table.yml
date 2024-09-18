@@ -23,7 +23,7 @@ jobs:
         id: strings
         shell: bash
         run: |
-          echo "ci=${{ github.workspace }}/ci >> "$GITHUB_OUTPUT"
+          echo "ci=${{ github.workspace }}/ci" >> "$GITHUB_OUTPUT"
           echo "gtest_build=${{ steps.strings.outputs.ci }}/speed_comparison/cmake-build-release" >> "$GITHUB_OUTPUT"
 
       - name: Configure

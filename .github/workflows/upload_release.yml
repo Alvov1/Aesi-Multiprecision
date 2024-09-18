@@ -15,7 +15,7 @@ jobs:
 
       - name: Generate release archive
         run: |
-          zip Aesi_universal_${{ github.ref }}.zip Aesi.h Aeu.h README.md
+          zip Aesi_universal_${{ github.ref_name }}.zip Aesi.h Aeu.h README.md
 
       - name: Create Release
         id: create_release
@@ -35,6 +35,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./Aesi_universal_${{ github.ref }}.zip
-          asset_name: Aesi_universal_${{ github.ref }}.zip
+          asset_path: ./Aesi_universal_${{ github.ref_name }}.zip
+          asset_name: Aesi_universal_${{ github.ref_name }}.zip
           asset_content_type: application/zip

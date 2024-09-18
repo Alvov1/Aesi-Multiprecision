@@ -3,8 +3,6 @@ name: Compares the execution time of the library and its analogues
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:

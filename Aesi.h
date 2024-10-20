@@ -98,11 +98,11 @@ public:
      * @param stringView String
      */
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
-            typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
+        std::decay_t<String>> || std::is_same_v<std::basic_string_view<Char>, std::decay_t<String>>)
     gpu constexpr Aesi(String&& stringView) noexcept : Aesi(stringView.data(), stringView.size()) {}
 
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
-            typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
+        std::decay_t<String>> || std::is_same_v<std::basic_string_view<Char>, std::decay_t<String>>)
     gpu constexpr Aesi(const String& stringView) noexcept : Aesi(stringView.data(), stringView.size()) {}
 
     /**
@@ -250,8 +250,7 @@ public:
             }
 
             if(sign == Sign::Positive) { /* Positive += Negative; */
-                const auto ratio = base.compareTo(addendum.base);
-                switch(ratio) {
+                switch(base.compareTo(addendum.base)) {
                     case Comparison::greater: {
                         base -= addendum.base;
                         return *this;
@@ -267,8 +266,7 @@ public:
                     }
                 }
             } else { /* Negative += Positive; */
-                const auto ratio = base.compareTo(addendum.base);
-                switch(ratio) {
+                switch(const auto ratio = base.compareTo(addendum.base)) {
                     case Comparison::greater: {
                         base -= addendum.base;
                         return *this;
@@ -312,8 +310,7 @@ public:
 
             if(sign == Sign::Positive) {
                 if(subtrahend.sign == Sign::Positive) { /* Positive -= Positive; */
-                    const auto ratio = base.compareTo(subtrahend.base);
-                    switch(ratio) {
+                    switch(base.compareTo(subtrahend.base)) {
                         case Comparison::greater: {
                             base -= subtrahend.base;
                             return *this;
@@ -334,8 +331,7 @@ public:
                 }
             } else {
                 if(subtrahend.sign == Sign::Negative) { /* Negative -= Negative; */
-                    const auto ratio = base.compareTo(subtrahend.base);
-                    switch(ratio) {
+                    switch(base.compareTo(subtrahend.base)) {
                         case Comparison::greater: {
                             base -= subtrahend.base;
                             return *this;
@@ -687,8 +683,7 @@ public:
          * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
          */
         gpu constexpr auto operator<=>(const Aesi& other) const noexcept -> std::strong_ordering {
-            const auto ratio = this->compareTo(other);
-            switch(ratio) {
+            switch(this->compareTo(other)) {
                 case Comparison::less:
                     return std::strong_ordering::less;
                 case Comparison::greater:
@@ -708,8 +703,7 @@ public:
          */
         template <typename Object>
         gpu constexpr auto operator<=>(const Object& other) const noexcept -> std::strong_ordering {
-            const auto ratio = this->compareTo(other);
-            switch(ratio) {
+            switch(this->compareTo(other)) {
                 case Comparison::less:
                     return std::strong_ordering::less;
                 case Comparison::greater:

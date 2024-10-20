@@ -4,7 +4,6 @@
 /// @cond HIDE_INCLUDES
 #include <iostream>
 #include <cassert>
-#include <vector>
 
 #ifdef __CUDACC__
 #define gpu __host__ __device__
@@ -220,11 +219,11 @@ public:
      * @details Constructs object from STD::Basic_String or STD::Basic_String_View. Accepts objects based on char or wchar_t
      */
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
-            typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
+        std::decay_t<String>> || std::is_same_v<std::basic_string_view<Char>, std::decay_t<String>>)
     gpu constexpr Aeu(String&& stringView) noexcept : Aeu(stringView.data(), stringView.size()) {}
 
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
-            typename std::decay<String>::type> || std::is_same_v<std::basic_string_view<Char>, typename std::decay<String>::type>)
+        std::decay_t<String>> || std::is_same_v<std::basic_string_view<Char>, std::decay_t<String>>)
     gpu constexpr Aeu(const String& stringView) noexcept : Aeu(stringView.data(), stringView.size()) {}
 
 #ifdef AESI_CRYPTOPP_INTEGRATION
@@ -794,8 +793,7 @@ public:
          * @note Available from C++20 standard and further. Should almost never return Strong_ordering::Equivalent
          */
         gpu constexpr auto operator<=>(const Aeu& other) const noexcept -> std::strong_ordering {
-            const auto ratio = this->compareTo(other);
-            switch(ratio) {
+            switch(this->compareTo(other)) {
                 case Comparison::less:
                     return std::strong_ordering::less;
                 case Comparison::greater:
@@ -815,8 +813,7 @@ public:
          */
         template <typename Unsigned>
         gpu constexpr auto operator<=>(const Unsigned& other) const noexcept -> std::strong_ordering {
-            const auto ratio = this->compareTo(other);
-            switch(ratio) {
+            switch(this->compareTo(other)) {
                 case Comparison::less:
                     return std::strong_ordering::less;
                 case Comparison::greater:
@@ -935,8 +932,7 @@ public:
         for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock) ;
 
         for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
-            const auto byte = (blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte);
-            if(byte)
+            if((blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte))
                 return lastBlock * sizeof(block) + byteN + 1;
         }
         return lastBlock * sizeof(block);
@@ -956,8 +952,7 @@ public:
             if(!byte) continue;
 
             for(int8_t bitN = bitsInByte - 1; bitN >= 0; --bitN) {
-                const auto bit = (byte & (0x1u << bitN)) >> bitN;
-                if(bit)
+                if((byte & (0x1u << bitN)) >> bitN)
                     return (lastBlock * sizeof(block) + byteN) * bitsInByte + bitN + 1;
             }
             return ((lastBlock - 1) * sizeof(block) + byteN) * bitsInByte;
@@ -1071,7 +1066,7 @@ public:
      * @details Counts Bézout coefficients along with the greatest common divisor. Returns coefficients by reference
      */
     gpu static constexpr auto gcd(const Aeu& first, const Aeu& second, Aeu& bezoutX, Aeu& bezoutY) noexcept -> Aeu {
-        Aeu gcd, tGcd, quotient, remainder;
+        Aeu gcd, quotient, remainder;
 
         const auto ratio = first.compareTo(second);
         if(ratio == Comparison::greater) {
@@ -1084,7 +1079,7 @@ public:
 
         bezoutX = 0u; bezoutY = 1u;
         for(Aeu tX = 1u, tY = 0u; remainder != 0u; ) {
-            tGcd = gcd; gcd = remainder;
+            Aeu tGcd = gcd; gcd = remainder;
 
             Aeu t = bezoutX; bezoutX = tX - quotient * bezoutX; tX = t;
             t = bezoutY; bezoutY = tY - quotient * bezoutY; tY = t;
@@ -1106,7 +1101,7 @@ public:
      * @details Faster version, ignoring bezout coefficients
      */
     gpu static constexpr auto gcd(const Aeu& first, const Aeu& second) noexcept -> Aeu {
-        Aeu gcd, tGcd, quotient, remainder;
+        Aeu gcd, quotient, remainder;
 
         const auto ratio = first.compareTo(second);
         if(ratio == Comparison::greater) {
@@ -1118,7 +1113,7 @@ public:
         }
 
         for(Aeu tX = 1u, tY = 0u; remainder != 0u; ) {
-            tGcd = gcd; gcd = remainder;
+            Aeu tGcd = gcd; gcd = remainder;
             divide(tGcd, gcd, quotient, remainder);
         }
         
@@ -1232,23 +1227,29 @@ public:
         if (showBase && bufferSize > 3) {
             if constexpr (base == 2) {
                 if constexpr (std::is_same_v<Char, char>) {
-                    memcpy(buffer, "0b", 2 * sizeof(Char));
+                    buffer[0] = '0'; buffer[1] = 'b';
+                    // memcpy(buffer, "0b", 2 * sizeof(Char));
                 } else {
-                    memcpy(buffer, L"0b", 2 * sizeof(Char));
+                    buffer[0] = L'0'; buffer[1] = L'b';
+                    // memcpy(buffer, L"0b", 2 * sizeof(Char));
                 }
                 position += 2;
             } else if constexpr (base == 8) {
                 if constexpr (std::is_same_v<Char, char>) {
-                    memcpy(buffer, "0o", 2 * sizeof(Char));
+                    buffer[0] = '0'; buffer[1] = 'o';
+                    // memcpy(buffer, "0o", 2 * sizeof(Char));
                 } else {
-                    memcpy(buffer, L"0o", 2 * sizeof(Char));
+                    buffer[0] = L'0'; buffer[1] = L'o';
+                    // memcpy(buffer, L"0o", 2 * sizeof(Char));
                 }
                 position += 2;
             } else if constexpr (base == 16) {
                 if constexpr (std::is_same_v<Char, char>) {
-                    memcpy(buffer, "0x", 2 * sizeof(Char));
+                    buffer[0] = '0'; buffer[1] = 'x';
+                    // memcpy(buffer, "0x", 2 * sizeof(Char));
                 } else {
-                    memcpy(buffer, L"0x", 2 * sizeof(Char));
+                    buffer[0] = L'0'; buffer[1] = L'x';
+                    // memcpy(buffer, L"0x", 2 * sizeof(Char));
                 }
                 position += 2;
             }

@@ -12,8 +12,6 @@ Aesi Multiprecision
         <img src="https://img.shields.io/github/commit-activity/y/Alvov1/Aesi-Multiprecision" alt="GitHub commit activity" /></a>
     <a href="https://github.com/Alvov1/Aesi-Multiprecision">
         <img src="https://img.shields.io/github/languages/code-size/Alvov1/Aesi-Multiprecision" alt="GitHub code size in bytes" /></a>
-    <a href="https://google.com" >
-        <img src="https://img.shields.io/badge/try%20on-godbolt-green" alt="Try on Godbolt Compiler Explorer"/></a>
 </p>
 
 The goal of this project is to develop a fast and handy multi-precision library that can be used with GPU parallelization frameworks such as CUDA, OpenCL, and Metal. The library should correspond to modern C++ standards, support constexpr expressions, and move semantics.
@@ -27,7 +25,8 @@ Library supports each arithmetic (binary and unary), bitwise, and boolean operat
 
 ## Installation:
 Package could be downloaded to project's directory, or accessed directly through CMake:
-```include(FetchContent)
+```
+include(FetchContent)
 FetchContent_Declare(AesiMultiprecision
     GIT_REPOSITORY https://github.com/Alvov1/Aesi-Multiprecision.git
     GIT_TAG main)

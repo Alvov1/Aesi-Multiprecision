@@ -1325,10 +1325,16 @@ public:
         auto flags = os.flags();
 
         const auto base = [] (long baseField, std::basic_ostream<Char>& ss, bool showbase) {
-            auto base = (baseField == std::ios::hex ? 16u : (baseField == std::ios::oct ? 8u : 10u));
-            if(showbase && base != 10)
-                ss << [&base] { if constexpr (std::is_same_v<Char, char>) { return base == 8 ? "0o" : "0x"; } else { return base == 8 ? L"0o" : L"0x"; }} () << std::noshowbase ;
-            return base;
+            auto tBase = (baseField == std::ios::hex ? 16u : (baseField == std::ios::oct ? 8u : 10u));
+            if(showbase && tBase != 10)
+                ss << [&tBase] {
+                    if constexpr (std::is_same_v<Char, char>) {
+                        return tBase == 8 ? "0o" : "0x";
+                    } else {
+                        return tBase == 8 ? L"0o" : L"0x";
+                    }
+                } () << std::noshowbase ;
+            return tBase;
         } (flags & std::ios::basefield, os, flags & std::ios::showbase);
 
         if(number.isZero())

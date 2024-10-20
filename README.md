@@ -9,7 +9,7 @@ Aesi Multiprecision
     <a href="https://github.com/Alvov1/Aesi-Multiprecision/actions">
         <img src="https://img.shields.io/github/last-commit/alvov1/Aesi-Multiprecision" alt="Last Commit"></a>
     <a href="https://sonarcloud.io/summary/new_code?id=Alvov1_Aesi-Multiprecision">
-        <img src="https://sonarcloud.io/api/project_badges/quality_gate?project=Alvov1_Aesi-Multiprecision" alt="SonarCloud Code Quality"></a>
+        <img src="https://sonarcloud.io/api/project_badges/measure?project=Alvov1_Aesi-Multiprecision&metric=alert_status" alt="SonarCloud Code Quality"></a>
     <a href="https://app.codacy.com/gh/Alvov1/Aesi-Multiprecision/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade">
         <img src="https://app.codacy.com/project/badge/Grade/1658a07a21cf41dd8ac84ea56d62dd45" alt="Codacy Code Quality"></a>
     <a href="https://github.com/Alvov1/Aesi-Multiprecision/commits/main/">

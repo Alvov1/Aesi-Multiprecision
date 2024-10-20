@@ -45,7 +45,7 @@ namespace {
      * @enum Comparison
      * @brief Analogue of STD::Strong_ordering since CUDA does not support <=> operator
      */
-    enum Comparison { equal = 0, less = 1, greater = 2, equivalent = 3 };
+    enum class Comparison { equal = 0, less = 1, greater = 2, equivalent = 3 };
 }
 
 /**
@@ -128,7 +128,7 @@ public:
      * @brief Copy assignment operator
      * @param other Aeu
      */
-    gpu constexpr Aeu& operator=(const Aeu& other) noexcept { blocks = other.blocks; return *this; }
+    gpu constexpr Aeu& operator=(const Aeu& other) = default;
 
     /**
      * @brief Integral constructor
@@ -310,9 +310,9 @@ public:
         gpu constexpr auto operator--() noexcept -> Aeu& {
             for(std::size_t i = 0; i < blocksNumber; ++i) {
                 if(blocks[i] > 0u) {
-                    --blocks[i];
-                    break;
-                } else blocks[i] = blockMax;
+                    --blocks[i]; break;
+                }
+                blocks[i] = blockMax;
             }
             return *this;
         }
@@ -724,12 +724,18 @@ public:
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned> && sizeof(Unsigned) < 8) [[nodiscard]]
         gpu constexpr auto compareTo(Unsigned other) const noexcept -> Comparison {
-            if(filledBlocksNumber() > 1) return Comparison::greater;
+            using enum Comparison;
+
+            if(filledBlocksNumber() > 1) return greater;
             const auto cmp = static_cast<block>(other);
+
             if(blocks[0] > cmp)
-                return Comparison::greater;
-            else if(blocks[0] < cmp)
-                return Comparison::less; else return Comparison::equal;
+                return greater;
+
+            if(blocks[0] < cmp)
+                return less;
+
+            return equal;
         }
 
         /**
@@ -740,10 +746,11 @@ public:
          */
         [[nodiscard]]
         gpu constexpr auto compareTo(uint64_t other) const noexcept -> Comparison {
-            if(filledBlocksNumber() > 2) return Comparison::greater;
+            using enum Comparison;
+            if(filledBlocksNumber() > 2) return greater;
             const auto base = (static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0]);
             if(base > other)
-                return Comparison::greater; else if(base < other) return Comparison::less; else return Comparison::equal;
+                return greater; else if(base < other) return less; else return equal;
         }
 
         /**
@@ -754,28 +761,29 @@ public:
          */
         template <std::size_t otherBitness = bitness> /*requires (otherBitness != bitness)*/ [[nodiscard]]
         gpu constexpr auto compareTo(const Aeu<otherBitness>& other) const noexcept -> Comparison {
-            /* First compare in common precision. */
+            using enum Comparison;
+
             const auto lowerBlockBorder = (blocksNumber < other.totalBlocksNumber() ? blocksNumber : other.totalBlocksNumber());
             for(long long i = lowerBlockBorder - 1; i >= 0; --i) {
                 const block thisBlock = blocks[i], otherBlock = other.getBlock(i);
                 if(thisBlock != otherBlock)
-                    return (thisBlock > otherBlock ? Comparison::greater : Comparison::less);
+                    return (thisBlock > otherBlock ? greater : less);
             }
 
             if constexpr (otherBitness != blocksNumber * blockBitLength) {
-                /* If larger number contains data out of lower number's range, it's greater. */
+                using enum Comparison;
                 if (other.totalBlocksNumber() > blocksNumber) {
                     for (long long i = other.totalBlocksNumber() - 1; i > lowerBlockBorder - 1; --i)
                         if (other.getBlock(i) != 0)
-                            return Comparison::less;
+                            return less;
                 } else if (blocksNumber > other.totalBlocksNumber()) {
                     for (long long i = blocksNumber - 1; i > lowerBlockBorder - 1; --i)
                         if (blocks[i] != 0)
-                            return Comparison::greater;
+                            return greater;
                 }
             }
 
-            return Comparison::equal;
+            return equal;
         }
     /* --------------------------------------------------------------------------- */
 
@@ -783,7 +791,7 @@ public:
     /* ------------------------ @name Spaceship operators. ----------------------- */
 #if (defined(__CUDACC__) || __cplusplus < 202002L || defined (PRE_CPP_20)) && !defined DOXYGEN_SKIP
         /**
-         * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on preCpp20
+         * @brief Oldstyle comparison operator(s). Used inside CUDA because it does not support <=> on preCpp20
          */
         gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool { return !this->operator==(value); }
         gpu constexpr auto operator<(const Aeu& value) const noexcept -> bool { return this->compareTo(value) == Comparison::less; }
@@ -799,11 +807,12 @@ public:
          */
         gpu constexpr auto operator<=>(const Aeu& other) const noexcept -> std::strong_ordering {
             switch(this->compareTo(other)) {
-                case Comparison::less:
+                using enum Comparison;
+                case less:
                     return std::strong_ordering::less;
-                case Comparison::greater:
+                case greater:
                     return std::strong_ordering::greater;
-                case Comparison::equal:
+                case equal:
                     return std::strong_ordering::equal;
                 default:
                     return std::strong_ordering::equivalent;
@@ -819,11 +828,12 @@ public:
         template <typename Unsigned>
         gpu constexpr auto operator<=>(const Unsigned& other) const noexcept -> std::strong_ordering {
             switch(this->compareTo(other)) {
-                case Comparison::less:
+                using enum Comparison;
+                case less:
                     return std::strong_ordering::less;
-                case Comparison::greater:
+                case greater:
                     return std::strong_ordering::greater;
-                case Comparison::equal:
+                case equal:
                     return std::strong_ordering::equal;
                 default:
                     return std::strong_ordering::equivalent;
@@ -836,7 +846,7 @@ public:
 
     /* ---------------------- @name Supporting methods. ---------------------- */
     /**
-     * @brief Set bit in number by index starting from the right
+     * @brief Set a bit in number by index starting from the right
      * @param index Size_t
      * @param bit Boolean
      * @note Does nothing for index out of range
@@ -862,7 +872,7 @@ public:
     [[nodiscard]]
     gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
 #ifndef AESI_UNSAFE
-            if(index >= bitness) return false;
+        if(index >= bitness) return false;
 #endif
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
         assert(blockNumber < blocksNumber && bitNumber < blockBitLength);
@@ -934,7 +944,8 @@ public:
     [[nodiscard]]
     gpu constexpr auto byteCount() const noexcept -> std::size_t {
         std::size_t lastBlock = blocksNumber - 1;
-        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock) ;
+        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock)
+            ;
 
         for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
             if((blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte))
@@ -950,7 +961,8 @@ public:
     [[nodiscard]]
     gpu constexpr auto bitCount() const noexcept -> std::size_t {
         std::size_t lastBlock = blocksNumber - 1;
-        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock);
+        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock)
+            ;
 
         for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
             const auto byte = (blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte);
@@ -1233,28 +1245,22 @@ public:
             if constexpr (base == 2) {
                 if constexpr (std::is_same_v<Char, char>) {
                     buffer[0] = '0'; buffer[1] = 'b';
-                    // memcpy(buffer, "0b", 2 * sizeof(Char));
                 } else {
                     buffer[0] = L'0'; buffer[1] = L'b';
-                    // memcpy(buffer, L"0b", 2 * sizeof(Char));
                 }
                 position += 2;
             } else if constexpr (base == 8) {
                 if constexpr (std::is_same_v<Char, char>) {
                     buffer[0] = '0'; buffer[1] = 'o';
-                    // memcpy(buffer, "0o", 2 * sizeof(Char));
                 } else {
                     buffer[0] = L'0'; buffer[1] = L'o';
-                    // memcpy(buffer, L"0o", 2 * sizeof(Char));
                 }
                 position += 2;
             } else if constexpr (base == 16) {
                 if constexpr (std::is_same_v<Char, char>) {
                     buffer[0] = '0'; buffer[1] = 'x';
-                    // memcpy(buffer, "0x", 2 * sizeof(Char));
                 } else {
                     buffer[0] = L'0'; buffer[1] = L'x';
-                    // memcpy(buffer, L"0x", 2 * sizeof(Char));
                 }
                 position += 2;
             }
@@ -1267,7 +1273,8 @@ public:
 
         if constexpr (base == 16) {
             long long iter = blocks.size() - 1;
-            for (; blocks[iter] == 0 && iter >= 0; --iter);
+            for (; blocks[iter] == 0 && iter >= 0; --iter)
+                ;
 
             if constexpr (std::is_same_v<Char, char>) {
                 position += snprintf(buffer + position, bufferSize - position, (hexUppercase ? "%X" : "%x"), blocks[iter--]);
@@ -1329,7 +1336,8 @@ public:
 
         if(base == 16) {
             long long iter = number.blocks.size() - 1;
-            for(; number.blocks[iter] == 0 && iter >= 0; --iter) ;
+            for(; number.blocks[iter] == 0 && iter >= 0; --iter)
+                ;
 
             os << number.blocks[iter--];
             for (; iter >= 0; --iter) {
@@ -1444,7 +1452,7 @@ public:
     }
 
     /**
-     * @brief Atomicity-oriented object exchangement operator
+     * @brief Atomicity-oriented object exchange operator
      * @param exchangeable Aeu
      * @note Method itself is not fully-atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for exchanging encapsulated class members atomically one by one

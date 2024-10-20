@@ -648,7 +648,9 @@ public:
                     default:
                         return equal;
                 }
-            } else if(value.isNegative()) {
+            }
+
+            if(value.isNegative()) {
                 if(sign == Negative)
                     switch(base.compareTo(value.base)) {
                         case greater:
@@ -659,11 +661,11 @@ public:
                             return equal;
                     }
                 return greater;
-            } else {
-                if(sign == Positive)
-                    return base.compareTo(value.base);
-                return less;
             }
+
+            if(sign == Positive)
+                return base.compareTo(value.base);
+            return less;
         }
     /* --------------------------------------------------------------------------- */
 
@@ -970,7 +972,7 @@ public:
         if(sign != Zero) {
             Aesi<newBitness> result = 1;
 
-            const std::size_t blockBoarder = (newBitness > bitness ? Aesi<bitness>::totalBlocksNumber() : Aesi<newBitness>::totalBlocksNumber());
+            const std::size_t blockBoarder = (newBitness > bitness ? totalBlocksNumber() : Aesi<newBitness>::totalBlocksNumber());
             for(std::size_t blockIdx = 0; blockIdx < blockBoarder; ++blockIdx)
                 result.setBlock(blockIdx, getBlock(blockIdx));
 
@@ -978,7 +980,9 @@ public:
                 result.inverse();
 
             return result;
-        } else return Aesi<newBitness> {};
+        }
+
+        return Aesi<newBitness> {};
     }
 
     /**

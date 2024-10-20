@@ -123,7 +123,7 @@ public:
      * @brief Copy assignment operator
      * @param other Aeu
      */
-    gpu constexpr Aeu& operator=(const Aeu& other) noexcept { blocks = other.blocks; return *this; }
+    gpu constexpr Aeu& operator=(const Aeu& other) noexcept = default;
 
     /**
      * @brief Integral constructor
@@ -778,7 +778,7 @@ public:
     /* ------------------------ @name Spaceship operators. ----------------------- */
 #if (defined(__CUDACC__) || __cplusplus < 202002L || defined (PRE_CPP_20)) && !defined DOXYGEN_SKIP
         /**
-         * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> on preCpp20
+         * @brief Oldstyle comparison operator(s). Used inside CUDA because it does not support <=> on preCpp20
          */
         gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool { return !this->operator==(value); }
         gpu constexpr auto operator<(const Aeu& value) const noexcept -> bool { return this->compareTo(value) == Comparison::less; }
@@ -831,7 +831,7 @@ public:
 
     /* ---------------------- @name Supporting methods. ---------------------- */
     /**
-     * @brief Set bit in number by index starting from the right
+     * @brief Set a bit in number by index starting from the right
      * @param index Size_t
      * @param bit Boolean
      * @note Does nothing for index out of range
@@ -929,7 +929,8 @@ public:
     [[nodiscard]]
     gpu constexpr auto byteCount() const noexcept -> std::size_t {
         std::size_t lastBlock = blocksNumber - 1;
-        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock) ;
+        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock)
+            ;
 
         for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
             if((blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte))
@@ -945,7 +946,8 @@ public:
     [[nodiscard]]
     gpu constexpr auto bitCount() const noexcept -> std::size_t {
         std::size_t lastBlock = blocksNumber - 1;
-        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock);
+        for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock)
+            ;
 
         for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
             const auto byte = (blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte);
@@ -1228,28 +1230,22 @@ public:
             if constexpr (base == 2) {
                 if constexpr (std::is_same_v<Char, char>) {
                     buffer[0] = '0'; buffer[1] = 'b';
-                    // memcpy(buffer, "0b", 2 * sizeof(Char));
                 } else {
                     buffer[0] = L'0'; buffer[1] = L'b';
-                    // memcpy(buffer, L"0b", 2 * sizeof(Char));
                 }
                 position += 2;
             } else if constexpr (base == 8) {
                 if constexpr (std::is_same_v<Char, char>) {
                     buffer[0] = '0'; buffer[1] = 'o';
-                    // memcpy(buffer, "0o", 2 * sizeof(Char));
                 } else {
                     buffer[0] = L'0'; buffer[1] = L'o';
-                    // memcpy(buffer, L"0o", 2 * sizeof(Char));
                 }
                 position += 2;
             } else if constexpr (base == 16) {
                 if constexpr (std::is_same_v<Char, char>) {
                     buffer[0] = '0'; buffer[1] = 'x';
-                    // memcpy(buffer, "0x", 2 * sizeof(Char));
                 } else {
                     buffer[0] = L'0'; buffer[1] = L'x';
-                    // memcpy(buffer, L"0x", 2 * sizeof(Char));
                 }
                 position += 2;
             }
@@ -1262,7 +1258,8 @@ public:
 
         if constexpr (base == 16) {
             long long iter = blocks.size() - 1;
-            for (; blocks[iter] == 0 && iter >= 0; --iter);
+            for (; blocks[iter] == 0 && iter >= 0; --iter)
+                ;
 
             if constexpr (std::is_same_v<Char, char>) {
                 position += snprintf(buffer + position, bufferSize - position, (hexUppercase ? "%X" : "%x"), blocks[iter--]);
@@ -1324,7 +1321,8 @@ public:
 
         if(base == 16) {
             long long iter = number.blocks.size() - 1;
-            for(; number.blocks[iter] == 0 && iter >= 0; --iter) ;
+            for(; number.blocks[iter] == 0 && iter >= 0; --iter)
+                ;
 
             os << number.blocks[iter--];
             for (; iter >= 0; --iter) {
@@ -1439,7 +1437,7 @@ public:
     }
 
     /**
-     * @brief Atomicity-oriented object exchangement operator
+     * @brief Atomicity-oriented object exchange operator
      * @param exchangeable Aeu
      * @note Method itself is not fully-atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for exchanging encapsulated class members atomically one by one

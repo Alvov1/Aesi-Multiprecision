@@ -22,7 +22,7 @@ namespace {
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Aesi final {
     /* -------------------------- @name Class members. ----------------------- */
-    Sign sign;
+    Sign sign { Sign::Zero };
 
     using Base = Aeu<bitness>;
     Base base;
@@ -165,7 +165,7 @@ public:
      * @brief Copy assignment operator
      * @param other Aesi&
      */
-    gpu constexpr Aesi& operator=(const Aesi& other) noexcept { base = other.base; sign = other.sign; return *this; }
+    gpu constexpr Aesi& operator=(const Aesi& other) noexcept = default;
     /* ----------------------------------------------------------------------- */
 
 
@@ -226,7 +226,7 @@ public:
 
     /* ------------------------ @name Addition operators. ------------------------ */
         /**
-         * @brief Adition operator
+         * @brief Addition operator
          * @param addendum Aesi&
          * @return Aesi
          */
@@ -550,7 +550,7 @@ public:
         }
 
         /**
-         * @brief Different precision equlity operator
+         * @brief Different precision equality operator
          * @param other Aesi&
          * @return bool
          */
@@ -658,7 +658,7 @@ public:
     /* ------------------------ @name Spaceship operators. ----------------------- */
 #if (defined(__CUDACC__) || __cplusplus < 202002L || defined (PRE_CPP_20)) && !defined DOXYGEN_SKIP
         /**
-         * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> operator.
+         * @brief Oldstyle comparison operator(s). Used inside CUDA because it does not support <=> operator.
          */
         gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool {
             return !this->operator==(value);
@@ -720,7 +720,7 @@ public:
 
     /* ---------------------- @name Supporting methods. ---------------------- */
     /**
-     * @brief Set bit in number by index starting from the right
+     * @brief Set a bit in number by index starting from the right
      * @param index Size_t
      * @param bit Boolean
      * @note Does nothing for index out of range. Does not affect sign
@@ -850,8 +850,8 @@ public:
     }
 
     /**
-     * @brief Invertes number's bitness
-     * @details Turns negative to positive and otherwise. Leaves zero unchanges
+     * @brief Inverts number's bitness
+     * @details Turns negative to positive and otherwise. Leaves zero unchanged
      */
     gpu constexpr auto inverse() noexcept -> void { sign = (sign == Sign::Zero ? Sign::Zero : (sign == Sign::Negative ? Sign::Positive : Sign::Negative)); }
     /* ----------------------------------------------------------------------- */
@@ -1056,18 +1056,18 @@ public:
      */
     __device__ constexpr auto tryAtomicSet(const Aesi& value) noexcept -> void {
         base.tryAtomicSet(value.base);
-        sign = value.sign; /* TODO: Make enum substitution using existing CUDA atomics */
+        sign = value.sign; /* TODO: Make enum substitution using CUDA atomics if possible */
     }
 
     /**
-     * @brief Atomicity-oriented object exchangement operator
+     * @brief Atomicity-oriented object exchange operator
      * @param Aesi exchangeable
      * @note Method itself is not fully-atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for exchanging encapsulated class members atomically one by one
      */
     __device__ constexpr auto tryAtomicExchange(const Aesi& value) noexcept -> void {
         base.tryAtomicExchange(value.base);
-        sign = value.sign; /* TODO: Make enum substitution using existing CUDA atomics */
+        sign = value.sign; /* TODO: Make enum substitution using CUDA atomics if possible */
     }
 #endif
 };

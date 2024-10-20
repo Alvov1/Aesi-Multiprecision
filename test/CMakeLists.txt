@@ -21,7 +21,7 @@ pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp)
 enable_testing()
 
 file(GLOB Tests *.cpp)
-add_executable(AesiMultiprecision ${Tests})
+add_executable(AesiMultiprecision ${Tests} ../Aeu.h ../Aesi.h)
 add_subdirectory(arithmetic)
 add_subdirectory(operations)
 add_subdirectory(bitwise)

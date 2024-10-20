@@ -115,6 +115,11 @@ public:
     gpu constexpr Aeu() noexcept = default;
 
     /**
+     * @brief Destructor
+     */
+    gpu constexpr ~Aeu() noexcept = default;
+
+    /**
      * @brief Copy constructor
      */
     gpu constexpr Aeu(const Aeu& copy) noexcept = default;

@@ -170,12 +170,12 @@ public:
         std::size_t position = 0;
 
         if constexpr (std::is_same_v<Char, char>) {
-            for(; !std::isalnum(data[position]) && position < size; ++position) ;
+            for(; position < size && !std::isalnum(data[position]); ++position) ;
         } else {
-            for(; !std::iswalnum(data[position]) && position < size; ++position) ;
+            for(; position < size && !std::iswalnum(data[position]); ++position) ;
         }
 
-        const auto base = [&data, &size, &position, &characters] {
+        const auto base = [&data, &size, &position] {
             if (data[position] == characters[0] && size > position + 1) {
                 switch (data[position + 1]) {
                     case characters[8]:
@@ -193,7 +193,7 @@ public:
             } return 10u;
         } ();
         for(; position < size; ++position) {
-            const auto digit = [&characters] (Char ch) {
+            const auto digit = [] (Char ch) {
                 if(characters[0] <= ch && ch <= characters[1])
                     return static_cast<unsigned>(ch) - static_cast<unsigned>(characters[0]);
                 if(characters[2] <= ch && ch <= characters[4])
@@ -252,7 +252,7 @@ public:
      */
     constexpr Aeu(const mpz_class& value) : Aeu {} {
         const auto bitLength = mpz_sizeinbase(value.get_mpz_t(), 2);
-        auto tBlocksNumber = static_cast<std::size_t>(1 + ((bitLength - 1) / sizeof(block) * 8));
+        auto tBlocksNumber = 1 + (bitLength - 1) / sizeof(block) * 8;
 
         std::basic_string<block> buffer (tBlocksNumber, 0u);
         mpz_export(buffer.data(), &tBlocksNumber, -1, sizeof(block), -1, 0, value.get_mpz_t());
@@ -423,7 +423,8 @@ public:
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
         gpu constexpr auto operator*=(Unsigned factor) noexcept -> Aeu& {
             if constexpr (std::is_same_v<Unsigned, uint64_t>) {
-                const auto longerLength = filledBlocksNumber(), smallerLength = (factor > blockMax ? 2UL : 1UL);
+                const auto longerLength = filledBlocksNumber();
+                const auto smallerLength = (factor > blockMax ? 2UL : 1UL);
                 blockLine buffer {};
 
                 for(std::size_t i = 0; i < longerLength; ++i) {
@@ -463,7 +464,8 @@ public:
                 blockLine buffer {};
 
                 for(std::size_t i = 0; i < longerLength; ++i) {
-                    uint64_t tBlock = longerLine[i], carryOut = 0;
+                    const uint64_t tBlock = longerLine[i];
+                    uint64_t carryOut = 0;
 
                     for(std::size_t j = 0; j < smallerLength && i + j < buffer.size(); ++j) {
                         const auto product = tBlock * static_cast<uint64_t>(smallerLine[j]) + carryOut;
@@ -479,8 +481,8 @@ public:
                 return buffer;
             };
 
-            const std::size_t thisLength = this->filledBlocksNumber(), valueLength = factor.filledBlocksNumber();
-            if(thisLength > valueLength)
+            const std::size_t thisLength = this->filledBlocksNumber();
+            if(const std::size_t valueLength = factor.filledBlocksNumber(); thisLength > valueLength)
                 blocks = multiplyLines(blocks, thisLength, factor.blocks, valueLength);
             else
                 blocks = multiplyLines(factor.blocks, valueLength, blocks, thisLength);

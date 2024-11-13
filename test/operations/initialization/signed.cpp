@@ -3,20 +3,19 @@
 #include "../../../Aesi.h"
 #include "../../generation.h"
 
+constexpr auto testsAmount = 2,
+    blocksNumber = 64;
+
 TEST(Signed_Initialization, Basic) {
     {
-        Aesi128 m0 {},
-            m1(0),
-            m2 = 0,
+        Aesi128 m2 = 0,
             m3 = Aesi128(0),
             m4 = {},
             m5 = "0",
             m6 = "-0",
-            m7 = "Somebody once told me...",
-            m8 = Aesi128(),
-            m9;
-        EXPECT_EQ(m0, 0); EXPECT_EQ(m1, 0); EXPECT_EQ(m2, 0); EXPECT_EQ(m3, 0);
-        EXPECT_EQ(m4, 0); EXPECT_EQ(m5, 0); EXPECT_EQ(m6, 0); EXPECT_EQ(m7, 0); EXPECT_EQ(m8, 0);
+            m7 = "Somebody once told me...";
+        EXPECT_EQ(Aesi128 {}, 0); EXPECT_EQ(Aesi128(0), 0); EXPECT_EQ(m2, 0); EXPECT_EQ(m3, 0);
+        EXPECT_EQ(m4, 0); EXPECT_EQ(m5, 0); EXPECT_EQ(m6, 0); EXPECT_EQ(m7, 0); EXPECT_EQ(Aesi128(), 0);
     }
     {
         Aesi128 i01 = 1, i02 = -1, i03 = 127, i04 = -127, i05 = -128, i06 = +127;
@@ -24,14 +23,11 @@ TEST(Signed_Initialization, Basic) {
         EXPECT_EQ(i04, -127); EXPECT_EQ(i05, -128); EXPECT_EQ(i06, 127);
     }
     {
-        Aesi128 ten = "10", negTen = "-10", fifty = "50", negFifty = "-50";
-        EXPECT_EQ(ten, 10); EXPECT_EQ(negTen, -10); EXPECT_EQ(fifty, 50); EXPECT_EQ(negFifty, -50);
-
-        Aesi128 octTenLC = "0o24", octTenHC = "0o24", negativeOctTenLC = "-0o24", negativeOctTenHC = "-0o24";
-        EXPECT_EQ(octTenLC, 20); EXPECT_EQ(octTenHC, 20); EXPECT_EQ(negativeOctTenLC, -20); EXPECT_EQ(negativeOctTenHC, -20);
-
-        Aesi128 hexTenLC = "0xa", hexTenHC = "0xA", negativeHexTenLC = "-0xa", negativeHexTenHC = "-0xA";
-        EXPECT_EQ(hexTenLC, 10); EXPECT_EQ(hexTenHC, 10); EXPECT_EQ(negativeHexTenLC, -10); EXPECT_EQ(negativeHexTenHC, -10);
+        EXPECT_EQ(Aesi128("10"), 10); EXPECT_EQ(Aesi128("-10"), -10);
+        EXPECT_EQ(Aesi128("50"), 50); EXPECT_EQ(Aesi128("-50"), -50);
+        EXPECT_EQ(Aesi128("0o24"), 20); EXPECT_EQ(Aesi128("-0o24"), -20);
+        EXPECT_EQ(Aesi128("0xa"), 10); EXPECT_EQ(Aesi128("0xA"), 10);
+        EXPECT_EQ(Aesi128("-0xa"), -10); EXPECT_EQ(Aesi128("-0xA"), -10);
     }
     {
         using namespace std::string_literals; using namespace std::string_view_literals;
@@ -128,8 +124,6 @@ TEST(Signed_Initialization, Different_precisions) {
 }
 
 TEST(Signed_Initialization, Binary) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
-
     Aesi<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
@@ -147,8 +141,6 @@ TEST(Signed_Initialization, Binary) {
 }
 
 TEST(Signed_Initialization, Decimal) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
-
     Aesi<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
@@ -160,8 +152,6 @@ TEST(Signed_Initialization, Decimal) {
 }
 
 TEST(Signed_Initialization, Octal) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
-
     Aesi<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
@@ -173,8 +163,6 @@ TEST(Signed_Initialization, Octal) {
 }
 
 TEST(Signed_Initialization, Hexadecimal) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
-
     Aesi<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
@@ -183,7 +171,8 @@ TEST(Signed_Initialization, Hexadecimal) {
         std::stringstream ss {};
         if(i % 2 == 0)
             ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::uppercase << (i % 2 == 0 ? value : value * -1);
-        else ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::nouppercase << (i % 2 == 0 ? value : value * -1);
+        else
+            ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::nouppercase << (i % 2 == 0 ? value : value * -1);
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }

@@ -56,25 +56,12 @@ TEST(Signed_Initialization, Basic) {
     EXPECT_EQ(Aesi512("-0x688589cc0e9505e2"s), -7531577461358003682);
     EXPECT_EQ(Aesi512("-0x3c9d4b9cb52fe"sv), -1066340417491710);
 
-    /* Binary negative-positive */
-    EXPECT_EQ(Aesi512(L"-1"s), -1LL);
-    EXPECT_EQ(Aesi512(L"--1"s), 1LL);
-    EXPECT_EQ(Aesi512(L"---1"s), -1LL);
-    EXPECT_EQ(Aesi512(L"----1"s), 1LL);
-    EXPECT_EQ(Aesi512(L"-----1"s), -1LL);
-    EXPECT_EQ(Aesi512(L"------1"s), 1LL);
-    EXPECT_EQ(Aesi512(L"-------1"s), -1LL);
-    EXPECT_EQ(Aesi512(L"--------1"s), 1LL);
-    EXPECT_EQ(Aesi512(L"---------1"s), -1LL);
-    EXPECT_EQ(Aesi512(L"----------1"s), 1LL);
-    EXPECT_EQ(Aesi512(L"-----------1"s), -1LL);
-    EXPECT_EQ(Aesi512(L"------------1"s), 1LL);
-    EXPECT_EQ(Aesi512(L"-------------1"s), -1LL);
-    EXPECT_EQ(Aesi512(L"--------------1"s), 1LL);
-    EXPECT_EQ(Aesi512(L"---------------1"s), -1LL);
-    EXPECT_EQ(Aesi512(L"----------------1"s), 1LL);
-    EXPECT_EQ(Aesi512(L"-----------------1"s), -1LL);
-    EXPECT_EQ(Aesi512(L"------------------1"s), 1LL);
+    /* Negative-positive */
+    std::string data = "-1";
+    for(std::size_t i = 0; i < 20; i++) {
+        data.insert(0, 1, '-');
+        EXPECT_EQ(Aesi128(data), 1 * (i % 2 == 0 ? 1 : -1));
+    }
 }
 
 TEST(Signed_Initialization, Different_precisions) {

@@ -209,7 +209,7 @@ public:
 
             if(digit < base) {
                 this->operator*=(base);
-                this->operator+=(digit);
+                *this += digit;
             }
         }
     }
@@ -332,45 +332,49 @@ public:
     /* ------------------------ @name Addition operators. ------------------------ */
         /**
          * @brief Addition operator for built-in integral types
+         * @param base Aeu
          * @param addendum Unsigned
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator+(Unsigned addendum) const noexcept -> Aeu {
-            Aeu result = *this; result.operator+=(addendum); return result;
+        gpu constexpr friend auto operator+(const Aeu& base, Unsigned addendum) noexcept -> Aeu {
+            Aeu result = base; result += addendum; return result;
         }
 
         /**
          * @brief Addition operator
+         * @param base Aeu
          * @param addendum Aeu
          * @return Aeu
          */
         [[nodiscard]]
-        gpu constexpr auto operator+(const Aeu& addendum) const noexcept -> Aeu {
-            Aeu result = *this; result += addendum; return result;
+        gpu constexpr friend auto operator+(const Aeu& base, const Aeu& addendum) noexcept -> Aeu {
+            Aeu result = base; result += addendum; return result;
         }
 
         /**
          * @brief Assignment addition operator for built-in integral types
+         * @param base Aeu
          * @param addendum Unsigned
          * @return Aeu&
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator+=(Unsigned addendum) noexcept -> Aeu& {
+        gpu constexpr friend auto operator+=(Aeu& base, Unsigned addendum) noexcept -> Aeu& {
             for(std::size_t i = 0; i < blocksNumber; ++i) {
-                const auto currentSum = static_cast<uint64_t>(blocks[i]) + static_cast<uint64_t>(addendum);
-                addendum = currentSum / blockBase; blocks[i] = currentSum % blockBase;
+                const auto currentSum = static_cast<uint64_t>(base.blocks[i]) + static_cast<uint64_t>(addendum);
+                addendum = currentSum / blockBase; base.blocks[i] = currentSum % blockBase;
             }
-            return *this;
+            return base;
         }
 
         /**
          * @brief Assignment addition operator
+         * @param base Aeu
          * @param addendum Aeu
          * @return Aeu&
          */
-        gpu constexpr auto operator+=(const Aeu& addendum) noexcept -> Aeu& {
-            addLine(blocks, addendum.blocks); return *this;
+        gpu constexpr friend auto operator+=(Aeu& base, const Aeu& addendum) noexcept -> Aeu& {
+            addLine(base.blocks, addendum.blocks); return base;
         }
     /* --------------------------------------------------------------------------- */
 
@@ -392,7 +396,7 @@ public:
          * @return Aeu&
          */
         gpu constexpr auto operator-=(const Aeu& subtrahend) noexcept -> Aeu& {
-            return this->operator+=(-subtrahend);
+            return operator+=(*this, -subtrahend);
         }
     /* --------------------------------------------------------------------------- */
 

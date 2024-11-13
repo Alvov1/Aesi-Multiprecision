@@ -13,7 +13,7 @@ TEST(Unsigned_Addition, Basic) {
         EXPECT_EQ(+m0 + zero, 26359343u);
         EXPECT_EQ(+zero + +m0, 26359343u);
         EXPECT_EQ(+m0 + +zero, 26359343u);
-        m0 += zero; EXPECT_EQ(m0, 26359343u); m0 += +zero; EXPECT_EQ(m0, 26359343u); +m0 += zero; EXPECT_EQ(m0, 26359343u); +m0 += +zero; EXPECT_EQ(m0, 26359343u);
+        m0 += zero; EXPECT_EQ(m0, 26359343u); m0 += +zero; EXPECT_EQ(m0, 26359343u); m0 += zero; EXPECT_EQ(m0, 26359343u); m0 += +zero; EXPECT_EQ(m0, 26359343u);
     }
     {
         Aeu128 zero = 0u, m1 = 14670384u, m2 = 55908622u;

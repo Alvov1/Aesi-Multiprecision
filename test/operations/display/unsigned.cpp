@@ -98,9 +98,12 @@ TEST(Unsigned_Display, OctalStreams) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
         const Aeu<blocksNumber * 32> aeu = value;
 
-        std::stringstream ss, ss2;
+        std::stringstream ss {};
         ss << "0o" << std::oct << std::noshowbase << value;
+
+        std::stringstream ss2 {};
         ss2 << "0o" << std::oct << std::noshowbase << aeu;
+
         EXPECT_EQ(ss2.str(), ss.str());
     }
 
@@ -108,13 +111,15 @@ TEST(Unsigned_Display, OctalStreams) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
         const Aeu<blocksNumber * 32> aeu = value;
 
-        std::stringstream ss;
+        std::stringstream ss {};
         ss << "0o" << std::oct << std::noshowbase << value;
-        std::wstringstream ss2;
+
+        std::wstringstream ss2 {};
         ss2 << "0o" << std::oct << std::noshowbase << aeu;
 
         const auto& ref = ss.str();
         std::wstring wstring (ref.begin(), ref.end());
+
         EXPECT_EQ(ss2.str(), wstring);
     }
 }
@@ -126,9 +131,12 @@ TEST(Unsigned_Display, HexadecimalStreams) {
         const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
         const Aeu<blocksNumber * 32> aeu = value;
 
-        std::stringstream ss, ss2;
+        std::stringstream ss {};
         ss << "0x" << std::hex << std::noshowbase << value;
+
+        std::stringstream ss2 {};
         ss2 << "0x" << std::hex << std::noshowbase << aeu;
+
         EXPECT_EQ(ss2.str(), ss.str());
     }
 
@@ -138,11 +146,13 @@ TEST(Unsigned_Display, HexadecimalStreams) {
 
         std::stringstream ss;
         ss << "0x" << std::hex << std::noshowbase << value;
+
         std::wstringstream ss2;
         ss2 << "0x" << std::hex << std::noshowbase << aeu;
 
         const auto& ref = ss.str();
         std::wstring wstring (ref.begin(), ref.end());
+
         EXPECT_EQ(ss2.str(), wstring);
     }
 }

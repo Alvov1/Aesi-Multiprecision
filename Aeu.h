@@ -175,6 +175,9 @@ public:
             for(; position < size && !std::iswalnum(data[position]); ++position) ;
         }
 
+        if(position == size)
+            return;
+
         const auto base = [&data, &size, &position, &characters] {
             if (data[position] == characters[0] && size > position + 1) {
                 switch (data[position + 1]) {
@@ -192,6 +195,7 @@ public:
                 }
             } return 10u;
         } ();
+
         for(; position < size; ++position) {
             const auto digit = [] (Char ch) {
                 if(characters[0] <= ch && ch <= characters[1])
@@ -705,7 +709,7 @@ public:
          * @param other Aeu
          * @return Boolean
          */
-        gpu constexpr auto operator==(const Aeu& other) const noexcept -> bool { return blocks == other.blocks; };
+        gpu constexpr auto operator==(const Aeu& other) const noexcept -> bool = default;
 
         /**
          * @brief Templated Equality check operator for numbers of different precision

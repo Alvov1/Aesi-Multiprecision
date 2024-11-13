@@ -1,3 +1,8 @@
+/**
+ * @file Aeu.h
+ * @brief Long precision unsigned integer with arithmetic operations
+ */
+
 #ifndef AEU_MULTIPRECISION
 #define AEU_MULTIPRECISION
 
@@ -27,11 +32,6 @@
 #ifdef AESI_GMP_INTEGRATION
 #include <gmpxx.h>
 #endif
-
-/**
- * @file Aeu.h
- * @brief Long precision unsigned integer with arithmetic operations
- */
 
 namespace {
     using byte = uint8_t;

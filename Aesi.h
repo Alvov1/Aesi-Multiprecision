@@ -1,14 +1,14 @@
+/**
+ * @file Aesi.h
+ * @brief Long precision signed integer with arithmetic operations
+ */
+
 #ifndef AESI_MULTIPRECISION
 #define AESI_MULTIPRECISION
 
 /// @cond HIDE_INCLUDES
 #include "Aeu.h"
 /// @endcond
-
-/**
- * @file Aesi.h
- * @brief Long precision signed integer with arithmetic operations
- */
 
 namespace {
     enum class Sign { Zero = 0, Positive = 1, Negative = -1 };
@@ -32,12 +32,12 @@ namespace {
         return positive == std::byte {1} ? Sign::Positive : Sign::Negative;
     }
 }
-
 /**
  * @class Aesi
  * @brief Long precision signed integer
  * @details May be used to represent positive and negative integers. Number precision is set in template parameter bitness.
  */
+
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Aesi final {
     /* -------------------------- @name Class members. ----------------------- */

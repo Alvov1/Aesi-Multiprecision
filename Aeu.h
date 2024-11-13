@@ -208,7 +208,7 @@ public:
             } (data[position]);
 
             if(digit < base) {
-                this->operator*=(base);
+                *this *= base;
                 *this += digit;
             }
         }
@@ -406,39 +406,42 @@ public:
     /* --------------------- @name Multiplication operators. --------------------- */
         /**
          * @brief Multiplication operator for built-in integral types
+         * @param base Aeu
          * @param factor Unsigned
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator*(Unsigned factor) const noexcept -> Aeu {
-            Aeu result = *this; result.operator*=(factor); return result;
+        gpu constexpr friend auto operator*(Aeu& base, Unsigned factor) noexcept -> Aeu {
+            Aeu result = base; result *= factor; return result;
         }
 
         /**
          * @brief Multiplication operator
+         * @param base Aeu
          * @param factor Aeu
          * @return Aeu
          */
         [[nodiscard]]
-        gpu constexpr auto operator*(const Aeu& factor) const noexcept -> Aeu {
-            Aeu result = *this; result *= factor; return result;
+        gpu constexpr friend auto operator*(const Aeu& base, const Aeu& factor) noexcept -> Aeu {
+            Aeu result = base; result *= factor; return result;
         }
 
         /**
          * @brief Assignment multiplication operator for built-in integral types
+         * @param base Aeu
          * @param factor Unsigned
          * @return Aeu&
          * @details Works with the greatest performance with types smaller than uint64_t
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator*=(Unsigned factor) noexcept -> Aeu& {
+        gpu constexpr friend auto operator*=(Aeu& base, Unsigned factor) noexcept -> Aeu& {
             if constexpr (std::is_same_v<Unsigned, uint64_t>) {
-                const auto longerLength = filledBlocksNumber();
+                const auto longerLength = base.filledBlocksNumber();
                 const auto smallerLength = (factor > blockMax ? 2UL : 1UL);
                 blockLine buffer {};
 
                 for(std::size_t i = 0; i < longerLength; ++i) {
-                    uint64_t tBlock = blocks[i], carryOut = 0;
+                    uint64_t tBlock = base.blocks[i], carryOut = 0;
 
                     for(std::size_t j = 0; j < smallerLength && i + j < buffer.size(); ++j) {
                         const auto product = tBlock * ((factor >> blockBitLength * j) & 0x00'00'00'00'ff'ff'ff'ff) + carryOut;
@@ -451,24 +454,25 @@ public:
                         buffer[smallerLength + i] += carryOut;
                 }
 
-                blocks = buffer;
-                return *this;
+                base.blocks = buffer;
+                return base;
             } else {
                 uint64_t carryOut = 0;
                 for (std::size_t i = 0; i < blocksNumber; ++i) {
-                    const auto product = static_cast<uint64_t>(factor) * static_cast<uint64_t>(blocks[i]) + carryOut;
-                    blocks[i] = product % blockBase; carryOut = product / blockBase;
+                    const auto product = static_cast<uint64_t>(factor) * static_cast<uint64_t>(base.blocks[i]) + carryOut;
+                    base.blocks[i] = product % blockBase; carryOut = product / blockBase;
                 }
-                return *this;
+                return base;
             }
         };
 
         /**
          * @brief Assignment multiplication operator
+         * @param base Aeu
          * @param factor Aeu
          * @return Aeu&
          */
-        gpu constexpr auto operator*=(const Aeu& factor) noexcept -> Aeu& {
+        gpu constexpr friend auto operator*=(Aeu& base, const Aeu& factor) noexcept -> Aeu& {
             constexpr auto multiplyLines = [] (const blockLine& longerLine, const std::size_t longerLength,
                                                const blockLine& smallerLine, const std::size_t smallerLength) {
                 blockLine buffer {};
@@ -491,13 +495,13 @@ public:
                 return buffer;
             };
 
-            const std::size_t thisLength = this->filledBlocksNumber();
+            const std::size_t thisLength = base.filledBlocksNumber();
             if(const std::size_t valueLength = factor.filledBlocksNumber(); thisLength > valueLength)
-                blocks = multiplyLines(blocks, thisLength, factor.blocks, valueLength);
+                base.blocks = multiplyLines(base.blocks, thisLength, factor.blocks, valueLength);
             else
-                blocks = multiplyLines(factor.blocks, valueLength, blocks, thisLength);
+                base.blocks = multiplyLines(factor.blocks, valueLength, base.blocks, thisLength);
 
-            return *this;
+            return base;
         }
     /* --------------------------------------------------------------------------- */
 

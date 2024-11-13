@@ -404,7 +404,7 @@ public:
                     this->inverse();
                     factor *= -1;
                 }
-                base.operator*=(static_cast<unsigned long long>(factor));
+                base *= static_cast<unsigned long long>(factor);
             }
             return *this;
         }
@@ -421,7 +421,7 @@ public:
             } else {
                 if(factor.isNegative())
                     this->inverse();
-                base.operator*=(factor.base);
+                base *= factor.base;
             }
             return *this;
         }

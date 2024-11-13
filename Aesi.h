@@ -388,118 +388,132 @@ public:
     /* --------------------- @name Multiplication operators. --------------------- */
         /**
          * @brief Multiplication operator for built-in types
+         * @param multiple Aesi
          * @param factor Integral
          * @return Aesi
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator*(Integral factor) const noexcept -> Aesi { Aesi result = *this; result *= factor; return result; }
+        gpu constexpr friend auto operator*(const Aesi& multiple, Integral factor) noexcept -> Aesi {
+            Aesi result = multiple; result *= factor; return result;
+        }
 
         /**
          * @brief Multiplication operator
-         * @param factor Aesi&
+         * @param multiple Aesi
+         * @param factor Aesi
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr auto operator*(const Aesi& factor) const noexcept -> Aesi { Aesi result = *this; result *= factor; return result; }
+        gpu constexpr friend auto operator*(const Aesi& multiple, const Aesi& factor) noexcept -> Aesi {
+            Aesi result = multiple; result *= factor; return result;
+        }
 
         /**
          * @brief Multiplication assignment operator for built-in types
+         * @param multiple Aesi
          * @param factor Integral
          * @return Aesi&
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator*=(Integral factor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator*=(Aesi& multiple, Integral factor) noexcept -> Aesi& {
             using enum Sign;
             if(factor == 0) {
-                sign = Zero;
+                multiple.sign = Zero;
             } else {
                 if(factor < 0) {
-                    this->inverse();
+                    multiple.inverse();
                     factor *= -1;
                 }
-                base *= static_cast<unsigned long long>(factor);
+                multiple.base *= static_cast<unsigned long long>(factor);
             }
-            return *this;
+            return multiple;
         }
 
         /**
          * @brief Multiplication assignment operator
-         * @param factor Aesi&
+         * @param multiple Aesi
+         * @param factor Aesi
          * @return Aesi&
          */
-        gpu constexpr auto operator*=(const Aesi& factor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator*=(Aesi& multiple, const Aesi& factor) noexcept -> Aesi& {
             using enum Sign;
             if(factor.isZero()) {
-                sign = Zero;
+                multiple.sign = Zero;
             } else {
                 if(factor.isNegative())
-                    this->inverse();
-                base *= factor.base;
+                    multiple.inverse();
+                multiple.base *= factor.base;
             }
-            return *this;
+            return multiple;
         }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------ @name Division operators. ------------------------ */
         /**
          * @brief Division operator for built-in integral types
+         * @param division Aesi
          * @param divisor Integral
          * @return Aesi
          * @note Undefined behaviour for division by zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator/(Integral divisor) const noexcept -> Aesi {
-            Aesi result = *this; result /= divisor; return result;
+        gpu constexpr friend auto operator/(const Aesi& division, Integral divisor) noexcept -> Aesi {
+            Aesi result = division; result /= divisor; return result;
         }
 
         /**
          * @brief Division operator
+         * @param division Aesi
          * @param divisor Aesi
          * @return Aesi
          * @note Undefined behaviour for division by zero
          */
         [[nodiscard]]
-        gpu constexpr auto operator/(const Aesi& divisor) const noexcept -> Aesi { Aesi result = *this; result /= divisor; return result; }
+        gpu constexpr friend auto operator/(const Aesi& division, const Aesi& divisor) noexcept -> Aesi {
+            Aesi result = division; result /= divisor; return result;
+        }
 
         /**
          * @brief Assignment division operator for built-in integral types
+         * @param division Aesi
          * @param divisor Integral
          * @return Aesi&
          * @note Undefined behaviour for division by zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator/=(Integral divisor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator/=(Aesi& division, Integral divisor) noexcept -> Aesi& {
             using enum Sign;
             if(divisor == 0) {
-                sign = Zero;
+                division.sign = Zero;
             } else {
                 if(divisor < 0) {
-                    this->inverse();
+                    division.inverse();
                     divisor *= -1;
                 }
-                base /= static_cast<unsigned long long>(divisor);
-                if(base.isZero()) sign = Zero;
+                division.base /= static_cast<unsigned long long>(divisor);
+                if(division.base.isZero()) division.sign = Zero;
             }
-            return *this;
+            return division;
         }
 
         /**
          * @brief Assignment division operator
+         * @param division Aesi
          * @param divisor Aesi
          * @return Aesi&
          * @note Undefined behaviour for division by zero
          */
-        gpu constexpr auto operator/=(const Aesi& divisor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator/=(Aesi& division, const Aesi& divisor) noexcept -> Aesi& {
             using enum Sign;
             if(divisor.isZero()) {
-                sign = Zero;
+                division.sign = Zero;
             } else {
                 if(divisor.isNegative())
-                    this->inverse();
-                base /= divisor.base;
-                if(base.isZero()) sign = Zero;
+                    division.inverse();
+                division.base /= divisor.base;
+                if(division.base.isZero()) division.sign = Zero;
             }
-            return *this;
+            return division;
         }
     /* --------------------------------------------------------------------------- */
 

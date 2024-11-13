@@ -12,6 +12,25 @@
 
 namespace {
     enum class Sign { Zero = 0, Positive = 1, Negative = -1 };
+
+    template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
+    Sign traverseDashes(const Char* ptr, std::size_t);
+
+    template <>
+    Sign traverseDashes(const char* ptr, std::size_t size) {
+        std::byte positive { 1 };
+        for(std::size_t i = 0; i < size; ++i)
+            if(ptr[i] == '-') positive ^= std::byte {1};
+        return positive == std::byte {1} ? Sign::Positive : Sign::Negative;
+    }
+
+    template <>
+    Sign traverseDashes(const wchar_t* ptr, std::size_t size) {
+        std::byte positive { 1 };
+        for(std::size_t i = 0; i < size; ++i)
+            if(ptr[i] == L'-') positive ^= std::byte {1};
+        return positive == std::byte {1} ? Sign::Positive : Sign::Negative;
+    }
 }
 
 /**
@@ -28,7 +47,7 @@ class Aesi final {
     Base base;
     /* ----------------------------------------------------------------------- */
 
-    gpu constexpr Aesi(Sign withSign, Base withBase): sign { withSign }, base { withBase } {};
+    gpu constexpr Aesi(Sign withSign, Base withBase): sign { withSign }, base { withBase } {}
 
 public:
     /* --------------------- @name Different constructors. ------------------- */
@@ -75,22 +94,9 @@ public:
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
     gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) {
-        using enum Sign;
-        if(!base.isZero()) {
-            std::byte positive { 1 };
-
-            const auto dash = [] {
-                if constexpr (std::is_same_v<Char, char>) {
-                    return '-';
-                } else {
-                    return L'-';
-                }
-            } ();
-            for(std::size_t i = 0; i < size; ++i)
-                if(ptr[i] == dash) positive ^= std::byte {1};
-
-            sign = (positive == std::byte {1} ? Positive : Negative);
-        } else sign = Zero;
+        if(!base.isZero())
+            sign = traverseDashes(ptr, size);
+        else sign = Sign::Zero;
     }
 
     /**
@@ -239,33 +245,33 @@ public:
     /* ------------------------ @name Addition operators. ------------------------ */
         /**
          * @brief Addition operator
-         * @param base Aesi
+         * @param addition Aesi
          * @param addendum Aesi&
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr friend auto operator+(const Aesi& base, const Aesi& addendum) noexcept -> Aesi {
-            Aesi result = base; result += addendum; return result;
+        gpu constexpr friend auto operator+(const Aesi& addition, const Aesi& addendum) noexcept -> Aesi {
+            Aesi result = addition; result += addendum; return result;
         }
 
         /**
          * @brief Addition assignment operator
-         * @param left Aesi
-         * @param right Aesi&
+         * @param addition Aesi
+         * @param addendum Aesi&
          * @return Aesi&
          */
-        gpu constexpr friend auto operator+=(Aesi& left, const Aesi& right) noexcept -> Aesi& {
+        gpu constexpr friend auto operator+=(Aesi& addition, const Aesi& addendum) noexcept -> Aesi& {
             using enum Sign;
-            Sign& lSign = left.sign; const Sign& rSign = right.sign;
-            Base& lBase = left.base; const Base& rBase = right.base;
+            Sign& lSign = addition.sign; const Sign& rSign = addendum.sign;
+            Base& lBase = addition.base; const Base& rBase = addendum.base;
 
             if(rSign == Zero)
-                return left;
+                return addition;
             else if(lSign == Zero)
-                return left = right;
+                return addition = addendum;
             else if(lSign == rSign) {
                 lBase += rBase;
-                return left;
+                return addition;
             }
 
             if(lSign == Positive) {
@@ -273,16 +279,16 @@ public:
                     using enum Comparison;
                     case greater: {
                         lBase -= rBase;
-                        return left;
+                        return addition;
                     }
                     case less: {
                         lBase = rBase - lBase;
                         lSign = Negative;
-                        return left;
+                        return addition;
                     }
                     default: {
                         lSign = Zero;
-                        return left;
+                        return addition;
                     }
                 }
             } else {
@@ -290,16 +296,16 @@ public:
                     using enum Comparison;
                     case greater: {
                         lBase -= rBase;
-                        return left;
+                        return addition;
                     }
                     case less: {
                         lBase = rBase - lBase;
                         lSign = Positive;
-                        return left;
+                        return addition;
                     }
                     default: {
                         lSign = Zero;
-                        return left;
+                        return addition;
                     }
                 }
             }
@@ -309,32 +315,32 @@ public:
     /* ----------------------- @name Subtraction operators. ---------------------- */
         /**
          * @brief Subtraction operator
-         * @param base Aesi
+         * @param subtraction Aesi
          * @param subtrahend Aesi&
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr friend auto operator-(const Aesi& base, const Aesi& subtrahend) noexcept -> Aesi {
-            Aesi result = base; result -= subtrahend; return result;
+        gpu constexpr friend auto operator-(const Aesi& subtraction, const Aesi& subtrahend) noexcept -> Aesi {
+            Aesi result = subtraction; result -= subtrahend; return result;
         }
 
         /**
          * @brief Subtraction assignment operator
-         * @param left Aesi
-         * @param right Aesi&
+         * @param subtraction Aesi
+         * @param subtrahend Aesi&
          * @return Aesi&
          */
-        gpu constexpr friend auto operator-=(Aesi& left, const Aesi& right) noexcept -> Aesi& {
+        gpu constexpr friend auto operator-=(Aesi& subtraction, const Aesi& subtrahend) noexcept -> Aesi& {
             using enum Sign;
-            Sign& lSign = left.sign; const Sign& rSign = right.sign;
-            Base& lBase = left.base; const Base& rBase = right.base;
+            Sign& lSign = subtraction.sign; const Sign& rSign = subtrahend.sign;
+            Base& lBase = subtraction.base; const Base& rBase = subtrahend.base;
 
             if(rSign == Zero)
-                return left;
+                return subtraction;
             if(lSign == Zero) {
-                left = right;
-                left.inverse();
-                return left;
+                subtraction = subtrahend;
+                subtraction.inverse();
+                return subtraction;
             }
 
             if(lSign == Positive) {
@@ -343,21 +349,21 @@ public:
                         using enum Comparison;
                         case greater: {
                             lBase -= rBase;
-                            return left;
+                            return subtraction;
                         }
                         case less: {
                             lBase = rBase - lBase;
                             lSign = Negative;
-                            return left;
+                            return subtraction;
                         }
                         default: {
                             lSign = Zero;
-                            return left;
+                            return subtraction;
                         }
                     }
                 } else {
                     lBase += rBase;
-                    return left;
+                    return subtraction;
                 }
             } else {
                 if(rSign == Negative) {
@@ -365,21 +371,21 @@ public:
                         using enum Comparison;
                         case greater: {
                             lBase -= rBase;
-                            return left;
+                            return subtraction;
                         }
                         case less: {
                             lBase = rBase - lBase;
                             lSign = Positive;
-                            return left;
+                            return subtraction;
                         }
                         default: {
                             lSign = Zero;
-                            return left;
+                            return subtraction;
                         }
                     }
                 } else {
                     lBase += rBase;
-                    return left;
+                    return subtraction;
                 }
             }
         }
@@ -388,63 +394,63 @@ public:
     /* --------------------- @name Multiplication operators. --------------------- */
         /**
          * @brief Multiplication operator for built-in types
-         * @param multiple Aesi
+         * @param multiplication Aesi
          * @param factor Integral
          * @return Aesi
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr friend auto operator*(const Aesi& multiple, Integral factor) noexcept -> Aesi {
-            Aesi result = multiple; result *= factor; return result;
+        gpu constexpr friend auto operator*(const Aesi& multiplication, Integral factor) noexcept -> Aesi {
+            Aesi result = multiplication; result *= factor; return result;
         }
 
         /**
          * @brief Multiplication operator
-         * @param multiple Aesi
+         * @param multiplication Aesi
          * @param factor Aesi
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr friend auto operator*(const Aesi& multiple, const Aesi& factor) noexcept -> Aesi {
-            Aesi result = multiple; result *= factor; return result;
+        gpu constexpr friend auto operator*(const Aesi& multiplication, const Aesi& factor) noexcept -> Aesi {
+            Aesi result = multiplication; result *= factor; return result;
         }
 
         /**
          * @brief Multiplication assignment operator for built-in types
-         * @param multiple Aesi
+         * @param multiplication Aesi
          * @param factor Integral
          * @return Aesi&
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr friend auto operator*=(Aesi& multiple, Integral factor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator*=(Aesi& multiplication, Integral factor) noexcept -> Aesi& {
             using enum Sign;
             if(factor == 0) {
-                multiple.sign = Zero;
+                multiplication.sign = Zero;
             } else {
                 if(factor < 0) {
-                    multiple.inverse();
+                    multiplication.inverse();
                     factor *= -1;
                 }
-                multiple.base *= static_cast<unsigned long long>(factor);
+                multiplication.base *= static_cast<unsigned long long>(factor);
             }
-            return multiple;
+            return multiplication;
         }
 
         /**
          * @brief Multiplication assignment operator
-         * @param multiple Aesi
+         * @param multiplication Aesi
          * @param factor Aesi
          * @return Aesi&
          */
-        gpu constexpr friend auto operator*=(Aesi& multiple, const Aesi& factor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator*=(Aesi& multiplication, const Aesi& factor) noexcept -> Aesi& {
             using enum Sign;
             if(factor.isZero()) {
-                multiple.sign = Zero;
+                multiplication.sign = Zero;
             } else {
                 if(factor.isNegative())
-                    multiple.inverse();
-                multiple.base *= factor.base;
+                    multiplication.inverse();
+                multiplication.base *= factor.base;
             }
-            return multiple;
+            return multiplication;
         }
     /* --------------------------------------------------------------------------- */
 
@@ -592,13 +598,13 @@ public:
     /* ------------------------ @name Equality operators. ------------------------ */
         /**
          * @brief Equality operator for built-in types
-         * @param value Aesi
+         * @param our Aesi
          * @param integral Integral
          * @return bool
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr friend auto operator==(const Aesi& value, Integral integral) noexcept -> bool {
-            return value.compareTo(integral) == Comparison::equal;
+        gpu constexpr friend auto operator==(const Aesi& our, Integral integral) noexcept -> bool {
+            return our.compareTo(integral) == Comparison::equal;
         }
 
         /**

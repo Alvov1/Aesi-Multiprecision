@@ -256,47 +256,49 @@ public:
          */
         gpu constexpr friend auto operator+=(Aesi& left, const Aesi& right) noexcept -> Aesi& {
             using enum Sign;
-            if(right.sign == Zero)
-                return left;
-            if(left.sign == Zero)
-                return left = right;
+            Sign& lSign = left.sign; const Sign& rSign = right.sign;
+            Base& lBase = left.base; const Base& rBase = right.base;
 
-            if(left.sign == right.sign) {
-                left.base += right.base;
+            if(rSign == Zero)
+                return left;
+            else if(lSign == Zero)
+                return left = right;
+            else if(lSign == rSign) {
+                lBase += rBase;
                 return left;
             }
 
-            if(left.sign == Positive) {
-                switch(left.base.compareTo(right.base)) {
+            if(lSign == Positive) {
+                switch(lBase.compareTo(rBase)) {
                     using enum Comparison;
                     case greater: {
-                        left.base -= right.base;
+                        lBase -= rBase;
                         return left;
                     }
                     case less: {
-                        left.base = right.base - left.base;
-                        left.sign = Negative;
+                        lBase = rBase - lBase;
+                        lSign = Negative;
                         return left;
                     }
                     default: {
-                        left.sign = Zero;
+                        lSign = Zero;
                         return left;
                     }
                 }
             } else {
-                switch(const auto ratio = left.base.compareTo(right.base)) {
+                switch(const auto ratio = lBase.compareTo(rBase)) {
                     using enum Comparison;
                     case greater: {
-                        left.base -= right.base;
+                        lBase -= rBase;
                         return left;
                     }
                     case less: {
-                        left.base = right.base - left.base;
-                        left.sign = Positive;
+                        lBase = rBase - lBase;
+                        lSign = Positive;
                         return left;
                     }
                     default: {
-                        left.sign = Zero;
+                        lSign = Zero;
                         return left;
                     }
                 }
@@ -324,56 +326,59 @@ public:
          */
         gpu constexpr friend auto operator-=(Aesi& left, const Aesi& right) noexcept -> Aesi& {
             using enum Sign;
-            if(right.sign == Zero)
+            Sign& lSign = left.sign; const Sign& rSign = right.sign;
+            Base& lBase = left.base; const Base& rBase = right.base;
+
+            if(rSign == Zero)
                 return left;
-            if(left.sign == Zero) {
+            if(lSign == Zero) {
                 left = right;
                 left.inverse();
                 return left;
             }
 
-            if(left.sign == Positive) {
-                if(right.sign == Positive) {
-                    switch(left.base.compareTo(right.base)) {
+            if(lSign == Positive) {
+                if(rSign == Positive) {
+                    switch(lBase.compareTo(rBase)) {
                         using enum Comparison;
                         case greater: {
-                            left.base -= right.base;
+                            lBase -= rBase;
                             return left;
                         }
                         case less: {
-                            left.base = right.base - left.base;
-                            left.sign = Negative;
+                            lBase = rBase - lBase;
+                            lSign = Negative;
                             return left;
                         }
                         default: {
-                            left.sign = Zero;
+                            lSign = Zero;
                             return left;
                         }
                     }
                 } else {
-                    left.base += right.base;
+                    lBase += rBase;
                     return left;
                 }
             } else {
-                if(right.sign == Negative) {
-                    switch(left.base.compareTo(right.base)) {
+                if(rSign == Negative) {
+                    switch(lBase.compareTo(rBase)) {
                         using enum Comparison;
                         case greater: {
-                            left.base -= right.base;
+                            lBase -= rBase;
                             return left;
                         }
                         case less: {
-                            left.base = right.base - left.base;
-                            left.sign = Positive;
+                            lBase = rBase - lBase;
+                            lSign = Positive;
                             return left;
                         }
                         default: {
-                            left.sign = Zero;
+                            lSign = Zero;
                             return left;
                         }
                     }
                 } else {
-                    left.base += right.base;
+                    lBase += rBase;
                     return left;
                 }
             }

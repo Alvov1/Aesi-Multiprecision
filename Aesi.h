@@ -520,62 +520,70 @@ public:
     /* ------------------------- @name Modulo operators. ------------------------- */
         /**
          * @brief Modulo operator for built-in types
+         * @param modulation Aesi
          * @param modulo Integral
          * @return Aesi
          * @note Returns zero for the modulo of zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator%(Integral modulo) const noexcept -> Aesi { Aesi result = *this; result %= modulo; return result; }
+        gpu constexpr friend auto operator%(const Aesi& modulation, Integral modulo) noexcept -> Aesi {
+            Aesi result = modulation; result %= modulo; return result;
+        }
 
         /**
          * @brief Modulo operator
-         * @param modulo Aesi&
+         * @param modulation Aesi
+         * @param modulo Aesi
          * @return Aesi
          * @details DETAILS
          * @note Returns zero for the modulo of zero
          */
         [[nodiscard]]
-        gpu constexpr auto operator%(const Aesi& modulo) const noexcept -> Aesi { Aesi result = *this; result %= modulo; return result; }
+        gpu constexpr friend auto operator%(const Aesi& modulation, const Aesi& modulo)  noexcept -> Aesi {
+            Aesi result = modulation; result %= modulo; return result;
+        }
 
         /**
          * @brief Modulo assignment operator for built-in types
+         * @param modulation Aesi
          * @param modulo Integral
          * @return Aesi&
          * @note Returns zero for the modulo of zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator%=(Integral modulo) noexcept -> Aesi& {
+        gpu constexpr friend auto operator%=(Aesi& modulation, Integral modulo) noexcept -> Aesi& {
             using enum Sign;
             if(modulo == 0) {
-                sign = Zero;
+                modulation.sign = Zero;
             } else {
                 if(modulo < 0) {
-                    this->inverse();
+                    modulation.inverse();
                     modulo *= -1;
                 }
-                base %= static_cast<unsigned long long>(modulo);
+                modulation.base %= static_cast<unsigned long long>(modulo);
             }
-            return *this;
+            return modulation;
         }
 
         /**
          * @brief Modulo assignment operator
-         * @param modulo Aesi&
+         * @param modulation Aesi
+         * @param modulo Aesi
          * @return Aesi&
          * @details DETAILS
          * @note Returns zero for the modulo of zero
          */
-        gpu constexpr auto operator%=(const Aesi& modulo) noexcept -> Aesi& {
+        gpu constexpr friend auto operator%=(Aesi& modulation, const Aesi& modulo) noexcept -> Aesi& {
             if(modulo.isZero())
-                return *this;
+                return modulation;
 
             if(modulo.isNegative())
-                this->inverse();
-            base %= modulo.base;
-            if(base.isZero())
-                sign = Sign::Zero;
+                modulation.inverse();
+            modulation.base %= modulo.base;
+            if(modulation.base.isZero())
+                modulation.sign = Sign::Zero;
 
-            return *this;
+            return modulation;
         }
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */

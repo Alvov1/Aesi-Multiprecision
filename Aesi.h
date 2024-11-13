@@ -592,31 +592,32 @@ public:
     /* ------------------------ @name Equality operators. ------------------------ */
         /**
          * @brief Equality operator for built-in types
+         * @param value Aesi
          * @param integral Integral
          * @return bool
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator==(Integral integral) const noexcept -> bool {
-            return compareTo(integral) == Comparison::equal;
+        gpu constexpr friend auto operator==(const Aesi& value, Integral integral) noexcept -> bool {
+            return value.compareTo(integral) == Comparison::equal;
         }
 
         /**
          * @brief Equality operator
-         * @param other Aesi&
+         * @param our Aesi
+         * @param other Aesi
          * @return bool
          */
-        gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool {
-            return sign == other.sign && base == other.base;
-        }
+        gpu constexpr friend auto operator==(const Aesi& our, const Aesi& other) noexcept -> bool = default;
 
         /**
          * @brief Different precision equlity operator
-         * @param other Aesi&
+         * @param our Aesi
+         * @param other Aesi
          * @return bool
          */
         template <std::size_t otherBitness> requires (otherBitness != bitness)
-        gpu constexpr auto operator==(const Aesi<otherBitness>& other) const noexcept -> bool {
-            return precisionCast<otherBitness>() == other;
+        gpu constexpr friend auto operator==(const Aesi& our, const Aesi<otherBitness>& other) noexcept -> bool {
+            return our.precisionCast<otherBitness>() == other;
         }
     /* --------------------------------------------------------------------------- */
 

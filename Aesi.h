@@ -238,62 +238,66 @@ public:
 
     /* ------------------------ @name Addition operators. ------------------------ */
         /**
-         * @brief Adition operator
+         * @brief Addition operator
+         * @param base Aesi
          * @param addendum Aesi&
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr auto operator+(const Aesi& addendum) const noexcept -> Aesi { Aesi result = *this; result += addendum; return result; }
+        gpu constexpr friend auto operator+(const Aesi& base, const Aesi& addendum) noexcept -> Aesi {
+            Aesi result = base; result += addendum; return result;
+        }
 
         /**
          * @brief Addition assignment operator
-         * @param addendum Aesi&
+         * @param left Aesi
+         * @param right Aesi&
          * @return Aesi&
          */
-        gpu constexpr auto operator+=(const Aesi& addendum) noexcept -> Aesi& {
+        gpu constexpr friend auto operator+=(Aesi& left, const Aesi& right) noexcept -> Aesi& {
             using enum Sign;
-            if(addendum.sign == Zero)
-                return *this;
-            if(sign == Zero)
-                return this->operator=(addendum);
+            if(right.sign == Zero)
+                return left;
+            if(left.sign == Zero)
+                return left = right;
 
-            if(sign == addendum.sign) {
-                base += addendum.base;
-                return *this;
+            if(left.sign == right.sign) {
+                left.base += right.base;
+                return left;
             }
 
-            if(sign == Positive) {
-                switch(base.compareTo(addendum.base)) {
+            if(left.sign == Positive) {
+                switch(left.base.compareTo(right.base)) {
                     using enum Comparison;
                     case greater: {
-                        base -= addendum.base;
-                        return *this;
+                        left.base -= right.base;
+                        return left;
                     }
                     case less: {
-                        base = addendum.base - base;
-                        sign = Negative;
-                        return *this;
+                        left.base = right.base - left.base;
+                        left.sign = Negative;
+                        return left;
                     }
                     default: {
-                        sign = Zero;
-                        return *this;
+                        left.sign = Zero;
+                        return left;
                     }
                 }
             } else {
-                switch(const auto ratio = base.compareTo(addendum.base)) {
+                switch(const auto ratio = left.base.compareTo(right.base)) {
                     using enum Comparison;
                     case greater: {
-                        base -= addendum.base;
-                        return *this;
+                        left.base -= right.base;
+                        return left;
                     }
                     case less: {
-                        base = addendum.base - base;
-                        sign = Positive;
-                        return *this;
+                        left.base = right.base - left.base;
+                        left.sign = Positive;
+                        return left;
                     }
                     default: {
-                        sign = Zero;
-                        return *this;
+                        left.sign = Zero;
+                        return left;
                     }
                 }
             }
@@ -303,70 +307,74 @@ public:
     /* ----------------------- @name Subtraction operators. ---------------------- */
         /**
          * @brief Subtraction operator
+         * @param base Aesi
          * @param subtrahend Aesi&
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr auto operator-(const Aesi& subtrahend) const noexcept -> Aesi { Aesi result = *this; result -= subtrahend; return result; }
+        gpu constexpr friend auto operator-(const Aesi& base, const Aesi& subtrahend) noexcept -> Aesi {
+            Aesi result = base; result -= subtrahend; return result;
+        }
 
         /**
          * @brief Subtraction assignment operator
-         * @param subtrahend Aesi&
+         * @param left Aesi
+         * @param right Aesi&
          * @return Aesi&
          */
-        gpu constexpr auto operator-=(const Aesi& subtrahend) noexcept -> Aesi& {
+        gpu constexpr friend auto operator-=(Aesi& left, const Aesi& right) noexcept -> Aesi& {
             using enum Sign;
-            if(subtrahend.sign == Zero)
-                return *this;
-            if(sign == Zero) {
-                *this = subtrahend;
-                this->inverse();
-                return *this;
+            if(right.sign == Zero)
+                return left;
+            if(left.sign == Zero) {
+                left = right;
+                left.inverse();
+                return left;
             }
 
-            if(sign == Positive) {
-                if(subtrahend.sign == Positive) {
-                    switch(base.compareTo(subtrahend.base)) {
+            if(left.sign == Positive) {
+                if(right.sign == Positive) {
+                    switch(left.base.compareTo(right.base)) {
                         using enum Comparison;
                         case greater: {
-                            base -= subtrahend.base;
-                            return *this;
+                            left.base -= right.base;
+                            return left;
                         }
                         case less: {
-                            base = subtrahend.base - base;
-                            sign = Negative;
-                            return *this;
+                            left.base = right.base - left.base;
+                            left.sign = Negative;
+                            return left;
                         }
                         default: {
-                            sign = Zero;
-                            return *this;
+                            left.sign = Zero;
+                            return left;
                         }
                     }
                 } else {
-                    base += subtrahend.base;
-                    return *this;
+                    left.base += right.base;
+                    return left;
                 }
             } else {
-                if(subtrahend.sign == Negative) {
-                    switch(base.compareTo(subtrahend.base)) {
+                if(right.sign == Negative) {
+                    switch(left.base.compareTo(right.base)) {
                         using enum Comparison;
                         case greater: {
-                            base -= subtrahend.base;
-                            return *this;
+                            left.base -= right.base;
+                            return left;
                         }
                         case less: {
-                            base = subtrahend.base - base;
-                            sign = Positive;
-                            return *this;
+                            left.base = right.base - left.base;
+                            left.sign = Positive;
+                            return left;
                         }
                         default: {
-                            sign = Zero;
-                            return *this;
+                            left.sign = Zero;
+                            return left;
                         }
                     }
                 } else {
-                    base += subtrahend.base;
-                    return *this;
+                    left.base += right.base;
+                    return left;
                 }
             }
         }

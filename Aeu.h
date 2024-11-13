@@ -175,7 +175,7 @@ public:
             for(; position < size && !std::iswalnum(data[position]); ++position) ;
         }
 
-        const auto base = [&data, &size, &position] {
+        const auto base = [&data, &size, &position, &characters] {
             if (data[position] == characters[0] && size > position + 1) {
                 switch (data[position + 1]) {
                     case characters[8]:

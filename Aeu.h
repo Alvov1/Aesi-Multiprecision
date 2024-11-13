@@ -509,45 +509,47 @@ public:
     /* ------------------------ @name Division operators. ------------------------ */
         /**
          * @brief Division operator
+         * @param base Aeu
          * @param divisor Aeu
          * @return Aeu
          * @note Undefined behaviour for division by zero
          */
         [[nodiscard]]
-        gpu constexpr auto operator/(const Aeu& divisor) const noexcept -> Aeu {
-            Aeu quotient, _; divide(*this, divisor, quotient, _); return quotient;
+        gpu constexpr friend auto operator/(const Aeu& base, const Aeu& divisor) noexcept -> Aeu {
+            Aeu quotient, _; divide(base, divisor, quotient, _); return quotient;
         }
 
         /**
          * @brief Assignment division operator
+         * @param base Aeu
          * @param divisor Aeu
          * @return Aeu&
          * @note Undefined behaviour for division by zero
          */
-        gpu constexpr auto operator/=(const Aeu& divisor) noexcept -> Aeu& {
-            return this->operator=(this->operator/(divisor));
-        }
+        gpu constexpr friend auto operator/=(Aeu& base, const Aeu& divisor) noexcept -> Aeu& { return base = base / divisor; }
     /* --------------------------------------------------------------------------- */
 
 
     /* ------------------------- @name Modulo operators. ------------------------- */
         /**
          * @brief Modulo operator
+         * @param base Aeu
          * @param modulo Aeu
          * @return Aeu
          */
         [[nodiscard]]
-        gpu constexpr auto operator%(const Aeu& modulo) const noexcept -> Aeu {
-            Aeu _, remainder; divide(*this, modulo, _, remainder); return remainder;
+        gpu constexpr friend auto operator%(const Aeu& base, const Aeu& modulo) noexcept -> Aeu {
+            Aeu _, remainder; divide(base, modulo, _, remainder); return remainder;
         }
 
         /**
          * @brief Assignment modulo operator
+         * @param base Aeu
          * @param modulo Aeu
          * @return Aeu&
          */
-        gpu constexpr auto operator%=(const Aeu& modulo) noexcept -> Aeu& {
-            return this->operator=(this->operator%(modulo));
+        gpu constexpr friend auto operator%=(Aeu& base, const Aeu& modulo) noexcept -> Aeu& {
+            return base = base % modulo;
         }
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
@@ -1232,7 +1234,7 @@ public:
 
         do {
             x = y;
-            y = (x + this->operator/(x)) >> 1u;
+            y = (x + *this / x) >> 1u;
         } while (y < x);
 
         return x;

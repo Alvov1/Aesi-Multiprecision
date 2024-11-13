@@ -435,7 +435,9 @@ public:
          * @note Undefined behaviour for division by zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator/(Integral divisor) const noexcept -> Aesi { Aesi result = *this; result /= divisor; return result; }
+        gpu constexpr auto operator/(Integral divisor) const noexcept -> Aesi {
+            Aesi result = *this; result /= divisor; return result;
+        }
 
         /**
          * @brief Division operator
@@ -462,7 +464,7 @@ public:
                     this->inverse();
                     divisor *= -1;
                 }
-                base.operator/=(static_cast<unsigned long long>(divisor));
+                base /= static_cast<unsigned long long>(divisor);
                 if(base.isZero()) sign = Zero;
             }
             return *this;
@@ -481,7 +483,7 @@ public:
             } else {
                 if(divisor.isNegative())
                     this->inverse();
-                base.operator/=(divisor.base);
+                base /= divisor.base;
                 if(base.isZero()) sign = Zero;
             }
             return *this;
@@ -524,7 +526,7 @@ public:
                     this->inverse();
                     modulo *= -1;
                 }
-                base.operator%=(static_cast<unsigned long long>(modulo));
+                base %= static_cast<unsigned long long>(modulo);
             }
             return *this;
         }
@@ -542,7 +544,7 @@ public:
 
             if(modulo.isNegative())
                 this->inverse();
-            base.operator%=(modulo.base);
+            base %= modulo.base;
             if(base.isZero())
                 sign = Sign::Zero;
 

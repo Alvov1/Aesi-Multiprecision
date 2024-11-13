@@ -382,21 +382,23 @@ public:
     /* ----------------------- @name Subtraction operators. ---------------------- */
         /**
          * @brief Subtraction operator
+         * @param base Aeu
          * @param subtrahend Aeu
          * @return Aeu
          */
         [[nodiscard]]
-        gpu constexpr auto operator-(const Aeu& subtrahend) const noexcept -> Aeu {
-            Aeu result = *this; result -= subtrahend; return result;
+        gpu constexpr friend auto operator-(const Aeu& base, const Aeu& subtrahend) noexcept -> Aeu {
+            Aeu result = base; result -= subtrahend; return result;
         }
 
         /**
          * @brief Assignment subtraction operator
+         * @param base Aeu
          * @param subtrahend Aeu
          * @return Aeu&
          */
-        gpu constexpr auto operator-=(const Aeu& subtrahend) noexcept -> Aeu& {
-            return operator+=(*this, -subtrahend);
+        gpu constexpr friend auto operator-=(Aeu& base, const Aeu& subtrahend) noexcept -> Aeu& {
+            return base += -subtrahend;
         }
     /* --------------------------------------------------------------------------- */
 

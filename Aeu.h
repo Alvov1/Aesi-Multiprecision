@@ -494,7 +494,7 @@ public:
 
                 return buffer;
             };
-
+          
             const std::size_t thisLength = base.filledBlocksNumber();
             if(const std::size_t valueLength = factor.filledBlocksNumber(); thisLength > valueLength)
                 base.blocks = multiplyLines(base.blocks, thisLength, factor.blocks, valueLength);

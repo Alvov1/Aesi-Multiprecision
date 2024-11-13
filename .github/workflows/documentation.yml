@@ -29,8 +29,8 @@ jobs:
       - name: Install Doxygen
         run: |
           wget https://github.com/doxygen/doxygen/releases/download/Release_1_12_0/doxygen-1.12.0.linux.bin.tar.gz
-          tar -xf doxygen-1.10.0.linux.bin.tar.gz
-          cd doxygen-1.10.0 && sudo make && sudo make install
+          tar -xf doxygen-1.12.0.linux.bin.tar.gz
+          cd doxygen-1.12.0 && sudo make && sudo make install
           doxygen --version
 
       - name: Install Graphviz

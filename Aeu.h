@@ -716,31 +716,36 @@ public:
     /* ------------------------ @name Equality operators. ------------------------ */
         /**
          * @brief Equality check operator for built-in types uint8_t, uint16_t, uint32_t
+         * @param our Aeu
          * @param other Unsigned
          * @return Boolean
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned> && sizeof(Unsigned) < 8)
-        gpu constexpr auto operator==(Unsigned other) const noexcept -> bool {
-            return filledBlocksNumber() <= 1 && static_cast<block>(other) == blocks[0];
+        gpu constexpr friend auto operator==(const Aeu& our, Unsigned other) noexcept -> bool {
+            return our.filledBlocksNumber() <= 1 && static_cast<block>(other) == our.blocks[0];
         }
-        gpu constexpr auto operator==(uint64_t other) const noexcept -> bool {
-            return filledBlocksNumber() <= 2 && ((static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0])) == other;
+        gpu constexpr friend auto operator==(const Aeu& our, uint64_t other) noexcept -> bool {
+            return our.filledBlocksNumber() <= 2 && (static_cast<uint64_t>(our.blocks[1]) << blockBitLength | static_cast<uint64_t>(our.blocks[0])) == other;
         }
 
         /**
          * @brief Equality check operator for numbers of the same precision
+         * @param our Aeu
          * @param other Aeu
          * @return Boolean
          */
-        gpu constexpr auto operator==(const Aeu& other) const noexcept -> bool = default;
+        gpu constexpr friend auto operator==(const Aeu& our, const Aeu& other) noexcept -> bool = default;
 
         /**
          * @brief Templated Equality check operator for numbers of different precision
+         * @param our Aeu
          * @param other Aeu
          * @return Boolean
          */
         template <std::size_t otherBitness> requires (otherBitness != bitness)
-        gpu constexpr auto operator==(const Aeu<otherBitness>& other) const noexcept -> bool { return compareTo(other) == Comparison::equal; };
+        gpu constexpr friend auto operator==(const Aeu& our, const Aeu<otherBitness>& other) noexcept -> bool {
+            return our.compareTo(other) == Comparison::equal;
+        };
     /* --------------------------------------------------------------------------- */
 
 

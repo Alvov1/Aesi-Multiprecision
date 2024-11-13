@@ -570,133 +570,144 @@ public:
 
     /**
      * @brief Bitwise XOR operator
+     * @param base Aeu
      * @param other Aeu
      * @return Aeu
      */
     [[nodiscard]]
-    gpu constexpr auto operator^(const Aeu& other) const noexcept -> Aeu {
-        Aeu result = *this; result ^= other; return result;
+    gpu constexpr friend auto operator^(const Aeu& base, const Aeu& other) noexcept -> Aeu {
+        Aeu result = base; result ^= other; return result;
     }
 
     /**
      * @brief Assignment bitwise XOR operator
+     * @param base Aeu
      * @param other Aeu
      * @return Aeu&
      */
-    gpu constexpr auto operator^=(const Aeu& other) noexcept -> Aeu& {
+    gpu constexpr friend auto operator^=(Aeu& base, const Aeu& other) noexcept -> Aeu& {
         for(std::size_t i = 0; i < blocksNumber; ++i)
-            blocks[i] ^= other.blocks[i];
-        return *this;
+            base.blocks[i] ^= other.blocks[i];
+        return base;
     }
 
     /**
      * @brief Bitwise AND operator
+     * @param base Aeu
      * @param other Aeu
      * @return Aeu
      */
     [[nodiscard]]
-    gpu constexpr auto operator&(const Aeu& other) const noexcept -> Aeu {
-        Aeu result = *this; result &= other; return result;
+    gpu constexpr friend auto operator&(const Aeu& base, const Aeu& other) noexcept -> Aeu {
+        Aeu result = base; result &= other; return result;
     }
 
     /**
      * @brief Assignment bitwise AND operator
+     * @param base Aeu
      * @param other Aeu
      * @return Aeu&
      */
-    gpu constexpr auto operator&=(const Aeu& other) noexcept -> Aeu& {
+    gpu constexpr friend auto operator&=(Aeu& base, const Aeu& other) noexcept -> Aeu& {
         for(std::size_t i = 0; i < blocksNumber; ++i)
-            blocks[i] &= other.blocks[i];
-        return *this;
+            base.blocks[i] &= other.blocks[i];
+        return base;
     }
 
     /**
      * @brief Bitwise OR operator
+     * @param base Aeu
      * @param other Aeu
      * @return Aeu
      */
     [[nodiscard]]
-    gpu constexpr auto operator|(const Aeu& other) const noexcept -> Aeu {
-        Aeu result = *this; result |= other; return result;
+    gpu constexpr friend auto operator|(const Aeu& base, const Aeu& other) noexcept -> Aeu {
+        Aeu result = base; result |= other; return result;
     }
 
     /**
      * @brief Assignment bitwise OR operator
+     * @param base Aeu
      * @param other Aeu
      * @return Aeu&
      */
-    gpu constexpr auto operator|=(const Aeu& other) noexcept -> Aeu& {
+    gpu constexpr friend auto operator|=(Aeu& base, const Aeu& other) noexcept -> Aeu& {
         for(std::size_t i = 0; i < blocksNumber; ++i)
-            blocks[i] |= other.blocks[i];
-        return *this;
+            base.blocks[i] |= other.blocks[i];
+        return base;
     }
 
     /**
      * @brief Left shift operator
+     * @param base Aeu
      * @param bitShift Unsigned
      * @return Aeu
      * @note Does nothing for shift greater than precision
      */
     template <typename Unsigned> requires (std::is_integral_v<Unsigned> && std::is_unsigned_v<Unsigned>) [[nodiscard]]
-    gpu constexpr auto operator<<(Unsigned bitShift) const noexcept -> Aeu {
-        Aeu result = *this; result.operator<<=(bitShift); return result;
+    gpu constexpr friend auto operator<<(const Aeu& base, Unsigned bitShift) noexcept -> Aeu {
+        Aeu result = base; result <<= bitShift; return result;
     }
 
     /**
      * @brief Left shift assignment operator
+     * @param base Aeu
      * @param bitShift Unsigned
      * @return Aeu&
      * @note Does nothing for shift greater than precision
      */
     template <typename Unsigned> requires (std::is_integral_v<Unsigned> && std::is_unsigned_v<Unsigned>)
-    gpu constexpr auto operator<<=(Unsigned bitShift) noexcept -> Aeu& {
-        if(bitShift >= bitness || bitShift == 0) return *this;
+    gpu constexpr friend auto operator<<=(Aeu& base, Unsigned bitShift) noexcept -> Aeu& {
+        if(bitShift >= bitness || bitShift == 0) return base;
 
         const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
         const block stamp = (1UL << (blockBitLength - remainder)) - 1;
 
         for (long long i = blocksNumber - 1; i >= (quotient + (remainder ? 1 : 0)); --i)
-            blocks[i] = ((blocks[i - quotient] & stamp) << remainder) | ((blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> ((blockBitLength - remainder) % blockBitLength));
+            base.blocks[i] = (base.blocks[i - quotient] & stamp) << remainder
+                | ((base.blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> (blockBitLength - remainder) % blockBitLength);
 
-        blocks[quotient] = (blocks[0] & stamp) << remainder;
+        base.blocks[quotient] = (base.blocks[0] & stamp) << remainder;
 
         for (std::size_t i = 0; i < quotient; ++i)
-            blocks[i] = 0;
-        return *this;
+            base.blocks[i] = 0;
+        return base;
     }
 
     /**
      * @brief Right shift operator
+     * @param base Aeu
      * @param bitShift Unsigned
      * @return Aeu
      * @note Does nothing for shift greater than precision
      */
     template <typename Unsigned> requires (std::is_integral_v<Unsigned> && std::is_unsigned_v<Unsigned>) [[nodiscard]]
-    gpu constexpr auto operator>>(Unsigned bitShift) const noexcept -> Aeu {
-        Aeu result = *this; result >>= bitShift; return result;
+    gpu constexpr friend auto operator>>(const Aeu& base, Unsigned bitShift) noexcept -> Aeu {
+        Aeu result = base; result >>= bitShift; return result;
     }
 
     /**
      * @brief Right shift assignment operator
+     * @param base Aeu
      * @param bitShift Unsigned
      * @return Aeu&
      * @note Does nothing for shift greater than precision
      */
     template <typename Unsigned> requires (std::is_integral_v<Unsigned> && std::is_unsigned_v<Unsigned>)
-    gpu constexpr auto operator>>=(Unsigned bitShift) noexcept -> Aeu& {
-        if(bitShift >= bitness || bitShift == 0) return *this;
+    gpu constexpr friend auto operator>>=(Aeu& base, Unsigned bitShift) noexcept -> Aeu& {
+        if(bitShift >= bitness || bitShift == 0) return base;
 
         const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
         const block stamp = (1UL << remainder) - 1;
 
         for(std::size_t i = 0; i < blocksNumber - (quotient + (remainder ? 1 : 0)); ++i)
-            blocks[i] = ((blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << ((blockBitLength - remainder) % blockBitLength)) | ((blocks[i + quotient] & ~stamp) >> remainder);
+            base.blocks[i] = ((base.blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << (blockBitLength - remainder) % blockBitLength) | (base.blocks[i + quotient] & ~stamp) >> remainder;
 
-        blocks[blocksNumber - 1 - quotient] = (blocks[blocksNumber - 1] & ~stamp) >> remainder;
+        base.blocks[blocksNumber - 1 - quotient] = (base.blocks[blocksNumber - 1] & ~stamp) >> remainder;
 
         for(long long i = blocksNumber - quotient; i < blocksNumber; ++i)
-            blocks[i] = 0;
-        return *this;
+            base.blocks[i] = 0;
+        return base;
     }
     /* ----------------------------------------------------------------------- */
 

@@ -12,6 +12,25 @@
 
 namespace {
     enum class Sign { Zero = 0, Positive = 1, Negative = -1 };
+
+    template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
+    Sign traverseDashes(const Char* ptr, std::size_t);
+
+    template <>
+    Sign traverseDashes(const char* ptr, std::size_t size) {
+        std::byte positive { 1 };
+        for(std::size_t i = 0; i < size; ++i)
+            if(ptr[i] == '-') positive ^= std::byte {1};
+        return positive == std::byte {1} ? Sign::Positive : Sign::Negative;
+    }
+
+    template <>
+    Sign traverseDashes(const wchar_t* ptr, std::size_t size) {
+        std::byte positive { 1 };
+        for(std::size_t i = 0; i < size; ++i)
+            if(ptr[i] == L'-') positive ^= std::byte {1};
+        return positive == std::byte {1} ? Sign::Positive : Sign::Negative;
+    }
 }
 
 /**
@@ -28,7 +47,7 @@ class Aesi final {
     Base base;
     /* ----------------------------------------------------------------------- */
 
-    gpu constexpr Aesi(Sign withSign, Base withBase): sign { withSign }, base { withBase } {};
+    gpu constexpr Aesi(Sign withSign, Base withBase): sign { withSign }, base { withBase } {}
 
 public:
     /* --------------------- @name Different constructors. ------------------- */
@@ -75,22 +94,9 @@ public:
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
     gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) {
-        using enum Sign;
-        if(!base.isZero()) {
-            std::byte positive { 1 };
-
-            const auto dash = [] {
-                if constexpr (std::is_same_v<Char, char>) {
-                    return '-';
-                } else {
-                    return L'-';
-                }
-            } ();
-            for(std::size_t i = 0; i < size; ++i)
-                if(ptr[i] == dash) positive ^= std::byte {1};
-
-            sign = (positive == std::byte {1} ? Positive : Negative);
-        } else sign = Zero;
+        if(!base.isZero())
+            sign = traverseDashes(ptr, size);
+        else sign = Sign::Zero;
     }
 
     /**
@@ -238,62 +244,68 @@ public:
 
     /* ------------------------ @name Addition operators. ------------------------ */
         /**
-         * @brief Adition operator
+         * @brief Addition operator
+         * @param addition Aesi
          * @param addendum Aesi&
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr auto operator+(const Aesi& addendum) const noexcept -> Aesi { Aesi result = *this; result += addendum; return result; }
+        gpu constexpr friend auto operator+(const Aesi& addition, const Aesi& addendum) noexcept -> Aesi {
+            Aesi result = addition; result += addendum; return result;
+        }
 
         /**
          * @brief Addition assignment operator
+         * @param addition Aesi
          * @param addendum Aesi&
          * @return Aesi&
          */
-        gpu constexpr auto operator+=(const Aesi& addendum) noexcept -> Aesi& {
+        gpu constexpr friend auto operator+=(Aesi& addition, const Aesi& addendum) noexcept -> Aesi& {
             using enum Sign;
-            if(addendum.sign == Zero)
-                return *this;
-            if(sign == Zero)
-                return this->operator=(addendum);
+            Sign& lSign = addition.sign; const Sign& rSign = addendum.sign;
+            Base& lBase = addition.base; const Base& rBase = addendum.base;
 
-            if(sign == addendum.sign) {
-                base += addendum.base;
-                return *this;
+            if(rSign == Zero)
+                return addition;
+            else if(lSign == Zero)
+                return addition = addendum;
+            else if(lSign == rSign) {
+                lBase += rBase;
+                return addition;
             }
 
-            if(sign == Positive) {
-                switch(base.compareTo(addendum.base)) {
+            if(lSign == Positive) {
+                switch(lBase.compareTo(rBase)) {
                     using enum Comparison;
                     case greater: {
-                        base -= addendum.base;
-                        return *this;
+                        lBase -= rBase;
+                        return addition;
                     }
                     case less: {
-                        base = addendum.base - base;
-                        sign = Negative;
-                        return *this;
+                        lBase = rBase - lBase;
+                        lSign = Negative;
+                        return addition;
                     }
                     default: {
-                        sign = Zero;
-                        return *this;
+                        lSign = Zero;
+                        return addition;
                     }
                 }
             } else {
-                switch(const auto ratio = base.compareTo(addendum.base)) {
+                switch(const auto ratio = lBase.compareTo(rBase)) {
                     using enum Comparison;
                     case greater: {
-                        base -= addendum.base;
-                        return *this;
+                        lBase -= rBase;
+                        return addition;
                     }
                     case less: {
-                        base = addendum.base - base;
-                        sign = Positive;
-                        return *this;
+                        lBase = rBase - lBase;
+                        lSign = Positive;
+                        return addition;
                     }
                     default: {
-                        sign = Zero;
-                        return *this;
+                        lSign = Zero;
+                        return addition;
                     }
                 }
             }
@@ -303,70 +315,77 @@ public:
     /* ----------------------- @name Subtraction operators. ---------------------- */
         /**
          * @brief Subtraction operator
+         * @param subtraction Aesi
          * @param subtrahend Aesi&
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr auto operator-(const Aesi& subtrahend) const noexcept -> Aesi { Aesi result = *this; result -= subtrahend; return result; }
+        gpu constexpr friend auto operator-(const Aesi& subtraction, const Aesi& subtrahend) noexcept -> Aesi {
+            Aesi result = subtraction; result -= subtrahend; return result;
+        }
 
         /**
          * @brief Subtraction assignment operator
+         * @param subtraction Aesi
          * @param subtrahend Aesi&
          * @return Aesi&
          */
-        gpu constexpr auto operator-=(const Aesi& subtrahend) noexcept -> Aesi& {
+        gpu constexpr friend auto operator-=(Aesi& subtraction, const Aesi& subtrahend) noexcept -> Aesi& {
             using enum Sign;
-            if(subtrahend.sign == Zero)
-                return *this;
-            if(sign == Zero) {
-                *this = subtrahend;
-                this->inverse();
-                return *this;
+            Sign& lSign = subtraction.sign; const Sign& rSign = subtrahend.sign;
+            Base& lBase = subtraction.base; const Base& rBase = subtrahend.base;
+
+            if(rSign == Zero)
+                return subtraction;
+            if(lSign == Zero) {
+                subtraction = subtrahend;
+                subtraction.inverse();
+                return subtraction;
             }
 
-            if(sign == Positive) {
-                if(subtrahend.sign == Positive) {
-                    switch(base.compareTo(subtrahend.base)) {
+            if(lSign == Positive) {
+                if(rSign == Positive) {
+                    switch(lBase.compareTo(rBase)) {
                         using enum Comparison;
                         case greater: {
-                            base -= subtrahend.base;
-                            return *this;
+                            lBase -= rBase;
+                            return subtraction;
                         }
                         case less: {
-                            base = subtrahend.base - base;
-                            sign = Negative;
-                            return *this;
+                            lBase = rBase - lBase;
+                            lSign = Negative;
+                            return subtraction;
                         }
                         default: {
-                            sign = Zero;
-                            return *this;
+                            lSign = Zero;
+                            return subtraction;
                         }
                     }
                 } else {
-                    base += subtrahend.base;
-                    return *this;
+                    lBase += rBase;
+                    return subtraction;
                 }
             } else {
-                if(subtrahend.sign == Negative) {
-                    switch(base.compareTo(subtrahend.base)) {
+                if(rSign == Negative) {
+                    switch(lBase.compareTo(rBase)) {
                         using enum Comparison;
                         case greater: {
-                            base -= subtrahend.base;
-                            return *this;
+                            lBase -= rBase;
+                            return subtraction;
                         }
                         case less: {
-                            base = subtrahend.base - base;
-                            sign = Positive;
-                            return *this;
+                            lBase = rBase - lBase;
+                            lSign = Positive;
+                            return subtraction;
                         }
                         default: {
-                            sign = Zero;
-                            return *this;
+                            lSign = Zero;
+                            return subtraction;
                         }
                     }
                 } else {
-                    base += subtrahend.base;
-                    return *this;
+                    lBase += rBase;
+                    return subtraction;
                 }
             }
         }
@@ -375,178 +394,202 @@ public:
     /* --------------------- @name Multiplication operators. --------------------- */
         /**
          * @brief Multiplication operator for built-in types
+         * @param multiplication Aesi
          * @param factor Integral
          * @return Aesi
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator*(Integral factor) const noexcept -> Aesi { Aesi result = *this; result *= factor; return result; }
+        gpu constexpr friend auto operator*(const Aesi& multiplication, Integral factor) noexcept -> Aesi {
+            Aesi result = multiplication; result *= factor; return result;
+        }
 
         /**
          * @brief Multiplication operator
-         * @param factor Aesi&
+         * @param multiplication Aesi
+         * @param factor Aesi
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr auto operator*(const Aesi& factor) const noexcept -> Aesi { Aesi result = *this; result *= factor; return result; }
+        gpu constexpr friend auto operator*(const Aesi& multiplication, const Aesi& factor) noexcept -> Aesi {
+            Aesi result = multiplication; result *= factor; return result;
+        }
 
         /**
          * @brief Multiplication assignment operator for built-in types
+         * @param multiplication Aesi
          * @param factor Integral
          * @return Aesi&
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator*=(Integral factor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator*=(Aesi& multiplication, Integral factor) noexcept -> Aesi& {
             using enum Sign;
             if(factor == 0) {
-                sign = Zero;
+                multiplication.sign = Zero;
             } else {
                 if(factor < 0) {
-                    this->inverse();
+                    multiplication.inverse();
                     factor *= -1;
                 }
-                base.operator*=(static_cast<unsigned long long>(factor));
+                multiplication.base *= static_cast<unsigned long long>(factor);
             }
-            return *this;
+            return multiplication;
         }
 
         /**
          * @brief Multiplication assignment operator
-         * @param factor Aesi&
+         * @param multiplication Aesi
+         * @param factor Aesi
          * @return Aesi&
          */
-        gpu constexpr auto operator*=(const Aesi& factor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator*=(Aesi& multiplication, const Aesi& factor) noexcept -> Aesi& {
             using enum Sign;
             if(factor.isZero()) {
-                sign = Zero;
+                multiplication.sign = Zero;
             } else {
                 if(factor.isNegative())
-                    this->inverse();
-                base.operator*=(factor.base);
+                    multiplication.inverse();
+                multiplication.base *= factor.base;
             }
-            return *this;
+            return multiplication;
         }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------ @name Division operators. ------------------------ */
         /**
          * @brief Division operator for built-in integral types
+         * @param division Aesi
          * @param divisor Integral
          * @return Aesi
          * @note Undefined behaviour for division by zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator/(Integral divisor) const noexcept -> Aesi { Aesi result = *this; result /= divisor; return result; }
+        gpu constexpr friend auto operator/(const Aesi& division, Integral divisor) noexcept -> Aesi {
+            Aesi result = division; result /= divisor; return result;
+        }
 
         /**
          * @brief Division operator
+         * @param division Aesi
          * @param divisor Aesi
          * @return Aesi
          * @note Undefined behaviour for division by zero
          */
         [[nodiscard]]
-        gpu constexpr auto operator/(const Aesi& divisor) const noexcept -> Aesi { Aesi result = *this; result /= divisor; return result; }
+        gpu constexpr friend auto operator/(const Aesi& division, const Aesi& divisor) noexcept -> Aesi {
+            Aesi result = division; result /= divisor; return result;
+        }
 
         /**
          * @brief Assignment division operator for built-in integral types
+         * @param division Aesi
          * @param divisor Integral
          * @return Aesi&
          * @note Undefined behaviour for division by zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator/=(Integral divisor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator/=(Aesi& division, Integral divisor) noexcept -> Aesi& {
             using enum Sign;
             if(divisor == 0) {
-                sign = Zero;
+                division.sign = Zero;
             } else {
                 if(divisor < 0) {
-                    this->inverse();
+                    division.inverse();
                     divisor *= -1;
                 }
-                base.operator/=(static_cast<unsigned long long>(divisor));
-                if(base.isZero()) sign = Zero;
+                division.base /= static_cast<unsigned long long>(divisor);
+                if(division.base.isZero()) division.sign = Zero;
             }
-            return *this;
+            return division;
         }
 
         /**
          * @brief Assignment division operator
+         * @param division Aesi
          * @param divisor Aesi
          * @return Aesi&
          * @note Undefined behaviour for division by zero
          */
-        gpu constexpr auto operator/=(const Aesi& divisor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator/=(Aesi& division, const Aesi& divisor) noexcept -> Aesi& {
             using enum Sign;
             if(divisor.isZero()) {
-                sign = Zero;
+                division.sign = Zero;
             } else {
                 if(divisor.isNegative())
-                    this->inverse();
-                base.operator/=(divisor.base);
-                if(base.isZero()) sign = Zero;
+                    division.inverse();
+                division.base /= divisor.base;
+                if(division.base.isZero()) division.sign = Zero;
             }
-            return *this;
+            return division;
         }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------- @name Modulo operators. ------------------------- */
         /**
          * @brief Modulo operator for built-in types
+         * @param modulation Aesi
          * @param modulo Integral
          * @return Aesi
          * @note Returns zero for the modulo of zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator%(Integral modulo) const noexcept -> Aesi { Aesi result = *this; result %= modulo; return result; }
+        gpu constexpr friend auto operator%(const Aesi& modulation, Integral modulo) noexcept -> Aesi {
+            Aesi result = modulation; result %= modulo; return result;
+        }
 
         /**
          * @brief Modulo operator
-         * @param modulo Aesi&
+         * @param modulation Aesi
+         * @param modulo Aesi
          * @return Aesi
          * @details DETAILS
          * @note Returns zero for the modulo of zero
          */
         [[nodiscard]]
-        gpu constexpr auto operator%(const Aesi& modulo) const noexcept -> Aesi { Aesi result = *this; result %= modulo; return result; }
+        gpu constexpr friend auto operator%(const Aesi& modulation, const Aesi& modulo)  noexcept -> Aesi {
+            Aesi result = modulation; result %= modulo; return result;
+        }
 
         /**
          * @brief Modulo assignment operator for built-in types
+         * @param modulation Aesi
          * @param modulo Integral
          * @return Aesi&
          * @note Returns zero for the modulo of zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator%=(Integral modulo) noexcept -> Aesi& {
+        gpu constexpr friend auto operator%=(Aesi& modulation, Integral modulo) noexcept -> Aesi& {
             using enum Sign;
             if(modulo == 0) {
-                sign = Zero;
+                modulation.sign = Zero;
             } else {
                 if(modulo < 0) {
-                    this->inverse();
+                    modulation.inverse();
                     modulo *= -1;
                 }
-                base.operator%=(static_cast<unsigned long long>(modulo));
+                modulation.base %= static_cast<unsigned long long>(modulo);
             }
-            return *this;
+            return modulation;
         }
 
         /**
          * @brief Modulo assignment operator
-         * @param modulo Aesi&
+         * @param modulation Aesi
+         * @param modulo Aesi
          * @return Aesi&
          * @details DETAILS
          * @note Returns zero for the modulo of zero
          */
-        gpu constexpr auto operator%=(const Aesi& modulo) noexcept -> Aesi& {
+        gpu constexpr friend auto operator%=(Aesi& modulation, const Aesi& modulo) noexcept -> Aesi& {
             if(modulo.isZero())
-                return *this;
+                return modulation;
 
             if(modulo.isNegative())
-                this->inverse();
-            base.operator%=(modulo.base);
-            if(base.isZero())
-                sign = Sign::Zero;
+                modulation.inverse();
+            modulation.base %= modulo.base;
+            if(modulation.base.isZero())
+                modulation.sign = Sign::Zero;
 
-            return *this;
+            return modulation;
         }
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
@@ -555,31 +598,32 @@ public:
     /* ------------------------ @name Equality operators. ------------------------ */
         /**
          * @brief Equality operator for built-in types
+         * @param our Aesi
          * @param integral Integral
          * @return bool
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator==(Integral integral) const noexcept -> bool {
-            return compareTo(integral) == Comparison::equal;
+        gpu constexpr friend auto operator==(const Aesi& our, Integral integral) noexcept -> bool {
+            return our.compareTo(integral) == Comparison::equal;
         }
 
         /**
          * @brief Equality operator
-         * @param other Aesi&
+         * @param our Aesi
+         * @param other Aesi
          * @return bool
          */
-        gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool {
-            return sign == other.sign && base == other.base;
-        }
+        gpu constexpr friend auto operator==(const Aesi& our, const Aesi& other) noexcept -> bool = default;
 
         /**
          * @brief Different precision equlity operator
-         * @param other Aesi&
+         * @param our Aesi
+         * @param other Aesi
          * @return bool
          */
         template <std::size_t otherBitness> requires (otherBitness != bitness)
-        gpu constexpr auto operator==(const Aesi<otherBitness>& other) const noexcept -> bool {
-            return precisionCast<otherBitness>() == other;
+        gpu constexpr friend auto operator==(const Aesi& our, const Aesi<otherBitness>& other) noexcept -> bool {
+            return our.precisionCast<otherBitness>() == other;
         }
     /* --------------------------------------------------------------------------- */
 

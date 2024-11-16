@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="21" failures="0" disabled="0" errors="0" time="554.271" timestamp="2024-11-16T18:35:26.571" name="AllTests">
+  <testsuite name="Addition" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="38.625" timestamp="2024-11-16T18:35:26.571">
+    <testcase name="CryptoPP" file="/content/Aesi-Multiprecision/ci/speed_comparison/addition.cpp" line="11" status="run" result="completed" time="1.846" timestamp="2024-11-16T18:35:26.571" classname="Addition" />
+    <testcase name="GMP" file="/content/Aesi-Multiprecision/ci/speed_comparison/addition.cpp" line="20" status="run" result="completed" time="1.271" timestamp="2024-11-16T18:35:28.417" classname="Addition" />
+    <testcase name="Aesi" file="/content/Aesi-Multiprecision/ci/speed_comparison/addition.cpp" line="29" status="run" result="completed" time="35.507" timestamp="2024-11-16T18:35:29.689" classname="Addition" />
+  </testsuite>
+  <testsuite name="Division" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="74.903" timestamp="2024-11-16T18:36:05.197">
+    <testcase name="CryptoPP" file="/content/Aesi-Multiprecision/ci/speed_comparison/division.cpp" line="33" status="run" result="completed" time="0.046" timestamp="2024-11-16T18:36:05.197" classname="Division" />
+    <testcase name="GMP" file="/content/Aesi-Multiprecision/ci/speed_comparison/division.cpp" line="42" status="run" result="completed" time="0.001" timestamp="2024-11-16T18:36:05.244" classname="Division" />
+    <testcase name="Aesi" file="/content/Aesi-Multiprecision/ci/speed_comparison/division.cpp" line="51" status="run" result="completed" time="74.855" timestamp="2024-11-16T18:36:05.245" classname="Division" />
+  </testsuite>
+  <testsuite name="GCD" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="108.692" timestamp="2024-11-16T18:37:20.100">
+    <testcase name="CryptoPP" file="/content/Aesi-Multiprecision/ci/speed_comparison/gcd.cpp" line="28" status="run" result="completed" time="0.009" timestamp="2024-11-16T18:37:20.100" classname="GCD" />
+    <testcase name="GMP" file="/content/Aesi-Multiprecision/ci/speed_comparison/gcd.cpp" line="35" status="run" result="completed" time="0." timestamp="2024-11-16T18:37:20.110" classname="GCD" />
+    <testcase name="Aesi" file="/content/Aesi-Multiprecision/ci/speed_comparison/gcd.cpp" line="42" status="run" result="completed" time="108.683" timestamp="2024-11-16T18:37:20.110" classname="GCD" />
+  </testsuite>
+  <testsuite name="Modulo" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="115.669" timestamp="2024-11-16T18:39:08.793">
+    <testcase name="CryptoPP" file="/content/Aesi-Multiprecision/ci/speed_comparison/modulo.cpp" line="33" status="run" result="completed" time="0.01" timestamp="2024-11-16T18:39:08.793" classname="Modulo" />
+    <testcase name="GMP" file="/content/Aesi-Multiprecision/ci/speed_comparison/modulo.cpp" line="40" status="run" result="completed" time="0.001" timestamp="2024-11-16T18:39:08.804" classname="Modulo" />
+    <testcase name="Aesi" file="/content/Aesi-Multiprecision/ci/speed_comparison/modulo.cpp" line="47" status="run" result="completed" time="115.656" timestamp="2024-11-16T18:39:08.806" classname="Modulo" />
+  </testsuite>
+  <testsuite name="Multiplication" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="56.522" timestamp="2024-11-16T18:41:04.462">
+    <testcase name="CryptoPP" file="/content/Aesi-Multiprecision/ci/speed_comparison/multiplication.cpp" line="26" status="run" result="completed" time="0.659" timestamp="2024-11-16T18:41:04.462" classname="Multiplication" />
+    <testcase name="GMP" file="/content/Aesi-Multiprecision/ci/speed_comparison/multiplication.cpp" line="36" status="run" result="completed" time="0.429" timestamp="2024-11-16T18:41:05.122" classname="Multiplication" />
+    <testcase name="Aesi" file="/content/Aesi-Multiprecision/ci/speed_comparison/multiplication.cpp" line="45" status="run" result="completed" time="55.433" timestamp="2024-11-16T18:41:05.552" classname="Multiplication" />
+  </testsuite>
+  <testsuite name="Powm" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="72.324" timestamp="2024-11-16T18:42:00.985">
+    <testcase name="CryptoPP" file="/content/Aesi-Multiprecision/ci/speed_comparison/powm.cpp" line="15" status="run" result="completed" time="0.329" timestamp="2024-11-16T18:42:00.985" classname="Powm" />
+    <testcase name="GMP" file="/content/Aesi-Multiprecision/ci/speed_comparison/powm.cpp" line="22" status="run" result="completed" time="0.034" timestamp="2024-11-16T18:42:01.315" classname="Powm" />
+    <testcase name="Aesi" file="/content/Aesi-Multiprecision/ci/speed_comparison/powm.cpp" line="31" status="run" result="completed" time="71.96" timestamp="2024-11-16T18:42:01.349" classname="Powm" />
+  </testsuite>
+  <testsuite name="Subtraction" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="87.532" timestamp="2024-11-16T18:43:13.310">
+    <testcase name="CryptoPP" file="/content/Aesi-Multiprecision/ci/speed_comparison/subtraction.cpp" line="33" status="run" result="completed" time="0.154" timestamp="2024-11-16T18:43:13.310" classname="Subtraction" />
+    <testcase name="GMP" file="/content/Aesi-Multiprecision/ci/speed_comparison/subtraction.cpp" line="40" status="run" result="completed" time="0.384" timestamp="2024-11-16T18:43:13.464" classname="Subtraction" />
+    <testcase name="Aesi" file="/content/Aesi-Multiprecision/ci/speed_comparison/subtraction.cpp" line="47" status="run" result="completed" time="86.993" timestamp="2024-11-16T18:43:13.849" classname="Subtraction" />
+  </testsuite>
+</testsuites>

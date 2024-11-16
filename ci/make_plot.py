@@ -28,6 +28,10 @@ def parse_xml_and_plot(xml_file, output):
             elif name == 'Aesi':
                 aesi_times.append(time)
 
+    print(f'\n  Test case   | CryptoPP |  GMP  |  Aesi')
+    for test_name, records in zip(test_names, zip(cryptopp_times, gmp_times, aesi_times)):
+        print(f"{test_name.ljust(14)}   {str(records[0]).ljust(5)}     {str(records[1]).ljust(5)}   {str(records[2]).ljust(5)}")
+
     x = np.arange(len(test_names))
     width = 0.25
 

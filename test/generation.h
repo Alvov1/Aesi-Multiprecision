@@ -8,8 +8,7 @@
 #include <cryptopp/osrng.h>
 
 namespace Generation {
-    using CryptoPP::Integer;
-    using UnsPP = Integer;
+    using UnsPP = CryptoPP::Integer;
     using UnsGmp = mpz_class;
 
     static std::random_device dev;

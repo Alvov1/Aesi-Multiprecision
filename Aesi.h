@@ -181,7 +181,7 @@ public:
      * @brief Copy assignment operator
      * @param other Aesi&
      */
-    gpu constexpr Aesi& operator=(const Aesi& other) noexcept { base = other.base; sign = other.sign; return *this; }
+    gpu constexpr Aesi& operator=(const Aesi& other) noexcept = default;
     /* ----------------------------------------------------------------------- */
 
 

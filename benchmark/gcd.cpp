@@ -1,8 +1,9 @@
-#include <gtest/gtest.h>
-#include <thread>
+#include <benchmark/benchmark.h>
 #include <cryptopp/integer.h>
+#include <cryptopp/nbtheory.h>
 #include <gmpxx.h>
-#include "../../Aeu.h"
+#include "../Aeu.h"
+
 
 constexpr char left[] = "0xa24872afd57464d79dfeec239367995f623429772ec032eb3bc9b376d0775c956dcb330a2c4f8f0d001f62fe6e0b"
                         "2e3b024d8f352522f3aa0ac7fbf05e7e3a2038e4650efb641862969f2437084448a28ff14d9c1e2def670babcf65a8"
@@ -23,30 +24,23 @@ constexpr char right[] = "0xdb446efadae5960843e38dbdc26afc0c6d6633d0e3f7983b11d7
                          "f825d5bb62a1a327148f4e8405f2ee2622122d3d8c967f2fdc6e05a8c1d40c93f3c0dfeb5b8b4c9f1755a9c26f351"
                          "ac1cdebf";
 
-TEST(Multiplication, CryptoPP) {
-    for(std::size_t i = 0; i < 15; ++i) {
-        CryptoPP::Integer leftA (left), rightA (right), _ {};
-        for(long long j = 0; j < 16384 * 16384; j += 16384)
-            _ = leftA * (rightA + j);
-        if(_.IsZero()) std::cout << '1';
-    }
-
+static void gcd_CryptoPP(benchmark::State& state) {
+    CryptoPP::Integer leftA (left), rightA (right), result {};
+    for(auto _ : state)
+        result = CryptoPP::GCD(leftA, rightA);
 }
+BENCHMARK(gcd_CryptoPP);
 
-TEST(Multiplication, GMP) {
-    for(std::size_t i = 0; i < 15; ++i) {
-        mpz_class leftA (left), rightA (right), _ {};
-        for(std::size_t j = 0; j < 16384 * 16384; j += 16384)
-            _ = leftA * (rightA + j);
-        if(_ == 0) std::cout << '1';
-    }
+static void gcd_GMP(benchmark::State& state) {
+    mpz_class leftA (left), rightA (right), result {};
+    for(auto _ : state)
+        mpz_gcd(result.get_mpz_t(), leftA.get_mpz_t(), rightA.get_mpz_t());
 }
+BENCHMARK(gcd_GMP);
 
-TEST(Multiplication, Aesi) {
-    for(std::size_t i = 0; i < 20; ++i) {
-        Aeu<4192> leftA (left), rightA (right), _ {};
-        for(std::size_t j = 0; j < 16384 * 16384; j += 16384)
-            _ = leftA * (rightA + j);
-        if(_.isZero()) std::cout << '1';
-    }
+static void gcd_Aesi(benchmark::State& state) {
+    Aeu<4192> leftA (left), rightA (right), result {};
+    for(auto _ : state)
+        result = Aeu<4192>::gcd(leftA, rightA);
 }
+BENCHMARK(gcd_Aesi);

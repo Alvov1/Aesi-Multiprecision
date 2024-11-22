@@ -1,56 +1,57 @@
-import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
 import sys
 import numpy as np
-from datetime import datetime
+import json
+
+def parse_json(path: str):
+    with open(path) as file:
+        tests = json.load(file)["benchmarks"]
+
+        functions = dict()
+        for test in tests:
+            function, library = test["name"].split('_')
+            if function not in functions:
+                functions[function] = dict()
+            functions[function][library] = int(test["real_time"])
+
+        records = dict()
+        for _, libraries in functions.items():
+            for library in libraries:
+                if library not in records:
+                    records[library] = list()
+                records[library].append(libraries[library])
+
+        return list(functions.keys()), records
 
 
-def parse_xml_and_plot(xml_file, output):
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
+def plot(operations, data, output_path, font):
+    plt.rcParams['font.size'] = 10
+    plt.rcParams['font.family'] = font
+    plt.rcParams['font.weight'] = 'bold'
 
-    test_names = []
-    cryptopp_times = []
-    gmp_times = []
-    aesi_times = []
-
-    for testsuite in root.findall('testsuite'):
-        suite_name = testsuite.get('name')
-        test_names.append(suite_name)
-
-        for testcase in testsuite.findall('testcase'):
-            name = testcase.get('name')
-            time = float(testcase.get('time'))
-            if name == 'CryptoPP':
-                cryptopp_times.append(time)
-            elif name == 'GMP':
-                gmp_times.append(time)
-            elif name == 'Aesi':
-                aesi_times.append(time)
-
-    print(f'\n  Test case   | CryptoPP |  GMP  |  Aesi')
-    for test_name, records in zip(test_names, zip(cryptopp_times, gmp_times, aesi_times)):
-        print(f"{test_name.ljust(14)}   {str(records[0]).ljust(5)}     {str(records[1]).ljust(5)}   {str(records[2]).ljust(5)}")
-
-    x = np.arange(len(test_names))
+    plt.style.use('fivethirtyeight')
+    libraries = list(data.keys())
+    values = np.array(list(data.values()))
+    x = np.arange(len(operations))
     width = 0.25
 
-    fig, ax = plt.subplots()
-    rects3 = ax.bar(x + width, aesi_times, width, capstyle='butt', label='Aesi')
-    rects1 = ax.bar(x - width, cryptopp_times, width, capstyle='projecting', label='CryptoPP')
-    rects2 = ax.bar(x, gmp_times, width, capstyle='round', label='GMP')
+    fig, ax = plt.subplots(figsize=(12, 6))
 
-    now = datetime.now()
-    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+    for i, lib in enumerate(libraries):
+        ax.bar(x + i * width, values[i], width, label=lib, color=colors[i])
 
-    ax.set_ylabel('Time (seconds)')
-    ax.set_title(f'Execution Time\n{dt_string}')
-    ax.set_xticks(x)
-    ax.set_xticklabels(test_names)
-    ax.legend()
+    ax.set_xlabel('Operations', fontsize=13, weight='bold')
+    ax.set_ylabel('Execution Time (ns)', fontsize=13, weight='bold')
+    ax.set_title('Execution Time Comparison', fontsize=14, weight='bold')
+    ax.set_xticks(x + width)
+    ax.set_xticklabels(operations, rotation=45, ha='right', fontsize=11)
+    ax.set_yscale('log')
+    ax.legend(title='Libraries', fontsize=10)
 
-    fig.tight_layout()
-    plt.savefig(output, dpi=300)
+    plt.tight_layout()
+    plt.savefig(output_path)
 
 
 if __name__ == '__main__':
@@ -59,7 +60,8 @@ if __name__ == '__main__':
     print(f"Loading measures table from '{measures}'")
     print(f"Output image location '{output_image_path}'")
 
-    plt.rcParams['font.size'] = 10
-
-    parse_xml_and_plot(measures, output_image_path)
-
+    print()
+    test_names, records = parse_json(measures)
+    print(test_names)
+    print(records)
+    plot(test_names, records, output_image_path, 'Courier New')

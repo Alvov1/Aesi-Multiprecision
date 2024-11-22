@@ -3,6 +3,8 @@ name: Compare the execution time
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   Make-comparison:
@@ -11,33 +13,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install GTest
-        run: sudo apt-get install libgtest-dev
-
-      - name: Install Crypto++
-        run: sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
+      - name: Install packages
+        run: sudo apt-get install libbenchmark-dev libgmp3-dev libcrypto++-dev libcrypto++-doc libcrypto++-utils
 
       - name: Set reusable strings
         id: strings
         shell: bash
         run: |
           echo "ci=${{ github.workspace }}/ci" >> "$GITHUB_OUTPUT"
-          echo "gtest_build=${{ github.workspace }}/ci/speed_comparison/cmake-build-release" >> "$GITHUB_OUTPUT"
+          echo "benchmark=${{ github.workspace }}/benchmark" >> "$GITHUB_OUTPUT"
+          echo "build=${{ github.workspace }}/benchmark/cmake-build-release" >> "$GITHUB_OUTPUT"
 
       - name: Configure
         run: >
-          cmake -B ${{ steps.strings.outputs.gtest_build }}
+          cmake -B ${{ steps.strings.outputs.build }}
           -DCMAKE_CXX_COMPILER=g++
           -DCMAKE_C_COMPILER=gcc
           -DCMAKE_BUILD_TYPE=Release
-          -S ${{ steps.strings.outputs.ci }}/speed_comparison
+          -S ${{ steps.strings.outputs.benchmark }}
 
       - name: Build
-        run: cmake --build ${{ steps.strings.outputs.gtest_build }} --target SpeedComparison -j 8
+        run: cmake --build ${{ steps.strings.outputs.build }} --target Benchmark -j8
 
       - name: Run generated tests
-        working-directory: ${{ steps.strings.outputs.gtest_build }}
-        run: ./SpeedComparison --gtest_output=xml:tests.xml --gtest_color=yes
+        working-directory: ${{ steps.strings.outputs.build }}
+        run: ./Benchmark --benchmark_out=benchmarks.json
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -51,13 +51,13 @@ jobs:
 
       - name: Run Python script
         working-directory: ${{ steps.strings.outputs.ci }}
-        run: python make_plot.py benchmarks/cmake-build-release/tests.xml tests.png
+        run: python make_plot.py ${{ steps.strings.outputs.build }}/benchmarks.json graph.png
 
       - name: Upload a picture
         uses: devicons/public-upload-to-imgur@v2.2.2
         id: imgur_step
         with:
-          path: ${{ steps.strings.outputs.ci }}/tests.png
+          path: ${{ steps.strings.outputs.ci }}/graph.png
           client_id: ${{ secrets.IMGUR_CLIENT_ID }}
 
       - name: Update image link

@@ -1,10 +1,7 @@
-#include <gtest/gtest.h>
-#include <thread>
+#include <benchmark/benchmark.h>
 #include <cryptopp/integer.h>
-#include <cryptopp/nbtheory.h>
 #include <gmpxx.h>
-#include "../../Aeu.h"
-
+#include "../Aeu.h"
 
 constexpr char left[] = "0xa24872afd57464d79dfeec239367995f623429772ec032eb3bc9b376d0775c956dcb330a2c4f8f0d001f62fe6e0b"
                         "2e3b024d8f352522f3aa0ac7fbf05e7e3a2038e4650efb641862969f2437084448a28ff14d9c1e2def670babcf65a8"
@@ -25,23 +22,24 @@ constexpr char right[] = "0xdb446efadae5960843e38dbdc26afc0c6d6633d0e3f7983b11d7
                          "f825d5bb62a1a327148f4e8405f2ee2622122d3d8c967f2fdc6e05a8c1d40c93f3c0dfeb5b8b4c9f1755a9c26f351"
                          "ac1cdebf";
 
-TEST(GCD, CryptoPP) {
-    CryptoPP::Integer leftA (left), rightA (right), _ {};
-    for(long long i = 0; i < 10 * 0x3143cd64e9; i += 0x3143cd64e9)
-        _ = CryptoPP::GCD(leftA, rightA + i);
-    if(_.IsZero()) std::cout << '1';
-}
+static void multiplication_CryptoPP(benchmark::State& state) {
+    CryptoPP::Integer leftA (left), rightA (right), result {};
+    for(auto _ : state)
+        result = leftA * rightA;
 
-TEST(GCD, GMP) {
-    mpz_class leftA (left), rightA (right), _ {};
-    for(std::size_t i = 0; i < 10 * 0x3143cd64e9; i += 0x3143cd64e9)
-        mpz_gcd(_.get_mpz_t(), leftA.get_mpz_t(), rightA.get_mpz_t());
-    if(_ == 0) std::cout << '1';
 }
+BENCHMARK(multiplication_CryptoPP);
 
-TEST(GCD, Aesi) {
-    Aeu<4192> leftA (left), rightA (right), _ {};
-    for(std::size_t i = 0; i < 10 * 0x3143cd64e9; i += 0x3143cd64e9)
-        _ = Aeu<4192>::gcd(leftA, rightA + i);
-    if(_.isZero()) std::cout << '1';
+static void multiplication_GMP(benchmark::State& state) {
+    mpz_class leftA (left), rightA (right), result {};
+    for(auto _ : state)
+        result = leftA * rightA;
 }
+BENCHMARK(multiplication_GMP);
+
+static void multiplication_Aesi(benchmark::State& state) {
+    Aeu<4192> leftA (left), rightA (right), result {};
+    for(auto _ : state)
+        result = leftA * rightA;
+}
+BENCHMARK(multiplication_Aesi);

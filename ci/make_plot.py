@@ -59,9 +59,5 @@ if __name__ == '__main__':
     output_image_path = sys.argv[2]
     print(f"Loading measures table from '{measures}'")
     print(f"Output image location '{output_image_path}'")
-
-    print()
     test_names, records = parse_json(measures)
-    print(test_names)
-    print(records)
     plot(test_names, records, output_image_path, 'Courier New')

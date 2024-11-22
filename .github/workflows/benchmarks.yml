@@ -24,7 +24,7 @@ jobs:
           echo "benchmark=${{ github.workspace }}/benchmark" >> "$GITHUB_OUTPUT"
           echo "build=${{ github.workspace }}/benchmark/cmake-build-release" >> "$GITHUB_OUTPUT"
 
-      - name: Configure
+      - name: Load CMake configuration
         run: >
           cmake -B ${{ steps.strings.outputs.build }}
           -DCMAKE_CXX_COMPILER=g++
@@ -32,10 +32,10 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release
           -S ${{ steps.strings.outputs.benchmark }}
 
-      - name: Build
+      - name: Build executable
         run: cmake --build ${{ steps.strings.outputs.build }} --target Benchmarking -j8
 
-      - name: Run generated tests
+      - name: Run benchmark analysis
         working-directory: ${{ steps.strings.outputs.build }}
         run: ./Benchmarking --benchmark_out=benchmarks.json
 

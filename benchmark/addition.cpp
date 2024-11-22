@@ -10,20 +10,23 @@ constexpr char data[] = "0x56612239db6d8ce375c48f335a4ba6f4933c871a672f6e66c7899
 static void addition_CryptoPP(benchmark::State& state) {
     CryptoPP::Integer left (data), right (data), result {};
     for (auto _ : state)
-        result = left + right;
+        benchmark::DoNotOptimize(result = left + right);
+    // if(result.IsEven()) result += 1;
 }
 BENCHMARK(addition_CryptoPP);
 
 static void addition_GMP(benchmark::State& state) {
     mpz_class left (data), right (data), result {};
     for (auto _ : state)
-        result = left + right;
+        benchmark::DoNotOptimize(result = left + right);
+    // if(mpz_even_p(result.get_mpz_t())) result += 1;
 }
 BENCHMARK(addition_GMP);
 
 static void addition_Aesi(benchmark::State& state) {
     Aeu<2048> left (data), right (data), result {};
     for (auto _ : state)
-        result = left + right;
+        benchmark::DoNotOptimize(result = left + right);
+    // if(result.isEven()) result += 1u;
 }
 BENCHMARK(addition_Aesi);

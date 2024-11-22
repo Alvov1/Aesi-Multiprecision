@@ -32,20 +32,23 @@ constexpr char divisor[] = "0x55c5374ad14e5c9bff62109df3100124f654bb11ef8fbdcc93
 static void modulo_CryptoPP(benchmark::State& state) {
     CryptoPP::Integer left (division), right (divisor), result {};
     for(auto _ : state)
-        result = left % right;
+        benchmark::DoNotOptimize(result = left % right);
+    // if(result.IsEven()) result += 1;
 }
 BENCHMARK(modulo_CryptoPP);
 
 static void modulo_GMP(benchmark::State& state) {
     mpz_class left (division), right (divisor), result {};
     for(auto _ : state)
-        result = left % right;
+        benchmark::DoNotOptimize(result = left % right);
+    // if(mpz_even_p(result.get_mpz_t())) result += 1;
 }
 BENCHMARK(modulo_GMP);
 
 static void modulo_Aesi(benchmark::State& state) {
     Aeu<8192> left (division), right (divisor), result {};
     for(auto _ : state)
-        result = left % right;
+        benchmark::DoNotOptimize(result = left % right);
+    // if(result.isEven()) result += 1u;
 }
 BENCHMARK(modulo_Aesi);

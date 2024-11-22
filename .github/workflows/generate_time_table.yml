@@ -51,7 +51,7 @@ jobs:
 
       - name: Run Python script
         working-directory: ${{ steps.strings.outputs.ci }}
-        run: python make_plot.py speed_comparison/cmake-build-release/tests.xml tests.png
+        run: python make_plot.py benchmarks/cmake-build-release/tests.xml tests.png
 
       - name: Upload a picture
         uses: devicons/public-upload-to-imgur@v2.2.2

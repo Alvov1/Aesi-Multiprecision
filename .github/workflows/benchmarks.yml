@@ -1,4 +1,4 @@
-name: Compare the execution time
+name: Benchmarking
 
 on:
   push:

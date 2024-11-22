@@ -60,4 +60,6 @@ if __name__ == '__main__':
     print(f"Loading measures table from '{measures}'")
     print(f"Output image location '{output_image_path}'")
     test_names, records = parse_json(measures)
+
+    fm._load_fontmanager(try_read_cache=False)
     plot(test_names, records, output_image_path, 'Courier New')

@@ -114,5 +114,5 @@ cout << Aeu<256>::powm(base.precisionCast<256>(),     // Fine
 
 ## Issues
 Library is relatively slow in compare to other multiple precision libraries
-![Execution Time Graph](https://dub.sh/jNgf79u?)
+![Execution Time Graph](https://dub.sh/jNgf79u?1)
 

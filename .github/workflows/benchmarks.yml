@@ -33,11 +33,11 @@ jobs:
           -S ${{ steps.strings.outputs.benchmark }}
 
       - name: Build
-        run: cmake --build ${{ steps.strings.outputs.build }} --target Benchmark -j8
+        run: cmake --build ${{ steps.strings.outputs.build }} --target Benchmarking -j8
 
       - name: Run generated tests
         working-directory: ${{ steps.strings.outputs.build }}
-        run: ./Benchmark --benchmark_out=benchmarks.json
+        run: ./Benchmarking --benchmark_out=benchmarks.json
 
       - name: Set up Python
         uses: actions/setup-python@v4

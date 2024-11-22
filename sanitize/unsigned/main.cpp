@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <filesystem>
+#include <cmath>
 #include "../../Aeu.h"
 
 /* Creator: Alexander Lvov

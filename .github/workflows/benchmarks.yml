@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  Make-comparison:
+  Measure:
     runs-on: ubuntu-latest
 
     steps:
@@ -48,6 +48,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install matplotlib numpy requests
+
+      - name: Download font file
+        working-directory: ${{ steps.strings.outputs.ci }}
+        run: wget https://github.com/google/fonts/blob/main/ofl/courierprime/CourierPrime-Bold.ttf
 
       - name: Run Python script
         working-directory: ${{ steps.strings.outputs.ci }}

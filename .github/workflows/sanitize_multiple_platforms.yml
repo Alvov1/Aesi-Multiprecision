@@ -1,4 +1,4 @@
-name: Sanitizing
+name: Sanitize
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  Sanitize:
+  Run:
     runs-on: ${{ matrix.os }}
 
     strategy:

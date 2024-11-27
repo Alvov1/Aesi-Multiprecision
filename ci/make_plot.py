@@ -26,7 +26,7 @@ def parse_json(path: str):
 
 
 def plot(operations, data, output_path, font):
-    plt.rcParams['font.size'] = 10
+    plt.rcParams['font.size'] = 12
     plt.rcParams['font.family'] = font
     plt.rcParams['font.weight'] = 'bold'
 
@@ -36,19 +36,19 @@ def plot(operations, data, output_path, font):
     x = np.arange(len(operations))
     width = 0.25
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(14, 6))
 
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
     for i, lib in enumerate(libraries):
         ax.bar(x + i * width, values[i], width, label=lib, color=colors[i])
 
-    ax.set_xlabel('Operations', fontsize=13, weight='bold')
-    ax.set_ylabel('Execution Time (ns)', fontsize=13, weight='bold')
-    ax.set_title('Execution Time Comparison', fontsize=14, weight='bold')
+    ax.set_xlabel('Operations', fontsize=15, weight='bold')
+    ax.set_ylabel('Execution Time (ns)', fontsize=15, weight='bold')
+    ax.set_title('Execution Time Comparison', fontsize=16, weight='bold')
     ax.set_xticks(x + width)
-    ax.set_xticklabels(operations, rotation=45, ha='right', fontsize=11)
+    ax.set_xticklabels(operations, rotation=45, ha='right', fontsize=13)
     ax.set_yscale('log')
-    ax.legend(title='Libraries', fontsize=10)
+    ax.legend(title='Libraries', fontsize=12)
 
     plt.tight_layout()
     plt.savefig(output_path)
@@ -59,7 +59,9 @@ if __name__ == '__main__':
     output_image_path = sys.argv[2]
     print(f"Loading measures table from '{measures}'")
     print(f"Output image location '{output_image_path}'")
-    test_names, records = parse_json(measures)
 
-    fm._load_fontmanager(try_read_cache=False)
-    plot(test_names, records, output_image_path, 'Courier New')
+    font_path, font_name = ('CourierPrime-Bold.ttf', 'Courier Prime')
+    fm.fontManager.addfont(font_path)
+
+    test_names, records = parse_json(measures)
+    plot(test_names, records, output_image_path, font_name)

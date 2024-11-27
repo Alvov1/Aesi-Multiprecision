@@ -1,4 +1,4 @@
-name: Sanitize on multiple platforms
+name: Sanitize
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  Sanitize:
+  Run:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -50,4 +50,4 @@ jobs:
 
       - name: Run sanitizing application
         working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: /${{ steps.strings.outputs.build-output-dir }}/AesiSanitize
+        run: /${{ steps.strings.outputs.build-output-dir }}/AesiSanitize ../../primes.bin

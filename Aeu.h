@@ -1,3 +1,33 @@
+/**
+ * Copyright 2021-2023, Alexander V. Lvov
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list
+ *    of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this
+ *    list of conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**/
+
+/**
+ * @file Aeu.h
+ * @brief Long precision unsigned integer with arithmetic operations
+ */
+
 #ifndef AEU_MULTIPRECISION
 #define AEU_MULTIPRECISION
 
@@ -28,16 +58,12 @@
 #include <gmpxx.h>
 #endif
 
-/**
- * @file Aeu.h
- * @brief Long precision unsigned integer with arithmetic operations
- */
-
 namespace {
     using byte = uint8_t;
     using block = uint32_t;
 
-    constexpr inline std::size_t bitsInByte = 8, blockBitLength = sizeof(block) * bitsInByte;
+    constexpr inline std::size_t bitsInByte = 8;
+    constexpr inline std::size_t blockBitLength = sizeof(block) * bitsInByte;
     constexpr inline uint64_t blockBase = 1ULL << blockBitLength;
     constexpr inline block blockMax = 0xff'ff'ff'ffu;
 
@@ -45,7 +71,7 @@ namespace {
      * @enum Comparison
      * @brief Analogue of STD::Strong_ordering since CUDA does not support <=> operator
      */
-    enum Comparison { equal = 0, less = 1, greater = 2, equivalent = 3 };
+    enum class Comparison { equal = 0, less = 1, greater = 2, equivalent = 3 };
 }
 
 /**
@@ -115,6 +141,11 @@ public:
     gpu constexpr Aeu() noexcept = default;
 
     /**
+     * @brief Destructor
+     */
+    gpu constexpr ~Aeu() noexcept = default;
+
+    /**
      * @brief Copy constructor
      */
     gpu constexpr Aeu(const Aeu& copy) noexcept = default;
@@ -123,7 +154,7 @@ public:
      * @brief Copy assignment operator
      * @param other Aeu
      */
-    gpu constexpr Aeu& operator=(const Aeu& other) noexcept = default;
+    gpu constexpr Aeu& operator=(const Aeu& other) = default;
 
     /**
      * @brief Integral constructor
@@ -165,10 +196,13 @@ public:
         std::size_t position = 0;
 
         if constexpr (std::is_same_v<Char, char>) {
-            for(; !std::isalnum(data[position]) && position < size; ++position) ;
+            for(; position < size && !std::isalnum(data[position]); ++position) ;
         } else {
-            for(; !std::iswalnum(data[position]) && position < size; ++position) ;
+            for(; position < size && !std::iswalnum(data[position]); ++position) ;
         }
+
+        if(position == size)
+            return;
 
         const auto base = [&data, &size, &position, &characters] {
             if (data[position] == characters[0] && size > position + 1) {
@@ -187,8 +221,9 @@ public:
                 }
             } return 10u;
         } ();
+
         for(; position < size; ++position) {
-            const auto digit = [&characters] (Char ch) {
+            const auto digit = [] (Char ch) {
                 if(characters[0] <= ch && ch <= characters[1])
                     return static_cast<unsigned>(ch) - static_cast<unsigned>(characters[0]);
                 if(characters[2] <= ch && ch <= characters[4])
@@ -199,8 +234,8 @@ public:
             } (data[position]);
 
             if(digit < base) {
-                this->operator*=(base);
-                this->operator+=(digit);
+                *this *= base;
+                *this += digit;
             }
         }
     }
@@ -247,7 +282,7 @@ public:
      */
     constexpr Aeu(const mpz_class& value) : Aeu {} {
         const auto bitLength = mpz_sizeinbase(value.get_mpz_t(), 2);
-        auto tBlocksNumber = static_cast<std::size_t>(1 + ((bitLength - 1) / sizeof(block) * 8));
+        auto tBlocksNumber = 1 + (bitLength - 1) / sizeof(block) * 8;
 
         std::basic_string<block> buffer (tBlocksNumber, 0u);
         mpz_export(buffer.data(), &tBlocksNumber, -1, sizeof(block), -1, 0, value.get_mpz_t());
@@ -305,9 +340,9 @@ public:
         gpu constexpr auto operator--() noexcept -> Aeu& {
             for(std::size_t i = 0; i < blocksNumber; ++i) {
                 if(blocks[i] > 0u) {
-                    --blocks[i];
-                    break;
-                } else blocks[i] = blockMax;
+                    --blocks[i]; break;
+                }
+                blocks[i] = blockMax;
             }
             return *this;
         }
@@ -323,45 +358,49 @@ public:
     /* ------------------------ @name Addition operators. ------------------------ */
         /**
          * @brief Addition operator for built-in integral types
+         * @param addition Aeu
          * @param addendum Unsigned
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator+(Unsigned addendum) const noexcept -> Aeu {
-            Aeu result = *this; result.operator+=(addendum); return result;
+        gpu constexpr friend auto operator+(const Aeu& addition, Unsigned addendum) noexcept -> Aeu {
+            Aeu result = addition; result += addendum; return result;
         }
 
         /**
          * @brief Addition operator
+         * @param addition Aeu
          * @param addendum Aeu
          * @return Aeu
          */
         [[nodiscard]]
-        gpu constexpr auto operator+(const Aeu& addendum) const noexcept -> Aeu {
-            Aeu result = *this; result += addendum; return result;
+        gpu constexpr friend auto operator+(const Aeu& addition, const Aeu& addendum) noexcept -> Aeu {
+            Aeu result = addition; result += addendum; return result;
         }
 
         /**
          * @brief Assignment addition operator for built-in integral types
+         * @param addition Aeu
          * @param addendum Unsigned
          * @return Aeu&
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator+=(Unsigned addendum) noexcept -> Aeu& {
+        gpu constexpr friend auto operator+=(Aeu& addition, Unsigned addendum) noexcept -> Aeu& {
             for(std::size_t i = 0; i < blocksNumber; ++i) {
-                const auto currentSum = static_cast<uint64_t>(blocks[i]) + static_cast<uint64_t>(addendum);
-                addendum = currentSum / blockBase; blocks[i] = currentSum % blockBase;
+                const auto currentSum = static_cast<uint64_t>(addition.blocks[i]) + static_cast<uint64_t>(addendum);
+                addendum = currentSum / blockBase; addition.blocks[i] = currentSum % blockBase;
             }
-            return *this;
+            return addition;
         }
 
         /**
          * @brief Assignment addition operator
+         * @param addition Aeu
          * @param addendum Aeu
          * @return Aeu&
          */
-        gpu constexpr auto operator+=(const Aeu& addendum) noexcept -> Aeu& {
-            addLine(blocks, addendum.blocks); return *this;
+        gpu constexpr friend auto operator+=(Aeu& addition, const Aeu& addendum) noexcept -> Aeu& {
+            addLine(addition.blocks, addendum.blocks); return addition;
         }
     /* --------------------------------------------------------------------------- */
 
@@ -369,21 +408,23 @@ public:
     /* ----------------------- @name Subtraction operators. ---------------------- */
         /**
          * @brief Subtraction operator
+         * @param subtraction Aeu
          * @param subtrahend Aeu
          * @return Aeu
          */
         [[nodiscard]]
-        gpu constexpr auto operator-(const Aeu& subtrahend) const noexcept -> Aeu {
-            Aeu result = *this; result -= subtrahend; return result;
+        gpu constexpr friend auto operator-(const Aeu& subtraction, const Aeu& subtrahend) noexcept -> Aeu {
+            Aeu result = subtraction; result -= subtrahend; return result;
         }
 
         /**
          * @brief Assignment subtraction operator
+         * @param subtraction Aeu
          * @param subtrahend Aeu
          * @return Aeu&
          */
-        gpu constexpr auto operator-=(const Aeu& subtrahend) noexcept -> Aeu& {
-            return this->operator+=(-subtrahend);
+        gpu constexpr friend auto operator-=(Aeu& subtraction, const Aeu& subtrahend) noexcept -> Aeu& {
+            return subtraction += -subtrahend;
         }
     /* --------------------------------------------------------------------------- */
 
@@ -391,42 +432,47 @@ public:
     /* --------------------- @name Multiplication operators. --------------------- */
         /**
          * @brief Multiplication operator for built-in integral types
+         * @param multiplication Aeu
          * @param factor Unsigned
          * @return Aeu
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>) [[nodiscard]]
-        gpu constexpr auto operator*(Unsigned factor) const noexcept -> Aeu {
-            Aeu result = *this; result.operator*=(factor); return result;
+        gpu constexpr friend auto operator*(Aeu& multiplication, Unsigned factor) noexcept -> Aeu {
+            Aeu result = multiplication; result *= factor; return result;
         }
 
         /**
          * @brief Multiplication operator
+         * @param multiplication Aeu
          * @param factor Aeu
          * @return Aeu
          */
         [[nodiscard]]
-        gpu constexpr auto operator*(const Aeu& factor) const noexcept -> Aeu {
-            Aeu result = *this; result *= factor; return result;
+        gpu constexpr friend auto operator*(const Aeu& multiplication, const Aeu& factor) noexcept -> Aeu {
+            Aeu result = multiplication; result *= factor; return result;
         }
 
         /**
          * @brief Assignment multiplication operator for built-in integral types
+         * @param multiplication Aeu
          * @param factor Unsigned
          * @return Aeu&
          * @details Works with the greatest performance with types smaller than uint64_t
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned>)
-        gpu constexpr auto operator*=(Unsigned factor) noexcept -> Aeu& {
+        gpu constexpr friend auto operator*=(Aeu& multiplication, Unsigned factor) noexcept -> Aeu& {
             if constexpr (std::is_same_v<Unsigned, uint64_t>) {
-                const auto longerLength = filledBlocksNumber(), smallerLength = (factor > blockMax ? 2UL : 1UL);
+                const auto longerLength = multiplication.filledBlocksNumber();
+                const auto smallerLength = (factor > blockMax ? 2UL : 1UL);
                 blockLine buffer {};
 
                 for(std::size_t i = 0; i < longerLength; ++i) {
-                    uint64_t tBlock = blocks[i], carryOut = 0;
+                    const uint64_t tBlock = multiplication.blocks[i];
+                    uint64_t carryOut = 0;
 
-                    for(std::size_t j = 0; j < smallerLength && i + j < buffer.size(); ++j) {
-                        const auto product = tBlock * ((factor >> blockBitLength * j) & 0x00'00'00'00'ff'ff'ff'ff) + carryOut;
-                        const auto block = static_cast<uint64_t>(buffer[i + j]) + (product % blockBase);
+                    for(std::size_t j = 0; j < smallerLength && j < buffer.size() - i; ++j) {
+                        const auto product = tBlock * (factor >> blockBitLength * j & 0x00'00'00'00'ff'ff'ff'ff) + carryOut;
+                        const auto block = static_cast<uint64_t>(buffer[i + j]) + product % blockBase;
                         carryOut = product / blockBase + block / blockBase;
                         buffer[i + j] = block % blockBase;
                     }
@@ -435,34 +481,36 @@ public:
                         buffer[smallerLength + i] += carryOut;
                 }
 
-                blocks = buffer;
-                return *this;
+                multiplication.blocks = buffer;
+                return multiplication;
             } else {
                 uint64_t carryOut = 0;
                 for (std::size_t i = 0; i < blocksNumber; ++i) {
-                    const auto product = static_cast<uint64_t>(factor) * static_cast<uint64_t>(blocks[i]) + carryOut;
-                    blocks[i] = product % blockBase; carryOut = product / blockBase;
+                    const auto product = static_cast<uint64_t>(factor) * static_cast<uint64_t>(multiplication.blocks[i]) + carryOut;
+                    multiplication.blocks[i] = product % blockBase; carryOut = product / blockBase;
                 }
-                return *this;
+                return multiplication;
             }
-        };
+        }
 
         /**
          * @brief Assignment multiplication operator
+         * @param multiplication Aeu
          * @param factor Aeu
          * @return Aeu&
          */
-        gpu constexpr auto operator*=(const Aeu& factor) noexcept -> Aeu& {
+        gpu constexpr friend auto operator*=(Aeu& multiplication, const Aeu& factor) noexcept -> Aeu& {
             constexpr auto multiplyLines = [] (const blockLine& longerLine, const std::size_t longerLength,
                                                const blockLine& smallerLine, const std::size_t smallerLength) {
                 blockLine buffer {};
 
                 for(std::size_t i = 0; i < longerLength; ++i) {
-                    uint64_t tBlock = longerLine[i], carryOut = 0;
+                    const uint64_t tBlock = longerLine[i];
+                    uint64_t carryOut = 0;
 
-                    for(std::size_t j = 0; j < smallerLength && i + j < buffer.size(); ++j) {
+                    for(std::size_t j = 0; j < smallerLength && j < buffer.size() - i; ++j) {
                         const auto product = tBlock * static_cast<uint64_t>(smallerLine[j]) + carryOut;
-                        const auto block = static_cast<uint64_t>(buffer[i + j]) + (product % blockBase);
+                        const auto block = static_cast<uint64_t>(buffer[i + j]) + product % blockBase;
                         carryOut = product / blockBase + block / blockBase;
                         buffer[i + j] = block % blockBase;
                     }
@@ -474,13 +522,13 @@ public:
                 return buffer;
             };
 
-            const std::size_t thisLength = this->filledBlocksNumber(), valueLength = factor.filledBlocksNumber();
-            if(thisLength > valueLength)
-                blocks = multiplyLines(blocks, thisLength, factor.blocks, valueLength);
+            const std::size_t thisLength = multiplication.filledBlocksNumber();
+            if(const std::size_t valueLength = factor.filledBlocksNumber(); thisLength > valueLength)
+                multiplication.blocks = multiplyLines(multiplication.blocks, thisLength, factor.blocks, valueLength);
             else
-                blocks = multiplyLines(factor.blocks, valueLength, blocks, thisLength);
+                multiplication.blocks = multiplyLines(factor.blocks, valueLength, multiplication.blocks, thisLength);
 
-            return *this;
+            return multiplication;
         }
     /* --------------------------------------------------------------------------- */
 
@@ -488,45 +536,47 @@ public:
     /* ------------------------ @name Division operators. ------------------------ */
         /**
          * @brief Division operator
+         * @param division Aeu
          * @param divisor Aeu
          * @return Aeu
          * @note Undefined behaviour for division by zero
          */
         [[nodiscard]]
-        gpu constexpr auto operator/(const Aeu& divisor) const noexcept -> Aeu {
-            Aeu quotient, _; divide(*this, divisor, quotient, _); return quotient;
+        gpu constexpr friend auto operator/(const Aeu& division, const Aeu& divisor) noexcept -> Aeu {
+            Aeu quotient, _; divide(division, divisor, quotient, _); return quotient;
         }
 
         /**
          * @brief Assignment division operator
+         * @param division Aeu
          * @param divisor Aeu
          * @return Aeu&
          * @note Undefined behaviour for division by zero
          */
-        gpu constexpr auto operator/=(const Aeu& divisor) noexcept -> Aeu& {
-            return this->operator=(this->operator/(divisor));
-        }
+        gpu constexpr friend auto operator/=(Aeu& division, const Aeu& divisor) noexcept -> Aeu& { return division = division / divisor; }
     /* --------------------------------------------------------------------------- */
 
 
     /* ------------------------- @name Modulo operators. ------------------------- */
         /**
          * @brief Modulo operator
+         * @param modulation Aeu
          * @param modulo Aeu
          * @return Aeu
          */
         [[nodiscard]]
-        gpu constexpr auto operator%(const Aeu& modulo) const noexcept -> Aeu {
-            Aeu _, remainder; divide(*this, modulo, _, remainder); return remainder;
+        gpu constexpr friend auto operator%(const Aeu& modulation, const Aeu& modulo) noexcept -> Aeu {
+            Aeu _, remainder; divide(modulation, modulo, _, remainder); return remainder;
         }
 
         /**
          * @brief Assignment modulo operator
+         * @param modulation Aeu
          * @param modulo Aeu
          * @return Aeu&
          */
-        gpu constexpr auto operator%=(const Aeu& modulo) noexcept -> Aeu& {
-            return this->operator=(this->operator%(modulo));
+        gpu constexpr friend auto operator%=(Aeu& modulation, const Aeu& modulo) noexcept -> Aeu& {
+            return modulation = modulation % modulo;
         }
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
@@ -547,133 +597,144 @@ public:
 
     /**
      * @brief Bitwise XOR operator
-     * @param other Aeu
+     * @param left Aeu
+     * @param right Aeu
      * @return Aeu
      */
     [[nodiscard]]
-    gpu constexpr auto operator^(const Aeu& other) const noexcept -> Aeu {
-        Aeu result = *this; result ^= other; return result;
+    gpu constexpr friend auto operator^(const Aeu& left, const Aeu& right) noexcept -> Aeu {
+        Aeu result = left; result ^= right; return result;
     }
 
     /**
      * @brief Assignment bitwise XOR operator
-     * @param other Aeu
+     * @param left Aeu
+     * @param right Aeu
      * @return Aeu&
      */
-    gpu constexpr auto operator^=(const Aeu& other) noexcept -> Aeu& {
+    gpu constexpr friend auto operator^=(Aeu& left, const Aeu& right) noexcept -> Aeu& {
         for(std::size_t i = 0; i < blocksNumber; ++i)
-            blocks[i] ^= other.blocks[i];
-        return *this;
+            left.blocks[i] ^= right.blocks[i];
+        return left;
     }
 
     /**
      * @brief Bitwise AND operator
-     * @param other Aeu
+     * @param left Aeu
+     * @param right Aeu
      * @return Aeu
      */
     [[nodiscard]]
-    gpu constexpr auto operator&(const Aeu& other) const noexcept -> Aeu {
-        Aeu result = *this; result &= other; return result;
+    gpu constexpr friend auto operator&(const Aeu& left, const Aeu& right) noexcept -> Aeu {
+        Aeu result = left; result &= right; return result;
     }
 
     /**
      * @brief Assignment bitwise AND operator
-     * @param other Aeu
+     * @param left Aeu
+     * @param right Aeu
      * @return Aeu&
      */
-    gpu constexpr auto operator&=(const Aeu& other) noexcept -> Aeu& {
+    gpu constexpr friend auto operator&=(Aeu& left, const Aeu& right) noexcept -> Aeu& {
         for(std::size_t i = 0; i < blocksNumber; ++i)
-            blocks[i] &= other.blocks[i];
-        return *this;
+            left.blocks[i] &= right.blocks[i];
+        return left;
     }
 
     /**
      * @brief Bitwise OR operator
-     * @param other Aeu
+     * @param left Aeu
+     * @param right Aeu
      * @return Aeu
      */
     [[nodiscard]]
-    gpu constexpr auto operator|(const Aeu& other) const noexcept -> Aeu {
-        Aeu result = *this; result |= other; return result;
+    gpu constexpr friend auto operator|(const Aeu& left, const Aeu& right) noexcept -> Aeu {
+        Aeu result = left; result |= right; return result;
     }
 
     /**
      * @brief Assignment bitwise OR operator
-     * @param other Aeu
+     * @param left Aeu
+     * @param right Aeu
      * @return Aeu&
      */
-    gpu constexpr auto operator|=(const Aeu& other) noexcept -> Aeu& {
+    gpu constexpr friend auto operator|=(Aeu& left, const Aeu& right) noexcept -> Aeu& {
         for(std::size_t i = 0; i < blocksNumber; ++i)
-            blocks[i] |= other.blocks[i];
-        return *this;
+            left.blocks[i] |= right.blocks[i];
+        return left;
     }
 
     /**
      * @brief Left shift operator
+     * @param value Aeu
      * @param bitShift Unsigned
      * @return Aeu
      * @note Does nothing for shift greater than precision
      */
     template <typename Unsigned> requires (std::is_integral_v<Unsigned> && std::is_unsigned_v<Unsigned>) [[nodiscard]]
-    gpu constexpr auto operator<<(Unsigned bitShift) const noexcept -> Aeu {
-        Aeu result = *this; result.operator<<=(bitShift); return result;
+    gpu constexpr friend auto operator<<(const Aeu& value, Unsigned bitShift) noexcept -> Aeu {
+        Aeu result = value; result <<= bitShift; return result;
     }
 
     /**
      * @brief Left shift assignment operator
+     * @param value Aeu
      * @param bitShift Unsigned
      * @return Aeu&
      * @note Does nothing for shift greater than precision
      */
     template <typename Unsigned> requires (std::is_integral_v<Unsigned> && std::is_unsigned_v<Unsigned>)
-    gpu constexpr auto operator<<=(Unsigned bitShift) noexcept -> Aeu& {
-        if(bitShift >= bitness || bitShift == 0) return *this;
+    gpu constexpr friend auto operator<<=(Aeu& value, Unsigned bitShift) noexcept -> Aeu& {
+        if(bitShift >= bitness || bitShift == 0) return value;
 
         const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
         const block stamp = (1UL << (blockBitLength - remainder)) - 1;
 
         for (long long i = blocksNumber - 1; i >= (quotient + (remainder ? 1 : 0)); --i)
-            blocks[i] = ((blocks[i - quotient] & stamp) << remainder) | ((blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> ((blockBitLength - remainder) % blockBitLength));
+            value.blocks[i] = (value.blocks[i - quotient] & stamp) << remainder
+                | ((value.blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> (blockBitLength - remainder) % blockBitLength);
 
-        blocks[quotient] = (blocks[0] & stamp) << remainder;
+        value.blocks[quotient] = (value.blocks[0] & stamp) << remainder;
 
         for (std::size_t i = 0; i < quotient; ++i)
-            blocks[i] = 0;
-        return *this;
+            value.blocks[i] = 0;
+        return value;
     }
 
     /**
      * @brief Right shift operator
+     * @param value Aeu
      * @param bitShift Unsigned
      * @return Aeu
      * @note Does nothing for shift greater than precision
      */
     template <typename Unsigned> requires (std::is_integral_v<Unsigned> && std::is_unsigned_v<Unsigned>) [[nodiscard]]
-    gpu constexpr auto operator>>(Unsigned bitShift) const noexcept -> Aeu {
-        Aeu result = *this; result >>= bitShift; return result;
+    gpu constexpr friend auto operator>>(const Aeu& value, Unsigned bitShift) noexcept -> Aeu {
+        Aeu result = value; result >>= bitShift; return result;
     }
 
     /**
      * @brief Right shift assignment operator
+     * @param value Aeu
      * @param bitShift Unsigned
      * @return Aeu&
      * @note Does nothing for shift greater than precision
      */
     template <typename Unsigned> requires (std::is_integral_v<Unsigned> && std::is_unsigned_v<Unsigned>)
-    gpu constexpr auto operator>>=(Unsigned bitShift) noexcept -> Aeu& {
-        if(bitShift >= bitness || bitShift == 0) return *this;
+    gpu constexpr friend auto operator>>=(Aeu& value, Unsigned bitShift) noexcept -> Aeu& {
+        if(bitShift >= bitness || bitShift == 0) return value;
 
         const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
         const block stamp = (1UL << remainder) - 1;
 
         for(std::size_t i = 0; i < blocksNumber - (quotient + (remainder ? 1 : 0)); ++i)
-            blocks[i] = ((blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << ((blockBitLength - remainder) % blockBitLength)) | ((blocks[i + quotient] & ~stamp) >> remainder);
+            value.blocks[i] = ((value.blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << (blockBitLength - remainder) % blockBitLength) | (value.blocks[i + quotient] & ~stamp) >> remainder;
 
-        blocks[blocksNumber - 1 - quotient] = (blocks[blocksNumber - 1] & ~stamp) >> remainder;
+        value.blocks[blocksNumber - 1 - quotient] = (value.blocks[blocksNumber - 1] & ~stamp) >> remainder;
 
         for(long long i = blocksNumber - quotient; i < blocksNumber; ++i)
-            blocks[i] = 0;
-        return *this;
+            value.blocks[i] = 0;
+        return value;
     }
     /* ----------------------------------------------------------------------- */
 
@@ -682,31 +743,36 @@ public:
     /* ------------------------ @name Equality operators. ------------------------ */
         /**
          * @brief Equality check operator for built-in types uint8_t, uint16_t, uint32_t
+         * @param our Aeu
          * @param other Unsigned
          * @return Boolean
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned> && sizeof(Unsigned) < 8)
-        gpu constexpr auto operator==(Unsigned other) const noexcept -> bool {
-            return filledBlocksNumber() <= 1 && static_cast<block>(other) == blocks[0];
+        gpu constexpr friend auto operator==(const Aeu& our, Unsigned other) noexcept -> bool {
+            return our.filledBlocksNumber() <= 1 && static_cast<block>(other) == our.blocks[0];
         }
-        gpu constexpr auto operator==(uint64_t other) const noexcept -> bool {
-            return filledBlocksNumber() <= 2 && ((static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0])) == other;
+        gpu constexpr friend auto operator==(const Aeu& our, uint64_t other) noexcept -> bool {
+            return our.filledBlocksNumber() <= 2 && (static_cast<uint64_t>(our.blocks[1]) << blockBitLength | static_cast<uint64_t>(our.blocks[0])) == other;
         }
 
         /**
          * @brief Equality check operator for numbers of the same precision
+         * @param our Aeu
          * @param other Aeu
          * @return Boolean
          */
-        gpu constexpr auto operator==(const Aeu& other) const noexcept -> bool { return blocks == other.blocks; };
+        gpu constexpr friend auto operator==(const Aeu& our, const Aeu& other) noexcept -> bool = default;
 
         /**
          * @brief Templated Equality check operator for numbers of different precision
+         * @param our Aeu
          * @param other Aeu
          * @return Boolean
          */
         template <std::size_t otherBitness> requires (otherBitness != bitness)
-        gpu constexpr auto operator==(const Aeu<otherBitness>& other) const noexcept -> bool { return compareTo(other) == Comparison::equal; };
+        gpu constexpr friend auto operator==(const Aeu& our, const Aeu<otherBitness>& other) noexcept -> bool {
+            return our.compareTo(other) == Comparison::equal;
+        };
     /* --------------------------------------------------------------------------- */
 
 
@@ -719,12 +785,18 @@ public:
          */
         template <typename Unsigned> requires (std::is_unsigned_v<Unsigned> && sizeof(Unsigned) < 8) [[nodiscard]]
         gpu constexpr auto compareTo(Unsigned other) const noexcept -> Comparison {
-            if(filledBlocksNumber() > 1) return Comparison::greater;
+            using enum Comparison;
+
+            if(filledBlocksNumber() > 1) return greater;
             const auto cmp = static_cast<block>(other);
+
             if(blocks[0] > cmp)
-                return Comparison::greater;
-            else if(blocks[0] < cmp)
-                return Comparison::less; else return Comparison::equal;
+                return greater;
+
+            if(blocks[0] < cmp)
+                return less;
+
+            return equal;
         }
 
         /**
@@ -735,10 +807,11 @@ public:
          */
         [[nodiscard]]
         gpu constexpr auto compareTo(uint64_t other) const noexcept -> Comparison {
-            if(filledBlocksNumber() > 2) return Comparison::greater;
+            using enum Comparison;
+            if(filledBlocksNumber() > 2) return greater;
             const auto base = (static_cast<uint64_t>(blocks[1]) << blockBitLength) | static_cast<uint64_t>(blocks[0]);
             if(base > other)
-                return Comparison::greater; else if(base < other) return Comparison::less; else return Comparison::equal;
+                return greater; else if(base < other) return less; else return equal;
         }
 
         /**
@@ -749,28 +822,29 @@ public:
          */
         template <std::size_t otherBitness = bitness> /*requires (otherBitness != bitness)*/ [[nodiscard]]
         gpu constexpr auto compareTo(const Aeu<otherBitness>& other) const noexcept -> Comparison {
-            /* First compare in common precision. */
+            using enum Comparison;
+
             const auto lowerBlockBorder = (blocksNumber < other.totalBlocksNumber() ? blocksNumber : other.totalBlocksNumber());
             for(long long i = lowerBlockBorder - 1; i >= 0; --i) {
                 const block thisBlock = blocks[i], otherBlock = other.getBlock(i);
                 if(thisBlock != otherBlock)
-                    return (thisBlock > otherBlock ? Comparison::greater : Comparison::less);
+                    return (thisBlock > otherBlock ? greater : less);
             }
 
             if constexpr (otherBitness != blocksNumber * blockBitLength) {
-                /* If larger number contains data out of lower number's range, it's greater. */
+                using enum Comparison;
                 if (other.totalBlocksNumber() > blocksNumber) {
                     for (long long i = other.totalBlocksNumber() - 1; i > lowerBlockBorder - 1; --i)
                         if (other.getBlock(i) != 0)
-                            return Comparison::less;
+                            return less;
                 } else if (blocksNumber > other.totalBlocksNumber()) {
                     for (long long i = blocksNumber - 1; i > lowerBlockBorder - 1; --i)
                         if (blocks[i] != 0)
-                            return Comparison::greater;
+                            return greater;
                 }
             }
 
-            return Comparison::equal;
+            return equal;
         }
     /* --------------------------------------------------------------------------- */
 
@@ -794,11 +868,12 @@ public:
          */
         gpu constexpr auto operator<=>(const Aeu& other) const noexcept -> std::strong_ordering {
             switch(this->compareTo(other)) {
-                case Comparison::less:
+                using enum Comparison;
+                case less:
                     return std::strong_ordering::less;
-                case Comparison::greater:
+                case greater:
                     return std::strong_ordering::greater;
-                case Comparison::equal:
+                case equal:
                     return std::strong_ordering::equal;
                 default:
                     return std::strong_ordering::equivalent;
@@ -814,11 +889,12 @@ public:
         template <typename Unsigned>
         gpu constexpr auto operator<=>(const Unsigned& other) const noexcept -> std::strong_ordering {
             switch(this->compareTo(other)) {
-                case Comparison::less:
+                using enum Comparison;
+                case less:
                     return std::strong_ordering::less;
-                case Comparison::greater:
+                case greater:
                     return std::strong_ordering::greater;
-                case Comparison::equal:
+                case equal:
                     return std::strong_ordering::equal;
                 default:
                     return std::strong_ordering::equivalent;
@@ -857,7 +933,7 @@ public:
     [[nodiscard]]
     gpu constexpr auto getBit(std::size_t index) const noexcept -> bool {
 #ifndef AESI_UNSAFE
-            if(index >= bitness) return false;
+        if(index >= bitness) return false;
 #endif
         const std::size_t blockNumber = index / blockBitLength, bitNumber = index % blockBitLength;
         assert(blockNumber < blocksNumber && bitNumber < blockBitLength);
@@ -1201,7 +1277,7 @@ public:
 
         do {
             x = y;
-            y = (x + this->operator/(x)) >> 1u;
+            y = (x + *this / x) >> 1u;
         } while (y < x);
 
         return x;
@@ -1310,10 +1386,16 @@ public:
         auto flags = os.flags();
 
         const auto base = [] (long baseField, std::basic_ostream<Char>& ss, bool showbase) {
-            auto base = (baseField == std::ios::hex ? 16u : (baseField == std::ios::oct ? 8u : 10u));
-            if(showbase && base != 10)
-                ss << [&base] { if constexpr (std::is_same_v<Char, char>) { return base == 8 ? "0o" : "0x"; } else { return base == 8 ? L"0o" : L"0x"; }} () << std::noshowbase ;
-            return base;
+            auto tBase = (baseField == std::ios::hex ? 16u : (baseField == std::ios::oct ? 8u : 10u));
+            if(showbase && tBase != 10)
+                ss << [&tBase] {
+                    if constexpr (std::is_same_v<Char, char>) {
+                        return tBase == 8 ? "0o" : "0x";
+                    } else {
+                        return tBase == 8 ? L"0o" : L"0x";
+                    }
+                } () << std::noshowbase ;
+            return tBase;
         } (flags & std::ios::basefield, os, flags & std::ios::showbase);
 
         if(number.isZero())

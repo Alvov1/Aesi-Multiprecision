@@ -1,3 +1,33 @@
+/**
+ * Copyright 2021-2023, Alexander V. Lvov
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list
+ *    of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this
+ *    list of conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**/
+
+/**
+ * @file Aesi.h
+ * @brief Long precision signed integer with arithmetic operations
+ */
+
 #ifndef AESI_MULTIPRECISION
 #define AESI_MULTIPRECISION
 
@@ -5,30 +35,44 @@
 #include "Aeu.h"
 /// @endcond
 
-/**
- * @file Aesi.h
- * @brief Long precision signed integer with arithmetic operations
- */
-
 namespace {
     enum class Sign { Zero = 0, Positive = 1, Negative = -1 };
-}
 
+    template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
+    Sign traverseDashes(const Char* ptr, std::size_t);
+
+    template <>
+    Sign traverseDashes(const char* ptr, std::size_t size) {
+        std::byte positive { 1 };
+        for(std::size_t i = 0; i < size; ++i)
+            if(ptr[i] == '-') positive ^= std::byte {1};
+        return positive == std::byte {1} ? Sign::Positive : Sign::Negative;
+    }
+
+    template <>
+    Sign traverseDashes(const wchar_t* ptr, std::size_t size) {
+        std::byte positive { 1 };
+        for(std::size_t i = 0; i < size; ++i)
+            if(ptr[i] == L'-') positive ^= std::byte {1};
+        return positive == std::byte {1} ? Sign::Positive : Sign::Negative;
+    }
+}
 /**
  * @class Aesi
  * @brief Long precision signed integer
  * @details May be used to represent positive and negative integers. Number precision is set in template parameter bitness.
  */
+
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Aesi final {
     /* -------------------------- @name Class members. ----------------------- */
-    Sign sign { Sign::Zero };
+    Sign sign;
 
     using Base = Aeu<bitness>;
     Base base;
     /* ----------------------------------------------------------------------- */
 
-    gpu constexpr Aesi(Sign withSign, Base withBase): sign { withSign }, base { withBase } {};
+    gpu constexpr Aesi(Sign withSign, Base withBase): sign { withSign }, base { withBase } {}
 
 public:
     /* --------------------- @name Different constructors. ------------------- */
@@ -36,6 +80,11 @@ public:
      * @brief Default constructor
      */
     gpu constexpr Aesi() noexcept = default;
+
+    /**
+     * @brief Destructor
+     */
+    gpu constexpr ~Aesi() noexcept = default;
 
     /**
      * @brief Copy constructor
@@ -49,15 +98,16 @@ public:
      */
     template <typename Integral> requires (std::is_integral_v<Integral>)
     gpu constexpr Aesi(Integral value) noexcept {
+        using enum Sign;
         if(value < 0) {
             value *= -1;
             base = Base(static_cast<unsigned long long>(value));
-            sign = Sign::Negative;
+            sign = Negative;
         } else if(value > 0) {
             base = Base(static_cast<unsigned long long>(value));
-            sign = Sign::Positive;
+            sign = Positive;
         } else
-            sign = Sign::Zero;
+            sign = Zero;
     }
 
     /**
@@ -69,21 +119,9 @@ public:
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
     gpu constexpr Aesi(const Char* ptr, std::size_t size) noexcept : base(ptr, size) {
-        if(!base.isZero()) {
-            uint8_t positive = 1;
-
-            const auto dash = [] {
-                if constexpr (std::is_same_v<Char, char>) {
-                    return '-';
-                } else {
-                    return L'-';
-                }
-            } ();
-            for(std::size_t i = 0; i < size; ++i)
-                if(ptr[i] == dash) positive ^= 1;
-
-            sign = (positive ? Sign::Positive : Sign::Negative);
-        } else sign = Sign::Zero;
+        if(!base.isZero())
+            sign = traverseDashes(ptr, size);
+        else sign = Sign::Zero;
     }
 
     /**
@@ -117,13 +155,14 @@ public:
      * @param number CryptoPP::Integer&
      */
     constexpr Aesi(const CryptoPP::Integer& number) {
+        using enum Sign;
         if(number.IsZero())
-            sign = Sign::Zero;
+            sign = Zero;
         else {
             base = number;
             if(number.IsNegative())
-                sign = Sign::Negative;
-            else sign = Sign::Positive;
+                sign = Negative;
+            else sign = Positive;
         }
     }
 #endif
@@ -134,13 +173,14 @@ public:
      * @param number mpz_class&
      */
     constexpr Aesi(const mpz_class& number) {
+        using enum Sign;
         if(number == 0)
-            sign = Sign::Zero;
+            sign = Zero;
         else {
             base = number;
             if(number < 0)
-                sign = Sign::Negative;
-            else sign = Sign::Positive;
+                sign = Negative;
+            else sign = Positive;
         }
     }
 #endif
@@ -151,13 +191,14 @@ public:
      */
     template <typename Integral> requires (std::is_signed_v<Integral>)
     gpu constexpr Aesi& operator=(Integral value) noexcept {
+        using enum Sign;
         if(value != 0) {
             if(value < 0) {
-                sign = Sign::Negative;
+                sign = Negative;
                 value *= -1;
-            } else sign = Sign::Positive;
+            } else sign = Positive;
             base = static_cast<unsigned long long>(value);
-        } else sign = Sign::Zero;
+        } else sign = Zero;
         return *this;
     }
 
@@ -165,7 +206,7 @@ public:
      * @brief Copy assignment operator
      * @param other Aesi&
      */
-    gpu constexpr Aesi& operator=(const Aesi& other) noexcept = default;
+    gpu constexpr Aesi& operator=(const Aesi& other) noexcept { base = other.base; sign = other.sign; return *this; }
     /* ----------------------------------------------------------------------- */
 
 
@@ -190,11 +231,12 @@ public:
          * @return Aesi&
          */
         gpu constexpr auto operator++() noexcept -> Aesi& {
-            if(sign == Sign::Negative) {
-                --base; if(base.isZero()) sign = Sign::Zero;
-            } else if(sign == Sign::Positive) {
+            using enum Sign;
+            if(sign == Negative) {
+                --base; if(base.isZero()) sign = Zero;
+            } else if(sign == Positive) {
                 ++base;
-            } else { base = 1u; sign = Sign::Positive; }
+            } else { base = 1u; sign = Positive; }
             return *this;
         }
 
@@ -209,11 +251,12 @@ public:
          * @return Aesi&
          */
         gpu constexpr auto operator--() noexcept -> Aesi& {
-            if(sign == Sign::Negative) {
+            using enum Sign;
+            if(sign == Negative) {
                 ++base;
-            } else if(sign == Sign::Positive) {
-                --base; if(base.isZero()) sign = Sign::Zero;
-            } else { base = 1u; sign = Sign::Negative; }
+            } else if(sign == Positive) {
+                --base; if(base.isZero()) sign = Zero;
+            } else { base = 1u; sign = Negative; }
             return *this;
         }
 
@@ -227,58 +270,67 @@ public:
     /* ------------------------ @name Addition operators. ------------------------ */
         /**
          * @brief Addition operator
+         * @param addition Aesi
          * @param addendum Aesi&
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr auto operator+(const Aesi& addendum) const noexcept -> Aesi { Aesi result = *this; result += addendum; return result; }
+        gpu constexpr friend auto operator+(const Aesi& addition, const Aesi& addendum) noexcept -> Aesi {
+            Aesi result = addition; result += addendum; return result;
+        }
 
         /**
          * @brief Addition assignment operator
+         * @param addition Aesi
          * @param addendum Aesi&
          * @return Aesi&
          */
-        gpu constexpr auto operator+=(const Aesi& addendum) noexcept -> Aesi& {
-            if(addendum.sign == Sign::Zero) /* Any += Zero; */
-                return *this;
-            if(sign == Sign::Zero) /* Zero += Any; */
-                return this->operator=(addendum);
+        gpu constexpr friend auto operator+=(Aesi& addition, const Aesi& addendum) noexcept -> Aesi& {
+            using enum Sign;
+            Sign& lSign = addition.sign; const Sign& rSign = addendum.sign;
+            Base& lBase = addition.base; const Base& rBase = addendum.base;
 
-            if(sign == addendum.sign) { /* Positive += Positive; */
-                base += addendum.base;
-                return *this;
+            if(rSign == Zero)
+                return addition;
+            else if(lSign == Zero)
+                return addition = addendum;
+            else if(lSign == rSign) {
+                lBase += rBase;
+                return addition;
             }
 
-            if(sign == Sign::Positive) { /* Positive += Negative; */
-                switch(base.compareTo(addendum.base)) {
-                    case Comparison::greater: {
-                        base -= addendum.base;
-                        return *this;
+            if(lSign == Positive) {
+                switch(lBase.compareTo(rBase)) {
+                    using enum Comparison;
+                    case greater: {
+                        lBase -= rBase;
+                        return addition;
                     }
-                    case Comparison::less: {
-                        base = addendum.base - base;
-                        sign = Sign::Negative;
-                        return *this;
+                    case less: {
+                        lBase = rBase - lBase;
+                        lSign = Negative;
+                        return addition;
                     }
                     default: {
-                        sign = Sign::Zero;
-                        return *this;
+                        lSign = Zero;
+                        return addition;
                     }
                 }
-            } else { /* Negative += Positive; */
-                switch(const auto ratio = base.compareTo(addendum.base)) {
-                    case Comparison::greater: {
-                        base -= addendum.base;
-                        return *this;
+            } else {
+                switch(const auto ratio = lBase.compareTo(rBase)) {
+                    using enum Comparison;
+                    case greater: {
+                        lBase -= rBase;
+                        return addition;
                     }
-                    case Comparison::less: {
-                        base = addendum.base - base;
-                        sign = Sign::Positive;
-                        return *this;
+                    case less: {
+                        lBase = rBase - lBase;
+                        lSign = Positive;
+                        return addition;
                     }
                     default: {
-                        sign = Sign::Zero;
-                        return *this;
+                        lSign = Zero;
+                        return addition;
                     }
                 }
             }
@@ -288,67 +340,77 @@ public:
     /* ----------------------- @name Subtraction operators. ---------------------- */
         /**
          * @brief Subtraction operator
+         * @param subtraction Aesi
          * @param subtrahend Aesi&
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr auto operator-(const Aesi& subtrahend) const noexcept -> Aesi { Aesi result = *this; result -= subtrahend; return result; }
+        gpu constexpr friend auto operator-(const Aesi& subtraction, const Aesi& subtrahend) noexcept -> Aesi {
+            Aesi result = subtraction; result -= subtrahend; return result;
+        }
 
         /**
          * @brief Subtraction assignment operator
+         * @param subtraction Aesi
          * @param subtrahend Aesi&
          * @return Aesi&
          */
-        gpu constexpr auto operator-=(const Aesi& subtrahend) noexcept -> Aesi& {
-            if(subtrahend.sign == Sign::Zero) /* Any -= Zero; */
-                return *this;
-            if(sign == Sign::Zero) { /* Zero -= Any; */
-                *this = subtrahend;
-                this->inverse();
-                return *this;
+        gpu constexpr friend auto operator-=(Aesi& subtraction, const Aesi& subtrahend) noexcept -> Aesi& {
+            using enum Sign;
+            Sign& lSign = subtraction.sign; const Sign& rSign = subtrahend.sign;
+            Base& lBase = subtraction.base; const Base& rBase = subtrahend.base;
+
+            if(rSign == Zero)
+                return subtraction;
+            if(lSign == Zero) {
+                subtraction = subtrahend;
+                subtraction.inverse();
+                return subtraction;
             }
 
-            if(sign == Sign::Positive) {
-                if(subtrahend.sign == Sign::Positive) { /* Positive -= Positive; */
-                    switch(base.compareTo(subtrahend.base)) {
-                        case Comparison::greater: {
-                            base -= subtrahend.base;
-                            return *this;
+            if(lSign == Positive) {
+                if(rSign == Positive) {
+                    switch(lBase.compareTo(rBase)) {
+                        using enum Comparison;
+                        case greater: {
+                            lBase -= rBase;
+                            return subtraction;
                         }
-                        case Comparison::less: {
-                            base = subtrahend.base - base;
-                            sign = Sign::Negative;
-                            return *this;
+                        case less: {
+                            lBase = rBase - lBase;
+                            lSign = Negative;
+                            return subtraction;
                         }
                         default: {
-                            sign = Sign::Zero;
-                            return *this;
+                            lSign = Zero;
+                            return subtraction;
                         }
                     }
-                } else { /* Positive -= Negative; */
-                    base += subtrahend.base;
-                    return *this;
+                } else {
+                    lBase += rBase;
+                    return subtraction;
                 }
             } else {
-                if(subtrahend.sign == Sign::Negative) { /* Negative -= Negative; */
-                    switch(base.compareTo(subtrahend.base)) {
-                        case Comparison::greater: {
-                            base -= subtrahend.base;
-                            return *this;
+                if(rSign == Negative) {
+                    switch(lBase.compareTo(rBase)) {
+                        using enum Comparison;
+                        case greater: {
+                            lBase -= rBase;
+                            return subtraction;
                         }
-                        case Comparison::less: {
-                            base = subtrahend.base - base;
-                            sign = Sign::Positive;
-                            return *this;
+                        case less: {
+                            lBase = rBase - lBase;
+                            lSign = Positive;
+                            return subtraction;
                         }
                         default: {
-                            sign = Sign::Zero;
-                            return *this;
+                            lSign = Zero;
+                            return subtraction;
                         }
                     }
-                } else { /* Negative -= Positive; */
-                    base += subtrahend.base;
-                    return *this;
+                } else {
+                    lBase += rBase;
+                    return subtraction;
                 }
             }
         }
@@ -357,173 +419,202 @@ public:
     /* --------------------- @name Multiplication operators. --------------------- */
         /**
          * @brief Multiplication operator for built-in types
+         * @param multiplication Aesi
          * @param factor Integral
          * @return Aesi
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator*(Integral factor) const noexcept -> Aesi { Aesi result = *this; result *= factor; return result; }
+        gpu constexpr friend auto operator*(const Aesi& multiplication, Integral factor) noexcept -> Aesi {
+            Aesi result = multiplication; result *= factor; return result;
+        }
 
         /**
          * @brief Multiplication operator
-         * @param factor Aesi&
+         * @param multiplication Aesi
+         * @param factor Aesi
          * @return Aesi
          */
         [[nodiscard]]
-        gpu constexpr auto operator*(const Aesi& factor) const noexcept -> Aesi { Aesi result = *this; result *= factor; return result; }
+        gpu constexpr friend auto operator*(const Aesi& multiplication, const Aesi& factor) noexcept -> Aesi {
+            Aesi result = multiplication; result *= factor; return result;
+        }
 
         /**
          * @brief Multiplication assignment operator for built-in types
+         * @param multiplication Aesi
          * @param factor Integral
          * @return Aesi&
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator*=(Integral factor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator*=(Aesi& multiplication, Integral factor) noexcept -> Aesi& {
+            using enum Sign;
             if(factor == 0) {
-                sign = Sign::Zero;
+                multiplication.sign = Zero;
             } else {
                 if(factor < 0) {
-                    this->inverse();
+                    multiplication.inverse();
                     factor *= -1;
                 }
-                base.operator*=(static_cast<unsigned long long>(factor));
+                multiplication.base *= static_cast<unsigned long long>(factor);
             }
-            return *this;
+            return multiplication;
         }
 
         /**
          * @brief Multiplication assignment operator
-         * @param factor Aesi&
+         * @param multiplication Aesi
+         * @param factor Aesi
          * @return Aesi&
          */
-        gpu constexpr auto operator*=(const Aesi& factor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator*=(Aesi& multiplication, const Aesi& factor) noexcept -> Aesi& {
+            using enum Sign;
             if(factor.isZero()) {
-                sign = Sign::Zero;
+                multiplication.sign = Zero;
             } else {
                 if(factor.isNegative())
-                    this->inverse();
-                base.operator*=(factor.base);
+                    multiplication.inverse();
+                multiplication.base *= factor.base;
             }
-            return *this;
+            return multiplication;
         }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------ @name Division operators. ------------------------ */
         /**
          * @brief Division operator for built-in integral types
+         * @param division Aesi
          * @param divisor Integral
          * @return Aesi
          * @note Undefined behaviour for division by zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator/(Integral divisor) const noexcept -> Aesi { Aesi result = *this; result /= divisor; return result; }
+        gpu constexpr friend auto operator/(const Aesi& division, Integral divisor) noexcept -> Aesi {
+            Aesi result = division; result /= divisor; return result;
+        }
 
         /**
          * @brief Division operator
+         * @param division Aesi
          * @param divisor Aesi
          * @return Aesi
          * @note Undefined behaviour for division by zero
          */
         [[nodiscard]]
-        gpu constexpr auto operator/(const Aesi& divisor) const noexcept -> Aesi { Aesi result = *this; result /= divisor; return result; }
+        gpu constexpr friend auto operator/(const Aesi& division, const Aesi& divisor) noexcept -> Aesi {
+            Aesi result = division; result /= divisor; return result;
+        }
 
         /**
          * @brief Assignment division operator for built-in integral types
+         * @param division Aesi
          * @param divisor Integral
          * @return Aesi&
          * @note Undefined behaviour for division by zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator/=(Integral divisor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator/=(Aesi& division, Integral divisor) noexcept -> Aesi& {
+            using enum Sign;
             if(divisor == 0) {
-                sign = Sign::Zero;
+                division.sign = Zero;
             } else {
                 if(divisor < 0) {
-                    this->inverse();
+                    division.inverse();
                     divisor *= -1;
                 }
-                base.operator/=(static_cast<unsigned long long>(divisor));
-                if(base.isZero()) sign = Sign::Zero;
+                division.base /= static_cast<unsigned long long>(divisor);
+                if(division.base.isZero()) division.sign = Zero;
             }
-            return *this;
+            return division;
         }
 
         /**
          * @brief Assignment division operator
+         * @param division Aesi
          * @param divisor Aesi
          * @return Aesi&
          * @note Undefined behaviour for division by zero
          */
-        gpu constexpr auto operator/=(const Aesi& divisor) noexcept -> Aesi& {
+        gpu constexpr friend auto operator/=(Aesi& division, const Aesi& divisor) noexcept -> Aesi& {
+            using enum Sign;
             if(divisor.isZero()) {
-                sign = Sign::Zero;
+                division.sign = Zero;
             } else {
                 if(divisor.isNegative())
-                    this->inverse();
-                base.operator/=(divisor.base);
-                if(base.isZero()) sign = Sign::Zero;
+                    division.inverse();
+                division.base /= divisor.base;
+                if(division.base.isZero()) division.sign = Zero;
             }
-            return *this;
+            return division;
         }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------- @name Modulo operators. ------------------------- */
         /**
          * @brief Modulo operator for built-in types
+         * @param modulation Aesi
          * @param modulo Integral
          * @return Aesi
          * @note Returns zero for the modulo of zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
-        gpu constexpr auto operator%(Integral modulo) const noexcept -> Aesi { Aesi result = *this; result %= modulo; return result; }
+        gpu constexpr friend auto operator%(const Aesi& modulation, Integral modulo) noexcept -> Aesi {
+            Aesi result = modulation; result %= modulo; return result;
+        }
 
         /**
          * @brief Modulo operator
-         * @param modulo Aesi&
+         * @param modulation Aesi
+         * @param modulo Aesi
          * @return Aesi
          * @details DETAILS
          * @note Returns zero for the modulo of zero
          */
         [[nodiscard]]
-        gpu constexpr auto operator%(const Aesi& modulo) const noexcept -> Aesi { Aesi result = *this; result %= modulo; return result; }
+        gpu constexpr friend auto operator%(const Aesi& modulation, const Aesi& modulo)  noexcept -> Aesi {
+            Aesi result = modulation; result %= modulo; return result;
+        }
 
         /**
          * @brief Modulo assignment operator for built-in types
+         * @param modulation Aesi
          * @param modulo Integral
          * @return Aesi&
          * @note Returns zero for the modulo of zero
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator%=(Integral modulo) noexcept -> Aesi& {
+        gpu constexpr friend auto operator%=(Aesi& modulation, Integral modulo) noexcept -> Aesi& {
+            using enum Sign;
             if(modulo == 0) {
-                sign = Sign::Zero;
+                modulation.sign = Zero;
             } else {
                 if(modulo < 0) {
-                    this->inverse();
+                    modulation.inverse();
                     modulo *= -1;
                 }
-                base.operator%=(static_cast<unsigned long long>(modulo));
+                modulation.base %= static_cast<unsigned long long>(modulo);
             }
-            return *this;
+            return modulation;
         }
 
         /**
          * @brief Modulo assignment operator
-         * @param modulo Aesi&
+         * @param modulation Aesi
+         * @param modulo Aesi
          * @return Aesi&
          * @details DETAILS
          * @note Returns zero for the modulo of zero
          */
-        gpu constexpr auto operator%=(const Aesi& modulo) noexcept -> Aesi& {
+        gpu constexpr friend auto operator%=(Aesi& modulation, const Aesi& modulo) noexcept -> Aesi& {
             if(modulo.isZero())
-                return *this;
+                return modulation;
 
             if(modulo.isNegative())
-                this->inverse();
-            base.operator%=(modulo.base);
-            if(base.isZero())
-                sign = Sign::Zero;
+                modulation.inverse();
+            modulation.base %= modulo.base;
+            if(modulation.base.isZero())
+                modulation.sign = Sign::Zero;
 
-            return *this;
+            return modulation;
         }
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
@@ -532,31 +623,32 @@ public:
     /* ------------------------ @name Equality operators. ------------------------ */
         /**
          * @brief Equality operator for built-in types
+         * @param our Aesi
          * @param integral Integral
          * @return bool
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
-        gpu constexpr auto operator==(Integral integral) const noexcept -> bool {
-            return compareTo(integral) == Comparison::equal;
+        gpu constexpr friend auto operator==(const Aesi& our, Integral integral) noexcept -> bool {
+            return our.compareTo(integral) == Comparison::equal;
         }
 
         /**
          * @brief Equality operator
-         * @param other Aesi&
+         * @param our Aesi
+         * @param other Aesi
          * @return bool
          */
-        gpu constexpr auto operator==(const Aesi& other) const noexcept -> bool {
-            return sign == other.sign && base == other.base;
-        }
+        gpu constexpr friend auto operator==(const Aesi& our, const Aesi& other) noexcept -> bool = default;
 
         /**
-         * @brief Different precision equality operator
-         * @param other Aesi&
+         * @brief Different precision equlity operator
+         * @param our Aesi
+         * @param other Aesi
          * @return bool
          */
         template <std::size_t otherBitness> requires (otherBitness != bitness)
-        gpu constexpr auto operator==(const Aesi<otherBitness>& other) const noexcept -> bool {
-            return precisionCast<otherBitness>() == other;
+        gpu constexpr friend auto operator==(const Aesi& our, const Aesi<otherBitness>& other) noexcept -> bool {
+            return our.precisionCast<otherBitness>() == other;
         }
     /* --------------------------------------------------------------------------- */
 
@@ -569,38 +661,32 @@ public:
          */
         template <typename Integral> requires (std::is_integral_v<Integral>)
         gpu constexpr auto compareTo(Integral integral) const noexcept -> Comparison {
+            using enum Sign; using enum Comparison;
             if(integral == 0) {
                 switch(sign) {
-                    case Sign::Positive:
-                        return Comparison::greater;
-                    case Sign::Negative:
-                        return Comparison::less;
+                    case Positive:
+                        return greater;
+                    case Negative:
+                        return less;
                     default:
-                        return Comparison::equal;
+                        return equal;
                 }
             } else if(integral < 0) {
-                switch(sign) {
-                    case Sign::Negative:
-                        switch(base.compareTo(static_cast<unsigned long long>(integral * -1))) {
-                            case Comparison::greater:
-                                return Comparison::less;
-                            case Comparison::less:
-                                return Comparison::greater;
-                            default:
-                                return Comparison::equal;
-                        }
-                    case Sign::Positive:    // + > -
-                    default:                // 0 > -
-                        return Comparison::greater;
-                }
+                if(sign == Negative)
+                    switch(base.compareTo(static_cast<unsigned long long>(integral * -1))) {
+                        using enum Comparison;
+                        case greater:
+                            return less;
+                        case less:
+                            return greater;
+                        default:
+                            return equal;
+                    }
+                else return greater;
             } else {
-                switch(sign) {
-                    case Sign::Positive:
-                        return base.compareTo(static_cast<unsigned long long>(integral));
-                    case Sign::Negative:    // - < +
-                    default:                // 0 < +
-                        return Comparison::less;
-                }
+                if(sign == Positive)
+                    return base.compareTo(static_cast<unsigned long long>(integral));
+                return less;
             }
         }
 
@@ -621,44 +707,41 @@ public:
          */
         [[nodiscard]]
         gpu constexpr auto compareTo(const Aesi& value) const noexcept -> Comparison {
+            using enum Sign; using enum Comparison;
             if(value.isZero()) {
                 switch(sign) {
-                    case Sign::Positive:
-                        return Comparison::greater;             // Positive > 0
-                    case Sign::Negative:
-                        return Comparison::less;                // Negative < 0
+                    case Positive:
+                        return greater;
+                    case Negative:
+                        return less;
                     default:
-                        return Comparison::equal;               // 0 == 0
-                }
-            } else if(value.isNegative()) {
-                switch(sign) {
-                    case Sign::Negative:
-                        switch(base.compareTo(value.base)) {
-                            case Comparison::greater:
-                                return Comparison::less;        // -100 < -20
-                            case Comparison::less:
-                                return Comparison::greater;     // -20 > -100
-                            default:
-                                return Comparison::equal;       // -30 == -30
-                        }
-                    default:                                    // 0 > Negative
-                        return Comparison::greater;             // Positive > Negative
-                }
-            } else {
-                switch(sign) {
-                    case Sign::Positive:
-                        return base.compareTo(value.base);
-                    default:                                    // 0 < Positive
-                            return Comparison::less;            // Negative < Positive
+                        return equal;
                 }
             }
+
+            if(value.isNegative()) {
+                if(sign == Negative)
+                    switch(base.compareTo(value.base)) {
+                        case greater:
+                            return less;
+                        case less:
+                            return greater;
+                        default:
+                            return equal;
+                    }
+                return greater;
+            }
+
+            if(sign == Positive)
+                return base.compareTo(value.base);
+            return less;
         }
     /* --------------------------------------------------------------------------- */
 
     /* ------------------------ @name Spaceship operators. ----------------------- */
 #if (defined(__CUDACC__) || __cplusplus < 202002L || defined (PRE_CPP_20)) && !defined DOXYGEN_SKIP
         /**
-         * @brief Oldstyle comparison operator(s). Used inside CUDA because it does not support <=> operator.
+         * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> operator.
          */
         gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool {
             return !this->operator==(value);
@@ -684,11 +767,12 @@ public:
          */
         gpu constexpr auto operator<=>(const Aesi& other) const noexcept -> std::strong_ordering {
             switch(this->compareTo(other)) {
-                case Comparison::less:
+                using enum Comparison;
+                case less:
                     return std::strong_ordering::less;
-                case Comparison::greater:
+                case greater:
                     return std::strong_ordering::greater;
-                case Comparison::equal:
+                case equal:
                     return std::strong_ordering::equal;
                 default:
                     return std::strong_ordering::equivalent;
@@ -704,11 +788,12 @@ public:
         template <typename Object>
         gpu constexpr auto operator<=>(const Object& other) const noexcept -> std::strong_ordering {
             switch(this->compareTo(other)) {
-                case Comparison::less:
+                using enum Comparison;
+                case less:
                     return std::strong_ordering::less;
-                case Comparison::greater:
+                case greater:
                     return std::strong_ordering::greater;
-                case Comparison::equal:
+                case equal:
                     return std::strong_ordering::equal;
                 default:
                     return std::strong_ordering::equivalent;
@@ -720,7 +805,7 @@ public:
 
     /* ---------------------- @name Supporting methods. ---------------------- */
     /**
-     * @brief Set a bit in number by index starting from the right
+     * @brief Set bit in number by index starting from the right
      * @param index Size_t
      * @param bit Boolean
      * @note Does nothing for index out of range. Does not affect sign
@@ -850,10 +935,13 @@ public:
     }
 
     /**
-     * @brief Inverts number's bitness
-     * @details Turns negative to positive and otherwise. Leaves zero unchanged
+     * @brief Invertes number's bitness
+     * @details Turns negative to positive and otherwise. Leaves zero unchanges
      */
-    gpu constexpr auto inverse() noexcept -> void { sign = (sign == Sign::Zero ? Sign::Zero : (sign == Sign::Negative ? Sign::Positive : Sign::Negative)); }
+    gpu constexpr auto inverse() noexcept -> void {
+        using enum Sign;
+        sign = (sign == Zero ? Zero : (sign == Negative ? Positive : Negative));
+    }
     /* ----------------------------------------------------------------------- */
 
     /* -------------- @name Public arithmetic and number theory. ------------- */
@@ -866,39 +954,36 @@ public:
      * @details Returns values by references
      */
     gpu static constexpr auto divide(const Aesi& number, const Aesi& divisor, Aesi& quotient, Aesi& remainder) noexcept -> void {
-        if(number.sign == Sign::Zero || divisor.sign == Sign::Zero) {
-            quotient.sign = Sign::Zero;
-            remainder.sign = Sign::Zero;
+        using enum Sign;
+        if(number.sign == Zero || divisor.sign == Zero) {
+            quotient.sign = Zero;
+            remainder.sign = Zero;
             return;
         }
 
         Base::divide(number.base, divisor.base, quotient.base, remainder.base);
-        if(number.sign == Sign::Positive) {
-            if(divisor.sign == Sign::Positive) {
-                // (+; +) -> (+; +)
-                quotient.sign = Sign::Positive;
-                remainder.sign = Sign::Positive;
+        if(number.sign == Positive) {
+            if(divisor.sign == Positive) {
+                quotient.sign = Positive;
+                remainder.sign = Positive;
             } else {
-                // (+; -) -> (-; +)
-                quotient.sign = Sign::Negative;
-                remainder.sign = Sign::Positive;
+                quotient.sign = Negative;
+                remainder.sign = Positive;
             }
         } else {
-            if(divisor.sign == Sign::Positive) {
-                // (-; +) -> (-; -)
-                quotient.sign = Sign::Negative;
-                remainder.sign = Sign::Negative;
+            if(divisor.sign == Positive) {
+                quotient.sign = Negative;
+                remainder.sign = Negative;
             } else {
-                // (-; -) -> (+; -)
-                quotient.sign = Sign::Positive;
-                remainder.sign = Sign::Negative;
+                quotient.sign = Positive;
+                remainder.sign = Negative;
             }
         }
 
         if(quotient.base.isZero())
-            quotient.sign = Sign::Zero;
+            quotient.sign = Zero;
         if(remainder.base.isZero())
-            remainder.sign = Sign::Zero;
+            remainder.sign = Zero;
     }
 
     /**
@@ -908,9 +993,10 @@ public:
      */
     [[nodiscard]]
     gpu constexpr auto squareRoot() const noexcept -> Aesi {
-        if(sign == Sign::Positive)
-            return Aesi { Sign::Positive, base.squareRoot() };
-        Aesi result; result.sign = Sign::Zero; return result;
+        using enum Sign;
+        if(sign == Positive)
+            return Aesi { Positive, base.squareRoot() };
+        Aesi result; result.sign = Zero; return result;
     }
 
     /**
@@ -919,9 +1005,10 @@ public:
      */
     [[nodiscard]]
     gpu static constexpr auto power2(std::size_t power) noexcept -> Aesi {
-        Aesi result { Sign::Positive, Aeu<bitness>::power2(power) };
+        using enum Sign;
+        Aesi result { Positive, Aeu<bitness>::power2(power) };
         if(result.base.isZero())
-            result.sign = Sign::Zero;
+            result.sign = Zero;
         return result;
     }
     /* ----------------------------------------------------------------------- */
@@ -932,11 +1019,12 @@ public:
      */
     template <typename Integral> requires (std::is_integral_v<Integral>) [[nodiscard]]
     gpu constexpr auto integralCast() const noexcept -> Integral {
-        if(sign == Sign::Zero)
+        using enum Sign;
+        if(sign == Zero)
             return Integral(0);
 
         if constexpr (std::is_signed_v<Integral>) {
-            if(sign == Sign::Negative)
+            if(sign == Negative)
                 return base.template integralCast<Integral>() * -1;
         }
 
@@ -949,18 +1037,21 @@ public:
      */
     template <std::size_t newBitness> requires (newBitness != bitness) [[nodiscard]]
     gpu constexpr auto precisionCast() const noexcept -> Aesi<newBitness> {
-        if(sign != Sign::Zero) {
+        using enum Sign;
+        if(sign != Zero) {
             Aesi<newBitness> result = 1;
 
-            const std::size_t blockBoarder = (newBitness > bitness ? Aesi<bitness>::totalBlocksNumber() : Aesi<newBitness>::totalBlocksNumber());
+            const std::size_t blockBoarder = (newBitness > bitness ? totalBlocksNumber() : Aesi<newBitness>::totalBlocksNumber());
             for(std::size_t blockIdx = 0; blockIdx < blockBoarder; ++blockIdx)
                 result.setBlock(blockIdx, getBlock(blockIdx));
 
-            if(sign == Sign::Negative)
+            if(sign == Negative)
                 result.inverse();
 
             return result;
-        } else return Aesi<newBitness> {};
+        }
+
+        return Aesi<newBitness> {};
     }
 
     /**
@@ -982,8 +1073,10 @@ public:
       */
     template <byte notation, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> && (notation == 2 || notation == 8 || notation == 10 || notation == 16))
     gpu constexpr auto getString(Char* buffer, std::size_t bufferSize, bool showBase = false, bool hexUppercase = false) const noexcept -> std::size_t {
-        if(sign != Sign::Zero) {
-            if(sign == Sign::Negative && bufferSize > 0) {
+        using enum Sign;
+
+        if(sign != Zero) {
+            if(sign == Negative && bufferSize > 0) {
                 *buffer++ = [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ();
                 --bufferSize;
             }
@@ -1038,8 +1131,9 @@ public:
      */
     template <typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t>)
     friend constexpr auto operator<<(std::basic_ostream<Char>& os, const Aesi& number) -> std::basic_ostream<Char>& {
-        if(number.sign != Sign::Zero) {
-            if(number.sign == Sign::Negative)
+        using enum Sign;
+        if(number.sign != Zero) {
+            if(number.sign == Negative)
                 os << [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ();
             return os << number.base;
         }
@@ -1056,18 +1150,18 @@ public:
      */
     __device__ constexpr auto tryAtomicSet(const Aesi& value) noexcept -> void {
         base.tryAtomicSet(value.base);
-        sign = value.sign; /* TODO: Make enum substitution using CUDA atomics if possible */
+        sign = value.sign; /* TODO: Make enum substitution using existing CUDA atomics */
     }
 
     /**
-     * @brief Atomicity-oriented object exchange operator
+     * @brief Atomicity-oriented object exchangement operator
      * @param Aesi exchangeable
      * @note Method itself is not fully-atomic. There may be race conditions between two consecutive atomic calls on number blocks.
      * This method is an interface for exchanging encapsulated class members atomically one by one
      */
     __device__ constexpr auto tryAtomicExchange(const Aesi& value) noexcept -> void {
         base.tryAtomicExchange(value.base);
-        sign = value.sign; /* TODO: Make enum substitution using CUDA atomics if possible */
+        sign = value.sign; /* TODO: Make enum substitution using existing CUDA atomics */
     }
 #endif
 };

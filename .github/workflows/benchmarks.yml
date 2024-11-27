@@ -8,13 +8,13 @@ on:
 
 jobs:
   Measure:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install packages
-        run: brew install google-benchmark gmp cryptopp cmake
+        run: sudo apt-get -qq install libbenchmark-dev libgmp3-dev libcrypto++-dev libcrypto++-doc libcrypto++-utils
 
       - name: Set reusable strings
         id: strings
@@ -51,7 +51,7 @@ jobs:
 
       - name: Download font file
         working-directory: ${{ steps.strings.outputs.ci }}
-        run: wget https://github.com/google/fonts/blob/main/ofl/courierprime/CourierPrime-Bold.ttf -q
+        run: wget https://github.com/google/fonts/raw/refs/heads/main/ofl/courierprime/CourierPrime-Bold.ttf -q
 
       - name: Run Python script
         working-directory: ${{ steps.strings.outputs.ci }}

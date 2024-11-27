@@ -48,7 +48,7 @@ jobs:
 
       - name: Test
         working-directory: ${{ steps.strings.outputs.build }}
-        run: make . & ./Build
+        run: cmake --build ${{ steps.strings.outputs.build }} --target Build -j 8
         
 
 

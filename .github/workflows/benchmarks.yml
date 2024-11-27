@@ -20,7 +20,7 @@ jobs:
         id: strings
         shell: bash
         run: |
-          echo "ci=${{ github.workspace }}/ci" >> "$GITHUB_OUTPUT"
+          echo "ci=${{ github.workspace }}/ci/benchmarking" >> "$GITHUB_OUTPUT"
           echo "benchmark=${{ github.workspace }}/benchmark" >> "$GITHUB_OUTPUT"
           echo "build=${{ github.workspace }}/benchmark/cmake-build-release" >> "$GITHUB_OUTPUT"
 

@@ -1,0 +1,38 @@
+name: Build as library
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+      - name: Create directory
+        run: mkdir ${{ steps.strings.outputs.build }}
+
+      - name: Load CMake configuration
+        working-directory: ${{ steps.strings.outputs.build }}
+        run: cmake -B ${{ steps.strings.outputs.build }}
+          -DCMAKE_CXX_COMPILER=g++
+          -DCMAKE_C_COMPILER=gcc
+          -DCMAKE_BUILD_TYPE=Release
+          -S ${{ github.workspace }}
+
+      - name: Test
+        working-directory: ${{ steps.strings.outputs.build }}
+        run: |
+          make -j8
+          ./Build
+        
+
+

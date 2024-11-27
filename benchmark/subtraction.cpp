@@ -1,10 +1,9 @@
-#include <gtest/gtest.h>
-#include <thread>
+#include <benchmark/benchmark.h>
 #include <cryptopp/integer.h>
 #include <gmpxx.h>
-#include "../../Aeu.h"
+#include "../Aeu.h"
 
-constexpr char division[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf89884aac215f37c6418b2735a3e50e0889fac0c3ea61d"
+constexpr char difference[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf89884aac215f37c6418b2735a3e50e0889fac0c3ea61d"
                             "bc829d3919e94bf714f521969e75e15f570f870ef5e086add27842cfc8cafd321d038354a97e152c0ea74df004"
                             "0a2210f92c0b71aaded40c0a1bef125c2d187a2e8ea2cbfcc4664da71734ea5683da6de60ec5a2be9374608a64"
                             "9ff89756a4f65fd78af3c3744d886a87bfc95a7ea6fdd267b64ca69f4e87d1c7f83f77aee7dc328713778f330e"
@@ -28,31 +27,25 @@ constexpr char division[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf89884a
                             "921cb77ac656f22ec33354252dc017ad31e6df7204cbdb7c73a35857d5dd520d4c6db2d1ac33a8f54ccd362837"
                             "681484de652e54eda7516e72767e6e9ac8debb68497b07dbb45c1bdb97ed6b0dbbe503";
 
-constexpr char divisor[] = "0x55c5374ad14e5c9bff62109df3100124f654bb11ef8fbdcc93e892fde002a462";
+constexpr char subtrahend[] = "0x55c5374ad14e5c9bff62109df3100124f654bb11ef8fbdcc93e892fde002a462";
 
-TEST(Division, CryptoPP) {
-    for(std::size_t i = 0; i < 40; ++i) {
-        CryptoPP::Integer base (division), oper (divisor);
-        for (std::size_t j = 0; j < 30; ++j)
-            base /= oper;
-        if(base.IsZero()) std::cout << '1';
-    }
+static void subtraction_CryptoPP(benchmark::State& state) {
+    CryptoPP::Integer left (difference), right (subtrahend), result {};
+    for (auto _ : state)
+        benchmark::DoNotOptimize(result = left - right);
 }
+BENCHMARK(subtraction_CryptoPP);
 
-TEST(Division, GMP) {
-    for(std::size_t i = 0; i < 40; ++i) {
-        mpz_class base (division), oper (divisor);
-        for (std::size_t j = 0; j < 30; ++j)
-            base /= oper;
-        if(base == 0) std::cout << '1';
-    }
+static void subtraction_GMP(benchmark::State& state) {
+    mpz_class left (difference), right (subtrahend), result {};
+    for (auto _ : state)
+        benchmark::DoNotOptimize(result = left - right);
 }
+BENCHMARK(subtraction_GMP);
 
-TEST(Division, Aesi) {
-    for(std::size_t i = 0; i < 40; ++i) {
-        Aeu<8192> base = division, oper = divisor;
-        for (std::size_t j = 0; j < 30; ++j)
-            base /= oper;
-        if(base.isZero()) std::cout << '1';
-    }
+static void subtraction_Aesi(benchmark::State& state) {
+    Aeu<8192> left (difference), right (subtrahend), result {};
+    for (auto _ : state)
+        benchmark::DoNotOptimize(result = left - right);
 }
+BENCHMARK(subtraction_Aesi);

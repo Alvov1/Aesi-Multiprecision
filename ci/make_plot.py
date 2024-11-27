@@ -1,8 +1,11 @@
+from argparse import ArgumentError
+
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import sys
 import numpy as np
 import json
+import os
 
 def parse_json(path: str):
     with open(path) as file:
@@ -58,6 +61,13 @@ if __name__ == '__main__':
     measures = sys.argv[1]
     output_image_path = sys.argv[2]
     font_path, font_name = sys.argv[3], 'Courier Prime'
+
+    if not os.path.exists(measures):
+        raise RuntimeError('Measures file not exist')
+    if not os.path.exists(output_image_path):
+        raise RuntimeError('Output image path does not exist')
+    if not os.path.exists(font_path):
+        raise RuntimeError('Font file not exist')
 
     print(f"Loading measures table from '{measures}'")
     print(f"Output image location '{output_image_path}'")

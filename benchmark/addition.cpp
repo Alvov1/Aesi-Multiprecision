@@ -11,7 +11,6 @@ static void addition_CryptoPP(benchmark::State& state) {
     CryptoPP::Integer left (data), right (data), result {};
     for (auto _ : state)
         benchmark::DoNotOptimize(result = left + right);
-    // if(result.IsEven()) result += 1;
 }
 BENCHMARK(addition_CryptoPP);
 
@@ -19,7 +18,6 @@ static void addition_GMP(benchmark::State& state) {
     mpz_class left (data), right (data), result {};
     for (auto _ : state)
         benchmark::DoNotOptimize(result = left + right);
-    // if(mpz_even_p(result.get_mpz_t())) result += 1;
 }
 BENCHMARK(addition_GMP);
 
@@ -27,6 +25,5 @@ static void addition_Aesi(benchmark::State& state) {
     Aeu<2048> left (data), right (data), result {};
     for (auto _ : state)
         benchmark::DoNotOptimize(result = left + right);
-    // if(result.isEven()) result += 1u;
 }
 BENCHMARK(addition_Aesi);

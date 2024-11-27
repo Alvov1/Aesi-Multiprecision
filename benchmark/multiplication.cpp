@@ -26,7 +26,6 @@ static void multiplication_CryptoPP(benchmark::State& state) {
     CryptoPP::Integer leftA (left), rightA (right), result {};
     for(auto _ : state)
         benchmark::DoNotOptimize(result = leftA * rightA);
-    // if(result.IsEven()) result += 1;
 }
 BENCHMARK(multiplication_CryptoPP);
 
@@ -34,7 +33,6 @@ static void multiplication_GMP(benchmark::State& state) {
     mpz_class leftA (left), rightA (right), result {};
     for(auto _ : state)
         benchmark::DoNotOptimize(result = leftA * rightA);
-    // if(mpz_even_p(result.get_mpz_t())) result += 1;
 }
 BENCHMARK(multiplication_GMP);
 
@@ -42,6 +40,5 @@ static void multiplication_Aesi(benchmark::State& state) {
     Aeu<4192> leftA (left), rightA (right), result {};
     for(auto _ : state)
         benchmark::DoNotOptimize(result = leftA * rightA);
-    // if(result.isEven()) result += 1u;
 }
 BENCHMARK(multiplication_Aesi);

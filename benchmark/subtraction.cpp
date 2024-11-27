@@ -33,7 +33,6 @@ static void subtraction_CryptoPP(benchmark::State& state) {
     CryptoPP::Integer left (difference), right (subtrahend), result {};
     for (auto _ : state)
         benchmark::DoNotOptimize(result = left - right);
-    // if(result.IsEven()) result += 1;
 }
 BENCHMARK(subtraction_CryptoPP);
 
@@ -41,7 +40,6 @@ static void subtraction_GMP(benchmark::State& state) {
     mpz_class left (difference), right (subtrahend), result {};
     for (auto _ : state)
         benchmark::DoNotOptimize(result = left - right);
-    // if(mpz_even_p(result.get_mpz_t())) result += 1;
 }
 BENCHMARK(subtraction_GMP);
 
@@ -49,6 +47,5 @@ static void subtraction_Aesi(benchmark::State& state) {
     Aeu<8192> left (difference), right (subtrahend), result {};
     for (auto _ : state)
         benchmark::DoNotOptimize(result = left - right);
-    // if(result.isEven()) result += 1u;
 }
 BENCHMARK(subtraction_Aesi);

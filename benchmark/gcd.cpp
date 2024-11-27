@@ -28,7 +28,6 @@ static void gcd_CryptoPP(benchmark::State& state) {
     CryptoPP::Integer leftA (left), rightA (right), result {};
     for(auto _ : state)
         benchmark::DoNotOptimize(result = CryptoPP::GCD(leftA, rightA));
-    // if(result.IsEven()) result += 1;
 }
 BENCHMARK(gcd_CryptoPP);
 
@@ -36,7 +35,6 @@ static void gcd_GMP(benchmark::State& state) {
     mpz_class leftA (left), rightA (right), result {};
     for(auto _ : state)
         mpz_gcd(result.get_mpz_t(), leftA.get_mpz_t(), rightA.get_mpz_t());
-    // if(mpz_even_p(result.get_mpz_t())) result += 1;
 }
 BENCHMARK(gcd_GMP);
 
@@ -44,6 +42,5 @@ static void gcd_Aesi(benchmark::State& state) {
     Aeu<4192> leftA (left), rightA (right), result {};
     for(auto _ : state)
         benchmark::DoNotOptimize(result = Aeu<4192>::gcd(leftA, rightA));
-    // if(result.isEven()) result += 1u;
 }
 BENCHMARK(gcd_Aesi);

@@ -15,7 +15,6 @@ static void powm_CryptoPP(benchmark::State& state) {
     CryptoPP::Integer baseA (base), powerA (power), moduloA (modulo), result {};
     for (auto _ : state)
         benchmark::DoNotOptimize(result = CryptoPP::ModularExponentiation(baseA, powerA, moduloA));
-    // if(result.IsEven()) result += 1;
 }
 BENCHMARK(powm_CryptoPP);
 
@@ -23,7 +22,6 @@ static void powm_GMP(benchmark::State& state) {
     mpz_class baseA (base), powerA (power), moduloA (modulo), result {};
     for (auto _ : state)
         mpz_powm(result.get_mpz_t(), baseA.get_mpz_t(), powerA.get_mpz_t(), moduloA.get_mpz_t());
-    // if(mpz_even_p(result.get_mpz_t())) result += 1;
 }
 BENCHMARK(powm_GMP);
 
@@ -31,6 +29,5 @@ static void powm_Aesi(benchmark::State& state) {
     Aeu<512> baseA (base), powerA (power), moduloA (modulo), result {};
     for (auto _ : state)
         benchmark::DoNotOptimize(result = Aeu<512>::powm(baseA, powerA, moduloA));
-    // if(result.isEven()) result += 1u;
 }
 BENCHMARK(powm_Aesi);

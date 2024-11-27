@@ -1,4 +1,4 @@
-name: Sanitize
+name: Sanitizing
 
 on:
   push:

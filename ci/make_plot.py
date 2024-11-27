@@ -64,8 +64,6 @@ if __name__ == '__main__':
 
     if not os.path.exists(measures):
         raise RuntimeError('Measures file not exist')
-    if not os.path.exists(output_image_path):
-        raise RuntimeError('Output image path does not exist')
     if not os.path.exists(font_path):
         raise RuntimeError('Font file not exist')
 

@@ -8,13 +8,13 @@ on:
 
 jobs:
   Measure:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install packages
-        run: sudo apt-get install -qq libbenchmark-dev libgmp3-dev libcrypto++-dev libcrypto++-doc libcrypto++-utils
+        run: sudo apt-get -qq install libbenchmark-dev libgmp3-dev libcrypto++-dev libcrypto++-doc libcrypto++-utils
 
       - name: Set reusable strings
         id: strings

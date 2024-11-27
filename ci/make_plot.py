@@ -57,10 +57,10 @@ def plot(operations, data, output_path, font):
 if __name__ == '__main__':
     measures = sys.argv[1]
     output_image_path = sys.argv[2]
+    font_path, font_name = sys.argv[3], 'Courier Prime'
+
     print(f"Loading measures table from '{measures}'")
     print(f"Output image location '{output_image_path}'")
-
-    font_path, font_name = ('CourierPrime-Bold.ttf', 'Courier Prime')
     fm.fontManager.addfont(font_path)
 
     test_names, records = parse_json(measures)

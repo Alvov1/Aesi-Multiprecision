@@ -55,7 +55,7 @@ jobs:
 
       - name: Run Python script
         working-directory: ${{ steps.strings.outputs.ci }}
-        run: python make_plot.py ${{ steps.strings.outputs.build }}/benchmarks.json graph.png
+        run: python make_plot.py ${{ steps.strings.outputs.build }}/benchmarks.json graph.png CourierPrime-Bold.ttf
 
       - name: Upload a picture
         uses: devicons/public-upload-to-imgur@v2.2.2

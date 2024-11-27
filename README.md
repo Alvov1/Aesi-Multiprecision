@@ -113,8 +113,8 @@ cout << Aeu<256>::powm(base.precisionCast<256>(),     // Fine
 > \***Overflowed\***      201007033690655614485250957754150944769
 
 ## Issues
-Library is relatively slow in compare to other multiple precision libraries
+Library is relatively slow in comparison to popular CPU-directional multiple precision libraries:
 
 
-![Execution Time Graph](https://dub.sh/jNgf79u?1)
+![Execution Time Graph](https://dub.sh/jNgf79u?2)
 

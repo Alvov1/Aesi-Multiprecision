@@ -3,10 +3,10 @@
 #include "../../generation.h"
 
 TEST(Signed_Bitwise, GetSetBit) {
-    constexpr auto testsAmount = 2, bitness = 2048;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? -1 : 1) * Generation::getRandomWithBits(bitness - 20);
-        Aesi<bitness> aeu = 1;
+        const auto value = (i % 2 == 0 ? -1 : 1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
+        Aesi<blocksNumber * 32> aeu = 1;
         for (std::size_t j = 0; j < value.BitCount(); ++j)
             aeu.setBit(j, value.GetBit(j));
         if(i % 2 == 0) aeu.inverse();
@@ -19,10 +19,10 @@ TEST(Signed_Bitwise, GetSetBit) {
 }
 
 TEST(Signed_Bitwise, GetSetByte) {
-    constexpr auto testsAmount = 2, bitness = 2048;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? -1 : 1) * Generation::getRandomWithBits(bitness - 20);
-        Aesi<bitness> aeu = 1;
+        const auto value = (i % 2 == 0 ? -1 : 1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
+        Aesi<blocksNumber * 32> aeu = 1;
         for (std::size_t j = 0; j < value.ByteCount(); ++j)
             aeu.setByte(j, value.GetByte(j));
         if(i % 2 == 0) aeu.inverse();
@@ -35,10 +35,10 @@ TEST(Signed_Bitwise, GetSetByte) {
 }
 
 TEST(Signed_Bitwise, GetSetBlock) {
-    constexpr auto testsAmount = 2, bitness = 2048;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? -1 : 1) * Generation::getRandomWithBits(bitness - 20);
-        Aesi<bitness> aesi = 1;
+        const auto value = (i % 2 == 0 ? -1 : 1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
+        Aesi<blocksNumber * 32> aesi = 1;
 
         const auto totalBlocks = value.ByteCount() / 4,
                 remainingBytes = value.ByteCount() % 4;
@@ -67,10 +67,10 @@ TEST(Signed_Bitwise, GetSetBlock) {
 }
 
 TEST(Signed_Bitwise, CountBitsBytes) {
-    constexpr auto testsAmount = 2, bitness = 2048;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(bitness - 20);
-        Aesi<bitness> aeu = value;
+        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
+        Aesi<blocksNumber * 32> aeu = value;
         EXPECT_EQ(value.BitCount(), aeu.bitCount());
     }
 }

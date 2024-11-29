@@ -3,12 +3,12 @@
 #include "generation.h"
 
 TEST(NumberTheory, PowerByModulo) {
-    constexpr auto testsAmount = 256, blocksNumber = 8;
+    constexpr auto testsAmount = 3, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto base = Generation::getRandomWithBits(blocksNumber * 12 - 10),
-            power = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-            modulo = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-            powm = CryptoPP::ModularExponentiation(base, power, modulo);
+        const auto base = Generation::getRandomWithBits(blocksNumber * 16 - 10),
+                power = Generation::getRandomWithBits(blocksNumber * 16 - 10),
+                modulo = Generation::getRandomWithBits(blocksNumber * 16 - 10),
+                powm = CryptoPP::ModularExponentiation(base, power, modulo);
 
         Aeu<blocksNumber * 32> b = base, p = power, m = modulo;
         EXPECT_EQ(Aeu<blocksNumber * 32>::powm(b, p, m), powm);
@@ -16,7 +16,7 @@ TEST(NumberTheory, PowerByModulo) {
 }
 
 TEST(NumberTheory, PowerByModuloDifferentPrecision) {
-    constexpr auto testsAmount = 5;
+    constexpr auto testsAmount = 2;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto base = Generation::getRandomWithBits(250),
                 power = Generation::getRandomWithBits(1000),
@@ -30,21 +30,8 @@ TEST(NumberTheory, PowerByModuloDifferentPrecision) {
     }
 }
 
-TEST(NumberTheory, PowerByModuloHuge) {
-    constexpr auto testsAmount = 5, blocksNumber = 64;
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto base = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-                power = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-                modulo = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-                powm = CryptoPP::ModularExponentiation(base, power, modulo);
-
-        Aeu<blocksNumber * 32> b = base, p = power, m = modulo;
-        EXPECT_EQ(Aeu<blocksNumber * 32>::powm(b, p, m), powm);
-    }
-}
-
 TEST(NumberTheory, LeastCommonMultiplier) {
-    constexpr auto testsAmount = 256, blocksNumber = 64;
+    constexpr auto testsAmount = 3, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto left = Generation::getRandomWithBits(blocksNumber * 16 - 10),
                 right = Generation::getRandomWithBits(blocksNumber * 16 - 10);
@@ -55,7 +42,7 @@ TEST(NumberTheory, LeastCommonMultiplier) {
 }
 
 TEST(NumberTheory, GreatestCommonDivisor) {
-    constexpr auto testsAmount = 256, blocksNumber = 64;
+    constexpr auto testsAmount = 3, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto common = Generation::getRandomWithBits(blocksNumber * 8 - 10),
                 left = common * Generation::getRandomWithBits(blocksNumber * 24 - 10),

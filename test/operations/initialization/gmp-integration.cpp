@@ -8,7 +8,7 @@
 #include "../../generation.h"
 
 TEST(Signed_Initialization, GMP) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
+    constexpr auto testsAmount = 64, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const mpz_class gmp = Generation::getRandom(blocksNumber * 32 - 20) * (i % 2 == 0 ? 1 : -1);
         const Aesi<blocksNumber * 32> aeu = gmp;
@@ -19,7 +19,7 @@ TEST(Signed_Initialization, GMP) {
 }
 
 TEST(Unsigned_Initialization, GMP) {
-    constexpr auto testsAmount = 256, blocksNumber = 64;
+    constexpr auto testsAmount = 64, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const mpz_class gmp = Generation::getRandom(blocksNumber * 32 - 20);
         const Aeu<blocksNumber * 32> aeu = gmp;

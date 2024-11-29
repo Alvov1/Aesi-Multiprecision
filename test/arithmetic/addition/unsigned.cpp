@@ -47,7 +47,7 @@ TEST(Unsigned_Addition, Basic) {
 }
 
 TEST(Unsigned_Addition, Huge) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto l = Generation::getRandomWithBits(blocksNumber * 16 - 32),
@@ -74,7 +74,7 @@ TEST(Unsigned_Addition, Huge) {
 }
 
 TEST(Unsigned_Addition, Increment) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 110);
         Aeu<blocksNumber * 32> value = l;

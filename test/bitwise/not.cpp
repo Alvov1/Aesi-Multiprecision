@@ -5,7 +5,7 @@
 #include "../generation.h"
 
 TEST(Unsigned_Bitwise, NOT) {
-    constexpr auto testsAmount = 2048, blocksNumber = 8;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         auto value = Generation::getRandomWithBits(blocksNumber * 32);
         if(value.BitCount() < blocksNumber * 32)

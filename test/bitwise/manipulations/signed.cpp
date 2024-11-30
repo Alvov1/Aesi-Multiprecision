@@ -40,8 +40,7 @@ TEST(Signed_Bitwise, GetSetBlock) {
         const auto value = (i % 2 == 0 ? -1 : 1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
         Aesi<blocksNumber * 32> aesi = 1;
 
-        const auto totalBlocks = value.ByteCount() / 4,
-                remainingBytes = value.ByteCount() % 4;
+        const auto totalBlocks = value.ByteCount() / 4;
         for (std::size_t j = 0; j < totalBlocks; ++j) {
             uint32_t block = 0;
             for (std::size_t k = 0; k < 5; ++k) {

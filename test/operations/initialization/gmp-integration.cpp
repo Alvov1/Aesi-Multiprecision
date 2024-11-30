@@ -3,8 +3,8 @@
 #endif
 
 #include <gtest/gtest.h>
-#include <../../../../Aesi.h>
-#include <../../../../Aeu.h>
+#include "../../../Aesi.h"
+#include "../../../Aeu.h"
 #include "../../generation.h"
 
 TEST(Signed_Initialization, GMP) {

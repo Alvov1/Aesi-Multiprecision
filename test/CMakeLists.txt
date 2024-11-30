@@ -8,6 +8,8 @@ FetchContent_Declare(
         URL https://github.com/google/googletest/archive/refs/heads/main.zip
 )
 FetchContent_MakeAvailable(googletest)
+
+# Crypto++ requires building from sources to enable std::showbase support!
 FetchContent_Declare(
         CryptoPPLib
         GIT_REPOSITORY https://github.com/abdes/cryptopp-cmake.git
@@ -40,8 +42,12 @@ if (PREPROCESSOR_PRE_CPP_20)
     add_definitions(-DPRE_CPP_20=1)
 endif (PREPROCESSOR_PRE_CPP_20)
 
-target_link_libraries(AesiMultiprecision PUBLIC GTest::gtest_main cryptopp PkgConfig::GMP)
-target_include_directories(AesiMultiprecision PUBLIC PkgConfig::GMP)
+target_link_libraries(AesiMultiprecision PUBLIC
+        GTest::gtest_main
+        cryptopp
+        PkgConfig::GMP)
+target_include_directories(AesiMultiprecision PUBLIC
+        PkgConfig::GMP)
 
 include(GoogleTest)
 gtest_discover_tests(AesiMultiprecision XML_OUTPUT_DIR ${CMAKE_BINARY_DIR})

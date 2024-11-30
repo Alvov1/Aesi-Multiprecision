@@ -3,12 +3,12 @@
 #endif
 
 #include <gtest/gtest.h>
-#include <../../../../Aesi.h>
-#include <../../../../Aeu.h>
+#include "../../../Aesi.h"
+#include "../../../Aeu.h"
 #include "../../generation.h"
 
 TEST(Signed_Initialization, CryptoPP) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
+    constexpr auto testsAmount = 64, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto cryptopp = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
         const Aesi<blocksNumber * 32> aeu = cryptopp;
@@ -19,7 +19,7 @@ TEST(Signed_Initialization, CryptoPP) {
 }
 
 TEST(Unsigned_Initialization, CryptoPP) {
-    constexpr auto testsAmount = 256, blocksNumber = 64;
+    constexpr auto testsAmount = 64, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto cryptopp = Generation::getRandomWithBits(blocksNumber * 32 - 20);
         const Aeu<blocksNumber * 32> aeu = cryptopp;

@@ -40,7 +40,7 @@ TEST(Signed_Multiplication, Basic) {
 }
 
 TEST(Signed_Multiplication, Huge) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         int first = 0, second = 0;

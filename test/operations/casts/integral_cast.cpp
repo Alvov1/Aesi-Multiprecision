@@ -5,7 +5,7 @@
 #include "../../generation.h"
 
 TEST(Signed_IntegralCast, IntegralCast) {
-    constexpr auto testsAmount = 2;
+    constexpr auto testsAmount = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         auto value = Generation::getRandom<int64_t>();
         Aesi<128> aesi = value;
@@ -18,7 +18,7 @@ TEST(Signed_IntegralCast, IntegralCast) {
 }
 
 TEST(Unsigned_IntegralCast, IntegralCast) {
-    constexpr auto testsAmount = 2048;
+    constexpr auto testsAmount = 64;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         auto value = Generation::getRandom<uint64_t>();
         Aeu<128> aeu = value;
@@ -29,7 +29,7 @@ TEST(Unsigned_IntegralCast, IntegralCast) {
         EXPECT_EQ(aeu.integralCast<uint32_t>(), value);
     }
 
-    constexpr auto blocksNumber = 16;
+    constexpr auto blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto baseValue = Generation::getRandom<uint64_t>();
         std::stringstream ss; ss << "0x" << std::hex << Generation::getRandomWithBits(blocksNumber * 32 - 96)

@@ -47,7 +47,7 @@ TEST(Signed_Addition, Basic) {
 }
 
 TEST(Signed_Addition, Huge) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         int first = 0, second = 0;
@@ -85,7 +85,7 @@ TEST(Signed_Addition, Huge) {
 }
 
 TEST(Signed_Addition, Increment) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto l = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 110);
         Aesi<blocksNumber * 32> value = l;

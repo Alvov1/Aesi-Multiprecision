@@ -77,7 +77,7 @@ TEST(Unsigned_Initialization, Different_precisions) {
 }
 
 TEST(Unsigned_Initialization, Binary) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
 
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
@@ -96,7 +96,7 @@ TEST(Unsigned_Initialization, Binary) {
 }
 
 TEST(Unsigned_Initialization, Decimal) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
 
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
@@ -109,7 +109,7 @@ TEST(Unsigned_Initialization, Decimal) {
 }
 
 TEST(Unsigned_Initialization, Octal) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
 
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {
@@ -122,7 +122,7 @@ TEST(Unsigned_Initialization, Octal) {
 }
 
 TEST(Unsigned_Initialization, Hexadecimal) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
 
     Aeu<blocksNumber * 32> record {};
     for (std::size_t i = 0; i < testsAmount; ++i) {

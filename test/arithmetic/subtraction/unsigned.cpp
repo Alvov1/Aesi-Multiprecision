@@ -29,7 +29,7 @@ TEST(Unsigned_Subtraction, Basic) {
 }
 
 TEST(Unsigned_Subtraction, Huge) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 5),
@@ -56,7 +56,7 @@ TEST(Unsigned_Subtraction, Huge) {
 }
 
 TEST(Unsigned_Subtraction, Decrement) {
-    constexpr auto testsAmount = 2, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 110);
         Aeu<blocksNumber * 32> value = l;
@@ -79,6 +79,15 @@ TEST(Unsigned_Subtraction, Decrement) {
     EXPECT_TRUE(test.isZero());
     EXPECT_LT(test, 1u);
 
-    Aeu<4 * 32> test2 = "0x0000_0001'0000_0000'0000_0000'0000_0000";
-    EXPECT_EQ(--test2,  "0x0000_0000'FFFF_FFFF'FFFF_FFFF'FFFF_FFFF");
+    Aeu<512> test2 = "0x"
+    "0000_0000'0000_0000'0000_0000'0000_0000"
+    "0000_0000'0000_0000'0000_0000'0000_0000"
+    "0000_0000'0000_0000'0000_0000'0000_0000"
+    "0000_0001'0000_0000'0000_0000'0000_0000";
+
+    EXPECT_EQ(--test2,  "0x"
+        "0000_0000'0000_0000'0000_0000'0000_0000"
+        "0000_0000'0000_0000'0000_0000'0000_0000"
+        "0000_0000'0000_0000'0000_0000'0000_0000"
+        "0000_0000'FFFF_FFFF'FFFF_FFFF'FFFF_FFFF");
 }

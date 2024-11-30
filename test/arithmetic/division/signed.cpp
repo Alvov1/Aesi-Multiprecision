@@ -28,7 +28,7 @@ TEST(Signed_Division, Basic) {
 }
 
 TEST(Signed_Division, Huge) {
-    constexpr auto testsAmount = 128, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         int first, second;
@@ -51,7 +51,7 @@ TEST(Signed_Division, Huge) {
             lA /= rA;
             EXPECT_EQ(lA, l / r);
         } else {
-            auto result = -1 * ((l * -1) / r); // Cryptopp thank you!!!
+            auto result = -1 * ((l * -1) / r); // Encountered some errors in Cryptopp library LOL!!!
             EXPECT_EQ(lA / rA, result);
             lA /= rA;
             EXPECT_EQ(lA, result);

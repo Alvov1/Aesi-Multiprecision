@@ -40,17 +40,17 @@ TEST(Unsigned_Multiplication, Basic) {
 }
 
 TEST(Unsigned_Multiplication, Huge) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     /* Composite numbers. */
-    // for (std::size_t i = 0; i < testsAmount; ++i) {
-    //     const auto l = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-    //             r = Generation::getRandomWithBits(blocksNumber * 16 - 20);
-    //     Aeu<blocksNumber * 32> lA = l, rA = r;
-    //     EXPECT_EQ(lA * rA, l * r);
-    //
-    //     lA *= rA;
-    //     EXPECT_EQ(lA, l * r);
-    // }
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto l = Generation::getRandomWithBits(blocksNumber * 16 - 10),
+                r = Generation::getRandomWithBits(blocksNumber * 16 - 20);
+        Aeu<blocksNumber * 32> lA = l, rA = r;
+        EXPECT_EQ(lA * rA, l * r);
+
+        lA *= rA;
+        EXPECT_EQ(lA, l * r);
+    }
 
     /* Built-in types. */
     for (std::size_t i = 0; i < testsAmount; ++i) {

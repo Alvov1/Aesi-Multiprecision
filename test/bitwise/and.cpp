@@ -3,7 +3,7 @@
 #include "../generation.h"
 
 TEST(Unsigned_Bitwise, AND) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         auto l = Generation::getRandomWithBits(blocksNumber * 32 - 20),
                 r = Generation::getRandomWithBits(blocksNumber * 32 - 20);

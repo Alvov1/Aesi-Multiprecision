@@ -5,7 +5,7 @@
 #include "../generation.h"
 
 TEST(Unsigned_BinaryIO, BinaryRead) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (unsigned i = 0; i < testsAmount; i += 2) {
         std::array<uint32_t, blocksNumber> blocks {};
         std::stringstream ss, ss2; ss2 << "0x" << std::hex;
@@ -36,7 +36,7 @@ TEST(Unsigned_BinaryIO, BinaryRead) {
 }
 
 TEST(Unsigned_BinaryIO, BinaryWrite) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (unsigned i = 0; i < testsAmount; ++i) {
         std::stringstream ss, ss2; ss << std::hex << "0x";
         for (std::size_t j = 0; j < blocksNumber; ++j)

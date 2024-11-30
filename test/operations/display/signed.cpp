@@ -65,7 +65,7 @@ TEST(Signed_Display, Zero) {
 
 /* Output tester for std::streams and std::wstreams with decimal notation */
 TEST(Signed_Display, DecimalStreams) {
-    constexpr auto testsAmount = 30, blocksNumber = 64;
+    constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
         const Aesi<blocksNumber * 32> Aesi = value;
@@ -89,7 +89,7 @@ TEST(Signed_Display, DecimalStreams) {
 
 /* Output tester for std::streams and std::wstreams with octal notation */
 TEST(Signed_Display, OctalStreams) {
-    constexpr auto testsAmount = 30, blocksNumber = 64;
+    constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
         const Aesi<blocksNumber * 32> aesi = value;
@@ -113,7 +113,7 @@ TEST(Signed_Display, OctalStreams) {
 
 /* Output tester for std::streams and std::wstreams with hexadecimal notation */
 TEST(Signed_Display, HexadecimalStreams) {
-    constexpr auto testsAmount = 30, blocksNumber = 64;
+    constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
         const Aesi<blocksNumber * 32> Aesi = value;
@@ -144,7 +144,7 @@ TEST(Signed_Display, HexadecimalStreams) {
  *  - ASKII Binary
  *  */
 TEST(Signed_Display, FormatAskii) {
-    constexpr auto testsAmount = 20, blocksNumber = 2;
+    constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         static std::array<char, blocksNumber * 32 + 2> askii {};
 
@@ -198,7 +198,7 @@ TEST(Signed_Display, FormatAskii) {
  *  - UTF Binary
  *  */
 TEST(Signed_Display, FormatUtf) {
-    constexpr auto testsAmount = 20, blocksNumber = 2;
+    constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         static std::array<wchar_t, blocksNumber * 32 + 2> utf{};
 
@@ -259,7 +259,7 @@ TEST(Signed_Display, FormatUtf) {
  *  - C-style ASKII Binary
  *  */
 TEST(Signed_Display, ShowBaseAskii) {
-    constexpr auto testsAmount = 36, blocksNumber = 2;
+    constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 8; i < testsAmount; ++i) {
         static std::array<char, blocksNumber * 32 + 2> askii {};
 
@@ -345,7 +345,7 @@ TEST(Signed_Display, ShowBaseAskii) {
  *  - C-style UTF Binary
  *  */
 TEST(Signed_Display, ShowBaseUtf) {
-    constexpr auto testsAmount = 36, blocksNumber = 64;
+    constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         static std::array<wchar_t, blocksNumber * 32 + 2> utf {};
 

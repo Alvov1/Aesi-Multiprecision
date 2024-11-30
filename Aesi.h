@@ -1,14 +1,39 @@
+/**
+ * Copyright 2021-2023, Alexander V. Lvov
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list
+ *    of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this
+ *    list of conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**/
+
+/**
+ * @file Aesi.h
+ * @brief Long precision signed integer with arithmetic operations
+ */
+
 #ifndef AESI_MULTIPRECISION
 #define AESI_MULTIPRECISION
 
 /// @cond HIDE_INCLUDES
 #include "Aeu.h"
 /// @endcond
-
-/**
- * @file Aesi.h
- * @brief Long precision signed integer with arithmetic operations
- */
 
 namespace {
     enum class Sign { Zero = 0, Positive = 1, Negative = -1 };
@@ -32,12 +57,12 @@ namespace {
         return positive == std::byte {1} ? Sign::Positive : Sign::Negative;
     }
 }
-
 /**
  * @class Aesi
  * @brief Long precision signed integer
  * @details May be used to represent positive and negative integers. Number precision is set in template parameter bitness.
  */
+
 template <std::size_t bitness = 512> requires (bitness % blockBitLength == 0)
 class Aesi final {
     /* -------------------------- @name Class members. ----------------------- */

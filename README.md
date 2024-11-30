@@ -80,6 +80,10 @@ int main() {
 ```
 > Were in kernel thread and number is 1562144106091796071
 
+## License
+This project is licensed under the BSD 2-Clause License. See the LICENSE file for details.
+
+
 ## About precision cast
 It is admissible to use numbers of different precision inside the majority of operations, but it is not recommended cause it leads to redundant copying inside type conversions. Operation-assignment expressions (+=, -=, &=, etc...) require the bitness of the assignment to be greater or equal to the bitness of the assignable. The precision cast operator could be called by a user directly.
 

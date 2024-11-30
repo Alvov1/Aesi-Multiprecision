@@ -3,7 +3,7 @@
 #include "generation.h"
 
 TEST(NumberTheory, PowerByModulo) {
-    constexpr auto testsAmount = 3, blocksNumber = 32;
+    constexpr auto testsAmount = 256, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto base = Generation::getRandomWithBits(blocksNumber * 16 - 10),
                 power = Generation::getRandomWithBits(blocksNumber * 16 - 10),
@@ -31,7 +31,7 @@ TEST(NumberTheory, PowerByModuloDifferentPrecision) {
 }
 
 TEST(NumberTheory, LeastCommonMultiplier) {
-    constexpr auto testsAmount = 3, blocksNumber = 32;
+    constexpr auto testsAmount = 256, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto left = Generation::getRandomWithBits(blocksNumber * 16 - 10),
                 right = Generation::getRandomWithBits(blocksNumber * 16 - 10);
@@ -42,7 +42,7 @@ TEST(NumberTheory, LeastCommonMultiplier) {
 }
 
 TEST(NumberTheory, GreatestCommonDivisor) {
-    constexpr auto testsAmount = 3, blocksNumber = 32;
+    constexpr auto testsAmount = 256, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto common = Generation::getRandomWithBits(blocksNumber * 8 - 10),
                 left = common * Generation::getRandomWithBits(blocksNumber * 24 - 10),

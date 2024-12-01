@@ -3,8 +3,8 @@
 #include "../../../Aesi.h"
 #include "../../generation.h"
 
-constexpr auto testsAmount = 2;
-constexpr auto blocksNumber = 64;
+constexpr auto testsAmount = 64;
+constexpr auto blocksNumber = 32;
 
 TEST(Signed_Initialization, Basic) {
     Aesi128 m2 = 0;

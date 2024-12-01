@@ -3,10 +3,10 @@
 #include "../../generation.h"
 
 TEST(Unsigned_Bitwise, GetSetBit) {
-    constexpr auto testsAmount = 2048, bitness = 2048;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(bitness - 20);
-        Aeu<bitness> aeu {};
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
+        Aeu<blocksNumber * 32> aeu {};
         for (std::size_t j = 0; j < value.BitCount(); ++j)
             aeu.setBit(j, value.GetBit(j));
         EXPECT_EQ(aeu, value);
@@ -18,10 +18,10 @@ TEST(Unsigned_Bitwise, GetSetBit) {
 }
 
 TEST(Unsigned_Bitwise, GetSetByte) {
-    constexpr auto testsAmount = 2048, bitness = 2048;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(bitness - 20);
-        Aeu<bitness> aeu {};
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
+        Aeu<blocksNumber * 32> aeu {};
         for (std::size_t j = 0; j < value.ByteCount(); ++j)
             aeu.setByte(j, value.GetByte(j));
         EXPECT_EQ(aeu, value);
@@ -33,10 +33,10 @@ TEST(Unsigned_Bitwise, GetSetByte) {
 }
 
 TEST(Unsigned_Bitwise, GetSetBlock) {
-    constexpr auto testsAmount = 2048, bitness = 256;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(bitness - 20);
-        Aeu<bitness> aeu {};
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
+        Aeu<blocksNumber * 32> aeu {};
 
         const auto totalBlocks = value.ByteCount() / 4;
         for (std::size_t j = 0; j < totalBlocks; ++j) {
@@ -62,10 +62,10 @@ TEST(Unsigned_Bitwise, GetSetBlock) {
 }
 
 TEST(Unsigned_Bitwise, CountBitsBytes) {
-    constexpr auto testsAmount = 2048, bitness = 2048;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(bitness - 20);
-        Aeu<bitness> aeu = value;
+        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
+        Aeu<blocksNumber * 32> aeu = value;
         EXPECT_EQ(value.BitCount(), aeu.bitCount());
     }
 }

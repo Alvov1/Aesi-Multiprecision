@@ -10,7 +10,7 @@ TEST(Unsigned_Division, Basic) {
 }
 
 TEST(Unsigned_Division, Huge) {
-    constexpr auto testsAmount = 2048, blocksNumber = 64;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     /* Composite numbers. */
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 5),

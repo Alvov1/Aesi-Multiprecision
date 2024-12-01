@@ -4,7 +4,7 @@
 #include <cryptopp/integer.h>
 
 TEST(Signed_Boolean, ThreeWayComparasion) {
-    constexpr auto testsAmount = 2, blocksNumber = 8;
+    constexpr auto testsAmount = 1024, blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto l = ((i % 4) > 1 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20),
                 r = ((i % 4) < 2 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);

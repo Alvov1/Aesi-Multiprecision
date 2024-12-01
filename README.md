@@ -80,37 +80,45 @@ int main() {
 ```
 > Were in kernel thread and number is 1562144106091796071
 
+## License
+This project is licensed under the BSD 2-Clause License. See the LICENSE file for details.
+
+
 ## About precision cast
 It is admissible to use numbers of different precision inside the majority of operations, but it is not recommended cause it leads to redundant copying inside type conversions. Operation-assignment expressions (+=, -=, &=, etc...) require the bitness of the assignment to be greater or equal to the bitness of the assignable. The precision cast operator could be called by a user directly.
 
 ```cpp
-Aesi<128> base = "10888869450418352160768000001";
-Aesi<96> power = "99990001";
-Aesi<256> mod = "8683317618811886495518194401279999999";
+Aeu<128> base = "10888869450418352160768000001";
+Aeu<96> power = "99990001";
+Aeu<256> mod = "8683317618811886495518194401279999999";
 
-std::cout << Aesi<256>::powm(base, power, mod) << std::endl;
-// Numbers get cast explicitly to bitness 256 
+cout << Aeu<256>::powm(base.precisionCast<256>(), power.precisionCast<256>(), mod) << endl;
 
-Aesi<128> m128 = "265252859812191058636308479999999";
-Aesi<160> m160 = "263130836933693530167218012159999999";
+Aeu<128> m128 = "127958277599458332250117";
+Aeu<192> m192 = "279256103987149586783914830";
 
-std::cout << m128.precisionCast<256>() * m160 << std::endl; 
+cout << m128.precisionCast<192>() * m192 << endl;
 // Cast number of 128 bits to 256 bits, than multiply by number of 160 bits
 ```
-> 1142184225164688919052733263067509431086585217025      6680141832773294447513292887050873529
+> 6680141832773294447513292887050873529      35733130075330889632933652650476631619495985535110
 
 An exception to the rule above is using longer precision boundaries inside functions, susceptible to overflow. As far as the number's precision is fixed on the stage of compilation, functions that require number multiplication or exponentiation may easily lead to overflow:
 ```cpp
-Aesi<128> base = "340199290171201906239764863559915798527",
+Aeu<128> base = "340199290171201906239764863559915798527",
         power = "340282366920937859000464800151540596704",
         modulo = "338953138925230918806032648491249958912";
 
-std::cout << Aesi<128>::powm(base, power, modulo) << std::endl; // Overflow !!!
-std::cout << Aesi<256>::powm(base, power, modulo) << std::endl; // Fine
+cout << Aeu<128>::powm(base, power, modulo) << endl;  // Overflow !!!
+
+cout << Aeu<256>::powm(base.precisionCast<256>(),     // Fine
+    power,
+    modulo.precisionCast<256>()) << endl;
 ```
-> 201007033690655614485250957754150944769
+> \***Overflowed\***      201007033690655614485250957754150944769
 
 ## Issues
-Library is relatively slow in compare to other multiple precision libraries
-<img src="https://dub.sh/jNgf79u" alt="Dynamic Image">
+Library is relatively slow in comparison to popular CPU-directional multiple precision libraries:
+
+
+![Execution Time Graph](https://dub.sh/jNgf79u?2)
 

@@ -1,4 +1,4 @@
-name: Build as library
+name: Integration
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       branches: [ "main" ]
 
 jobs:
-  Integration-as-library:
+  Build-as-library:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -55,7 +55,7 @@ jobs:
           cmake --build ${{ steps.strings.outputs.build }} --target Library_Integration -j 8
           ./Library_Integration
 
-  Prezentation:
+  Presentation:
     runs-on: ${{ matrix.os }}
 
     strategy:

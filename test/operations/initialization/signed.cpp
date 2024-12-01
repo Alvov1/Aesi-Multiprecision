@@ -65,7 +65,7 @@ TEST(Signed_Initialization, Basic) {
 }
 
 TEST(Signed_Initialization, Different_precisions) {
-    uint64_t iValue0 = -3218136187561313218u;
+    int64_t iValue0 = -3218136187561313218LL;
     Aesi < 96 > o00 = iValue0;
     Aesi < 96 > o01 = iValue0;
 
@@ -94,6 +94,7 @@ TEST(Signed_Initialization, Binary) {
             binary += (byte & 1 ? '1' : '0');
         std::stringstream ss {};
         ss << (i % 2 == 0 ? "" : "-") << "0b" << std::string(binary.rbegin(), binary.rend());
+
         for(long long j = value.ByteCount() - 2; j >= 0; --j)
             ss << std::bitset<8>(value.GetByte(j));
         record = ss.str(); EXPECT_EQ(record, value);
@@ -117,7 +118,9 @@ TEST(Signed_Initialization, Octal) {
         const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
         record = value; EXPECT_EQ(record, value);
 
-        std::stringstream ss {}; ss << (i % 2 == 0 ? "" : "-") << "0o" << std::oct << (i % 2 == 0 ? value : value * -1);
+        std::stringstream ss {};
+        ss << (i % 2 == 0 ? "" : "-") << "0o" << std::oct << (i % 2 == 0 ? value : value * -1);
+
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }
@@ -130,9 +133,9 @@ TEST(Signed_Initialization, Hexadecimal) {
 
         std::stringstream ss {};
         if(i % 2 == 0)
-            ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::uppercase << (i % 2 == 0 ? value : value * -1);
+            ss << "0x" << std::hex << std::uppercase << (i % 2 == 0 ? value : value * -1);
         else
-            ss << (i % 2 == 0 ? "" : "-") << "0x" << std::hex << std::nouppercase << (i % 2 == 0 ? value : value * -1);
+            ss << "-0x" << std::hex << std::nouppercase << (i % 2 == 0 ? value : value * -1);
         record = ss.str(); EXPECT_EQ(record, value);
     }
 }

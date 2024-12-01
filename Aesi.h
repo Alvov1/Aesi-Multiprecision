@@ -633,22 +633,18 @@ public:
         }
 
         /**
-         * @brief Equality operator
-         * @param our Aesi
-         * @param other Aesi
-         * @return bool
-         */
-        gpu constexpr friend auto operator==(const Aesi& our, const Aesi& other) noexcept -> bool = default;
-
-        /**
          * @brief Different precision equlity operator
          * @param our Aesi
          * @param other Aesi
          * @return bool
          */
-        template <std::size_t otherBitness> requires (otherBitness != bitness)
+        template <std::size_t otherBitness>
         gpu constexpr friend auto operator==(const Aesi& our, const Aesi<otherBitness>& other) noexcept -> bool {
-            return our.precisionCast<otherBitness>() == other;
+            if constexpr (bitness == otherBitness) {
+                return our.compareTo(other) == Comparison::equal;
+            } else {
+                return our.precisionCast<otherBitness>() == other;
+            }
         }
     /* --------------------------------------------------------------------------- */
 

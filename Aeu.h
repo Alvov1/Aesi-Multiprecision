@@ -761,7 +761,7 @@ public:
          * @param other Aeu
          * @return Boolean
          */
-        gpu constexpr friend auto operator==(const Aeu& our, const Aeu& other) noexcept -> bool = default;
+        // gpu constexpr friend auto operator==(const Aeu& our, const Aeu& other) noexcept -> bool = default;
 
         /**
          * @brief Templated Equality check operator for numbers of different precision
@@ -769,7 +769,7 @@ public:
          * @param other Aeu
          * @return Boolean
          */
-        template <std::size_t otherBitness> requires (otherBitness != bitness)
+        template <std::size_t otherBitness>
         gpu constexpr friend auto operator==(const Aeu& our, const Aeu<otherBitness>& other) noexcept -> bool {
             return our.compareTo(other) == Comparison::equal;
         };

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 set(CMAKE_CXX_STANDARD 20)
-project(Build)
+project(Build LANGUAGES CXX CUDA)
 
 include(FetchContent)
 FetchContent_Declare(AesiMultiprecision
@@ -13,9 +13,15 @@ FetchContent_MakeAvailable(AesiMultiprecision)
 add_executable(Library_Integration main.cpp) # Build project as library
 target_include_directories(Library_Integration PRIVATE ${AesiMultiprecision_SOURCE_DIR})
 
+# 2. Build project with Aesi inside the CUDA compiler
+add_executable(Library_Integration_CUDA main.cpp)
+target_include_directories(Library_Integration_CUDA PRIVATE ${AesiMultiprecision_SOURCE_DIR})
+set_target_properties(Library_Integration_CUDA
+    CUDA_SEPARABLE_COMPILATION ON
+    CUDA_STANDARD 20
+)
 
-
-# 2. Test examples from README with GTest
+# 3. Test examples from README with GTest
 FetchContent_Declare(googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
         GIT_TAG main

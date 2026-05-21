@@ -10,3 +10,6 @@ FetchContent_MakeAvailable(AesiMultiprecision)
 
 add_executable(Build main.cpp)
 target_include_directories(Build PRIVATE ${AesiMultiprecision_SOURCE_DIR})
+
+enable_testing()
+add_test(NAME smoke COMMAND Build)

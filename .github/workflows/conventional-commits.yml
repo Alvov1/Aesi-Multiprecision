@@ -1,4 +1,4 @@
-name: Commitlint
+name: Conventional commits
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     types: [ opened, edited, synchronize, reopened ]
 
 jobs:
-  commitlint:
+  pt-title:
     runs-on: ubuntu-latest
 
     steps:

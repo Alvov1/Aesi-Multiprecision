@@ -1,5 +1,5 @@
 #include <iostream>
-#include <Aeu.h>
+#include <AesiMultiprecision/Aeu.h>
 
 int main() {
     const Aeu512 number = "0xffff'ffff'ffff'ffff'ffff'ffff'ffff'ffff'ffff'ffff";

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <iomanip>
-#include "../../../Aeu.h"
-#include "../../../Aesi.h"
+#include <AesiMultiprecision/Aeu.h>
+#include <AesiMultiprecision/Aesi.h>
 #include "../../generation.h"
 
 TEST(Signed_IntegralCast, IntegralCast) {

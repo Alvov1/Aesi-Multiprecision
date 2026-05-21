@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
 #include <cryptopp/integer.h>
 #include <gmpxx.h>
-#include "../Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 
 constexpr char left[] = "0xa24872afd57464d79dfeec239367995f623429772ec032eb3bc9b376d0775c956dcb330a2c4f8f0d001f62fe6e0b"
                         "2e3b024d8f352522f3aa0ac7fbf05e7e3a2038e4650efb641862969f2437084448a28ff14d9c1e2def670babcf65a8"

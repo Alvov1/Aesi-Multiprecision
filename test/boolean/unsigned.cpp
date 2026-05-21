@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 #include "../generation.h"
 
 TEST(Unsigned_Boolean, ThreeWayComparasion) {

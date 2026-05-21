@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <bitset>
 
-#include "../../../Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 #include "../../generation.h"
 
 /* Output tester for zero values */

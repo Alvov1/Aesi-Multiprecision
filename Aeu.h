@@ -32,6 +32,9 @@
 #define AEU_MULTIPRECISION
 
 /// @cond HIDE_INCLUDES
+#include <cstdint>
+#include <cctype>
+#include <cwctype>
 #include <iostream>
 #include <cassert>
 

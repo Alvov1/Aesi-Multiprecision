@@ -36,6 +36,7 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_BUILD_TYPE=Release
+          -DFETCHCONTENT_SOURCE_DIR_AESIMULTIPRECISION=${{ github.workspace }}
           -S ${{ github.workspace }}/ci/integration
 
       - name: Build

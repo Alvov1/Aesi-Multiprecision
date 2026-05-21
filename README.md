@@ -26,9 +26,14 @@ A fast, header-only multiprecision arithmetic library for C++ and CUDA. Supports
 
 Supports all arithmetic (binary and unary), bitwise, and boolean operations. Number theory functions include GCD, LCM, and modular exponentiation.
 
+## Requirements
+
+- C++20 or later
+- CMake 3.22 or later
+
 ## Installation
 
-Include directly via CMake FetchContent:
+**Via CMake FetchContent:**
 ```cmake
 include(FetchContent)
 FetchContent_Declare(AesiMultiprecision
@@ -36,11 +41,22 @@ FetchContent_Declare(AesiMultiprecision
     GIT_TAG main)
 FetchContent_MakeAvailable(AesiMultiprecision)
 
-target_include_directories(Target PRIVATE ${AesiMultiprecision_SOURCE_DIR})
+target_link_libraries(Target PRIVATE AesiMultiprecision)
 ```
+
+**Via cmake --install / find_package:**
+```bash
+cmake -B build && cmake --install build
+```
+```cmake
+find_package(AesiMultiprecision REQUIRED)
+target_link_libraries(Target PRIVATE AesiMultiprecision::AesiMultiprecision)
+```
+
 Then include in your source:
 ```cpp
-#include <Aeu.h>
+#include <AesiMultiprecision/Aeu.h>   // unsigned
+#include <AesiMultiprecision/Aesi.h>  // signed
 ```
 
 ## Usage

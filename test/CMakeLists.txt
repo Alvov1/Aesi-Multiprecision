@@ -9,16 +9,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-# Crypto++ requires building from sources to enable std::showbase support!
-FetchContent_Declare(
-        CryptoPPLib
-        GIT_REPOSITORY https://github.com/abdes/cryptopp-cmake.git
-        GIT_TAG        master
-)
-FetchContent_Populate(CryptoPPLib)
-
 find_package(PkgConfig)
 pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp)
+pkg_check_modules(GMPXX REQUIRED IMPORTED_TARGET gmpxx)
 
 enable_testing()
 
@@ -29,10 +22,7 @@ add_subdirectory(operations)
 add_subdirectory(bitwise)
 add_subdirectory(boolean)
 
-add_compile_definitions(CRYPTOPP_USE_STD_SHOWBASE)
-add_compile_definitions(AESI_CRYPTOPP_INTEGRATION)
 add_compile_definitions(AESI_GMP_INTEGRATION)
-add_subdirectory(${cryptopplib_SOURCE_DIR} ${cryptopplib_BINARY_DIR})
 
 if (PREPROCESSOR_UNSAFE)
     add_definitions(-DAESI_UNSAFE=1)
@@ -44,10 +34,11 @@ endif (PREPROCESSOR_PRE_CPP_20)
 
 target_link_libraries(AesiMultiprecision PUBLIC
         GTest::gtest_main
-        cryptopp
-        PkgConfig::GMP)
+        PkgConfig::GMP
+        PkgConfig::GMPXX)
 target_include_directories(AesiMultiprecision PUBLIC
-        PkgConfig::GMP)
+        PkgConfig::GMP
+        PkgConfig::GMPXX)
 
 include(GoogleTest)
 gtest_discover_tests(AesiMultiprecision XML_OUTPUT_DIR ${CMAKE_BINARY_DIR})

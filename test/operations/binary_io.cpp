@@ -5,8 +5,8 @@
 #include "../generation.h"
 
 TEST(Unsigned_BinaryIO, BinaryRead) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    for (unsigned i = 0; i < testsAmount; i += 2) {
+    constexpr auto testsAmount = 256, blocksNumber = 32;
+    for (unsigned i = 0; i < testsAmount; ++i) {
         std::array<uint32_t, blocksNumber> blocks {};
         std::stringstream ss, ss2; ss2 << "0x" << std::hex;
 
@@ -22,7 +22,7 @@ TEST(Unsigned_BinaryIO, BinaryRead) {
         } else {
             for(auto& block: blocks) {
                 block = Generation::getRandom<uint32_t>();
-                ss2 << std::hex << block;
+                ss2 << std::setw(8) << std::setfill('0') << block;
             }
 
             for(long long j = blocks.size() - 1; j >= 0; --j)
@@ -36,11 +36,11 @@ TEST(Unsigned_BinaryIO, BinaryRead) {
 }
 
 TEST(Unsigned_BinaryIO, BinaryWrite) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
+    constexpr auto testsAmount = 256, blocksNumber = 32;
     for (unsigned i = 0; i < testsAmount; ++i) {
-        std::stringstream ss, ss2; ss << std::hex << "0x";
+        std::stringstream ss, ss2; ss << "0x" << std::hex;
         for (std::size_t j = 0; j < blocksNumber; ++j)
-            ss << Generation::getRandom<uint32_t>();
+            ss << std::setw(8) << std::setfill('0') << Generation::getRandom<uint32_t>();
 
         Aeu<blocksNumber * 32> l = ss.str(), r {};
         uint32_t temp;

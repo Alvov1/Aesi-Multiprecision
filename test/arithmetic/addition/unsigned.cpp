@@ -47,47 +47,45 @@ TEST(Unsigned_Addition, Basic) {
 }
 
 TEST(Unsigned_Addition, Huge) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    /* Composite numbers. */
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto l = Generation::getRandomWithBits(blocksNumber * 16 - 32),
-            r = Generation::getRandomWithBits(blocksNumber * 16 - 32);
-
-        Aeu<blocksNumber * 32> lA = l, rA = r;
-        EXPECT_EQ(lA + rA, l + r);
-
-        lA += rA;
-        EXPECT_EQ(lA, l + r);
-    }
-
-    /* Built-in types. */
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
-        const auto add = Generation::getRandom<unsigned>();
-
-        Aeu<blocksNumber * 32> aeu = value;
-        EXPECT_EQ(aeu + add, value + add);
-
-        aeu += add;
-        EXPECT_EQ(aeu, value + add);
-    }
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        /* Composite numbers. */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto l = Generation::getRandom(N / 2 - 32),
+                r = Generation::getRandom(N / 2 - 32);
+            Aeu<N> lA = l, rA = r;
+            EXPECT_EQ(lA + rA, l + r);
+            lA += rA;
+            EXPECT_EQ(lA, l + r);
+        }
+        /* Built-in types. */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 200);
+            const auto add = Generation::getRandom<unsigned>();
+            Aeu<N> aeu = value;
+            EXPECT_EQ(aeu + add, value + add);
+            aeu += add;
+            EXPECT_EQ(aeu, value + add);
+        }
+    });
 }
 
 TEST(Unsigned_Addition, Increment) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 110);
-        Aeu<blocksNumber * 32> value = l;
-
-        const std::size_t increments = rand() % 100;
-        for (std::size_t j = 0; j < increments * 2; j += 2) {
-            EXPECT_EQ(value++, l + j);
-            EXPECT_EQ(++value, l + j + 2);
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto l = Generation::getRandom(N - 110);
+            Aeu<N> value = l;
+            const std::size_t increments = rand() % 100;
+            for (std::size_t j = 0; j < increments * 2; j += 2) {
+                EXPECT_EQ(value++, l + j);
+                EXPECT_EQ(++value, l + j + 2);
+            }
+            EXPECT_EQ(value, l + increments * 2);
         }
-        EXPECT_EQ(value, l + increments * 2);
-    }
+    });
 
-    Aeu<blocksNumber * 32> test = 0u; ++test;
+    Aeu<1024> test = 0u; ++test;
     EXPECT_EQ(test, 1u);
     EXPECT_FALSE(test.isZero());
     EXPECT_GT(test, 0u);

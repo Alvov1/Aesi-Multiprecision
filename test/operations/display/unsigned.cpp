@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 #include <bitset>
 
-#ifndef AESI_CRYPTOPP_INTEGRATION
-#define AESI_CRYPTOPP_INTEGRATION
-#endif
 #include "../../../Aeu.h"
 #include "../../generation.h"
 
@@ -67,7 +64,7 @@ TEST(Unsigned_Display, Zero) {
 TEST(Unsigned_Display, DecimalStreams) {
     constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         const Aeu<blocksNumber * 32> aeu = value;
 
         std::stringstream ss, ss2;
@@ -77,7 +74,7 @@ TEST(Unsigned_Display, DecimalStreams) {
     }
 
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         const Aeu<blocksNumber * 32> aeu = value;
 
         std::stringstream ss;
@@ -95,7 +92,7 @@ TEST(Unsigned_Display, DecimalStreams) {
 TEST(Unsigned_Display, OctalStreams) {
     constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         const Aeu<blocksNumber * 32> aeu = value;
 
         std::stringstream ss {};
@@ -108,7 +105,7 @@ TEST(Unsigned_Display, OctalStreams) {
     }
 
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         const Aeu<blocksNumber * 32> aeu = value;
 
         std::stringstream ss {};
@@ -128,7 +125,7 @@ TEST(Unsigned_Display, OctalStreams) {
 TEST(Unsigned_Display, HexadecimalStreams) {
     constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         const Aeu<blocksNumber * 32> aeu = value;
 
         std::stringstream ss {};
@@ -141,7 +138,7 @@ TEST(Unsigned_Display, HexadecimalStreams) {
     }
 
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         const Aeu<blocksNumber * 32> aeu = value;
 
         std::stringstream ss;
@@ -170,7 +167,7 @@ TEST(Unsigned_Display, FormatAskii) {
     for (std::size_t i = 0; i < testsAmount; ++i) {
         static std::array<char, blocksNumber * 32 + 2> askii {};
 
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         std::stringstream ss;
         const Aeu<blocksNumber * 32> aeu = value;
 
@@ -197,11 +194,16 @@ TEST(Unsigned_Display, FormatAskii) {
             }
             default: {  /* Binary */
                 std::string binary {};
-                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                const long long bitCount = (long long)mpz_sizeinbase(value.get_mpz_t(), 2);
+                const long long byteCount = (bitCount + 7) / 8;
+                auto getByteGmp = [&](long long k) -> unsigned char {
+                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                };
+                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
                 ss << std::string(binary.rbegin(), binary.rend());
-                for(long long j = value.ByteCount() - 2; j >= 0; --j)
-                    ss << std::bitset<8>(value.GetByte(j));
+                for (long long j = byteCount - 2; j >= 0; --j)
+                    ss << std::bitset<8>(getByteGmp(j));
                 aeu.getString<2>(askii.data(), askii.size(), false);
             }
         }
@@ -223,7 +225,7 @@ TEST(Unsigned_Display, FormatUtf) {
     for (std::size_t i = 0; i < testsAmount; ++i) {
         static std::array<wchar_t, blocksNumber * 32 + 2> utf{};
 
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         std::stringstream ss;
         const Aeu<blocksNumber * 32> aeu = value;
 
@@ -250,11 +252,16 @@ TEST(Unsigned_Display, FormatUtf) {
             }
             default: {  /* Binary */
                 std::string binary {};
-                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                const long long bitCount = (long long)mpz_sizeinbase(value.get_mpz_t(), 2);
+                const long long byteCount = (bitCount + 7) / 8;
+                auto getByteGmp = [&](long long k) -> unsigned char {
+                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                };
+                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
                 ss << std::string(binary.rbegin(), binary.rend());
-                for (long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
-                    ss << std::bitset<8>(value.GetByte(j));
+                for (long long j = byteCount - 2; j >= 0; --j)
+                    ss << std::bitset<8>(getByteGmp(j));
                 aeu.getString<2>(utf.data(), utf.size(), false);
             }
         }
@@ -283,7 +290,7 @@ TEST(Unsigned_Display, ShowBaseAskii) {
     for (std::size_t i = 8; i < testsAmount; ++i) {
         static std::array<char, blocksNumber * 32 + 2> askii {};
 
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         std::stringstream ss, ss2;
         const Aeu<blocksNumber * 32> aeu = value;
 
@@ -338,11 +345,16 @@ TEST(Unsigned_Display, ShowBaseAskii) {
             }
             default: {   /* C-style ASKII Binary */
                 std::string binary {};
-                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                const long long bitCount = (long long)mpz_sizeinbase(value.get_mpz_t(), 2);
+                const long long byteCount = (bitCount + 7) / 8;
+                auto getByteGmp = [&](long long k) -> unsigned char {
+                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                };
+                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
                 ss << "0b" << std::string(binary.rbegin(), binary.rend());
-                for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
-                    ss << std::bitset<8>(value.GetByte(j));
+                for (long long j = byteCount - 2; j >= 0; --j)
+                    ss << std::bitset<8>(getByteGmp(j));
                 aeu.getString<2>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
             }
@@ -368,7 +380,7 @@ TEST(Unsigned_Display, ShowBaseUtf) {
     for (std::size_t i = 0; i < testsAmount; ++i) {
         static std::array<wchar_t, blocksNumber * 32 + 2> utf {};
 
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const auto value = Generation::getRandom(blocksNumber * 32 - 32);
         std::stringstream ss;
         std::wstringstream ss2;
         const Aeu<blocksNumber * 32> aeu = value;
@@ -438,13 +450,18 @@ TEST(Unsigned_Display, ShowBaseUtf) {
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
                 break;
             }
-            default: {   /* C-style ASKII Binary */
+            default: {   /* C-style UTF Binary */
                 std::string binary {};
-                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                const long long bitCount = (long long)mpz_sizeinbase(value.get_mpz_t(), 2);
+                const long long byteCount = (bitCount + 7) / 8;
+                auto getByteGmp = [&](long long k) -> unsigned char {
+                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                };
+                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
                 ss << "0b" << std::string(binary.rbegin(), binary.rend());
-                for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
-                    ss << std::bitset<8>(value.GetByte(j));
+                for (long long j = byteCount - 2; j >= 0; --j)
+                    ss << std::bitset<8>(getByteGmp(j));
                 aeu.getString<2>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());

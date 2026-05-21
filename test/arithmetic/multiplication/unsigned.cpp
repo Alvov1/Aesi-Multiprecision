@@ -40,27 +40,29 @@ TEST(Unsigned_Multiplication, Basic) {
 }
 
 TEST(Unsigned_Multiplication, Huge) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    /* Composite numbers. */
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto l = Generation::getRandomWithBits(blocksNumber * 16 - 10),
-                r = Generation::getRandomWithBits(blocksNumber * 16 - 20);
-        Aeu<blocksNumber * 32> lA = l, rA = r;
-        EXPECT_EQ(lA * rA, l * r);
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        /* Composite numbers. */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto l = Generation::getRandom(N / 2 - 10),
+                    r = Generation::getRandom(N / 2 - 20);
+            Aeu<N> lA = l, rA = r;
+            EXPECT_EQ(lA * rA, l * r);
 
-        lA *= rA;
-        EXPECT_EQ(lA, l * r);
-    }
+            lA *= rA;
+            EXPECT_EQ(lA, l * r);
+        }
 
-    /* Built-in types. */
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
-        const auto factorU = Generation::getRandom<unsigned>();
+        /* Built-in types. */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 200);
+            const auto factorU = Generation::getRandom<unsigned>();
 
-        Aeu<blocksNumber * 32> aeu = value;
-        EXPECT_EQ(aeu * factorU, value * factorU);
+            Aeu<N> aeu = value;
+            EXPECT_EQ(aeu * factorU, value * factorU);
 
-        aeu *= factorU;
-        EXPECT_EQ(aeu, value * factorU);
-    }
+            aeu *= factorU;
+            EXPECT_EQ(aeu, value * factorU);
+        }
+    });
 }

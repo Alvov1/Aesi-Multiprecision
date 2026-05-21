@@ -3,9 +3,6 @@
 #include "../../../Aesi.h"
 #include "../../generation.h"
 
-constexpr auto testsAmount = 64;
-constexpr auto blocksNumber = 32;
-
 TEST(Signed_Initialization, Basic) {
     Aesi128 m2 = 0;
     auto m3 = Aesi128(0);
@@ -84,58 +81,72 @@ TEST(Signed_Initialization, Different_precisions) {
 }
 
 TEST(Signed_Initialization, Binary) {
-    Aesi<blocksNumber * 32> record {};
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        Aesi<N> record {};
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(N - 20);
+            record = value; EXPECT_EQ(record, value);
 
-        std::string binary {};
-        for (auto byte = value.GetByte(value.ByteCount() - 1); byte; byte >>= 1)
-            binary += (byte & 1 ? '1' : '0');
-        std::stringstream ss {};
-        ss << (i % 2 == 0 ? "" : "-") << "0b" << std::string(binary.rbegin(), binary.rend());
-
-        for(long long j = value.ByteCount() - 2; j >= 0; --j)
-            ss << std::bitset<8>(value.GetByte(j));
-        record = ss.str(); EXPECT_EQ(record, value);
-    }
+            mpz_class absVal; mpz_abs(absVal.get_mpz_t(), value.get_mpz_t());
+            const std::size_t byteCount = (mpz_sizeinbase(absVal.get_mpz_t(), 2) + 7) / 8;
+            auto getByteGmp = [&](std::size_t k) -> unsigned char {
+                return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
+            };
+            std::string binary {};
+            for (auto byte = getByteGmp(byteCount - 1); byte; byte >>= 1)
+                binary += (byte & 1 ? '1' : '0');
+            std::stringstream ss {};
+            ss << (i % 2 == 0 ? "" : "-") << "0b" << std::string(binary.rbegin(), binary.rend());
+            for(long long j = (long long)byteCount - 2; j >= 0; --j)
+                ss << std::bitset<8>(getByteGmp(j));
+            record = ss.str(); EXPECT_EQ(record, value);
+        }
+    });
 }
 
 TEST(Signed_Initialization, Decimal) {
-    Aesi<blocksNumber * 32> record {};
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        Aesi<N> record {};
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(N - 20);
+            record = value; EXPECT_EQ(record, value);
 
-        std::stringstream ss {}; ss << std::dec << value;
-        record = ss.str(); EXPECT_EQ(record, value);
-    }
+            std::stringstream ss {}; ss << std::dec << value;
+            record = ss.str(); EXPECT_EQ(record, value);
+        }
+    });
 }
 
 TEST(Signed_Initialization, Octal) {
-    Aesi<blocksNumber * 32> record {};
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        Aesi<N> record {};
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(N - 20);
+            record = value; EXPECT_EQ(record, value);
 
-        std::stringstream ss {};
-        ss << (i % 2 == 0 ? "" : "-") << "0o" << std::oct << (i % 2 == 0 ? value : value * -1);
-
-        record = ss.str(); EXPECT_EQ(record, value);
-    }
+            std::stringstream ss {}; ss << (i % 2 == 0 ? "" : "-") << "0o" << std::oct << (i % 2 == 0 ? value : value * -1);
+            record = ss.str(); EXPECT_EQ(record, value);
+        }
+    });
 }
 
 TEST(Signed_Initialization, Hexadecimal) {
-    Aesi<blocksNumber * 32> record {};
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        Aesi<N> record {};
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(N - 20);
+            record = value; EXPECT_EQ(record, value);
 
-        std::stringstream ss {};
-        if(i % 2 == 0)
-            ss << "0x" << std::hex << std::uppercase << (i % 2 == 0 ? value : value * -1);
-        else
-            ss << "-0x" << std::hex << std::nouppercase << (i % 2 == 0 ? value : value * -1);
-        record = ss.str(); EXPECT_EQ(record, value);
-    }
+            std::stringstream ss {};
+            if(i % 2 == 0)
+                ss << "0x" << std::hex << std::uppercase << value;
+            else
+                ss << "-0x" << std::hex << std::nouppercase << (value * -1);
+            record = ss.str(); EXPECT_EQ(record, value);
+        }
+    });
 }

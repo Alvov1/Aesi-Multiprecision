@@ -1,20 +1,21 @@
 #include <gtest/gtest.h>
 #include "../../Aesi.h"
 #include "../generation.h"
-#include <cryptopp/integer.h>
 
 TEST(Signed_Boolean, ThreeWayComparasion) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto l = ((i % 4) > 1 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20),
-                r = ((i % 4) < 2 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        Aesi<blocksNumber * 32> lA = l, rA = r;
-        EXPECT_EQ(lA < rA, l < r);
-        EXPECT_EQ(lA <= rA, l <= r);
-        EXPECT_EQ(lA > rA, l > r);
-        EXPECT_EQ(lA >= rA, l >= r);
-        EXPECT_EQ(lA == rA, l == r);
-    }
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const mpz_class l = ((i % 4) > 1 ? 1 : -1) * Generation::getRandom(N - 20),
+                    r = ((i % 4) < 2 ? 1 : -1) * Generation::getRandom(N - 20);
+            Aesi<N> lA = l, rA = r;
+            EXPECT_EQ(lA < rA, l < r);
+            EXPECT_EQ(lA <= rA, l <= r);
+            EXPECT_EQ(lA > rA, l > r);
+            EXPECT_EQ(lA >= rA, l >= r);
+            EXPECT_EQ(lA == rA, l == r);
+        }
+    });
 }
 
 TEST(Signed_Boolean, DifferentPrecisions) {

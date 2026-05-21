@@ -47,58 +47,52 @@ TEST(Signed_Addition, Basic) {
 }
 
 TEST(Signed_Addition, Huge) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    /* Composite numbers. */
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        int first = 0, second = 0;
-        switch(i % 4) {
-        case 0:
-            first = 1, second = 1; break;
-        case 1:
-            first = -1, second = -1; break;
-        case 2:
-            first = -1, second = 1; break;
-        default:
-            first = 1, second = -1;
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        /* Composite numbers. */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            int first = 0, second = 0;
+            switch(i % 4) {
+            case 0: first = 1,  second = 1;  break;
+            case 1: first = -1, second = -1; break;
+            case 2: first = -1, second = 1;  break;
+            default: first = 1, second = -1;
+            }
+            const mpz_class l = first * Generation::getRandom(N / 2 - 110),
+                    r = second * Generation::getRandom(N / 2 - 110);
+            Aesi<N> lA = l, rA = r;
+            EXPECT_EQ(lA + rA, l + r);
+            lA += rA;
+            EXPECT_EQ(lA, l + r);
         }
-        const auto l = first * Generation::getRandomWithBits(blocksNumber * 16 - 110),
-                r = second * Generation::getRandomWithBits(blocksNumber * 16 - 110);
-
-        Aesi<blocksNumber * 32> lA = l, rA = r;
-        EXPECT_EQ(lA + rA, l + r);
-
-        lA += rA;
-        EXPECT_EQ(lA, l + r);
-    }
-
-    /* Built-in types. */
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 200);
-        const auto mod = Generation::getRandom<long long>();
-
-        Aesi<blocksNumber * 32> aeu = value;
-        EXPECT_EQ(aeu + mod, value + mod);
-
-        aeu += mod;
-        EXPECT_EQ(aeu, value + mod);
-    }
+        /* Built-in types. */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const mpz_class value = Generation::getRandom(N - 200);
+            const auto mod = Generation::getRandom<long>();
+            Aesi<N> aeu = value;
+            EXPECT_EQ(aeu + mod, value + mod);
+            aeu += mod;
+            EXPECT_EQ(aeu, value + mod);
+        }
+    });
 }
 
 TEST(Signed_Addition, Increment) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto l = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 110);
-        Aesi<blocksNumber * 32> value = l;
-
-        const std::size_t increments = rand() % 100;
-        for (std::size_t j = 0; j < increments * 2; j += 2) {
-            EXPECT_EQ(value++, l + j);
-            EXPECT_EQ(++value, l + j + 2);
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const mpz_class l = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(N - 110);
+            Aesi<N> value = l;
+            const std::size_t increments = rand() % 100;
+            for (std::size_t j = 0; j < increments * 2; j += 2) {
+                EXPECT_EQ(value++, l + j);
+                EXPECT_EQ(++value, l + j + 2);
+            }
+            EXPECT_EQ(value, l + increments * 2);
         }
-        EXPECT_EQ(value, l + increments * 2);
-    }
+    });
 
-    Aesi<blocksNumber * 32> test = 0; ++test;
+    Aesi<1024> test = 0; ++test;
     EXPECT_EQ(test, 1);
     EXPECT_FALSE(test.isZero());
     EXPECT_GT(test, 0);

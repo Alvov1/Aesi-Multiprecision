@@ -32,7 +32,7 @@ TEST(Unsigned_IntegralCast, IntegralCast) {
     constexpr auto blocksNumber = 32;
     for (std::size_t i = 0; i < testsAmount; ++i) {
         const auto baseValue = Generation::getRandom<uint64_t>();
-        std::stringstream ss; ss << "0x" << std::hex << Generation::getRandomWithBits(blocksNumber * 32 - 96)
+        std::stringstream ss; ss << "0x" << std::hex << Generation::getRandom(blocksNumber * 32 - 96)
             << std::setw(16) << std::setfill('0') << baseValue;
         const auto& ref = ss.str();
         Aeu<blocksNumber * 32> aeu = ss.str();

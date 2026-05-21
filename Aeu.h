@@ -765,6 +765,19 @@ public:
         gpu constexpr friend auto operator==(const Aeu& our, const Aeu<otherBitness>& other) noexcept -> bool {
             return our.compareTo(other) == Comparison::equal;
         }
+
+#ifdef AESI_GMP_INTEGRATION
+        /**
+         * @brief Equality check operator against a GMP expression
+         * @param our Aeu
+         * @param other __gmp_expr
+         * @return Boolean
+         */
+        template <typename T, typename U>
+        constexpr friend auto operator==(const Aeu& our, const __gmp_expr<T, U>& other) noexcept -> bool {
+            return our == Aeu(mpz_class(other));
+        }
+#endif
     /* --------------------------------------------------------------------------- */
 
 

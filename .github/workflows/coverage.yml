@@ -40,12 +40,12 @@ jobs:
 
       - name: Collect coverage
         run: |
-          lcov --capture --directory build --output-file coverage.info
+          lcov --capture --directory build --output-file coverage.info --ignore-errors mismatch
           lcov --remove coverage.info \
             '/usr/*' \
             '*/googletest/*' \
             '*/test/*' \
-            --output-file coverage.info
+            --output-file coverage.info --ignore-errors mismatch
           lcov --list coverage.info
 
       - name: Upload to Codecov

@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.26)
-set(CMAKE_CXX_STANDARD 20)
-project(Benchmarking)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    cmake_minimum_required(VERSION 3.26)
+    project(Benchmarking)
+    set(CMAKE_CXX_STANDARD 20)
+endif()
 
 # 1. Prepare GMP library
 find_package(PkgConfig)

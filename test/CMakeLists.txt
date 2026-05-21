@@ -25,15 +25,10 @@ add_subdirectory(operations)
 add_subdirectory(bitwise)
 add_subdirectory(boolean)
 
-add_compile_definitions(AESI_GMP_INTEGRATION)
-
-if (PREPROCESSOR_UNSAFE)
-    add_definitions(-DAESI_UNSAFE=1)
-endif (PREPROCESSOR_UNSAFE)
-
-if (PREPROCESSOR_PRE_CPP_20)
-    add_definitions(-DPRE_CPP_20=1)
-endif (PREPROCESSOR_PRE_CPP_20)
+target_compile_definitions(AesiMultiprecision PRIVATE
+        AESI_GMP_INTEGRATION
+        $<$<BOOL:${PREPROCESSOR_UNSAFE}>:AESI_UNSAFE=1>
+        $<$<BOOL:${PREPROCESSOR_PRE_CPP_20}>:PRE_CPP_20=1>)
 
 target_link_libraries(AesiMultiprecision PUBLIC
         GTest::gtest_main

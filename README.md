@@ -3,10 +3,10 @@
 <p align="center">
     <a href="https://alvov1.github.io/Aesi-Multiprecision/index.html">
         <img src="https://img.shields.io/badge/Documentation-8A2BE2" alt="Documentation"></a>
-    <a href="https://github.com/Alvov1/Aesi-Multiprecision/actions/workflows/build_multiple_platforms.yml">
-        <img src="https://img.shields.io/github/actions/workflow/status/Alvov1/Aesi-Multiprecision/build_multiple_platforms.yml" alt="Workflow build status"/></a>
-    <a href="https://github.com/Alvov1/Aesi-Multiprecision/actions">
-        <img src="https://img.shields.io/github/last-commit/alvov1/Aesi-Multiprecision" alt="Last Commit"></a>
+    <a href="https://github.com/Alvov1/Aesi-Multiprecision/actions/workflows/integration.yml">
+        <img src="https://img.shields.io/github/actions/workflow/status/Alvov1/Aesi-Multiprecision/integration.yml" alt="Integration status"/></a>
+    <a href="https://github.com/Alvov1/Aesi-Multiprecision/blob/main/LICENSE">
+        <img src="https://img.shields.io/badge/License-BSD_2--Clause-blue.svg" alt="License: BSD 2-Clause"/></a>
     <a href="https://sonarcloud.io/summary/new_code?id=Alvov1_Aesi-Multiprecision">
         <img src="https://sonarcloud.io/api/project_badges/measure?project=Alvov1_Aesi-Multiprecision&metric=alert_status" alt="SonarCloud Code Quality"></a>
     <a href="https://app.codacy.com/gh/Alvov1/Aesi-Multiprecision/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade">

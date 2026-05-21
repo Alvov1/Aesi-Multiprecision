@@ -1,2 +1,2 @@
 file(GLOB BooleanSources *.cpp)
-target_sources(AesiMultiprecision PRIVATE ${BooleanSources})
+target_sources(AesiTests PRIVATE ${BooleanSources})

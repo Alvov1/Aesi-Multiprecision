@@ -7,6 +7,8 @@
         <img src="https://img.shields.io/github/actions/workflow/status/Alvov1/Aesi-Multiprecision/integration.yml" alt="Integration status"/></a>
     <a href="https://github.com/Alvov1/Aesi-Multiprecision/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-BSD_2--Clause-blue.svg" alt="License: BSD 2-Clause"/></a>
+    <a href="https://codecov.io/gh/Alvov1/Aesi-Multiprecision">
+        <img src="https://codecov.io/gh/Alvov1/Aesi-Multiprecision/graph/badge.svg" alt="Code coverage"/></a>
     <a href="https://sonarcloud.io/summary/new_code?id=Alvov1_Aesi-Multiprecision">
         <img src="https://sonarcloud.io/api/project_badges/measure?project=Alvov1_Aesi-Multiprecision&metric=alert_status" alt="SonarCloud Code Quality"></a>
     <a href="https://app.codacy.com/gh/Alvov1/Aesi-Multiprecision/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade">

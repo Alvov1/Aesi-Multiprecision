@@ -1,0 +1,55 @@
+name: Coverage
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'test/**'
+      - '.github/workflows/coverage.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'test/**'
+      - '.github/workflows/coverage.yml'
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get install -y lcov libgmp-dev libgmpxx4ldbl
+
+      - name: Configure
+        run: cmake -B build
+          -DCMAKE_CXX_COMPILER=g++
+          -DCMAKE_C_COMPILER=gcc
+          -DCMAKE_BUILD_TYPE=Debug
+          -DAESI_BUILD_TESTS=ON
+          -DAESI_BUILD_COVERAGE=ON
+
+      - name: Build
+        run: cmake --build build -j$(nproc)
+
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Collect coverage
+        run: |
+          lcov --capture --directory build --output-file coverage.info
+          lcov --remove coverage.info \
+            '/usr/*' \
+            '*/googletest/*' \
+            '*/test/*' \
+            --output-file coverage.info
+          lcov --list coverage.info
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.info
+          fail_ci_if_error: true

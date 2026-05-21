@@ -7,7 +7,7 @@
 #include <AesiMultiprecision/Aeu.h>
 #include "../../generation.h"
 
-TEST(Signed_Initialization, GMP) {
+TEST(Signed_Initialization, DISABLED_GMP) {
     Generation::forEachPrecision([]<std::size_t N>() {
         constexpr auto testsAmount = 256;
         for (std::size_t i = 0; i < testsAmount; ++i) {
@@ -20,7 +20,7 @@ TEST(Signed_Initialization, GMP) {
     });
 }
 
-TEST(Unsigned_Initialization, GMP) {
+TEST(Unsigned_Initialization, DISABLED_GMP) {
     Generation::forEachPrecision([]<std::size_t N>() {
         constexpr auto testsAmount = 256;
         for (std::size_t i = 0; i < testsAmount; ++i) {

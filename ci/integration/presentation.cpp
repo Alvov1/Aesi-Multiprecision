@@ -4,7 +4,7 @@
 #include <regex>
 #include <AesiMultiprecision/Aeu.h>
 
-TEST(Prezentation, Factorial) {
+TEST(Presentation, Factorial) {
     Aeu<512> f = 1u;
     for(unsigned i = 2; i <= 50; ++i)
         f *= i;
@@ -12,7 +12,7 @@ TEST(Prezentation, Factorial) {
     std::cout << std::showbase << std::hex << f << std::endl;
 }
 
-TEST(Prezentation, PrecisionCast) {
+TEST(Presentation, PrecisionCast) {
     std::stringstream cout {};
     using std::endl;
 
@@ -37,7 +37,7 @@ TEST(Prezentation, PrecisionCast) {
     std::regex_search(s, sm, re); EXPECT_TRUE(!sm.empty());
 }
 
-TEST(Prezentation, PrecisionCast2) {
+TEST(Presentation, PrecisionCast2) {
     std::stringstream cout {};
     using std::endl;
 

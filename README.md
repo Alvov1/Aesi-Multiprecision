@@ -3,10 +3,10 @@
 <p align="center">
     <a href="https://alvov1.github.io/Aesi-Multiprecision/index.html">
         <img src="https://img.shields.io/badge/Documentation-8A2BE2" alt="Documentation"></a>
-    <a href="https://github.com/Alvov1/Aesi-Multiprecision/actions/workflows/build_multiple_platforms.yml">
-        <img src="https://img.shields.io/github/actions/workflow/status/Alvov1/Aesi-Multiprecision/build_multiple_platforms.yml" alt="Workflow build status"/></a>
-    <a href="https://github.com/Alvov1/Aesi-Multiprecision/actions">
-        <img src="https://img.shields.io/github/last-commit/alvov1/Aesi-Multiprecision" alt="Last Commit"></a>
+    <a href="https://github.com/Alvov1/Aesi-Multiprecision/actions/workflows/integration.yml">
+        <img src="https://img.shields.io/github/actions/workflow/status/Alvov1/Aesi-Multiprecision/integration.yml" alt="Integration status"/></a>
+    <a href="https://github.com/Alvov1/Aesi-Multiprecision/blob/main/LICENSE">
+        <img src="https://img.shields.io/badge/License-BSD_2--Clause-blue.svg" alt="License: BSD 2-Clause"/></a>
     <a href="https://sonarcloud.io/summary/new_code?id=Alvov1_Aesi-Multiprecision">
         <img src="https://sonarcloud.io/api/project_badges/measure?project=Alvov1_Aesi-Multiprecision&metric=alert_status" alt="SonarCloud Code Quality"></a>
     <a href="https://app.codacy.com/gh/Alvov1/Aesi-Multiprecision/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade">
@@ -17,18 +17,20 @@
         <img src="https://img.shields.io/github/languages/code-size/Alvov1/Aesi-Multiprecision" alt="GitHub code size in bytes" /></a>
 </p>
 
-A fast, header-only multiprecision arithmetic library for C++ and CUDA. Supports `constexpr` expressions, move semantics, and GPU parallelization frameworks (CUDA, OpenCL, Metal).
-
-> [!IMPORTANT]
-> CUDA support is currently in active development. Errors may occur. OpenCL support is next in line; Metal support is planned after that.
+A header-only static-sized multiprecision arithmetic library for C++ and CUDA. Supports `constexpr` expressions, move semantics, and GPU parallelization frameworks in CUDA environments.
 
 ## Functionality
 
 Supports all arithmetic (binary and unary), bitwise, and boolean operations. Number theory functions include GCD, LCM, and modular exponentiation.
 
+## Requirements
+
+- C++20 or later
+- CMake 3.22 or later
+
 ## Installation
 
-Include directly via CMake FetchContent:
+**Via CMake FetchContent:**
 ```cmake
 include(FetchContent)
 FetchContent_Declare(AesiMultiprecision
@@ -36,11 +38,22 @@ FetchContent_Declare(AesiMultiprecision
     GIT_TAG main)
 FetchContent_MakeAvailable(AesiMultiprecision)
 
-target_include_directories(Target PRIVATE ${AesiMultiprecision_SOURCE_DIR})
+target_link_libraries(Target PRIVATE AesiMultiprecision)
 ```
+
+**Via cmake --install / find_package:**
+```bash
+cmake -B build && cmake --install build
+```
+```cmake
+find_package(AesiMultiprecision REQUIRED)
+target_link_libraries(Target PRIVATE AesiMultiprecision::AesiMultiprecision)
+```
+
 Then include in your source:
 ```cpp
-#include <Aeu.h>
+#include <AesiMultiprecision/Aeu.h>   // unsigned
+#include <AesiMultiprecision/Aesi.h>  // signed
 ```
 
 ## Usage
@@ -53,7 +66,7 @@ Initialization accepts integers, strings, string views, and library objects of d
 
 ```cpp
 #include <iostream>
-#include "Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 
 int main() {
     Aeu<512> f = 1u;

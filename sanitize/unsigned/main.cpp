@@ -1,8 +1,7 @@
 #include <iostream>
-#include <fstream>
 #include <vector>
-#include <filesystem>
 #include <cmath>
+#include <primesieve.hpp>
 #include "../../Aeu.h"
 
 /* Creator: Alexander Lvov
@@ -11,19 +10,6 @@
 
 using namespace std;
 using primeType = unsigned short;
-
-vector<primeType> loadPrimes(const filesystem::path& fromLocation) {
-    ifstream input(fromLocation, ios::binary);
-    if(input.fail())
-        throw std::runtime_error("Failed to open prime table");
-
-    const size_t primesAmount = filesystem::file_size(fromLocation) / sizeof(primeType);
-    vector<unsigned short> primes (primesAmount);
-    for (auto& prime: primes)
-        input.read(reinterpret_cast<char*>(&prime), sizeof(primeType));
-
-    return primes;
-}
 
 Aeu512 factorize(const Aeu512& number, const vector<primeType>& primes) {
     Aeu512 base = 2u;
@@ -47,15 +33,9 @@ Aeu512 factorize(const Aeu512& number, const vector<primeType>& primes) {
     throw std::runtime_error("Factor is not found.");
 }
 
-int main(const int argc, const char * const * const argv) {
-    if(argc < 2)
-        throw invalid_argument(string("Usage: ") + argv[0] + " <primes location>");
-
-    const filesystem::path fromLocation (argv[1]);
-    if(!filesystem::is_regular_file(fromLocation))
-        throw invalid_argument("Prime table is not found");
-
-    const auto primes = loadPrimes(fromLocation);
+int main() {
+    vector<primeType> primes;
+    primesieve::generate_primes(20000, &primes);
 
     const array numbers = { Aeu512("0x4c6f0a38f6c296d07052b794a02317ce9758855"),
         // 0xa9ab4314cf -> 2 × 3^2 × 7 × 1181 × 2083 × 2351

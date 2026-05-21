@@ -16,24 +16,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Generate release archive
         run: |
-          zip Aesi_${{ inputs.version }}.zip Aesi.h Aeu.h README.md
+          zip Aesi_${{ inputs.version || github.ref_name }}.zip Aesi.h Aeu.h README.md
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: archive
-          path: Aesi_${{ inputs.version }}.zip
+          path: Aesi_${{ inputs.version || github.ref_name }}.zip
 
       - name: Create Release
-        id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create \
-            --title "Release ${{ inputs.version }}" \
+            --title "Release ${{ inputs.version || github.ref_name }}" \
             "${{ github.ref_name }}" \
-            Aesi_${{ inputs.version }}.zip
+            Aesi_${{ inputs.version || github.ref_name }}.zip

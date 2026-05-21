@@ -6,8 +6,8 @@
 TEST(Signed_PrecisionCast, PrecisionCast) {
     constexpr auto testsAmount = 4;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto init0 = (i % 2 == 0 ? 1 : -1)
-    	* Generation::getRandomWithBits(250);
+        const mpz_class init0 = (i % 2 == 0 ? 1 : -1)
+    	* Generation::getRandom(250);
         const Aesi<256> aesi = init0;
         EXPECT_EQ(aesi.precisionCast<288>(), init0);
 		EXPECT_EQ(aesi.precisionCast<320>(), init0);
@@ -96,7 +96,7 @@ TEST(Signed_PrecisionCast, PrecisionCast) {
 TEST(Unsigned_PrecisionCast, PrecisionCast) {
     constexpr auto testsAmount = 4;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto init0 = Generation::getRandomWithBits(250);
+        const auto init0 = Generation::getRandom(250);
         const Aeu<256> aeu = init0;
         EXPECT_EQ(aeu.precisionCast<288>(), init0);
         EXPECT_EQ(aeu.precisionCast<320>(), init0);

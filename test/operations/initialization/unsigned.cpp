@@ -77,62 +77,70 @@ TEST(Unsigned_Initialization, Different_precisions) {
 }
 
 TEST(Unsigned_Initialization, Binary) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        Aeu<N> record {};
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 20);
+            record = value; EXPECT_EQ(record, value);
 
-    Aeu<blocksNumber * 32> record {};
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
-
-        std::stringstream ss {};
-        std::string binary {};
-        for (auto byte = value.GetByte(value.ByteCount() - 1); byte; byte >>= 1)
-            binary += (byte & 1 ? '1' : '0');
-        ss << "0b" << std::string(binary.rbegin(), binary.rend());
-        for(long long j = value.ByteCount() - 2; j >= 0; --j)
-            ss << std::bitset<8>(value.GetByte(j));
-        record = ss.str(); EXPECT_EQ(record, value);
-    }
+            const std::size_t byteCount = (mpz_sizeinbase(value.get_mpz_t(), 2) + 7) / 8;
+            auto getByteGmp = [&](std::size_t k) -> unsigned char {
+                return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+            };
+            std::stringstream ss {};
+            std::string binary {};
+            for (auto byte = getByteGmp(byteCount - 1); byte; byte >>= 1)
+                binary += (byte & 1 ? '1' : '0');
+            ss << "0b" << std::string(binary.rbegin(), binary.rend());
+            for(long long j = (long long)byteCount - 2; j >= 0; --j)
+                ss << std::bitset<8>(getByteGmp(j));
+            record = ss.str(); EXPECT_EQ(record, value);
+        }
+    });
 }
 
 TEST(Unsigned_Initialization, Decimal) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        Aeu<N> record {};
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 20);
+            record = value; EXPECT_EQ(record, value);
 
-    Aeu<blocksNumber * 32> record {};
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
-
-        std::stringstream ss {}; ss << std::dec << value;
-        record = ss.str(); EXPECT_EQ(record, value);
-    }
+            std::stringstream ss {}; ss << std::dec << value;
+            record = ss.str(); EXPECT_EQ(record, value);
+        }
+    });
 }
 
 TEST(Unsigned_Initialization, Octal) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        Aeu<N> record {};
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 20);
+            record = value; EXPECT_EQ(record, value);
 
-    Aeu<blocksNumber * 32> record {};
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
-
-        std::stringstream ss {}; ss << "0o" << std::oct << value;
-        record = ss.str(); EXPECT_EQ(record, value);
-    }
+            std::stringstream ss {}; ss << "0o" << std::oct << value;
+            record = ss.str(); EXPECT_EQ(record, value);
+        }
+    });
 }
 
 TEST(Unsigned_Initialization, Hexadecimal) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        Aeu<N> record {};
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 20);
+            record = value; EXPECT_EQ(record, value);
 
-    Aeu<blocksNumber * 32> record {};
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        record = value; EXPECT_EQ(record, value);
-
-        std::stringstream ss {};
-        if(i % 2 == 0)
-            ss << "0x" << std::hex << std::uppercase << value;
-        else ss << "0x" << std::hex << std::nouppercase << value;
-        record = ss.str(); EXPECT_EQ(record, value);
-    }
+            std::stringstream ss {};
+            if(i % 2 == 0)
+                ss << "0x" << std::hex << std::uppercase << value;
+            else ss << "0x" << std::hex << std::nouppercase << value;
+            record = ss.str(); EXPECT_EQ(record, value);
+        }
+    });
 }

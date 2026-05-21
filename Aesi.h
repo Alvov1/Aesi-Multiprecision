@@ -646,6 +646,19 @@ public:
                 return our.precisionCast<otherBitness>() == other;
             }
         }
+
+#ifdef AESI_GMP_INTEGRATION
+        /**
+         * @brief Equality check operator against a GMP expression
+         * @param our Aesi
+         * @param other __gmp_expr
+         * @return bool
+         */
+        template <typename T, typename U>
+        constexpr friend auto operator==(const Aesi& our, const __gmp_expr<T, U>& other) noexcept -> bool {
+            return our == Aesi(mpz_class(other));
+        }
+#endif
     /* --------------------------------------------------------------------------- */
 
 

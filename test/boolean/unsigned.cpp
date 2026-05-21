@@ -1,20 +1,21 @@
 #include <gtest/gtest.h>
 #include "../../Aeu.h"
 #include "../generation.h"
-#include <cryptopp/integer.h>
 
 TEST(Unsigned_Boolean, ThreeWayComparasion) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto l = Generation::getRandomWithBits(blocksNumber * 32 - 20),
-                r = Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        Aeu<blocksNumber * 32> lA = l, rA = r;
-        EXPECT_EQ(lA < rA, l < r);
-        EXPECT_EQ(lA <= rA, l <= r);
-        EXPECT_EQ(lA > rA, l > r);
-        EXPECT_EQ(lA >= rA, l >= r);
-        EXPECT_EQ(lA == rA, l == r);
-    }
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto l = Generation::getRandom(N - 20),
+                    r = Generation::getRandom(N - 20);
+            Aeu<N> lA = l, rA = r;
+            EXPECT_EQ(lA < rA, l < r);
+            EXPECT_EQ(lA <= rA, l <= r);
+            EXPECT_EQ(lA > rA, l > r);
+            EXPECT_EQ(lA >= rA, l >= r);
+            EXPECT_EQ(lA == rA, l == r);
+        }
+    });
 }
 
 TEST(Unsigned_Boolean, DifferentPrecisions) {

@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 #include <bitset>
 
-#ifndef AESI_CRYPTOPP_INTEGRATION
-#define AESI_CRYPTOPP_INTEGRATION
-#endif
 #include "../../../Aesi.h"
 #include "../../generation.h"
 
@@ -67,7 +64,7 @@ TEST(Signed_Display, Zero) {
 TEST(Signed_Display, DecimalStreams) {
     constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         const Aesi<blocksNumber * 32> Aesi = value;
 
         std::stringstream ss, ss2; ss << std::dec << std::noshowbase << value;
@@ -76,7 +73,7 @@ TEST(Signed_Display, DecimalStreams) {
     }
 
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         const Aesi<blocksNumber * 32> Aesi = value;
 
         std::stringstream ss; ss << std::dec << std::noshowbase << value;
@@ -91,7 +88,7 @@ TEST(Signed_Display, DecimalStreams) {
 TEST(Signed_Display, OctalStreams) {
     constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         const Aesi<blocksNumber * 32> aesi = value;
 
         std::stringstream ss, ss2; ss << std::oct << std::noshowbase << value;
@@ -100,7 +97,7 @@ TEST(Signed_Display, OctalStreams) {
     }
 
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         const Aesi<blocksNumber * 32> Aesi = value;
 
         std::stringstream ss; ss << std::oct << std::noshowbase << value;
@@ -115,7 +112,7 @@ TEST(Signed_Display, OctalStreams) {
 TEST(Signed_Display, HexadecimalStreams) {
     constexpr auto testsAmount = 64, blocksNumber = 16;
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         const Aesi<blocksNumber * 32> Aesi = value;
 
         std::stringstream ss, ss2; ss << std::hex << std::noshowbase << value;
@@ -124,7 +121,7 @@ TEST(Signed_Display, HexadecimalStreams) {
     }
 
     for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         const Aesi<blocksNumber * 32> Aesi = value;
 
         std::stringstream ss; ss << std::hex << std::noshowbase << value;
@@ -148,7 +145,7 @@ TEST(Signed_Display, FormatAskii) {
     for (std::size_t i = 0; i < testsAmount; ++i) {
         static std::array<char, blocksNumber * 32 + 2> askii {};
 
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         std::stringstream ss;
         const Aesi<blocksNumber * 32> Aesi = value;
 
@@ -176,11 +173,17 @@ TEST(Signed_Display, FormatAskii) {
             default: {  /* Binary */
                 ss << (i % 2 == 0 ? "" : "-");
                 std::string binary {};
-                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                mpz_class absVal; mpz_abs(absVal.get_mpz_t(), value.get_mpz_t());
+                const long long bitCount = (long long)mpz_sizeinbase(absVal.get_mpz_t(), 2);
+                const long long byteCount = (bitCount + 7) / 8;
+                auto getByteGmp = [&](long long k) -> unsigned char {
+                    return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
+                };
+                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
                 ss << std::string(binary.rbegin(), binary.rend());
-                for(long long j = value.ByteCount() - 2; j >= 0; --j)
-                    ss << std::bitset<8>(value.GetByte(j));
+                for (long long j = byteCount - 2; j >= 0; --j)
+                    ss << std::bitset<8>(getByteGmp(j));
                 Aesi.getString<2>(askii.data(), askii.size(), false);
             }
         }
@@ -202,7 +205,7 @@ TEST(Signed_Display, FormatUtf) {
     for (std::size_t i = 0; i < testsAmount; ++i) {
         static std::array<wchar_t, blocksNumber * 32 + 2> utf{};
 
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         std::stringstream ss;
         const Aesi<blocksNumber * 32> Aesi = value;
 
@@ -230,11 +233,17 @@ TEST(Signed_Display, FormatUtf) {
             default: {  /* Binary */
                 ss << (i % 2 == 0 ? "" : "-");
                 std::string binary {};
-                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                mpz_class absVal; mpz_abs(absVal.get_mpz_t(), value.get_mpz_t());
+                const long long bitCount = (long long)mpz_sizeinbase(absVal.get_mpz_t(), 2);
+                const long long byteCount = (bitCount + 7) / 8;
+                auto getByteGmp = [&](long long k) -> unsigned char {
+                    return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
+                };
+                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
                 ss << std::string(binary.rbegin(), binary.rend());
-                for (long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
-                    ss << std::bitset<8>(value.GetByte(j));
+                for (long long j = byteCount - 2; j >= 0; --j)
+                    ss << std::bitset<8>(getByteGmp(j));
                 Aesi.getString<2>(utf.data(), utf.size(), false);
             }
         }
@@ -263,25 +272,26 @@ TEST(Signed_Display, ShowBaseAskii) {
     for (std::size_t i = 8; i < testsAmount; ++i) {
         static std::array<char, blocksNumber * 32 + 2> askii {};
 
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         std::stringstream ss, ss2;
         const Aesi<blocksNumber * 32> Aesi = value;
+        mpz_class absValue; mpz_abs(absValue.get_mpz_t(), value.get_mpz_t());
 
         switch (i % 9) {
             case 0: {   /* Std::streams octal */
-                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << (i % 2 == 0 ? value : value * -1);
+                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << absValue;
                 ss2 << std::oct << std::showbase << Aesi;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
             }
             case 1: {   /* Std::streams hexadecimal, lowercase */
-                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
                 ss2 << std::hex << std::showbase << std::nouppercase << Aesi;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
             }
             case 2: {   /* Std::streams hexadecimal, uppercase */
-                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::uppercase << (i % 2 == 0 ? value : value * -1);
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::uppercase << absValue;
                 ss2 << std::hex << std::showbase << std::uppercase << Aesi;
                 EXPECT_EQ(ss2.str(), ss.str());
                 break;
@@ -293,19 +303,19 @@ TEST(Signed_Display, ShowBaseAskii) {
                 break;
             }
             case 4: {   /* C-style ASKII Octal */
-                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << (i % 2 == 0 ? value : value * -1);
+                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << absValue;
                 const auto size = Aesi.getString<8>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
-                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
                 const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
-                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
                 const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
@@ -319,11 +329,16 @@ TEST(Signed_Display, ShowBaseAskii) {
             default: {   /* C-style ASKII Binary */
                 ss << (i % 2 == 0 ? "0b" : "-0b");
                 std::string binary {};
-                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                const long long bitCount = (long long)mpz_sizeinbase(absValue.get_mpz_t(), 2);
+                const long long byteCount = (bitCount + 7) / 8;
+                auto getByteGmp = [&](long long k) -> unsigned char {
+                    return (unsigned char)(mpz_class(absValue >> (8 * k)).get_ui() & 0xFF);
+                };
+                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
                 ss << std::string(binary.rbegin(), binary.rend());
-                for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
-                    ss << std::bitset<8>(value.GetByte(j));
+                for (long long j = byteCount - 2; j >= 0; --j)
+                    ss << std::bitset<8>(getByteGmp(j));
                 Aesi.getString<2>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
             }
@@ -349,14 +364,15 @@ TEST(Signed_Display, ShowBaseUtf) {
     for (std::size_t i = 0; i < testsAmount; ++i) {
         static std::array<wchar_t, blocksNumber * 32 + 2> utf {};
 
-        const auto value = (i % 2 == 0 ? 1 : -1) * Generation::getRandomWithBits(blocksNumber * 32 - 32);
+        const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(blocksNumber * 32 - 32);
         std::stringstream ss;
         std::wstringstream ss2;
         const Aesi<blocksNumber * 32> Aesi = value;
+        mpz_class absValue; mpz_abs(absValue.get_mpz_t(), value.get_mpz_t());
 
         switch (i % 9) {
             case 0: {   /* Std::streams octal */
-                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << (i % 2 == 0 ? value : value * -1);
+                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << absValue;
                 ss2 << std::oct << std::showbase << Aesi;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -364,7 +380,7 @@ TEST(Signed_Display, ShowBaseUtf) {
                 break;
             }
             case 1: {   /* Std::streams hexadecimal, lowercase */
-                ss << (i % 2 == 0 ? "0x" : "-0x")  << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
                 ss2 << std::hex << std::showbase << std::nouppercase << Aesi;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -372,7 +388,7 @@ TEST(Signed_Display, ShowBaseUtf) {
                 break;
             }
             case 2: {   /* Std::streams hexadecimal, uppercase */
-                ss << (i % 2 == 0 ? "0x" : "-0x")  << std::hex << std::noshowbase << std::uppercase << (i % 2 == 0 ? value : value * -1);
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::uppercase << absValue;
                 ss2 << std::hex << std::showbase << std::uppercase << Aesi;
                 const auto& ref = ss.str();
                 std::wstring wstring (ref.begin(), ref.end());
@@ -387,31 +403,31 @@ TEST(Signed_Display, ShowBaseUtf) {
                 EXPECT_EQ(ss2.str(), wstring);
                 break;
             }
-            case 4: {   /* C-style ASKII Octal */
-                ss << (i % 2 == 0 ? "0o" : "-0o")  << std::oct << std::noshowbase << (i % 2 == 0 ? value : value * -1);
+            case 4: {   /* C-style UTF Octal */
+                ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << absValue;
                 const auto size = Aesi.getString<8>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
                 break;
             }
-            case 5: {   /* C-style ASKII Hexadecimal, lowercase */
-                ss << (i % 2 == 0 ? "0x" : "-0x")  << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
+            case 5: {   /* C-style UTF Hexadecimal, lowercase */
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
                 const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
                 break;
             }
-            case 6: {   /* C-style ASKII Hexadecimal, uppercase */
-                ss << (i % 2 == 0 ? "0x" : "-0x")  << std::hex << std::noshowbase << std::nouppercase << (i % 2 == 0 ? value : value * -1);
+            case 6: {   /* C-style UTF Hexadecimal, uppercase */
+                ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
                 const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
                 break;
             }
-            case 7: {   /* C-style ASKII Decimal */
+            case 7: {   /* C-style UTF Decimal */
                 ss << std::dec << std::noshowbase << value;
                 const auto size = Aesi.getString<10>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
@@ -419,14 +435,19 @@ TEST(Signed_Display, ShowBaseUtf) {
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
                 break;
             }
-            default: {   /* C-style ASKII Binary */
+            default: {   /* C-style UTF Binary */
                 ss << (i % 2 == 0 ? "0b" : "-0b");
                 std::string binary {};
-                for (auto byte = value.GetByte((value.BitCount() - 1) / 8); byte; byte >>= 1)
+                const long long bitCount = (long long)mpz_sizeinbase(absValue.get_mpz_t(), 2);
+                const long long byteCount = (bitCount + 7) / 8;
+                auto getByteGmp = [&](long long k) -> unsigned char {
+                    return (unsigned char)(mpz_class(absValue >> (8 * k)).get_ui() & 0xFF);
+                };
+                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
                 ss << std::string(binary.rbegin(), binary.rend());
-                for(long long j = (value.BitCount() - 1) / 8 - 1; j >= 0; --j)
-                    ss << std::bitset<8>(value.GetByte(j));
+                for (long long j = byteCount - 2; j >= 0; --j)
+                    ss << std::bitset<8>(getByteGmp(j));
                 Aesi.getString<2>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());

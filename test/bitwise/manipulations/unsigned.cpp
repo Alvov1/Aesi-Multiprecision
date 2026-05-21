@@ -3,69 +3,86 @@
 #include "../../generation.h"
 
 TEST(Unsigned_Bitwise, GetSetBit) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        Aeu<blocksNumber * 32> aeu {};
-        for (std::size_t j = 0; j < value.BitCount(); ++j)
-            aeu.setBit(j, value.GetBit(j));
-        EXPECT_EQ(aeu, value);
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 20);
+            const std::size_t bitCount = mpz_sizeinbase(value.get_mpz_t(), 2);
+            Aeu<N> aeu {};
+            for (std::size_t j = 0; j < bitCount; ++j)
+                aeu.setBit(j, mpz_tstbit(value.get_mpz_t(), j));
+            EXPECT_EQ(aeu, value);
 
-        aeu = value;
-        for (std::size_t j = 0; j < value.BitCount(); ++j)
-            EXPECT_EQ(aeu.getBit(j), value.GetBit(j));
-    }
+            aeu = value;
+            for (std::size_t j = 0; j < bitCount; ++j)
+                EXPECT_EQ(aeu.getBit(j), (bool)mpz_tstbit(value.get_mpz_t(), j));
+        }
+    });
 }
 
 TEST(Unsigned_Bitwise, GetSetByte) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        Aeu<blocksNumber * 32> aeu {};
-        for (std::size_t j = 0; j < value.ByteCount(); ++j)
-            aeu.setByte(j, value.GetByte(j));
-        EXPECT_EQ(aeu, value);
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 20);
+            const std::size_t byteCount = (mpz_sizeinbase(value.get_mpz_t(), 2) + 7) / 8;
+            auto getByteGmp = [&](std::size_t k) -> unsigned char {
+                return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+            };
+            Aeu<N> aeu {};
+            for (std::size_t j = 0; j < byteCount; ++j)
+                aeu.setByte(j, getByteGmp(j));
+            EXPECT_EQ(aeu, value);
 
-        aeu = value;
-        for (std::size_t j = 0; j < value.ByteCount(); ++j)
-            EXPECT_EQ(aeu.getByte(j), value.GetByte(j));
-    }
+            aeu = value;
+            for (std::size_t j = 0; j < byteCount; ++j)
+                EXPECT_EQ(aeu.getByte(j), getByteGmp(j));
+        }
+    });
 }
 
 TEST(Unsigned_Bitwise, GetSetBlock) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        Aeu<blocksNumber * 32> aeu {};
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 20);
+            const std::size_t byteCount = (mpz_sizeinbase(value.get_mpz_t(), 2) + 7) / 8;
+            auto getByteGmp = [&](std::size_t k) -> unsigned char {
+                return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+            };
+            Aeu<N> aeu {};
 
-        const auto totalBlocks = value.ByteCount() / 4;
-        for (std::size_t j = 0; j < totalBlocks; ++j) {
+            const auto totalBlocks = byteCount / 4;
+            for (std::size_t j = 0; j < totalBlocks; ++j) {
+                uint32_t block = 0;
+                for (std::size_t k = 1; k < 5; ++k) {
+                    const auto byte = static_cast<uint32_t>(getByteGmp((j + 1) * 4 - k));
+                    block <<= 8;
+                    block |= byte;
+                }
+                aeu.setBlock(j, block);
+            }
+
             uint32_t block = 0;
-            for (std::size_t k = 1; k < 5; ++k) {
-                const auto byte = static_cast<uint32_t>(value.GetByte((j + 1) * 4 - k));
+            for (std::size_t j = byteCount - 1; j >= totalBlocks * 4; --j) {
+                const auto byte = static_cast<uint32_t>(getByteGmp(j));
                 block <<= 8;
                 block |= byte;
             }
-            aeu.setBlock(j, block);
-        }
+            aeu.setBlock(totalBlocks, block);
 
-        uint32_t block = 0;
-        for (std::size_t j = value.ByteCount() - 1; j >= totalBlocks * 4; --j) {
-            const auto byte = static_cast<uint32_t>(value.GetByte(j));
-            block <<= 8;
-            block |= byte;
+            EXPECT_EQ(aeu, value);
         }
-        aeu.setBlock(totalBlocks, block);
-
-        EXPECT_EQ(aeu, value);
-    }
+    });
 }
 
 TEST(Unsigned_Bitwise, CountBitsBytes) {
-    constexpr auto testsAmount = 1024, blocksNumber = 32;
-    for (std::size_t i = 0; i < testsAmount; ++i) {
-        const auto value = Generation::getRandomWithBits(blocksNumber * 32 - 20);
-        Aeu<blocksNumber * 32> aeu = value;
-        EXPECT_EQ(value.BitCount(), aeu.bitCount());
-    }
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 20);
+            Aeu<N> aeu = value;
+            EXPECT_EQ(mpz_sizeinbase(value.get_mpz_t(), 2), aeu.bitCount());
+        }
+    });
 }

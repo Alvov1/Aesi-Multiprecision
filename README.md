@@ -123,9 +123,7 @@ cout << Aeu<256>::powm(base.precisionCast<256>(),
 
 ## Performance
 
-The library is slower than CPU-optimized multiprecision libraries:
-
-![Execution Time Graph](https://dub.sh/jNgf79u?2)
+The library is slower than CPU-optimized multiprecision libraries. Benchmark results are published in each [Benchmarking workflow run](https://github.com/Alvov1/Aesi-Multiprecision/actions/workflows/benchmarks.yml) as a job summary.
 
 ## Contributing
 

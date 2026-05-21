@@ -3,8 +3,18 @@ name: Benchmarking
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'benchmark/**'
+      - 'ci/benchmarking/**'
+      - '.github/workflows/benchmarks.yml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'benchmark/**'
+      - 'ci/benchmarking/**'
+      - '.github/workflows/benchmarks.yml'
 
 jobs:
   Measure:

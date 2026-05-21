@@ -3,8 +3,16 @@ name: Integration
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'ci/integration/**'
+      - '.github/workflows/integration.yml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'ci/integration/**'
+      - '.github/workflows/integration.yml'
 
 jobs:
   Build:

@@ -3,6 +3,10 @@ name: Deploy documentation
 on:
   push:
     branches: ["main"]
+    paths:
+      - 'include/**'
+      - 'Doxyfile'
+      - '.github/workflows/documentation.yml'
 
 permissions:
   contents: read

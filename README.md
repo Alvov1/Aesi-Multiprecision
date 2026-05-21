@@ -80,6 +80,12 @@ int main() {
 ```
 > Were in kernel thread and number is 1562144106091796071
 
+## Contributing
+Commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. To enable the local commit-msg hook:
+```bash
+git config core.hooksPath .githooks
+```
+
 ## License
 This project is licensed under the BSD 2-Clause License. See the LICENSE file for details.
 

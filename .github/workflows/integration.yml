@@ -37,7 +37,7 @@ jobs:
             cpp_compiler: cl
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Configure
         run: cmake -B ${{ github.workspace }}/ci/integration/cmake-build

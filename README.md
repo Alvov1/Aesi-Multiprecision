@@ -17,10 +17,7 @@
         <img src="https://img.shields.io/github/languages/code-size/Alvov1/Aesi-Multiprecision" alt="GitHub code size in bytes" /></a>
 </p>
 
-A fast, header-only multiprecision arithmetic library for C++ and CUDA. Supports `constexpr` expressions, move semantics, and GPU parallelization frameworks (CUDA, OpenCL, Metal).
-
-> [!IMPORTANT]
-> CUDA support is currently in active development. Errors may occur. OpenCL support is next in line; Metal support is planned after that.
+A header-only static-sized multiprecision arithmetic library for C++ and CUDA. Supports `constexpr` expressions, move semantics, and GPU parallelization frameworks in CUDA environments.
 
 ## Functionality
 

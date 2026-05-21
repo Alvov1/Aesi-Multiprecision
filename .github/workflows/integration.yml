@@ -8,19 +8,25 @@ on:
 
 jobs:
   Build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
 
       matrix:
-        c_compiler: [gcc, clang]
-        target: [Library_Integration, Readme_Examples]
         include:
-          - c_compiler: gcc
+          - os: ubuntu-latest
+            c_compiler: gcc
             cpp_compiler: g++
-          - c_compiler: clang
+          - os: ubuntu-latest
+            c_compiler: clang
             cpp_compiler: clang++
+          - os: macos-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
 
     steps:
       - uses: actions/checkout@v4
@@ -32,8 +38,8 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release
           -S ${{ github.workspace }}/ci/integration
 
-      - name: Build and run
-        working-directory: ${{ github.workspace }}/ci/integration/cmake-build
-        run: |
-          cmake --build . --target ${{ matrix.target }} -j8
-          ./${{ matrix.target }}
+      - name: Build
+        run: cmake --build ${{ github.workspace }}/ci/integration/cmake-build --config Release -j8
+
+      - name: Run
+        run: ctest --test-dir ${{ github.workspace }}/ci/integration/cmake-build -C Release --output-on-failure

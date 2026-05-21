@@ -6,23 +6,38 @@ on:
 
 jobs:
   Test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+          - os: macos-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libgmp-dev
-
       - name: Configure
         run: cmake -B ${{ github.workspace }}/build
-          -DCMAKE_CXX_COMPILER=g++
-          -DCMAKE_C_COMPILER=gcc
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_BUILD_TYPE=Release
           -S ${{ github.workspace }}/ci/build
 
-      - name: Build and run
-        working-directory: ${{ github.workspace }}/build
-        run: |
-          make -j8
-          ./Build
+      - name: Build
+        run: cmake --build ${{ github.workspace }}/build --config Release -j8
+
+      - name: Run
+        run: ctest --test-dir ${{ github.workspace }}/build -C Release --output-on-failure

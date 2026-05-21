@@ -20,13 +20,16 @@ jobs:
       - name: Create directory
         run: mkdir ${{ steps.strings.outputs.build }}
 
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgmp-dev
+
       - name: Load CMake configuration
         working-directory: ${{ steps.strings.outputs.build }}
         run: cmake -B ${{ steps.strings.outputs.build }}
           -DCMAKE_CXX_COMPILER=g++
           -DCMAKE_C_COMPILER=gcc
           -DCMAKE_BUILD_TYPE=Release
-          -S ${{ github.workspace }}
+          -S ${{ github.workspace }}/ci/build
 
       - name: Test
         working-directory: ${{ steps.strings.outputs.build }}

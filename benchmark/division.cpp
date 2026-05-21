@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
 #include <cryptopp/integer.h>
 #include <gmpxx.h>
-#include "../Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 
 constexpr char division[] = "0x1099091f922d948121cf94880af1fd07a60010c9bbf89884aac215f37c6418b2735a3e50e0889fac0c3ea61d"
                             "bc829d3919e94bf714f521969e75e15f570f870ef5e086add27842cfc8cafd321d038354a97e152c0ea74df004"

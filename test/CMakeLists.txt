@@ -16,7 +16,7 @@ pkg_check_modules(GMPXX REQUIRED IMPORTED_TARGET gmpxx)
 enable_testing()
 
 file(GLOB Tests *.cpp)
-add_executable(AesiMultiprecision ${Tests} ../Aeu.h ../Aesi.h)
+add_executable(AesiMultiprecision ${Tests})
 add_subdirectory(arithmetic)
 add_subdirectory(operations)
 add_subdirectory(bitwise)
@@ -37,6 +37,7 @@ target_link_libraries(AesiMultiprecision PUBLIC
         PkgConfig::GMP
         PkgConfig::GMPXX)
 target_include_directories(AesiMultiprecision PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include
         PkgConfig::GMP
         PkgConfig::GMPXX)
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../../Aeu.h"
-#include "../../Aesi.h"
+#include <AesiMultiprecision/Aeu.h>
+#include <AesiMultiprecision/Aesi.h>
 
 TEST(Signed, Power2) {
     constexpr std::size_t N = 512;

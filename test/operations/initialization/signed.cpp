@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <bitset>
-#include "../../../Aesi.h"
+#include <AesiMultiprecision/Aesi.h>
 #include "../../generation.h"
 
 TEST(Signed_Initialization, Basic) {

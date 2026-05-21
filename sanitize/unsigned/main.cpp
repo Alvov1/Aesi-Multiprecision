@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <primesieve.hpp>
-#include "../../Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 
 /* Creator: Alexander Lvov
  * Details: Pollard's (P-1) algorithm for integral factoring.

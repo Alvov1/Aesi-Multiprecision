@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <bitset>
 #include <iomanip>
-#include "../../Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 #include "../generation.h"
 
 TEST(Unsigned_BinaryIO, BinaryRead) {

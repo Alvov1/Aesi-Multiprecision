@@ -2,7 +2,7 @@
 #include <string>
 #include <sstream>
 #include <regex>
-#include "../../Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 
 TEST(Prezentation, Factorial) {
     Aeu<512> f = 1u;

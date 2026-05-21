@@ -13,6 +13,7 @@ FetchContent_Declare(primesieve
 FetchContent_MakeAvailable(primesieve)
 
 add_executable(AesiSanitize main.cpp)
+target_include_directories(AesiSanitize PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
 target_link_libraries(AesiSanitize PRIVATE primesieve::primesieve)
 
 if(ENABLE_SANITIZERS)

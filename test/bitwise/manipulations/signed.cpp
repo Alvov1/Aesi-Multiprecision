@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../../Aesi.h"
+#include <AesiMultiprecision/Aesi.h>
 #include "../../generation.h"
 
 TEST(Signed_Bitwise, GetSetBit) {

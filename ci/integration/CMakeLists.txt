@@ -11,7 +11,7 @@ FetchContent_MakeAvailable(AesiMultiprecision)
 
 # 1. Build project with Aesi as library
 add_executable(Library_Integration main.cpp)
-target_include_directories(Library_Integration PRIVATE ${AesiMultiprecision_SOURCE_DIR})
+target_link_libraries(Library_Integration PRIVATE AesiMultiprecision)
 
 # 2. Test examples from README with GTest
 FetchContent_Declare(googletest
@@ -24,8 +24,7 @@ enable_testing()
 add_test(NAME library-integration COMMAND Library_Integration)
 
 add_executable(Readme_Examples presentation.cpp)
-target_link_libraries(Readme_Examples PRIVATE GTest::gtest_main)
-target_include_directories(Readme_Examples PRIVATE ${AesiMultiprecision_SOURCE_DIR})
+target_link_libraries(Readme_Examples PRIVATE GTest::gtest_main AesiMultiprecision)
 
 include(GoogleTest)
 gtest_discover_tests(Readme_Examples XML_OUTPUT_DIR ${CMAKE_BINARY_DIR})

@@ -2,7 +2,7 @@
 #include <cryptopp/integer.h>
 #include <cryptopp/nbtheory.h>
 #include <gmpxx.h>
-#include "../Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 
 constexpr char base[] = "0x5bc934d7d1b1fd4cb5d62afd84e10ad94c030cee0f851155c94d374295228fd11d21119b4ad772673535a6c7f0fc"
                         "15a05458ac2dd14585cd663aeac277d5",

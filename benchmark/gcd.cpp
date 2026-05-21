@@ -2,7 +2,7 @@
 #include <cryptopp/integer.h>
 #include <cryptopp/nbtheory.h>
 #include <gmpxx.h>
-#include "../Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 
 
 constexpr char left[] = "0xa24872afd57464d79dfeec239367995f623429772ec032eb3bc9b376d0775c956dcb330a2c4f8f0d001f62fe6e0b"

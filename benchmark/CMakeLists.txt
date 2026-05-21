@@ -24,6 +24,7 @@ target_link_libraries(Benchmarking PRIVATE
         benchmark::benchmark
         ${CRYPTOPP_LIB})
 target_include_directories(Benchmarking PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include
         PkgConfig::GMP
         benchmark::benchmark
         ${CRYPTOPP_INCLUDE})

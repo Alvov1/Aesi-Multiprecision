@@ -69,7 +69,7 @@ Initialization accepts integers, strings, string views, and library objects of d
 
 ```cpp
 #include <iostream>
-#include "Aeu.h"
+#include <AesiMultiprecision/Aeu.h>
 
 int main() {
     Aeu<512> f = 1u;

@@ -127,10 +127,7 @@ The library is slower than CPU-optimized multiprecision libraries. Benchmark res
 
 ## Contributing
 
-Commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. To enable the local commit-msg hook:
-```bash
-git config core.hooksPath .githooks
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for commit conventions, branch naming, and how to run tests, benchmarks, and sanitizers.
 
 ## License
 

@@ -1,0 +1,26 @@
+name: Commitlint
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        run: |
+          pattern='^(feat|fix|docs|style|refactor|test|chore|ci|build|perf|revert)(\(.+\))?(!)?: .{1,100}'
+          failed=0
+          while IFS= read -r msg; do
+            if ! echo "$msg" | grep -qE "$pattern"; then
+              echo "Invalid: $msg"
+              failed=1
+            fi
+          done < <(git log origin/main..HEAD --format="%s")
+          exit $failed

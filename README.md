@@ -1,5 +1,4 @@
-Aesi Multiprecision 
-==================
+# Aesi Multiprecision
 
 <p align="center">
     <a href="https://alvov1.github.io/Aesi-Multiprecision/index.html">
@@ -18,37 +17,40 @@ Aesi Multiprecision
         <img src="https://img.shields.io/github/languages/code-size/Alvov1/Aesi-Multiprecision" alt="GitHub code size in bytes" /></a>
 </p>
 
-The goal of this project is to develop a fast and handy multi-precision library that can be used with GPU parallelization frameworks such as CUDA, OpenCL, and Metal. The library should correspond to modern C++ standards, support constexpr expressions, and move semantics.
+A fast, header-only multiprecision arithmetic library for C++ and CUDA. Supports `constexpr` expressions, move semantics, and GPU parallelization frameworks (CUDA, OpenCL, Metal).
 
 > [!IMPORTANT]
-> Project is currently in the testing and development stage to support the *Cuda* framework. Please be aware that errors and problems may occur. OpenCL support is next in line for development. Metal support is scheduled after some time, due to the presence of significant differences in the framework from Cuda and OpenCL.
->
+> CUDA support is currently in active development. Errors may occur. OpenCL support is next in line; Metal support is planned after that.
 
 ## Functionality
-Library supports each arithmetic (binary and unary), bitwise, and boolean operations. Various functions from number theory are being added to the library, among which the greatest common divisor, the least common multiplier, and exponentiation by modulo have already been implemented.
 
-## Installation:
-Package could be downloaded to project's directory, or accessed directly through CMake:
-```
+Supports all arithmetic (binary and unary), bitwise, and boolean operations. Number theory functions include GCD, LCM, and modular exponentiation.
+
+## Installation
+
+Include directly via CMake FetchContent:
+```cmake
 include(FetchContent)
 FetchContent_Declare(AesiMultiprecision
     GIT_REPOSITORY https://github.com/Alvov1/Aesi-Multiprecision.git
     GIT_TAG main)
 FetchContent_MakeAvailable(AesiMultiprecision)
-...
+
 target_include_directories(Target PRIVATE ${AesiMultiprecision_SOURCE_DIR})
 ```
-Further library could be included in project with standard preprocessor command:
-> #include <Aeu.h>
+Then include in your source:
+```cpp
+#include <Aeu.h>
+```
 
-## Usage:
-The library is a header only to avoid difficulties while building. In this case, it can be used simultaneously in C++ and CUDA projects without changing the file extension from .cu to .cpp and backwards. Library supports an object-oriented style of data management. Class operators are overloaded for use in expressions. The number's bitness is passed to the class object as a template parameter and has a default value of __*512 bits*__. It should be a multiple of 32.
+## Usage
 
-Number's initialization could be done with numbers, strings, string-views, string literals, or library objects with different precision. User-defined string literals are planned to be released in the future.
+The library is header-only and works in both C++ and CUDA projects without changing file extensions. The number's bitness is a template parameter with a default of **512 bits** — must be a multiple of 32.
 
-Library supports display operations with STD streams (char and wchar_t based only), along with stream modifications (std::showbase, std::uppercase, std::hex, std::dec, std::oct). std::format support is planned to be released in the future.
+Initialization accepts integers, strings, string views, and library objects of different precision. Display works with STD streams (`char` and `wchar_t`), including `std::showbase`, `std::uppercase`, `std::hex`, `std::dec`, `std::oct`.
 
-### Host:
+### Host
+
 ```cpp
 #include <iostream>
 #include "Aeu.h"
@@ -63,14 +65,15 @@ int main() {
 ```
 > 0x49eebc961ed279b02b1ef4f28d19a84f5973a1d2c7800000000000
 
-### Cuda kernel:
+### CUDA kernel
+
 ```cpp
 __global__ void test() {
     const auto tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid != 0) return;
 
     Aesi<128> amp = 1562144106091796071UL;
-    printf("Were in kernel thread and number is %lu\n", amp.integralCast<unsigned long>());
+    printf("Value in kernel thread: %lu\n", amp.integralCast<unsigned long>());
 }
 
 int main() {
@@ -78,47 +81,46 @@ int main() {
     return cudaSuccess != cudaDeviceSynchronize();
 }
 ```
-> Were in kernel thread and number is 1562144106091796071
+> Value in kernel thread: 1562144106091796071
 
-## License
-This project is licensed under the BSD 2-Clause License. See the LICENSE file for details.
+## Precision cast
 
-
-## About precision cast
-It is admissible to use numbers of different precision inside the majority of operations, but it is not recommended cause it leads to redundant copying inside type conversions. Operation-assignment expressions (+=, -=, &=, etc...) require the bitness of the assignment to be greater or equal to the bitness of the assignable. The precision cast operator could be called by a user directly.
+Numbers of different precision can be mixed in most operations, though it causes implicit copying. Operation-assignment expressions (`+=`, `-=`, `&=`, etc.) require the left-hand bitness to be greater or equal to the right-hand. Use `precisionCast<N>()` to convert explicitly.
 
 ```cpp
 Aeu<128> base = "10888869450418352160768000001";
-Aeu<96> power = "99990001";
+Aeu<96>  power = "99990001";
 Aeu<256> mod = "8683317618811886495518194401279999999";
 
 cout << Aeu<256>::powm(base.precisionCast<256>(), power.precisionCast<256>(), mod) << endl;
-
-Aeu<128> m128 = "127958277599458332250117";
-Aeu<192> m192 = "279256103987149586783914830";
-
-cout << m128.precisionCast<192>() * m192 << endl;
-// Cast number of 128 bits to 256 bits, than multiply by number of 160 bits
 ```
-> 6680141832773294447513292887050873529      35733130075330889632933652650476631619495985535110
+> 6680141832773294447513292887050873529
 
-An exception to the rule above is using longer precision boundaries inside functions, susceptible to overflow. As far as the number's precision is fixed on the stage of compilation, functions that require number multiplication or exponentiation may easily lead to overflow:
+Functions susceptible to overflow (e.g. `powm`) should use a larger precision explicitly:
 ```cpp
-Aeu<128> base = "340199290171201906239764863559915798527",
-        power = "340282366920937859000464800151540596704",
-        modulo = "338953138925230918806032648491249958912";
+Aeu<128> base  = "340199290171201906239764863559915798527",
+         power  = "340282366920937859000464800151540596704",
+         modulo = "338953138925230918806032648491249958912";
 
-cout << Aeu<128>::powm(base, power, modulo) << endl;  // Overflow !!!
-
-cout << Aeu<256>::powm(base.precisionCast<256>(),     // Fine
-    power,
-    modulo.precisionCast<256>()) << endl;
+cout << Aeu<128>::powm(base, power, modulo) << endl;             // Overflow
+cout << Aeu<256>::powm(base.precisionCast<256>(),
+         power, modulo.precisionCast<256>()) << endl;            // OK
 ```
-> \***Overflowed\***      201007033690655614485250957754150944769
+> \***Overflowed***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;201007033690655614485250957754150944769
 
-## Issues
-Library is relatively slow in comparison to popular CPU-directional multiple precision libraries:
+## Performance
 
+The library is slower than CPU-optimized multiprecision libraries:
 
 ![Execution Time Graph](https://dub.sh/jNgf79u?2)
 
+## Contributing
+
+Commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. To enable the local commit-msg hook:
+```bash
+git config core.hooksPath .githooks
+```
+
+## License
+
+This project is licensed under the BSD 2-Clause License. See the [LICENSE](LICENSE) file for details.

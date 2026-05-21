@@ -1,0 +1,10 @@
+#!/bin/bash
+msg=$(cat "$1")
+pattern='^(feat|fix|docs|style|refactor|test|chore|ci|build|perf|revert)(\(.+\))?(!)?: .{1,100}'
+if ! echo "$msg" | grep -qE "$pattern"; then
+    echo "Commit message does not follow Conventional Commits format."
+    echo "Expected: <type>[optional scope]: <description>"
+    echo "Types: feat|fix|docs|style|refactor|test|chore|ci|build|perf|revert"
+    echo "Example: fix(ci): correct cmake source path"
+    exit 1
+fi

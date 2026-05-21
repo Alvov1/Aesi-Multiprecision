@@ -3,24 +3,26 @@ name: Commitlint
 on:
   pull_request:
     branches: [ "main" ]
+    types: [ opened, edited, synchronize, reopened ]
 
 jobs:
   commitlint:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          fetch-depth: 0
-
-      - name: Validate commit messages
-        run: |
-          pattern='^(feat|fix|docs|style|refactor|test|chore|ci|build|perf|revert)(\(.+\))?(!)?: .{1,100}'
-          failed=0
-          while IFS= read -r msg; do
-            if ! echo "$msg" | grep -qE "$pattern"; then
-              echo "Invalid: $msg"
-              failed=1
-            fi
-          done < <(git log origin/main..HEAD --no-merges --format="%s")
-          exit $failed
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            chore
+            ci
+            build
+            perf
+            revert

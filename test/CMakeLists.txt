@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.26)
-set(CMAKE_CXX_STANDARD 20)
-project(AesiMultiprecision)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    cmake_minimum_required(VERSION 3.26)
+    project(AesiMultiprecision)
+    set(CMAKE_CXX_STANDARD 20)
+endif()
 
 include(FetchContent)
 FetchContent_Declare(

@@ -2,14 +2,15 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     cmake_minimum_required(VERSION 3.26)
     project(AesiMultiprecision)
     set(CMAKE_CXX_STANDARD 20)
-endif()
 
-include(FetchContent)
-FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/refs/heads/main.zip
-)
-FetchContent_MakeAvailable(googletest)
+    include(FetchContent)
+    FetchContent_Declare(googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG v1.17.0
+            GIT_SHALLOW TRUE)
+    FetchContent_MakeAvailable(googletest)
+    enable_testing()
+endif()
 
 find_package(PkgConfig)
 pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp)

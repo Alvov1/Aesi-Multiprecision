@@ -51,7 +51,7 @@ jobs:
 
       - name: Test
         working-directory: ${{ steps.strings.outputs.build }}
-        run: | 
+        run: |
           cmake --build ${{ steps.strings.outputs.build }} --target Library_Integration -j 8
           ./Library_Integration
 

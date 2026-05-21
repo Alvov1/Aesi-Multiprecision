@@ -10,6 +10,7 @@ target_include_directories(AesiMultiprecision INTERFACE
 option(AESI_BUILD_TESTS      "Build tests"       OFF)
 option(AESI_BUILD_BENCHMARKS "Build benchmarks"  OFF)
 option(AESI_BUILD_SANITIZERS "Build sanitizers"  OFF)
+option(AESI_BUILD_COVERAGE   "Build with gcov coverage instrumentation (GCC/Clang only)" OFF)
 
 if(AESI_BUILD_TESTS)
     include(FetchContent)

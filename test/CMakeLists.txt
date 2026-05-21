@@ -39,6 +39,11 @@ target_include_directories(AesiMultiprecision PUBLIC
         PkgConfig::GMP
         PkgConfig::GMPXX)
 
+if(AESI_BUILD_COVERAGE)
+    target_compile_options(AesiMultiprecision PRIVATE --coverage)
+    target_link_options(AesiMultiprecision PRIVATE --coverage)
+endif()
+
 include(GoogleTest)
 gtest_discover_tests(AesiMultiprecision XML_OUTPUT_DIR ${CMAKE_BINARY_DIR})
 

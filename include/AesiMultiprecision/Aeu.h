@@ -53,9 +53,6 @@
     #warning Enabled nightly mode for the library. Functions and methods input arguments are not checked for validity. Be really gentle
 #endif
 
-#ifdef AESI_CRYPTOPP_INTEGRATION
-#include <cryptopp/integer.h>
-#endif
 
 #ifdef AESI_GMP_INTEGRATION
 #include <gmpxx.h>
@@ -263,20 +260,6 @@ public:
     template <typename String, typename Char = typename String::value_type> requires (std::is_same_v<std::basic_string<Char>,
         std::decay_t<String>> || std::is_same_v<std::basic_string_view<Char>, std::decay_t<String>>)
     gpu constexpr Aeu(const String& stringView) noexcept : Aeu(stringView.data(), stringView.size()) {}
-
-#ifdef AESI_CRYPTOPP_INTEGRATION
-    /**
-     * @brief Constructor from the CryptoPP library integer value
-     * @param value CryptoPP::Integer
-     */
-    constexpr Aeu(const CryptoPP::Integer& value): Aeu {} {
-        const auto byteCount = value.ByteCount();
-        if(byteCount * 8 > bitness)
-            throw std::invalid_argument("Accessed overflow on construction object from CryptoPP::Integer");
-        for(std::size_t i = 0; i < byteCount; ++i)
-            setByte(i, value.GetByte(i));
-    }
-#endif
 
 #ifdef AESI_GMP_INTEGRATION
     /**

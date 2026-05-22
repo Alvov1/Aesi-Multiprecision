@@ -151,23 +151,6 @@ public:
      */
     explicit gpu constexpr Aesi(const Aeu<bitness>& value) : sign(Sign::Positive), base(value) {}
 
-#ifdef AESI_CRYPTOPP_INTEGRATION
-    /**
-     * @brief Crypto++ library integer constructor
-     * @param number CryptoPP::Integer&
-     */
-    constexpr Aesi(const CryptoPP::Integer& number) {
-        using enum Sign;
-        if(number.IsZero())
-            sign = Zero;
-        else {
-            base = number;
-            if(number.IsNegative())
-                sign = Negative;
-            else sign = Positive;
-        }
-    }
-#endif
 
 #ifdef AESI_GMP_INTEGRATION
     /**

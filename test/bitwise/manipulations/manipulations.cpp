@@ -3,6 +3,12 @@
 #include <AesiMultiprecision/Aesi.h>
 #include "../../generation.h"
 
+template<template<std::size_t> class T, std::size_t N>
+void testCountBitsBytes(const mpz_class& value) {
+    T<N> aeu = value;
+    EXPECT_EQ(mpz_sizeinbase(value.get_mpz_t(), 2), aeu.bitCount());
+}
+
 TEST(Unsigned_Bitwise, GetSetBit) {
     Generation::forEachPrecision([]<std::size_t N>() {
         constexpr auto testsAmount = 256;
@@ -80,11 +86,8 @@ TEST(Unsigned_Bitwise, GetSetBlock) {
 TEST(Unsigned_Bitwise, CountBitsBytes) {
     Generation::forEachPrecision([]<std::size_t N>() {
         constexpr auto testsAmount = 256;
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            const auto value = Generation::getRandom(N - 20);
-            Aeu<N> aeu = value;
-            EXPECT_EQ(mpz_sizeinbase(value.get_mpz_t(), 2), aeu.bitCount());
-        }
+        for (std::size_t i = 0; i < testsAmount; ++i)
+            testCountBitsBytes<Aeu, N>(Generation::getRandom(N - 20));
     });
 }
 
@@ -174,10 +177,7 @@ TEST(Signed_Bitwise, GetSetBlock) {
 TEST(Signed_Bitwise, CountBitsBytes) {
     Generation::forEachPrecision([]<std::size_t N>() {
         constexpr auto testsAmount = 256;
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            const mpz_class value = (i % 2 == 0 ? 1 : -1) * Generation::getRandom(N - 20);
-            Aesi<N> aeu = value;
-            EXPECT_EQ(mpz_sizeinbase(value.get_mpz_t(), 2), aeu.bitCount());
-        }
+        for (std::size_t i = 0; i < testsAmount; ++i)
+            testCountBitsBytes<Aesi, N>((i % 2 == 0 ? 1 : -1) * Generation::getRandom(N - 20));
     });
 }

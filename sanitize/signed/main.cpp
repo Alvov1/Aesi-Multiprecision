@@ -16,7 +16,7 @@ Aesi512 extendedGcd(const Aesi512& a, const Aesi512& b, Aesi512& x, Aesi512& y) 
         x = 1; y = 0;
         return a;
     }
-    Aesi512 x1, y1;
+    Aesi512 x1 {}, y1 {};
     const Aesi512 g = extendedGcd(b, a % b, x1, y1);
     x = y1;
     y = x1 - (a / b) * y1;
@@ -24,8 +24,16 @@ Aesi512 extendedGcd(const Aesi512& a, const Aesi512& b, Aesi512& x, Aesi512& y) 
 }
 
 void checkBezout(const Aesi512& a, const Aesi512& b) {
-    Aesi512 x, y;
-    const Aesi512 g = extendedGcd(a, b, x, y);
+    /* extendedGcd requires non-negative inputs (% follows C++ sign-of-dividend semantics).
+     * gcd(a,b) = gcd(|a|,|b|); negate x or y if the original input was negative. */
+    const Aesi512 absA = a.isNegative() ? -a : a;
+    const Aesi512 absB = b.isNegative() ? -b : b;
+
+    Aesi512 x {}, y {};
+    const Aesi512 g = extendedGcd(absA, absB, x, y);
+
+    if (a.isNegative()) x = -x;
+    if (b.isNegative()) y = -y;
 
     if (a * x + b * y != g) {
         std::cerr << "Bezout identity failed: a=" << a << " b=" << b << std::endl;
@@ -34,9 +42,9 @@ void checkBezout(const Aesi512& a, const Aesi512& b) {
 }
 
 void checkSignedOps() {
+    constexpr Aesi512 pos = 42;
     /* Unary minus and isNegative */
-    Aesi512 pos = 42, neg = -pos;
-    if (!neg.isNegative() || pos.isNegative()) {
+    if constexpr (constexpr Aesi512 neg = -pos; !neg.isNegative() || pos.isNegative()) {
         std::cerr << "Sign check failed" << std::endl;
         std::exit(1);
     }
@@ -51,16 +59,15 @@ void checkSignedOps() {
     /* power2 and squareRoot roundtrip */
     for (std::size_t p = 2; p <= 20; p += 2) {
         const Aesi512 powered = Aesi512::power2(p);
-        const Aesi512 root = powered.squareRoot();
-        if (root * root != powered) {
+        if (const Aesi512 root = powered.squareRoot(); root * root != powered) {
             std::cerr << "squareRoot roundtrip failed at power " << p << std::endl;
             std::exit(1);
         }
     }
 
+    constexpr Aesi512 a = 1000, b = -337;
     /* Mixed-sign arithmetic */
-    Aesi512 a = 1000, b = -337;
-    Aesi512 q, r;
+    Aesi512 q {}, r {};
     Aesi512::divide(a, b, q, r);
     if (q * b + r != a) {
         std::cerr << "divide identity failed" << std::endl;
@@ -71,7 +78,7 @@ void checkSignedOps() {
 int main() {
     checkSignedOps();
 
-    std::vector<unsigned int> primes;
+    std::vector<unsigned int> primes {};
     primesieve::generate_primes(10'000u, &primes);
 
     /* Pairs of distinct primes: gcd = 1, Bezout coefficients are naturally signed. */

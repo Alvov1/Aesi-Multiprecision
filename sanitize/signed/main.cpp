@@ -19,7 +19,7 @@ Aesi512 extendedGcd(const Aesi512& a, const Aesi512& b, Aesi512& x, Aesi512& y) 
     Aesi512 x1 {}, y1 {};
     const Aesi512 g = extendedGcd(b, a % b, x1, y1);
     x = y1;
-    y = x1 - (a / b) * y1;
+    y = x1 - a / b * y1;
     return g;
 }
 
@@ -75,31 +75,36 @@ void checkSignedOps() {
     }
 }
 
+/* Multiply a slice of primes[offset], primes[offset+step], ... (count terms) into one Aesi512. */
+Aesi512 primeProduct(const std::vector<unsigned int>& primes, const std::size_t offset, const std::size_t step, const std::size_t count) {
+    Aesi512 result = 1;
+    for (std::size_t k = 0; k < count && offset + k * step < primes.size(); ++k)
+        result *= primes[offset + k * step];
+    return result;
+}
+
 int main() {
     checkSignedOps();
 
     std::vector<unsigned int> primes {};
     primesieve::generate_primes(10'000u, &primes);
 
-    /* Pairs of distinct primes: gcd = 1, Bezout coefficients are naturally signed. */
+    /* Small primes: breadth check across many distinct pairs (gcd = 1). */
     for (std::size_t i = 0; i + 1 < primes.size(); i += 2) {
-        const Aesi512 a = primes[i];
-        const Aesi512 b = primes[i + 1];
-        checkBezout(a, b);
+        checkBezout(Aesi512(primes[i]), Aesi512(primes[i + 1]));
     }
 
-    /* Products of primes: non-trivial gcd. */
-    for (std::size_t i = 0; i + 2 < primes.size(); i += 4) {
+    /* Large operands: products of 12 primes each (~168 bits), spanning multiple
+     * internal 32-bit blocks — exercises multiblock arithmetic and carry propagation.
+     * Shared factor ensures non-trivial gcd. */
+    constexpr std::size_t groupSize = 12;
+    for (std::size_t i = 0; i + 3 * groupSize < primes.size(); i += groupSize) {
         const Aesi512 shared = primes[i];
-        const Aesi512 a = shared * primes[i + 1];
-        const Aesi512 b = shared * primes[i + 2];
+        const Aesi512 a = shared * primeProduct(primes, i + 1,          1, groupSize);
+        const Aesi512 b = shared * primeProduct(primes, i + groupSize + 1, 1, groupSize);
         checkBezout(a, b);
-    }
-
-    /* Negative inputs: Bezout identity must still hold. */
-    for (std::size_t i = 0; i + 1 < primes.size(); i += 6) {
-        checkBezout(-Aesi512(primes[i]), Aesi512(primes[i + 1]));
-        checkBezout(Aesi512(primes[i]), -Aesi512(primes[i + 1]));
+        checkBezout(-a, b);
+        checkBezout(a, -b);
     }
 
     std::cout << "All checks passed." << std::endl;

@@ -187,13 +187,6 @@ public:
     gpu constexpr Aeu(const Char* data, std::size_t size) noexcept : Aeu {} {
         if(size == 0) return;
 
-        constexpr const Char* characters = [] {
-            if constexpr (std::is_same_v<char, Char>) {
-                return "09aAfFoObBxX";
-            } else {
-                return L"09aAfFoObBxX";
-            }
-        } ();
         std::size_t position = 0;
 
         if constexpr (std::is_same_v<Char, char>) {
@@ -205,17 +198,14 @@ public:
         if(position == size)
             return;
 
-        const auto base = [&data, &size, &position, &characters] {
-            if (data[position] == characters[0] && size > position + 1) {
+        const auto base = [&data, &size, &position] {
+            if (data[position] == Char('0') && size > position + 1) {
                 switch (data[position + 1]) {
-                    case characters[8]:
-                    case characters[9]:
+                    case Char('b'): case Char('B'):
                         position += 2; return 2u;
-                    case characters[6]:
-                    case characters[7]:
+                    case Char('o'): case Char('O'):
                         position += 2; return 8u;
-                    case characters[10]:
-                    case characters[11]:
+                    case Char('x'): case Char('X'):
                         position += 2; return 16u;
                     default:
                         return 10u;
@@ -225,12 +215,12 @@ public:
 
         for(; position < size; ++position) {
             const auto digit = [] (Char ch) {
-                if(characters[0] <= ch && ch <= characters[1])
-                    return static_cast<unsigned>(ch) - static_cast<unsigned>(characters[0]);
-                if(characters[2] <= ch && ch <= characters[4])
-                    return static_cast<unsigned>(ch) - static_cast<unsigned>(characters[2]) + 10u;
-                if(characters[3] <= ch && ch <= characters[5])
-                    return static_cast<unsigned>(ch) - static_cast<unsigned>(characters[3]) + 10u;
+                if(Char('0') <= ch && ch <= Char('9'))
+                    return static_cast<unsigned>(ch) - static_cast<unsigned>(Char('0'));
+                if(Char('a') <= ch && ch <= Char('f'))
+                    return static_cast<unsigned>(ch) - static_cast<unsigned>(Char('a')) + 10u;
+                if(Char('A') <= ch && ch <= Char('F'))
+                    return static_cast<unsigned>(ch) - static_cast<unsigned>(Char('A')) + 10u;
                 return 99u;
             } (data[position]);
 
@@ -677,7 +667,7 @@ public:
         const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
         const block stamp = (1UL << (blockBitLength - remainder)) - 1;
 
-        for (long long i = blocksNumber - 1; i >= (quotient + (remainder ? 1 : 0)); --i)
+        for (long long i = static_cast<long long>(blocksNumber) - 1; i >= static_cast<long long>(quotient + (remainder ? 1 : 0)); --i)
             value.blocks[i] = (value.blocks[i - quotient] & stamp) << remainder
                 | ((value.blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> (blockBitLength - remainder) % blockBitLength);
 
@@ -719,7 +709,7 @@ public:
 
         value.blocks[blocksNumber - 1 - quotient] = (value.blocks[blocksNumber - 1] & ~stamp) >> remainder;
 
-        for(long long i = blocksNumber - quotient; i < blocksNumber; ++i)
+        for(std::size_t i = blocksNumber - quotient; i < blocksNumber; ++i)
             value.blocks[i] = 0;
         return value;
     }
@@ -826,11 +816,11 @@ public:
             if constexpr (otherBitness != blocksNumber * blockBitLength) {
                 using enum Comparison;
                 if (other.totalBlocksNumber() > blocksNumber) {
-                    for (long long i = other.totalBlocksNumber() - 1; i > lowerBlockBorder - 1; --i)
+                    for (long long i = static_cast<long long>(other.totalBlocksNumber()) - 1; i > static_cast<long long>(lowerBlockBorder) - 1; --i)
                         if (other.getBlock(i) != 0)
                             return less;
                 } else if (blocksNumber > other.totalBlocksNumber()) {
-                    for (long long i = blocksNumber - 1; i > lowerBlockBorder - 1; --i)
+                    for (long long i = static_cast<long long>(blocksNumber) - 1; i > static_cast<long long>(lowerBlockBorder) - 1; --i)
                         if (blocks[i] != 0)
                             return greater;
                 }
@@ -1182,11 +1172,11 @@ public:
             divide(second, first, quotient, remainder);
         }
 
-        for(Aeu tX = 1u, tY = 0u; remainder != 0u; ) {
+        while(remainder != 0u) {
             Aeu tGcd = gcd; gcd = remainder;
             divide(tGcd, gcd, quotient, remainder);
         }
-        
+
         return gcd;
     }
 
@@ -1288,7 +1278,7 @@ public:
      * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10, or 16
      * @note Works significantly faster for hexadecimal notation
      */
-    template <byte base, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> && (base == 2 || base == 8 || base == 10 || base == 16))
+    template <byte base, typename Char> requires (std::is_same_v<Char, char> || (std::is_same_v<Char, wchar_t> && (base == 2 || base == 8 || base == 10 || base == 16)))
     gpu constexpr auto getString(Char* const buffer, std::size_t bufferSize, bool showBase = false, bool hexUppercase = false) const noexcept -> std::size_t {
         if(bufferSize < 2) return 0;
 

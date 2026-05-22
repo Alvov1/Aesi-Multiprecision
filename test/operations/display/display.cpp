@@ -488,42 +488,42 @@ TEST(Signed_Display, Zero) {
 
         std::array<char, 10> askii{};
         std::array<wchar_t, 10> utf{};
-        auto size = m.getString<10>(askii.data(), 10, false);
+        m.getString<10>(askii.data(), 10, false);
         EXPECT_EQ(std::string_view(askii.data()), "0"sv);
 
         askii = {};
-        size = m.getString<2>(askii.data(), 10, true);
+        m.getString<2>(askii.data(), 10, true);
         EXPECT_EQ(std::string_view(askii.data()), "0b0"sv);
 
         askii = {};
-        size = m.getString<8>(askii.data(), 10, true);
+        m.getString<8>(askii.data(), 10, true);
         EXPECT_EQ(std::string_view(askii.data()), "0o0"sv);
 
         askii = {};
-        size = m.getString<10>(askii.data(), 10, true);
+        m.getString<10>(askii.data(), 10, true);
         EXPECT_EQ(std::string_view(askii.data()), "0"sv);
 
         askii = {};
-        size = m.getString<16>(askii.data(), 10, true);
+        m.getString<16>(askii.data(), 10, true);
         EXPECT_EQ(std::string_view(askii.data()), "0x0"sv);
 
-        size = m.getString<10>(utf.data(), 10);
+        m.getString<10>(utf.data(), 10);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0"sv);
 
         utf = {};
-        size = m.getString<2>(utf.data(), 10, true);
+        m.getString<2>(utf.data(), 10, true);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0b0"sv);
 
         utf = {};
-        size = m.getString<8>(utf.data(), 10, true);
+        m.getString<8>(utf.data(), 10, true);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0o0"sv);
 
         utf = {};
-        size = m.getString<10>(utf.data(), 10, true);
+        m.getString<10>(utf.data(), 10, true);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0"sv);
 
         utf = {};
-        size = m.getString<16>(utf.data(), 10, true);
+        m.getString<16>(utf.data(), 10, true);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0x0"sv);
     }
 }
@@ -620,22 +620,22 @@ TEST(Signed_Display, FormatAskii) {
         switch(i % 5) {
             case 0: {   /* Octal */
                 ss << std::oct << std::noshowbase << value;
-                const auto size = Aesi.getString<8>(askii.data(), askii.size(), false);
+                Aesi.getString<8>(askii.data(), askii.size(), false);
                 break;
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                const auto size = Aesi.getString<16>(askii.data(), askii.size(), false, false);
+                Aesi.getString<16>(askii.data(), askii.size(), false, false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                const auto size = Aesi.getString<16>(askii.data(), askii.size(), false, true);
+                Aesi.getString<16>(askii.data(), askii.size(), false, true);
                 break;
             }
             case 3: {  /* Decimal */
                 ss << std::dec << std::noshowbase << value;
-                const auto size = Aesi.getString<10>(askii.data(), askii.size(), false);
+                Aesi.getString<10>(askii.data(), askii.size(), false);
                 break;
             }
             default: {  /* Binary */
@@ -680,22 +680,22 @@ TEST(Signed_Display, FormatUtf) {
         switch (i % 5) {
             case 0: {   /* Octal */
                 ss << std::oct << std::noshowbase << value;
-                const auto size = Aesi.getString<8>(utf.data(), utf.size(), false);
+                Aesi.getString<8>(utf.data(), utf.size(), false);
                 break;
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                const auto size = Aesi.getString<16>(utf.data(), utf.size(), false, false);
+                Aesi.getString<16>(utf.data(), utf.size(), false, false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                const auto size = Aesi.getString<16>(utf.data(), utf.size(), false, true);
+                Aesi.getString<16>(utf.data(), utf.size(), false, true);
                 break;
             }
             case 3: {  /* Decimal */
                 ss << std::dec << std::noshowbase << value;
-                const auto size = Aesi.getString<10>(utf.data(), utf.size(), false);
+                Aesi.getString<10>(utf.data(), utf.size(), false);
                 break;
             }
             default: {  /* Binary */
@@ -772,25 +772,25 @@ TEST(Signed_Display, ShowBaseAskii) {
             }
             case 4: {   /* C-style ASKII Octal */
                 ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << absValue;
-                const auto size = Aesi.getString<8>(askii.data(), askii.size(), true);
+                Aesi.getString<8>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
+                Aesi.getString<16>(askii.data(), askii.size(), true, false);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
+                Aesi.getString<16>(askii.data(), askii.size(), true, false);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 7: {   /* C-style ASKII Decimal */
                 ss << std::dec << std::noshowbase << value;
-                const auto size = Aesi.getString<10>(askii.data(), askii.size(), true);
+                Aesi.getString<10>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
@@ -873,7 +873,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 4: {   /* C-style UTF Octal */
                 ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << absValue;
-                const auto size = Aesi.getString<8>(utf.data(), utf.size(), true);
+                Aesi.getString<8>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -881,7 +881,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 5: {   /* C-style UTF Hexadecimal, lowercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
+                Aesi.getString<16>(utf.data(), utf.size(), true, false);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -889,7 +889,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 6: {   /* C-style UTF Hexadecimal, uppercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
+                Aesi.getString<16>(utf.data(), utf.size(), true, false);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -897,7 +897,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 7: {   /* C-style UTF Decimal */
                 ss << std::dec << std::noshowbase << value;
-                const auto size = Aesi.getString<10>(utf.data(), utf.size(), true);
+                Aesi.getString<10>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);

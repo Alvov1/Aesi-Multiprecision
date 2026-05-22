@@ -42,7 +42,7 @@ namespace {
     Sign traverseDashes(const Char* ptr, std::size_t);
 
     template <>
-    Sign traverseDashes(const char* ptr, std::size_t size) {
+    inline Sign traverseDashes(const char* ptr, std::size_t size) {
         std::byte positive { 1 };
         for(std::size_t i = 0; i < size; ++i)
             if(ptr[i] == '-') positive ^= std::byte {1};
@@ -50,7 +50,7 @@ namespace {
     }
 
     template <>
-    Sign traverseDashes(const wchar_t* ptr, std::size_t size) {
+    inline Sign traverseDashes(const wchar_t* ptr, std::size_t size) {
         std::byte positive { 1 };
         for(std::size_t i = 0; i < size; ++i)
             if(ptr[i] == L'-') positive ^= std::byte {1};
@@ -1058,7 +1058,7 @@ public:
       * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10, or 16
       * @note Works significantly faster for hexadecimal notation
       */
-    template <byte notation, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> && (notation == 2 || notation == 8 || notation == 10 || notation == 16))
+    template <byte notation, typename Char> requires (std::is_same_v<Char, char> || (std::is_same_v<Char, wchar_t> && (notation == 2 || notation == 8 || notation == 10 || notation == 16)))
     gpu constexpr auto getString(Char* buffer, std::size_t bufferSize, bool showBase = false, bool hexUppercase = false) const noexcept -> std::size_t {
         using enum Sign;
 

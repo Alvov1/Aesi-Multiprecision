@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 #include <AesiMultiprecision/Aeu.h>
+#include <AesiMultiprecision/Aesi.h>
 #include "../../generation.h"
 
-TEST(Unsigned_Addition, Basic) {
+template <typename T128>
+void testAdditionBasic() {
     {
-        Aeu128 zero = 0u, m0 = 26359343u;
+        T128 zero = 0u, m0 = 26359343u;
         EXPECT_EQ(zero + m0, 26359343u);
         EXPECT_EQ(m0 + zero, 26359343u);
         EXPECT_EQ(zero + +m0, 26359343u);
@@ -16,7 +18,7 @@ TEST(Unsigned_Addition, Basic) {
         m0 += zero; EXPECT_EQ(m0, 26359343u); m0 += +zero; EXPECT_EQ(m0, 26359343u);
     }
     {
-        Aeu128 zero = 0u, m1 = 14670384u, m2 = 55908622u;
+        T128 zero = 0u, m1 = 14670384u, m2 = 55908622u;
         EXPECT_EQ(m1 + 0u, 14670384u); EXPECT_EQ(0u + m1, 14670384u); EXPECT_EQ(m1 + zero, 14670384u); EXPECT_EQ(m1 + +zero, 14670384u);
         EXPECT_EQ(m1 + +zero, 14670384u); EXPECT_EQ(zero + m1, 14670384u); EXPECT_EQ(+zero + m1, 14670384u); m1 += 0u; EXPECT_EQ(m1, 14670384u);
         m1 += zero; EXPECT_EQ(m1, 14670384u); m1 += +zero; EXPECT_EQ(m1, 14670384u);
@@ -26,7 +28,7 @@ TEST(Unsigned_Addition, Basic) {
         m2 += zero; EXPECT_EQ(m2, 55908622u); m2 += +zero; EXPECT_EQ(m2, 55908622u);
     }
     {
-        Aeu128 s1 = 0x24DFBE889u, s2 = 0x193E161Cu, s3 = 0x51CDFC6u, s4 = 0x1706808355u;
+        T128 s1 = 0x24DFBE889u, s2 = 0x193E161Cu, s3 = 0x51CDFC6u, s4 = 0x1706808355u;
         EXPECT_EQ(s1 + s1, 0x49BF7D112u);
         EXPECT_EQ(s1 + s2, 0x26739fea5u);
         EXPECT_EQ(s1 + s3, 0x25318c84fu);
@@ -45,6 +47,20 @@ TEST(Unsigned_Addition, Basic) {
         EXPECT_EQ(s4 + s4, 0x2e0d0106aau);
     }
 }
+
+template <typename T, std::size_t N>
+void runIncrementLoop(const mpz_class& l) {
+    T value = l;
+    const std::size_t increments = rand() % 100;
+    for (std::size_t j = 0; j < increments * 2; j += 2) {
+        EXPECT_EQ(value++, l + j);
+        EXPECT_EQ(++value, l + j + 2);
+    }
+    EXPECT_EQ(value, l + increments * 2);
+}
+
+TEST(Unsigned_Addition, Basic) { testAdditionBasic<Aeu128>(); }
+TEST(Signed_Addition, Basic)   { testAdditionBasic<Aesi128>(); }
 
 TEST(Unsigned_Addition, Huge) {
     Generation::forEachPrecision([]<std::size_t N>() {
@@ -70,19 +86,42 @@ TEST(Unsigned_Addition, Huge) {
     });
 }
 
+TEST(Signed_Addition, Huge) {
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        /* Composite numbers with all sign combinations. */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            int first = 0, second = 0;
+            switch(i % 4) {
+            case 0: first = 1,  second = 1;  break;
+            case 1: first = -1, second = -1; break;
+            case 2: first = -1, second = 1;  break;
+            default: first = 1, second = -1;
+            }
+            const mpz_class l = first * Generation::getRandom(N / 2 - 110),
+                    r = second * Generation::getRandom(N / 2 - 110);
+            Aesi<N> lA = l, rA = r;
+            EXPECT_EQ(lA + rA, l + r);
+            lA += rA;
+            EXPECT_EQ(lA, l + r);
+        }
+        /* Built-in types (signed). */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const mpz_class value = Generation::getRandom(N - 200);
+            const auto mod = Generation::getRandom<long>();
+            Aesi<N> aeu = value;
+            EXPECT_EQ(aeu + mod, value + mod);
+            aeu += mod;
+            EXPECT_EQ(aeu, value + mod);
+        }
+    });
+}
+
 TEST(Unsigned_Addition, Increment) {
     Generation::forEachPrecision([]<std::size_t N>() {
         constexpr auto testsAmount = 256;
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            const auto l = Generation::getRandom(N - 110);
-            Aeu<N> value = l;
-            const std::size_t increments = rand() % 100;
-            for (std::size_t j = 0; j < increments * 2; j += 2) {
-                EXPECT_EQ(value++, l + j);
-                EXPECT_EQ(++value, l + j + 2);
-            }
-            EXPECT_EQ(value, l + increments * 2);
-        }
+        for (std::size_t i = 0; i < testsAmount; ++i)
+            runIncrementLoop<Aeu<N>, N>(Generation::getRandom(N - 110));
     });
 
     Aeu<1024> test = 0u; ++test;
@@ -100,11 +139,37 @@ TEST(Unsigned_Addition, Increment) {
     "0000_0000'0000_0000'0000_0000'0000_0000"
     "0000_0000'0000_0000'0000_0000'0000_0000"
     "0000_0000'FFFF_FFFF'FFFF_FFFF'FFFF_FFFF";
-
-    EXPECT_EQ(++test2,  "0x"
+    EXPECT_EQ(++test2, "0x"
         "0000_0000'0000_0000'0000_0000'0000_0000"
         "0000_0000'0000_0000'0000_0000'0000_0000"
         "0000_0000'0000_0000'0000_0000'0000_0000"
         "0000_0001'0000_0000'0000_0000'0000_0000");
 }
 
+TEST(Signed_Addition, Increment) {
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        for (std::size_t i = 0; i < testsAmount; ++i)
+            runIncrementLoop<Aesi<N>, N>((i % 2 == 0 ? 1 : -1) * Generation::getRandom(N - 110));
+    });
+
+    Aesi<1024> test = 0; ++test;
+    EXPECT_EQ(test, 1);
+    EXPECT_FALSE(test.isZero());
+    EXPECT_GT(test, 0);
+
+    test = 0; test++;
+    EXPECT_EQ(test, 1);
+    EXPECT_FALSE(test.isZero());
+    EXPECT_GT(test, 0);
+
+    test = -1; ++test;
+    EXPECT_EQ(test, 0);
+    EXPECT_TRUE(test.isZero());
+    EXPECT_GT(test, -1);
+
+    test = -1; test++;
+    EXPECT_EQ(test, 0);
+    EXPECT_TRUE(test.isZero());
+    EXPECT_GT(test, -1);
+}

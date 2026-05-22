@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 #include <AesiMultiprecision/Aeu.h>
+#include <AesiMultiprecision/Aesi.h>
 #include "../../generation.h"
 
-TEST(Unsigned_Multiplication, Basic) {
-    Aeu128 zero = 0u, one = 1u;
-    Aeu128 m0 = 10919396u;
+template <typename T128>
+void testMultiplicationBasic() {
+    T128 zero = 0u, one = 1u;
+    T128 m0 = 10919396u;
     EXPECT_EQ(m0 * 0u, 0u);
     EXPECT_EQ(0u * m0, 0u);
     EXPECT_EQ(m0 * 1u, 10919396u);
@@ -39,6 +41,9 @@ TEST(Unsigned_Multiplication, Basic) {
     one *= +m0; EXPECT_EQ(one, 10919396u);
 }
 
+TEST(Unsigned_Multiplication, Basic) { testMultiplicationBasic<Aeu128>(); }
+TEST(Signed_Multiplication, Basic)   { testMultiplicationBasic<Aesi128>(); }
+
 TEST(Unsigned_Multiplication, Huge) {
     Generation::forEachPrecision([]<std::size_t N>() {
         constexpr auto testsAmount = 256;
@@ -63,6 +68,46 @@ TEST(Unsigned_Multiplication, Huge) {
 
             aeu *= factorU;
             EXPECT_EQ(aeu, value * factorU);
+        }
+    });
+}
+
+TEST(Signed_Multiplication, Huge) {
+    Generation::forEachPrecision([]<std::size_t N>() {
+        constexpr auto testsAmount = 256;
+        /* Composite numbers with all sign combinations. */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            int first = 0, second = 0;
+            switch(i % 4) {
+            case 0:
+                first = 1, second = 1; break;
+            case 1:
+                first = -1, second = -1; break;
+            case 2:
+                first = -1, second = 1; break;
+            default:
+                first = 1, second = -1;
+            }
+            const mpz_class l = first * Generation::getRandom(N / 2 - 110),
+                    r = second * Generation::getRandom(N / 2 - 110);
+
+            Aesi<N> lA = l, rA = r;
+            EXPECT_EQ(lA * rA, l * r);
+
+            lA *= rA;
+            EXPECT_EQ(lA, l * r);
+        }
+
+        /* Built-in types. */
+        for (std::size_t i = 0; i < testsAmount; ++i) {
+            const auto value = Generation::getRandom(N - 200);
+            const auto factor = Generation::getRandom<unsigned>();
+
+            Aesi<N> aeu = value;
+            EXPECT_EQ((aeu * factor) * factor, (value * factor) * factor);
+
+            aeu *= factor; aeu *= factor;
+            EXPECT_EQ(aeu, (value * factor) * factor);
         }
     });
 }

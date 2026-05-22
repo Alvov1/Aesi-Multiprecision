@@ -3,6 +3,19 @@
 #include <AesiMultiprecision/Aesi.h>
 #include "../../generation.h"
 
+template<template<std::size_t> class T, std::size_t N>
+void testModuloComposite(std::size_t lBits, std::size_t rBits) {
+    constexpr auto testsAmount = 256;
+    for (std::size_t i = 0; i < testsAmount; ++i) {
+        const auto l = Generation::getRandom(lBits),
+                r = Generation::getRandom(rBits);
+        T<N> lA = l, rA = r;
+        EXPECT_EQ(lA % rA, l % r);
+        lA %= rA;
+        EXPECT_EQ(lA, l % r);
+    }
+}
+
 TEST(Unsigned_Modulo, Basic) {
     Aeu128 one = 1u, zero = 0u, ten = 10u, two = 2u;
     EXPECT_EQ(zero % one, zero);
@@ -14,20 +27,10 @@ TEST(Unsigned_Modulo, Basic) {
 
 TEST(Unsigned_Modulo, Huge) {
     Generation::forEachPrecision([]<std::size_t N>() {
-        constexpr auto testsAmount = 256;
-        /* Composite numbers. */
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            const auto l = Generation::getRandom(N - 5),
-                r = Generation::getRandom(N / 2 - 32);
-
-            Aeu<N> lA = l, rA = r;
-            EXPECT_EQ(lA % rA, l % r);
-
-            lA %= rA;
-            EXPECT_EQ(lA, l % r);
-        }
+        testModuloComposite<Aeu, N>(N - 5, N / 2 - 32);
 
         /* Built-in types. */
+        constexpr auto testsAmount = 256;
         for (std::size_t i = 0; i < testsAmount; ++i) {
             const auto value = Generation::getRandom(N - 200);
             const auto mod = Generation::getRandom<unsigned>();
@@ -68,20 +71,10 @@ TEST(Signed_Modulo, Basic) {
 
 TEST(Signed_Modulo, Huge) {
     Generation::forEachPrecision([]<std::size_t N>() {
-        constexpr auto testsAmount = 256;
-        /* Composite numbers. */
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            const auto l = Generation::getRandom(N - 110),
-                    r = Generation::getRandom(N / 2 - 110);
-
-            Aesi<N> lA = l, rA = r;
-            EXPECT_EQ(lA % rA, l % r);
-
-            lA %= rA;
-            EXPECT_EQ(lA, l % r);
-        }
+        testModuloComposite<Aesi, N>(N - 110, N / 2 - 110);
 
         /* Built-in types. */
+        constexpr auto testsAmount = 256;
         for (std::size_t i = 0; i < testsAmount; ++i) {
             const auto value = Generation::getRandom(N - 200);
             const auto mod = Generation::getRandom<unsigned long>();

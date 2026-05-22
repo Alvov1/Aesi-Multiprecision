@@ -27,6 +27,7 @@ if(AESI_BUILD_BENCHMARKS)
 endif()
 if(AESI_BUILD_SANITIZERS)
     add_subdirectory(sanitize/unsigned)
+    add_subdirectory(sanitize/signed)
 endif()
 
 # Install

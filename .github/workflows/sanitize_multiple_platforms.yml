@@ -32,16 +32,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure
+      - name: Configure unsigned
         run: cmake -B ${{ github.workspace }}/sanitize/unsigned/cmake-build
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_BUILD_TYPE=Release
           -S ${{ github.workspace }}/sanitize/unsigned
 
-      - name: Build
+      - name: Build unsigned
         run: cmake --build ${{ github.workspace }}/sanitize/unsigned/cmake-build --target AesiSanitize -j8
 
-      - name: Run
+      - name: Run unsigned
         working-directory: ${{ github.workspace }}/sanitize/unsigned/cmake-build
         run: ./AesiSanitize
+
+      - name: Configure signed
+        run: cmake -B ${{ github.workspace }}/sanitize/signed/cmake-build
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=Release
+          -S ${{ github.workspace }}/sanitize/signed
+
+      - name: Build signed
+        run: cmake --build ${{ github.workspace }}/sanitize/signed/cmake-build --target AesiSignedSanitize -j8
+
+      - name: Run signed
+        working-directory: ${{ github.workspace }}/sanitize/signed/cmake-build
+        run: ./AesiSignedSanitize

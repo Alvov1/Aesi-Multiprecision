@@ -106,8 +106,10 @@ public:
         } else if(value > 0) {
             base = Base(static_cast<unsigned long long>(value));
             sign = Positive;
-        } else
+        } else {
+            base = {};
             sign = Zero;
+        }
     }
 
     /**
@@ -174,9 +176,10 @@ public:
      */
     constexpr Aesi(const mpz_class& number) {
         using enum Sign;
-        if(number == 0)
+        if(number == 0) {
+            base = {};
             sign = Zero;
-        else {
+        } else {
             base = number;
             if(number < 0)
                 sign = Negative;
@@ -191,15 +194,7 @@ public:
      */
     template <typename Integral> requires (std::is_signed_v<Integral>)
     gpu constexpr Aesi& operator=(Integral value) noexcept {
-        using enum Sign;
-        if(value != 0) {
-            if(value < 0) {
-                sign = Negative;
-                value *= -1;
-            } else sign = Positive;
-            base = static_cast<unsigned long long>(value);
-        } else sign = Zero;
-        return *this;
+        return *this = Aesi(value);
     }
 
     /**
@@ -1005,7 +1000,7 @@ public:
         using enum Sign;
         if(sign == Positive)
             return Aesi { Positive, base.squareRoot() };
-        Aesi result; result.sign = Zero; return result;
+        return Aesi { 0 };
     }
 
     /**

@@ -47,7 +47,7 @@ jobs:
 
       - name: Run benchmark analysis
         working-directory: ${{ steps.strings.outputs.build }}
-        run: ./Benchmarking --benchmark_out=benchmarks.json
+        run: ./Benchmarking --benchmark_out=benchmarks.json --benchmark_out_format=json
 
       - name: Set up Python
         uses: actions/setup-python@v5

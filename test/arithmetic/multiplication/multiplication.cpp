@@ -46,19 +46,12 @@ TEST(Signed_Multiplication, Basic)   { testMultiplicationBasic<Aesi128>(); }
 
 TEST(Unsigned_Multiplication, Huge) {
     Generation::forEachPrecision([]<std::size_t N>() {
-        constexpr auto testsAmount = 256;
-        /* Composite numbers. */
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            const auto l = Generation::getRandom(N / 2 - 10),
-                    r = Generation::getRandom(N / 2 - 20);
-            Aeu<N> lA = l, rA = r;
-            EXPECT_EQ(lA * rA, l * r);
-
-            lA *= rA;
-            EXPECT_EQ(lA, l * r);
-        }
+        Generation::runCompositeTest<Aeu, N>(N / 2 - 10, N / 2 - 20,
+            [](auto a, auto b) { return a * b; },
+            [](auto& a, const auto& b) { a *= b; });
 
         /* Built-in types. */
+        constexpr auto testsAmount = 256;
         for (std::size_t i = 0; i < testsAmount; ++i) {
             const auto value = Generation::getRandom(N - 200);
             const auto factorU = Generation::getRandom<unsigned>();
@@ -74,31 +67,12 @@ TEST(Unsigned_Multiplication, Huge) {
 
 TEST(Signed_Multiplication, Huge) {
     Generation::forEachPrecision([]<std::size_t N>() {
-        constexpr auto testsAmount = 256;
-        /* Composite numbers with all sign combinations. */
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            int first = 0, second = 0;
-            switch(i % 4) {
-            case 0:
-                first = 1, second = 1; break;
-            case 1:
-                first = -1, second = -1; break;
-            case 2:
-                first = -1, second = 1; break;
-            default:
-                first = 1, second = -1;
-            }
-            const mpz_class l = first * Generation::getRandom(N / 2 - 110),
-                    r = second * Generation::getRandom(N / 2 - 110);
-
-            Aesi<N> lA = l, rA = r;
-            EXPECT_EQ(lA * rA, l * r);
-
-            lA *= rA;
-            EXPECT_EQ(lA, l * r);
-        }
+        Generation::runSignedCompositeTest<Aesi, N>(N / 2 - 110, N / 2 - 110,
+            [](auto a, auto b) { return a * b; },
+            [](auto& a, const auto& b) { a *= b; });
 
         /* Built-in types. */
+        constexpr auto testsAmount = 256;
         for (std::size_t i = 0; i < testsAmount; ++i) {
             const auto value = Generation::getRandom(N - 200);
             const auto factor = Generation::getRandom<unsigned>();

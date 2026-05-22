@@ -12,20 +12,12 @@ TEST(Unsigned_Division, Basic) {
 
 TEST(Unsigned_Division, Huge) {
     Generation::forEachPrecision([]<std::size_t N>() {
-        constexpr auto testsAmount = 256;
-        /* Composite numbers. */
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            const auto l = Generation::getRandom(N - 5),
-                r = Generation::getRandom(N / 2 - 32);
-
-            Aeu<N> lA = l, rA = r;
-            EXPECT_EQ(lA / rA, l / r);
-
-            lA /= rA;
-            EXPECT_EQ(lA, l / r);
-        }
+        Generation::runCompositeTest<Aeu, N>(N - 5, N / 2 - 32,
+            [](auto a, auto b) { return a / b; },
+            [](auto& a, const auto& b) { a /= b; });
 
         /* Built-in types. */
+        constexpr auto testsAmount = 256;
         for (std::size_t i = 0; i < testsAmount; ++i) {
             const auto value = Generation::getRandom(N - 10);
             const auto subU = Generation::getRandom<unsigned>();

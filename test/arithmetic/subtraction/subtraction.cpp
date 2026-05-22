@@ -68,17 +68,11 @@ TEST(Signed_Subtraction, Basic) {
 
 TEST(Unsigned_Subtraction, Huge) {
     Generation::forEachPrecision([]<std::size_t N>() {
-        constexpr auto testsAmount = 256;
-        /* Composite numbers. */
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            const auto l = Generation::getRandom(N - 5),
-                r = Generation::getRandom(N - 32);
-            Aeu<N> lA = l, rA = r;
-            EXPECT_EQ(lA - rA, l - r);
-            lA -= rA;
-            EXPECT_EQ(lA, l - r);
-        }
+        Generation::runCompositeTest<Aeu, N>(N - 5, N - 32,
+            [](auto a, auto b) { return a - b; },
+            [](auto& a, const auto& b) { a -= b; });
         /* Built-in types. */
+        constexpr auto testsAmount = 256;
         for (std::size_t i = 0; i < testsAmount; ++i) {
             const auto value = Generation::getRandom(N - 10);
             const auto subU = Generation::getRandom<unsigned>();
@@ -92,24 +86,11 @@ TEST(Unsigned_Subtraction, Huge) {
 
 TEST(Signed_Subtraction, Huge) {
     Generation::forEachPrecision([]<std::size_t N>() {
-        constexpr auto testsAmount = 256;
-        /* Composite numbers with all sign combinations. */
-        for (std::size_t i = 0; i < testsAmount; ++i) {
-            int first = 0, second = 0;
-            switch(i % 4) {
-                case 0: first = 1,  second = 1;  break;
-                case 1: first = -1, second = -1; break;
-                case 2: first = -1, second = 1;  break;
-                default: first = 1, second = -1;
-            }
-            const mpz_class l = first * Generation::getRandom(N - 110),
-                    r = second * Generation::getRandom(N - 110);
-            Aesi<N> lA = l, rA = r;
-            EXPECT_EQ(lA - rA, l - r);
-            lA -= rA;
-            EXPECT_EQ(lA, l - r);
-        }
+        Generation::runSignedCompositeTest<Aesi, N>(N - 110, N - 110,
+            [](auto a, auto b) { return a - b; },
+            [](auto& a, const auto& b) { a -= b; });
         /* Built-in types (signed). */
+        constexpr auto testsAmount = 256;
         for (std::size_t i = 0; i < testsAmount; ++i) {
             const mpz_class value = Generation::getRandom(N - 200);
             const auto sub = Generation::getRandom<long>();

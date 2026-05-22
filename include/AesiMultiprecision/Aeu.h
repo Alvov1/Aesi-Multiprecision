@@ -46,6 +46,7 @@
 #define gpu
     #include <utility>
     #include <array>
+    #include <vector>
 #endif
 /// @endcond
 
@@ -270,7 +271,7 @@ public:
         const auto bitLength = mpz_sizeinbase(value.get_mpz_t(), 2);
         auto tBlocksNumber = 1 + (bitLength - 1) / sizeof(block) * 8;
 
-        std::basic_string<block> buffer (tBlocksNumber, 0u);
+        std::vector<block> buffer (tBlocksNumber, 0u);
         mpz_export(buffer.data(), &tBlocksNumber, -1, sizeof(block), -1, 0, value.get_mpz_t());
 
         for (std::size_t i = 0; i < tBlocksNumber; ++i)

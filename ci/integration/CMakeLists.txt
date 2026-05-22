@@ -9,9 +9,14 @@ FetchContent_Declare(AesiMultiprecision
 FetchContent_MakeAvailable(AesiMultiprecision)
 
 
+set(AESI_WARNING_FLAGS
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall;-Wextra;-Werror>
+    $<$<CXX_COMPILER_ID:MSVC>:/W4;/WX>)
+
 # 1. Build project with Aesi as library
 add_executable(Library_Integration main.cpp)
 target_link_libraries(Library_Integration PRIVATE AesiMultiprecision)
+target_compile_options(Library_Integration PRIVATE ${AESI_WARNING_FLAGS})
 
 # 2. Test examples from README with GTest
 FetchContent_Declare(googletest
@@ -25,6 +30,7 @@ add_test(NAME library-integration COMMAND Library_Integration)
 
 add_executable(Readme_Examples presentation.cpp)
 target_link_libraries(Readme_Examples PRIVATE GTest::gtest_main AesiMultiprecision)
+target_compile_options(Readme_Examples PRIVATE ${AESI_WARNING_FLAGS})
 
 include(GoogleTest)
 gtest_discover_tests(Readme_Examples XML_OUTPUT_DIR ${CMAKE_BINARY_DIR})

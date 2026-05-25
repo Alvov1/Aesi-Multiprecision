@@ -365,7 +365,7 @@ public:
         gpu constexpr friend auto operator+=(Aeu& addition, Unsigned addendum) noexcept -> Aeu& {
             for(std::size_t i = 0; i < blocksNumber; ++i) {
                 const auto currentSum = static_cast<uint64_t>(addition.blocks[i]) + static_cast<uint64_t>(addendum);
-                addendum = currentSum / blockBase; addition.blocks[i] = currentSum % blockBase;
+                addendum = static_cast<Unsigned>(currentSum / blockBase); addition.blocks[i] = static_cast<block>(currentSum % blockBase);
             }
             return addition;
         }
@@ -451,11 +451,11 @@ public:
                         const auto product = tBlock * (factor >> blockBitLength * j & 0x00'00'00'00'ff'ff'ff'ff) + carryOut;
                         const auto block = static_cast<uint64_t>(buffer[i + j]) + product % blockBase;
                         carryOut = product / blockBase + block / blockBase;
-                        buffer[i + j] = block % blockBase;
+                        buffer[i + j] = static_cast<block>(block % blockBase);
                     }
 
                     if(smallerLength + i < buffer.size())
-                        buffer[smallerLength + i] += carryOut;
+                        buffer[smallerLength + i] += static_cast<block>(carryOut);
                 }
 
                 multiplication.blocks = buffer;
@@ -464,7 +464,7 @@ public:
                 uint64_t carryOut = 0;
                 for (std::size_t i = 0; i < blocksNumber; ++i) {
                     const auto product = static_cast<uint64_t>(factor) * static_cast<uint64_t>(multiplication.blocks[i]) + carryOut;
-                    multiplication.blocks[i] = product % blockBase; carryOut = product / blockBase;
+                    multiplication.blocks[i] = static_cast<block>(product % blockBase); carryOut = product / blockBase;
                 }
                 return multiplication;
             }
@@ -489,11 +489,11 @@ public:
                         const auto product = tBlock * static_cast<uint64_t>(smallerLine[j]) + carryOut;
                         const auto block = static_cast<uint64_t>(buffer[i + j]) + product % blockBase;
                         carryOut = product / blockBase + block / blockBase;
-                        buffer[i + j] = block % blockBase;
+                        buffer[i + j] = static_cast<block>(block % blockBase);
                     }
 
                     if(smallerLength < blocksNumber && smallerLength + i < buffer.size())
-                        buffer[smallerLength + i] += carryOut;
+                        buffer[smallerLength + i] += static_cast<block>(carryOut);
                 }
 
                 return buffer;

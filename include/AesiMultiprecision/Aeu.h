@@ -166,7 +166,7 @@ public:
     template <typename Integral> requires (std::is_unsigned_v<Integral>)
     gpu constexpr Aeu(Integral value) noexcept {
         if(value != 0) {
-            uint64_t tValue = static_cast<uint64_t>(value);
+            unsigned long long tValue = static_cast<unsigned long long>(value);
             for (std::size_t i = 0; i < blocksNumber; ++i) {
                 blocks[i] = static_cast<block>(tValue % blockBase);
                 tValue /= blockBase;
@@ -1401,7 +1401,7 @@ public:
             Aeu copy = number;
             while(!copy.isZero() && filled < bufferSize) {
                 const auto [quotient, remainder] = divide(copy, base);
-                buffer[filled++] = [] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } () + remainder.template integralCast<byte>();
+                buffer[filled++] = static_cast<Char>([] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } () + remainder.template integralCast<byte>());
                 copy = quotient;
             }
 

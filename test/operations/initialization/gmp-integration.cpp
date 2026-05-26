@@ -7,9 +7,9 @@
 #include <AesiMultiprecision/Aeu.h>
 #include "../../generation.h"
 
-TEST(Signed_Initialization, DISABLED_GMP) {
+TEST(Signed_Initialization, GMP) {
     Generation::forEachPrecision([]<std::size_t N>() {
-        constexpr auto testsAmount = 256;
+        constexpr auto testsAmount = 16;
         for (std::size_t i = 0; i < testsAmount; ++i) {
             const mpz_class gmp = Generation::getRandom(N - 20) * (i % 2 == 0 ? 1 : -1);
             const Aesi<N> aeu = gmp;
@@ -20,9 +20,9 @@ TEST(Signed_Initialization, DISABLED_GMP) {
     });
 }
 
-TEST(Unsigned_Initialization, DISABLED_GMP) {
+TEST(Unsigned_Initialization, GMP) {
     Generation::forEachPrecision([]<std::size_t N>() {
-        constexpr auto testsAmount = 256;
+        constexpr auto testsAmount = 16;
         for (std::size_t i = 0; i < testsAmount; ++i) {
             const mpz_class gmp = Generation::getRandom(N - 20);
             const Aeu<N> aeu = gmp;

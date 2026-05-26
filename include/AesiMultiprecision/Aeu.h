@@ -449,9 +449,9 @@ public:
 
                     for(std::size_t j = 0; j < smallerLength && j < buffer.size() - i; ++j) {
                         const auto product = tBlock * (factor >> blockBitLength * j & 0x00'00'00'00'ff'ff'ff'ff) + carryOut;
-                        const auto block = static_cast<uint64_t>(buffer[i + j]) + product % blockBase;
-                        carryOut = product / blockBase + block / blockBase;
-                        buffer[i + j] = static_cast<block>(block % blockBase);
+                        const auto partial = static_cast<uint64_t>(buffer[i + j]) + product % blockBase;
+                        carryOut = product / blockBase + partial / blockBase;
+                        buffer[i + j] = static_cast<block>(partial % blockBase);
                     }
 
                     if(smallerLength + i < buffer.size())
@@ -487,9 +487,9 @@ public:
 
                     for(std::size_t j = 0; j < smallerLength && j < buffer.size() - i; ++j) {
                         const auto product = tBlock * static_cast<uint64_t>(smallerLine[j]) + carryOut;
-                        const auto block = static_cast<uint64_t>(buffer[i + j]) + product % blockBase;
-                        carryOut = product / blockBase + block / blockBase;
-                        buffer[i + j] = static_cast<block>(block % blockBase);
+                        const auto partial = static_cast<uint64_t>(buffer[i + j]) + product % blockBase;
+                        carryOut = product / blockBase + partial / blockBase;
+                        buffer[i + j] = static_cast<block>(partial % blockBase);
                     }
 
                     if(smallerLength < blocksNumber && smallerLength + i < buffer.size())

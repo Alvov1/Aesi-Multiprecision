@@ -40,7 +40,7 @@ target_include_directories(AesiTests PUBLIC
         PkgConfig::GMPXX)
 
 target_compile_options(AesiTests PRIVATE
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall;-Wextra;-Werror>)
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall;-Wextra;-Werror;-Wconversion;-Wsign-conversion>)
 
 if(AESI_BUILD_COVERAGE)
     target_compile_options(AesiTests PRIVATE --coverage)

@@ -105,7 +105,7 @@ TEST(Unsigned_Initialization, Binary) {
             for (auto byte = getByteGmp(byteCount - 1); byte; byte >>= 1)
                 binary += (byte & 1 ? '1' : '0');
             ss << "0b" << std::string(binary.rbegin(), binary.rend());
-            for(long long j = (long long)byteCount - 2; j >= 0; --j)
+            for(std::size_t j = byteCount - 1; j-- > 0;)
                 ss << std::bitset<8>(getByteGmp(j));
             record = ss.str(); EXPECT_EQ(record, value);
         }
@@ -231,7 +231,7 @@ TEST(Signed_Initialization, Binary) {
                 binary += (byte & 1 ? '1' : '0');
             std::stringstream ss {};
             ss << (i % 2 == 0 ? "" : "-") << "0b" << std::string(binary.rbegin(), binary.rend());
-            for(long long j = (long long)byteCount - 2; j >= 0; --j)
+            for(std::size_t j = byteCount - 1; j-- > 0;)
                 ss << std::bitset<8>(getByteGmp(j));
             record = ss.str(); EXPECT_EQ(record, value);
         }

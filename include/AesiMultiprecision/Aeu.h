@@ -166,13 +166,11 @@ public:
     template <typename Integral> requires (std::is_unsigned_v<Integral>)
     gpu constexpr Aeu(Integral value) noexcept {
         if(value != 0) {
-            uint64_t tValue = (value < 0 ? static_cast<uint64_t>(value * -1) : static_cast<uint64_t>(value));
+            uint64_t tValue = static_cast<uint64_t>(value);
             for (std::size_t i = 0; i < blocksNumber; ++i) {
                 blocks[i] = static_cast<block>(tValue % blockBase);
                 tValue /= blockBase;
             }
-            if(value < 0)
-                makeComplement(blocks);
         } else
             blocks = {};
     }
@@ -665,11 +663,12 @@ public:
         if(bitShift >= bitness || bitShift == 0) return value;
 
         const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
-        const block stamp = (1UL << (blockBitLength - remainder)) - 1;
+        const block stamp = static_cast<block>((1ULL << (blockBitLength - remainder)) - 1);
 
-        for (long long i = static_cast<long long>(blocksNumber) - 1; i >= static_cast<long long>(quotient + (remainder ? 1 : 0)); --i)
+        const std::size_t minI = quotient + (remainder ? 1U : 0U);
+        for (std::size_t i = blocksNumber; i-- > minI;)
             value.blocks[i] = (value.blocks[i - quotient] & stamp) << remainder
-                | ((value.blocks[i - quotient - (remainder ? 1 : 0)] & ~stamp) >> (blockBitLength - remainder) % blockBitLength);
+                | ((value.blocks[i - quotient - (remainder ? 1U : 0U)] & ~stamp) >> (blockBitLength - remainder) % blockBitLength);
 
         value.blocks[quotient] = (value.blocks[0] & stamp) << remainder;
 
@@ -702,7 +701,7 @@ public:
         if(bitShift >= bitness || bitShift == 0) return value;
 
         const std::size_t quotient = bitShift / blockBitLength, remainder = bitShift % blockBitLength;
-        const block stamp = (1UL << remainder) - 1;
+        const block stamp = static_cast<block>((1ULL << remainder) - 1);
 
         for(std::size_t i = 0; i < blocksNumber - (quotient + (remainder ? 1 : 0)); ++i)
             value.blocks[i] = ((value.blocks[i + quotient + (remainder ? 1 : 0)] & stamp) << (blockBitLength - remainder) % blockBitLength) | (value.blocks[i + quotient] & ~stamp) >> remainder;
@@ -807,7 +806,7 @@ public:
             using enum Comparison;
 
             const auto lowerBlockBorder = (blocksNumber < other.totalBlocksNumber() ? blocksNumber : other.totalBlocksNumber());
-            for(long long i = lowerBlockBorder - 1; i >= 0; --i) {
+            for(std::size_t i = lowerBlockBorder; i-- > 0;) {
                 const block thisBlock = blocks[i], otherBlock = other.getBlock(i);
                 if(thisBlock != otherBlock)
                     return (thisBlock > otherBlock ? greater : less);
@@ -816,11 +815,11 @@ public:
             if constexpr (otherBitness != blocksNumber * blockBitLength) {
                 using enum Comparison;
                 if (other.totalBlocksNumber() > blocksNumber) {
-                    for (long long i = static_cast<long long>(other.totalBlocksNumber()) - 1; i > static_cast<long long>(lowerBlockBorder) - 1; --i)
+                    for (std::size_t i = other.totalBlocksNumber(); i-- > lowerBlockBorder;)
                         if (other.getBlock(i) != 0)
                             return less;
                 } else if (blocksNumber > other.totalBlocksNumber()) {
-                    for (long long i = static_cast<long long>(blocksNumber) - 1; i > static_cast<long long>(lowerBlockBorder) - 1; --i)
+                    for (std::size_t i = blocksNumber; i-- > lowerBlockBorder;)
                         if (blocks[i] != 0)
                             return greater;
                 }
@@ -950,7 +949,7 @@ public:
 #endif
         const std::size_t blockNumber = index / sizeof(block), byteInBlock = index % sizeof(block), shift = byteInBlock * bitsInByte;
         assert(blockNumber < blocksNumber && byteInBlock < sizeof(block));
-        return (blocks[blockNumber] & (0xffU << shift)) >> shift;
+        return static_cast<byte>((blocks[blockNumber] & (0xffU << shift)) >> shift);
     }
 
     /**
@@ -990,7 +989,7 @@ public:
         for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock)
             ;
 
-        for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
+        for(std::size_t byteN = sizeof(block); byteN-- > 0;) {
             if((blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte))
                 return lastBlock * sizeof(block) + byteN + 1;
         }
@@ -1007,11 +1006,11 @@ public:
         for(; lastBlock > 0 && blocks[lastBlock] == 0; --lastBlock)
             ;
 
-        for(int8_t byteN = sizeof(block) - 1; byteN >= 0; --byteN) {
+        for(std::size_t byteN = sizeof(block); byteN-- > 0;) {
             const auto byte = (blocks[lastBlock] & (0xffU << (byteN * bitsInByte))) >> (byteN * bitsInByte);
             if(!byte) continue;
 
-            for(int8_t bitN = bitsInByte - 1; bitN >= 0; --bitN) {
+            for(std::size_t bitN = bitsInByte; bitN-- > 0;) {
                 if((byte & (0x1u << bitN)) >> bitN)
                     return (lastBlock * sizeof(block) + byteN) * bitsInByte + bitN + 1;
             }
@@ -1047,7 +1046,7 @@ public:
      */
     [[nodiscard]]
     gpu constexpr auto filledBlocksNumber() const noexcept -> std::size_t {
-        for(long long i = blocksNumber - 1; i >= 0; --i)
+        for(std::size_t i = blocksNumber; i-- > 0;)
             if(blocks[i]) return i + 1;
         return 0;
     }
@@ -1092,7 +1091,7 @@ public:
 
         if(ratio == Comparison::greater) {
             const auto bitsUsed = number.filledBlocksNumber() * blockBitLength;
-            for(long long i = bitsUsed - 1; i >= 0; --i) {
+            for(std::size_t i = bitsUsed; i-- > 0;) {
                 remainder <<= 1u;
                 remainder.setBit(0, number.getBit(i));
 
@@ -1315,18 +1314,18 @@ public:
         }
 
         if constexpr (base == 16) {
-            long long iter = blocks.size() - 1;
-            for (; blocks[iter] == 0 && iter >= 0; --iter)
+            std::size_t iter = blocks.size() - 1;
+            for (; iter > 0 && blocks[iter] == 0; --iter)
                 ;
 
             if constexpr (std::is_same_v<Char, char>) {
-                position += snprintf(buffer + position, bufferSize - position, (hexUppercase ? "%X" : "%x"), blocks[iter--]);
-                for (; iter >= 0; --iter)
-                    position += snprintf(buffer + position, bufferSize - position, (hexUppercase ? "%08X" : "%08x"), blocks[iter]);
+                position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, (hexUppercase ? "%X" : "%x"), blocks[iter]));
+                for (; iter-- > 0;)
+                    position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, (hexUppercase ? "%08X" : "%08x"), blocks[iter]));
             } else {
-                position += swprintf(buffer + position, bufferSize - position, (hexUppercase ? L"%X" : L"%x"), blocks[iter--]);
-                for (; iter >= 0; --iter)
-                    position += swprintf(buffer + position, bufferSize - position, (hexUppercase ? L"%08X" : L"%08x"), blocks[iter]);
+                position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, (hexUppercase ? L"%X" : L"%x"), blocks[iter]));
+                for (; iter-- > 0;)
+                    position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, (hexUppercase ? L"%08X" : L"%08x"), blocks[iter]));
             }
         } else {
             const auto startPosition = position;
@@ -1384,12 +1383,12 @@ public:
             return os << '0';
 
         if(base == 16) {
-            long long iter = number.blocks.size() - 1;
-            for(; number.blocks[iter] == 0 && iter >= 0; --iter)
+            std::size_t iter = number.blocks.size() - 1;
+            for(; iter > 0 && number.blocks[iter] == 0; --iter)
                 ;
 
-            os << number.blocks[iter--];
-            for (; iter >= 0; --iter) {
+            os << number.blocks[iter];
+            for (; iter-- > 0;) {
                 os.fill([] { if constexpr (std::is_same_v<Char, char>) { return '0'; } else { return L'0'; } } ());
                 os.width(8); os << std::right << number.blocks[iter];
             }

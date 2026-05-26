@@ -22,8 +22,8 @@ TEST(Unsigned_Bitwise, NOT) {
             for (auto byte = static_cast<uint8_t>(~getByteGmp(byteCount - 1)); byte; byte >>= 1)
                 binary += (byte & 1 ? '1' : '0');
             ss << "0b" << std::string(binary.rbegin(), binary.rend());
-            for(long long j = (long long)byteCount - 2; j >= 0; --j)
-                ss << std::bitset<8>(~getByteGmp(j));
+            for(std::size_t j = byteCount - 1; j-- > 0;)
+                ss << std::bitset<8>(static_cast<uint8_t>(~getByteGmp(j)));
 
             Aeu<N> aeu = value, notted = ss.str();
             EXPECT_EQ(~aeu, notted);

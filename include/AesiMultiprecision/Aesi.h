@@ -100,8 +100,7 @@ public:
     gpu constexpr Aesi(Integral value) noexcept {
         using enum Sign;
         if(value < 0) {
-            value *= -1;
-            base = Base(static_cast<unsigned long long>(value));
+            base = Base(static_cast<unsigned long long>(-value));
             sign = Negative;
         } else if(value > 0) {
             base = Base(static_cast<unsigned long long>(value));
@@ -431,7 +430,7 @@ public:
             } else {
                 if(factor < 0) {
                     multiplication.inverse();
-                    factor *= -1;
+                    factor = static_cast<Integral>(-factor);
                 }
                 multiplication.base *= static_cast<unsigned long long>(factor);
             }
@@ -497,7 +496,7 @@ public:
             } else {
                 if(divisor < 0) {
                     division.inverse();
-                    divisor *= -1;
+                    divisor = static_cast<Integral>(-divisor);
                 }
                 division.base /= static_cast<unsigned long long>(divisor);
                 if(division.base.isZero()) division.sign = Zero;
@@ -567,7 +566,7 @@ public:
             } else {
                 if(modulo < 0) {
                     modulation.inverse();
-                    modulo *= -1;
+                    modulo = static_cast<Integral>(-modulo);
                 }
                 modulation.base %= static_cast<unsigned long long>(modulo);
             }
@@ -660,7 +659,7 @@ public:
                 }
             } else if(integral < 0) {
                 if(sign == Negative)
-                    switch(base.compareTo(static_cast<unsigned long long>(integral * -1))) {
+                    switch(base.compareTo(static_cast<unsigned long long>(-integral))) {
                         using enum Comparison;
                         case greater:
                             return less;

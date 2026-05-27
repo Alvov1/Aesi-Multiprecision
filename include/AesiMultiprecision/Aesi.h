@@ -659,7 +659,7 @@ public:
                 }
             } else if(integral < 0) {
                 if(sign == Negative)
-                    switch(base.compareTo(static_cast<unsigned long long>(-integral))) {
+                    switch(base.compareTo(static_cast<uint64_t>(-static_cast<int64_t>(integral)))) {
                         using enum Comparison;
                         case greater:
                             return less;
@@ -671,7 +671,7 @@ public:
                 else return greater;
             } else {
                 if(sign == Positive)
-                    return base.compareTo(static_cast<unsigned long long>(integral));
+                    return base.compareTo(static_cast<uint64_t>(static_cast<int64_t>(integral)));
                 return less;
             }
         }

@@ -190,7 +190,7 @@ public:
         if constexpr (std::is_same_v<Char, char>) {
             for(; position < size && !std::isalnum(data[position]); ++position) ;
         } else {
-            for(; position < size && !std::iswalnum(data[position]); ++position) ;
+            for(; position < size && !std::iswalnum(static_cast<wint_t>(data[position])); ++position) ;
         }
 
         if(position == size)
@@ -1334,9 +1334,9 @@ public:
             while (!copy.isZero() && position < bufferSize) {
                 auto [quotient, remainder] = divide(copy, base);
                 if constexpr (std::is_same_v<Char, char>) {
-                    buffer[position++] = '0' + remainder.template integralCast<byte>();
+                    buffer[position++] = static_cast<Char>('0' + remainder.template integralCast<byte>());
                 } else {
-                    buffer[position++] = L'0' + remainder.template integralCast<byte>();
+                    buffer[position++] = static_cast<Char>(L'0' + remainder.template integralCast<byte>());
                 }
                 copy = quotient;
             }

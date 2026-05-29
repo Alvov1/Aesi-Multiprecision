@@ -17,15 +17,14 @@ on:
 jobs:
   Build:
     runs-on: ubuntu-latest
-    container: nvidia/cuda:12.6.0-devel-ubuntu24.04
 
     steps:
-      - name: Install dependencies
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: apt-get update && apt-get install -y cmake git
-
       - uses: actions/checkout@v4
+
+      - name: Install CUDA toolkit
+        uses: Jimver/cuda-toolkit@v0.2.22
+        with:
+          cuda: '12.6.0'
 
       - name: Configure
         run: cmake -B ${{ github.workspace }}/ci/cuda/cmake-build

@@ -1,0 +1,56 @@
+name: Sanitize
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'sanitize/**'
+      - '.github/workflows/sanitize.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'sanitize/**'
+      - '.github/workflows/sanitize.yml'
+
+jobs:
+  Run:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        type: [unsigned, signed]
+        c_compiler: [gcc, clang]
+        include:
+          - c_compiler: gcc
+            cpp_compiler: g++
+          - c_compiler: clang
+            cpp_compiler: clang++
+          - type: unsigned
+            target: AesiSanitize
+          - type: signed
+            target: AesiSignedSanitize
+        exclude:
+          - os: macos-latest
+            c_compiler: gcc
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B ${{ github.workspace }}/sanitize/${{ matrix.type }}/cmake-build
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=Release
+          -S ${{ github.workspace }}/sanitize/${{ matrix.type }}
+
+      - name: Build
+        run: cmake --build ${{ github.workspace }}/sanitize/${{ matrix.type }}/cmake-build --target ${{ matrix.target }} -j8
+
+      - name: Run
+        working-directory: ${{ github.workspace }}/sanitize/${{ matrix.type }}/cmake-build
+        run: ./${{ matrix.target }}

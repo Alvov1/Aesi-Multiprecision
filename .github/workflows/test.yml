@@ -1,4 +1,4 @@
-name: Coverage
+name: Test
 
 on:
   push:
@@ -6,31 +6,47 @@ on:
     paths:
       - 'include/**'
       - 'test/**'
-      - '.github/workflows/coverage.yml'
+      - '.github/workflows/test.yml'
   pull_request:
     branches: [ "main" ]
     paths:
       - 'include/**'
       - 'test/**'
-      - '.github/workflows/coverage.yml'
+      - '.github/workflows/test.yml'
 
 jobs:
-  coverage:
+  Test:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          - c_compiler: gcc
+            cpp_compiler: g++
+            coverage: true
+          - c_compiler: clang
+            cpp_compiler: clang++
+            coverage: false
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: sudo apt-get install -y lcov libgmp-dev libgmpxx4ldbl
+        run: sudo apt-get install -y libgmp-dev libgmpxx4ldbl
+
+      - name: Install lcov
+        if: matrix.coverage
+        run: sudo apt-get install -y lcov
 
       - name: Configure
         run: cmake -B build
-          -DCMAKE_CXX_COMPILER=g++
-          -DCMAKE_C_COMPILER=gcc
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
           -DCMAKE_BUILD_TYPE=Release
           -DAESI_BUILD_TESTS=ON
-          -DAESI_BUILD_COVERAGE=ON
+          ${{ matrix.coverage && '-DAESI_BUILD_COVERAGE=ON' || '' }}
 
       - name: Build
         run: cmake --build build -j$(nproc)
@@ -39,6 +55,7 @@ jobs:
         run: ctest --test-dir build --output-on-failure
 
       - name: Collect coverage
+        if: matrix.coverage
         run: |
           lcov --capture --directory build --output-file coverage.info --ignore-errors mismatch
           lcov --remove coverage.info \
@@ -49,6 +66,7 @@ jobs:
           lcov --list coverage.info
 
       - name: Upload to Codecov
+        if: matrix.coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

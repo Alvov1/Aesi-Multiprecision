@@ -79,18 +79,18 @@ public:
     /**
      * @brief Default constructor
      */
-    gpu constexpr Aesi() noexcept = default;
+    constexpr Aesi() noexcept = default;
 
     /**
      * @brief Destructor
      */
-    gpu constexpr ~Aesi() noexcept = default;
+    constexpr ~Aesi() noexcept = default;
 
     /**
      * @brief Copy constructor
      * @param copy Aesi&
      */
-    gpu constexpr Aesi(const Aesi& copy) noexcept = default;
+    constexpr Aesi(const Aesi& copy) noexcept = default;
 
     /**
      * @brief Integral constructor
@@ -183,7 +183,7 @@ public:
      * @brief Copy assignment operator
      * @param other Aesi&
      */
-    gpu constexpr Aesi& operator=(const Aesi& other) noexcept = default;
+    constexpr Aesi& operator=(const Aesi& other) noexcept = default;
     /* ----------------------------------------------------------------------- */
 
 
@@ -729,19 +729,19 @@ public:
         /**
          * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> operator.
          */
-        gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator!=(const Aeu<bitness>& value) const noexcept -> bool {
             return !this->operator==(value);
         }
-        gpu constexpr auto operator<(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator<(const Aeu<bitness>& value) const noexcept -> bool {
             return this->compareTo(value) == Comparison::less;
         }
-        gpu constexpr auto operator<=(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator<=(const Aeu<bitness>& value) const noexcept -> bool {
             return !this->operator>(value);
         }
-        gpu constexpr auto operator>(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator>(const Aeu<bitness>& value) const noexcept -> bool {
             return this->compareTo(value) == Comparison::greater;
         }
-        gpu constexpr auto operator>=(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator>=(const Aeu<bitness>& value) const noexcept -> bool {
             return !this->operator<(value);
         }
 #else

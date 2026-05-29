@@ -139,23 +139,23 @@ public:
     /**
      * @brief Default constructor
      */
-    gpu constexpr Aeu() noexcept = default;
+    constexpr Aeu() noexcept = default;
 
     /**
      * @brief Destructor
      */
-    gpu constexpr ~Aeu() noexcept = default;
+    constexpr ~Aeu() noexcept = default;
 
     /**
      * @brief Copy constructor
      */
-    gpu constexpr Aeu(const Aeu& copy) noexcept = default;
+    constexpr Aeu(const Aeu& copy) noexcept = default;
 
     /**
      * @brief Copy assignment operator
      * @param other Aeu
      */
-    gpu constexpr Aeu& operator=(const Aeu& other) = default;
+    constexpr Aeu& operator=(const Aeu& other) = default;
 
     /**
      * @brief Integral constructor

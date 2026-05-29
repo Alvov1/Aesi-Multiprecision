@@ -859,7 +859,7 @@ public:
                 default:
                     return std::strong_ordering::equivalent;
             }
-        };
+        }
 
         /**
          * @brief Three-way comparison operator for numbers of different precision and built-in integral types
@@ -880,7 +880,7 @@ public:
                 default:
                     return std::strong_ordering::equivalent;
             }
-        };
+        }
 #endif
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */

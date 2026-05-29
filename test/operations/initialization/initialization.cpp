@@ -98,7 +98,7 @@ TEST(Unsigned_Initialization, Binary) {
 
             const std::size_t byteCount = (mpz_sizeinbase(value.get_mpz_t(), 2) + 7) / 8;
             auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                return static_cast<unsigned char>(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
             };
             std::stringstream ss {};
             std::string binary {};
@@ -224,7 +224,7 @@ TEST(Signed_Initialization, Binary) {
             mpz_class absVal; mpz_abs(absVal.get_mpz_t(), value.get_mpz_t());
             const std::size_t byteCount = (mpz_sizeinbase(absVal.get_mpz_t(), 2) + 7) / 8;
             auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
+                return static_cast<unsigned char>(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
             };
             std::string binary {};
             for (auto byte = getByteGmp(byteCount - 1); byte; byte >>= 1)

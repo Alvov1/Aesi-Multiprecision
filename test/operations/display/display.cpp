@@ -198,7 +198,7 @@ TEST(Unsigned_Display, FormatAskii) {
                 const std::size_t bitCount = mpz_sizeinbase(value.get_mpz_t(), 2);
                 const std::size_t byteCount = (bitCount + 7) / 8;
                 auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                    return static_cast<unsigned char>(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
                 };
                 for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
@@ -256,7 +256,7 @@ TEST(Unsigned_Display, FormatUtf) {
                 const std::size_t bitCount = mpz_sizeinbase(value.get_mpz_t(), 2);
                 const std::size_t byteCount = (bitCount + 7) / 8;
                 auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                    return static_cast<unsigned char>(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
                 };
                 for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
@@ -349,7 +349,7 @@ TEST(Unsigned_Display, ShowBaseAskii) {
                 const std::size_t bitCount = mpz_sizeinbase(value.get_mpz_t(), 2);
                 const std::size_t byteCount = (bitCount + 7) / 8;
                 auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                    return static_cast<unsigned char>(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
                 };
                 for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
@@ -456,7 +456,7 @@ TEST(Unsigned_Display, ShowBaseUtf) {
                 const std::size_t bitCount = mpz_sizeinbase(value.get_mpz_t(), 2);
                 const std::size_t byteCount = (bitCount + 7) / 8;
                 auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                    return static_cast<unsigned char>(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
                 };
                 for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
@@ -645,7 +645,7 @@ TEST(Signed_Display, FormatAskii) {
                 const std::size_t bitCount = mpz_sizeinbase(absVal.get_mpz_t(), 2);
                 const std::size_t byteCount = (bitCount + 7) / 8;
                 auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                    return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
+                    return static_cast<unsigned char>(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
                 };
                 for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
@@ -705,7 +705,7 @@ TEST(Signed_Display, FormatUtf) {
                 const std::size_t bitCount = mpz_sizeinbase(absVal.get_mpz_t(), 2);
                 const std::size_t byteCount = (bitCount + 7) / 8;
                 auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                    return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
+                    return static_cast<unsigned char>(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
                 };
                 for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
@@ -800,7 +800,7 @@ TEST(Signed_Display, ShowBaseAskii) {
                 const std::size_t bitCount = mpz_sizeinbase(absValue.get_mpz_t(), 2);
                 const std::size_t byteCount = (bitCount + 7) / 8;
                 auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                    return (unsigned char)(mpz_class(absValue >> (8 * k)).get_ui() & 0xFF);
+                    return static_cast<unsigned char>(mpz_class(absValue >> (8 * k)).get_ui() & 0xFF);
                 };
                 for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
@@ -909,7 +909,7 @@ TEST(Signed_Display, ShowBaseUtf) {
                 const std::size_t bitCount = mpz_sizeinbase(absValue.get_mpz_t(), 2);
                 const std::size_t byteCount = (bitCount + 7) / 8;
                 auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                    return (unsigned char)(mpz_class(absValue >> (8 * k)).get_ui() & 0xFF);
+                    return static_cast<unsigned char>(mpz_class(absValue >> (8 * k)).get_ui() & 0xFF);
                 };
                 for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');

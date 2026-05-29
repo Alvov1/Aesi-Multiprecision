@@ -14,7 +14,7 @@ TEST(Unsigned_Bitwise, NOT) {
 
             const std::size_t byteCount = (mpz_sizeinbase(value.get_mpz_t(), 2) + 7) / 8;
             auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                return static_cast<unsigned char>(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
             };
 
             std::stringstream ss {};

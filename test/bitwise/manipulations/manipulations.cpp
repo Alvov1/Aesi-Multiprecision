@@ -22,7 +22,7 @@ TEST(Unsigned_Bitwise, GetSetBit) {
 
             aeu = value;
             for (std::size_t j = 0; j < bitCount; ++j)
-                EXPECT_EQ(aeu.getBit(j), (bool)mpz_tstbit(value.get_mpz_t(), j));
+                EXPECT_EQ(aeu.getBit(j), static_cast<bool>(mpz_tstbit(value.get_mpz_t(), j)));
         }
     });
 }
@@ -34,7 +34,7 @@ TEST(Unsigned_Bitwise, GetSetByte) {
             const auto value = Generation::getRandom(N - 20);
             const std::size_t byteCount = (mpz_sizeinbase(value.get_mpz_t(), 2) + 7) / 8;
             auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                return static_cast<unsigned char>(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
             };
             Aeu<N> aeu {};
             for (std::size_t j = 0; j < byteCount; ++j)
@@ -55,7 +55,7 @@ TEST(Unsigned_Bitwise, GetSetBlock) {
             const auto value = Generation::getRandom(N - 20);
             const std::size_t byteCount = (mpz_sizeinbase(value.get_mpz_t(), 2) + 7) / 8;
             auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                return static_cast<unsigned char>(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
             };
             Aeu<N> aeu {};
 
@@ -107,7 +107,7 @@ TEST(Signed_Bitwise, GetSetBit) {
 
             aeu = value;
             for (std::size_t j = 0; j < bitCount; ++j)
-                EXPECT_EQ(aeu.getBit(j), (bool)mpz_tstbit(absVal.get_mpz_t(), j));
+                EXPECT_EQ(aeu.getBit(j), static_cast<bool>(mpz_tstbit(absVal.get_mpz_t(), j)));
         }
     });
 }
@@ -120,7 +120,7 @@ TEST(Signed_Bitwise, GetSetByte) {
             mpz_class absVal; mpz_abs(absVal.get_mpz_t(), value.get_mpz_t());
             const std::size_t byteCount = (mpz_sizeinbase(absVal.get_mpz_t(), 2) + 7) / 8;
             auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
+                return static_cast<unsigned char>(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
             };
 
             Aesi<N> aeu = 1;
@@ -144,7 +144,7 @@ TEST(Signed_Bitwise, GetSetBlock) {
             mpz_class absVal; mpz_abs(absVal.get_mpz_t(), value.get_mpz_t());
             const std::size_t byteCount = (mpz_sizeinbase(absVal.get_mpz_t(), 2) + 7) / 8;
             auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
+                return static_cast<unsigned char>(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
             };
             Aesi<N> aesi = 1;
 

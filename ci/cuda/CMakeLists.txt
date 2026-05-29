@@ -12,3 +12,5 @@ FetchContent_MakeAvailable(AesiMultiprecision)
 
 add_executable(AesiCudaSmoke smoke.cu)
 target_link_libraries(AesiCudaSmoke PRIVATE AesiMultiprecision)
+target_compile_options(AesiCudaSmoke PRIVATE
+    $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-Wall,-Wextra,-Werror>)

@@ -10,7 +10,7 @@ FetchContent_MakeAvailable(AesiMultiprecision)
 
 
 set(AESI_WARNING_FLAGS
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall;-Wextra;-Werror>
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall;-Wextra;-Werror;-Wconversion;-Wsign-conversion;-Wpedantic;-Wshadow;-Wold-style-cast;-Wnull-dereference;-Wundef>
     $<$<CXX_COMPILER_ID:MSVC>:/W4;/WX>)
 
 # 1. Build project with Aesi as library

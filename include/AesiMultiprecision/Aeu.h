@@ -1319,13 +1319,25 @@ public:
                 ;
 
             if constexpr (std::is_same_v<Char, char>) {
-                position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, (hexUppercase ? "%X" : "%x"), blocks[iter]));
-                for (; iter-- > 0;)
-                    position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, (hexUppercase ? "%08X" : "%08x"), blocks[iter]));
+                if (hexUppercase) {
+                    position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, "%X", blocks[iter]));
+                    for (; iter-- > 0;)
+                        position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, "%08X", blocks[iter]));
+                } else {
+                    position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, "%x", blocks[iter]));
+                    for (; iter-- > 0;)
+                        position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, "%08x", blocks[iter]));
+                }
             } else {
-                position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, (hexUppercase ? L"%X" : L"%x"), blocks[iter]));
-                for (; iter-- > 0;)
-                    position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, (hexUppercase ? L"%08X" : L"%08x"), blocks[iter]));
+                if (hexUppercase) {
+                    position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, L"%X", blocks[iter]));
+                    for (; iter-- > 0;)
+                        position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, L"%08X", blocks[iter]));
+                } else {
+                    position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, L"%x", blocks[iter]));
+                    for (; iter-- > 0;)
+                        position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, L"%08x", blocks[iter]));
+                }
             }
         } else {
             const auto startPosition = position;

@@ -1,0 +1,39 @@
+name: CUDA Compile
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'ci/cuda/**'
+      - '.github/workflows/cuda.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'ci/cuda/**'
+      - '.github/workflows/cuda.yml'
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    container: nvidia/cuda:12.6.0-devel-ubuntu24.04
+
+    steps:
+      - name: Install dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: apt-get update && apt-get install -y cmake git
+
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B ${{ github.workspace }}/ci/cuda/cmake-build
+          -DCMAKE_CUDA_COMPILER=nvcc
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_CUDA_ARCHITECTURES=80
+          -DFETCHCONTENT_SOURCE_DIR_AESIMULTIPRECISION=${{ github.workspace }}
+          -S ${{ github.workspace }}/ci/cuda
+
+      - name: Build
+        run: cmake --build ${{ github.workspace }}/ci/cuda/cmake-build -j8

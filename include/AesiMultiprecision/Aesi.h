@@ -729,19 +729,19 @@ public:
         /**
          * @brief Oldstyle comparison operator(s). Used inside CUDA cause it does not support <=> operator.
          */
-        gpu constexpr auto operator!=(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator!=(const Aeu<bitness>& value) const noexcept -> bool {
             return !this->operator==(value);
         }
-        gpu constexpr auto operator<(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator<(const Aeu<bitness>& value) const noexcept -> bool {
             return this->compareTo(value) == Comparison::less;
         }
-        gpu constexpr auto operator<=(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator<=(const Aeu<bitness>& value) const noexcept -> bool {
             return !this->operator>(value);
         }
-        gpu constexpr auto operator>(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator>(const Aeu<bitness>& value) const noexcept -> bool {
             return this->compareTo(value) == Comparison::greater;
         }
-        gpu constexpr auto operator>=(const Aeu& value) const noexcept -> bool {
+        gpu constexpr auto operator>=(const Aeu<bitness>& value) const noexcept -> bool {
             return !this->operator<(value);
         }
 #else

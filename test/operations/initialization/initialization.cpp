@@ -98,14 +98,14 @@ TEST(Unsigned_Initialization, Binary) {
 
             const std::size_t byteCount = (mpz_sizeinbase(value.get_mpz_t(), 2) + 7) / 8;
             auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
+                return static_cast<unsigned char>(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
             };
             std::stringstream ss {};
             std::string binary {};
             for (auto byte = getByteGmp(byteCount - 1); byte; byte >>= 1)
                 binary += (byte & 1 ? '1' : '0');
             ss << "0b" << std::string(binary.rbegin(), binary.rend());
-            for(long long j = (long long)byteCount - 2; j >= 0; --j)
+            for(std::size_t j = byteCount - 1; j-- > 0;)
                 ss << std::bitset<8>(getByteGmp(j));
             record = ss.str(); EXPECT_EQ(record, value);
         }
@@ -224,14 +224,14 @@ TEST(Signed_Initialization, Binary) {
             mpz_class absVal; mpz_abs(absVal.get_mpz_t(), value.get_mpz_t());
             const std::size_t byteCount = (mpz_sizeinbase(absVal.get_mpz_t(), 2) + 7) / 8;
             auto getByteGmp = [&](std::size_t k) -> unsigned char {
-                return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
+                return static_cast<unsigned char>(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
             };
             std::string binary {};
             for (auto byte = getByteGmp(byteCount - 1); byte; byte >>= 1)
                 binary += (byte & 1 ? '1' : '0');
             std::stringstream ss {};
             ss << (i % 2 == 0 ? "" : "-") << "0b" << std::string(binary.rbegin(), binary.rend());
-            for(long long j = (long long)byteCount - 2; j >= 0; --j)
+            for(std::size_t j = byteCount - 1; j-- > 0;)
                 ss << std::bitset<8>(getByteGmp(j));
             record = ss.str(); EXPECT_EQ(record, value);
         }

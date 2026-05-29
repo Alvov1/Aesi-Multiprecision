@@ -6,7 +6,7 @@
 template <typename T, std::size_t N>
 void runDecrementLoop(const mpz_class& l) {
     T value = l;
-    const std::size_t decrements = rand() % 100;
+    const std::size_t decrements = static_cast<std::size_t>(rand()) % 100;
     for (std::size_t j = 0; j < decrements * 2; j += 2) {
         EXPECT_EQ(value--, l - j);
         EXPECT_EQ(--value, l - j - 2);

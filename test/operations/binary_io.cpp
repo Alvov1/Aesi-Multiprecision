@@ -25,7 +25,7 @@ TEST(Unsigned_BinaryIO, BinaryRead) {
                 ss2 << std::setw(8) << std::setfill('0') << block;
             }
 
-            for(long long j = blocks.size() - 1; j >= 0; --j)
+            for(std::size_t j = blocks.size(); j-- > 0;)
                 ss.write(reinterpret_cast<const char*>(&blocks[j]), sizeof(uint32_t));
 
             a.readBinary(ss, false);
@@ -53,7 +53,7 @@ TEST(Unsigned_BinaryIO, BinaryWrite) {
             }
         } else {
             l.writeBinary(ss2, true);
-            for (long long j = blocksNumber - 1; j >= 0; --j) {
+            for (std::size_t j = static_cast<std::size_t>(blocksNumber); j-- > 0;) {
                 ss2.read(reinterpret_cast<char*>(&temp), sizeof(uint32_t));
                 r.setBlock(j, temp);
             }

@@ -39,6 +39,9 @@ target_include_directories(AesiTests PUBLIC
         PkgConfig::GMP
         PkgConfig::GMPXX)
 
+target_compile_options(AesiTests PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall;-Wextra;-Werror;-Wconversion;-Wsign-conversion;-Wpedantic;-Wshadow;-Wold-style-cast;-Wnull-dereference;-Wundef>)
+
 if(AESI_BUILD_COVERAGE)
     target_compile_options(AesiTests PRIVATE --coverage)
     target_link_options(AesiTests PRIVATE --coverage)

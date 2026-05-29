@@ -51,7 +51,7 @@ void testAdditionBasic() {
 template <typename T, std::size_t N>
 void runIncrementLoop(const mpz_class& l) {
     T value = l;
-    const std::size_t increments = rand() % 100;
+    const std::size_t increments = static_cast<std::size_t>(rand()) % 100;
     for (std::size_t j = 0; j < increments * 2; j += 2) {
         EXPECT_EQ(value++, l + j);
         EXPECT_EQ(++value, l + j + 2);

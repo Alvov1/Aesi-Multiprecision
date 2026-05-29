@@ -5,6 +5,21 @@
 #include <AesiMultiprecision/Aesi.h>
 #include "../../generation.h"
 
+static std::string gmpToBinaryString(const mpz_class& v) {
+    const std::size_t bitCount = mpz_sizeinbase(v.get_mpz_t(), 2);
+    const std::size_t byteCount = (bitCount + 7) / 8;
+    auto getByte = [&](std::size_t k) -> unsigned char {
+        return static_cast<unsigned char>(mpz_class(v >> (8 * k)).get_ui() & 0xFF);
+    };
+    std::string msb;
+    for (auto byte = getByte((bitCount - 1) / 8); byte; byte >>= 1)
+        msb += (byte & 1 ? '1' : '0');
+    std::string result(msb.rbegin(), msb.rend());
+    for (std::size_t j = byteCount - 1; j-- > 0;)
+        result += std::bitset<8>(getByte(j)).to_string();
+    return result;
+}
+
 /* Output tester for zero values */
 TEST(Unsigned_Display, Zero) {
     Aeu128 m = 0u;
@@ -180,12 +195,12 @@ TEST(Unsigned_Display, FormatAskii) {
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(askii.data(), askii.size(), false, false);
+                aeu.getString<16>(askii.data(), askii.size(), false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                aeu.getString<16>(askii.data(), askii.size(), false, true);
+                aeu.getString<16, true>(askii.data(), askii.size(), false);
                 break;
             }
             case 3: {  /* Decimal */
@@ -194,17 +209,7 @@ TEST(Unsigned_Display, FormatAskii) {
                 break;
             }
             default: {  /* Binary */
-                std::string binary {};
-                const long long bitCount = (long long)mpz_sizeinbase(value.get_mpz_t(), 2);
-                const long long byteCount = (bitCount + 7) / 8;
-                auto getByteGmp = [&](long long k) -> unsigned char {
-                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
-                };
-                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
-                    binary += (byte & 1 ? '1' : '0');
-                ss << std::string(binary.rbegin(), binary.rend());
-                for (long long j = byteCount - 2; j >= 0; --j)
-                    ss << std::bitset<8>(getByteGmp(j));
+                ss << gmpToBinaryString(value);
                 aeu.getString<2>(askii.data(), askii.size(), false);
             }
         }
@@ -238,12 +243,12 @@ TEST(Unsigned_Display, FormatUtf) {
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(utf.data(), utf.size(), false, false);
+                aeu.getString<16>(utf.data(), utf.size(), false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                aeu.getString<16>(utf.data(), utf.size(), false, true);
+                aeu.getString<16, true>(utf.data(), utf.size(), false);
                 break;
             }
             case 3: {  /* Decimal */
@@ -252,17 +257,7 @@ TEST(Unsigned_Display, FormatUtf) {
                 break;
             }
             default: {  /* Binary */
-                std::string binary {};
-                const long long bitCount = (long long)mpz_sizeinbase(value.get_mpz_t(), 2);
-                const long long byteCount = (bitCount + 7) / 8;
-                auto getByteGmp = [&](long long k) -> unsigned char {
-                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
-                };
-                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
-                    binary += (byte & 1 ? '1' : '0');
-                ss << std::string(binary.rbegin(), binary.rend());
-                for (long long j = byteCount - 2; j >= 0; --j)
-                    ss << std::bitset<8>(getByteGmp(j));
+                ss << gmpToBinaryString(value);
                 aeu.getString<2>(utf.data(), utf.size(), false);
             }
         }
@@ -328,13 +323,13 @@ TEST(Unsigned_Display, ShowBaseAskii) {
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(askii.data(), askii.size(), true, false);
+                aeu.getString<16>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(askii.data(), askii.size(), true, false);
+                aeu.getString<16>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
@@ -345,17 +340,7 @@ TEST(Unsigned_Display, ShowBaseAskii) {
                 break;
             }
             default: {   /* C-style ASKII Binary */
-                std::string binary {};
-                const long long bitCount = (long long)mpz_sizeinbase(value.get_mpz_t(), 2);
-                const long long byteCount = (bitCount + 7) / 8;
-                auto getByteGmp = [&](long long k) -> unsigned char {
-                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
-                };
-                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
-                    binary += (byte & 1 ? '1' : '0');
-                ss << "0b" << std::string(binary.rbegin(), binary.rend());
-                for (long long j = byteCount - 2; j >= 0; --j)
-                    ss << std::bitset<8>(getByteGmp(j));
+                ss << "0b" << gmpToBinaryString(value);
                 aeu.getString<2>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
             }
@@ -429,7 +414,7 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(utf.data(), utf.size(), true, false);
+                aeu.getString<16>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -437,7 +422,7 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(utf.data(), utf.size(), true, false);
+                aeu.getString<16>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -452,17 +437,7 @@ TEST(Unsigned_Display, ShowBaseUtf) {
                 break;
             }
             default: {   /* C-style UTF Binary */
-                std::string binary {};
-                const long long bitCount = (long long)mpz_sizeinbase(value.get_mpz_t(), 2);
-                const long long byteCount = (bitCount + 7) / 8;
-                auto getByteGmp = [&](long long k) -> unsigned char {
-                    return (unsigned char)(mpz_class(value >> (8 * k)).get_ui() & 0xFF);
-                };
-                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
-                    binary += (byte & 1 ? '1' : '0');
-                ss << "0b" << std::string(binary.rbegin(), binary.rend());
-                for (long long j = byteCount - 2; j >= 0; --j)
-                    ss << std::bitset<8>(getByteGmp(j));
+                ss << "0b" << gmpToBinaryString(value);
                 aeu.getString<2>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
@@ -488,42 +463,42 @@ TEST(Signed_Display, Zero) {
 
         std::array<char, 10> askii{};
         std::array<wchar_t, 10> utf{};
-        auto size = m.getString<10>(askii.data(), 10, false);
+        m.getString<10>(askii.data(), 10, false);
         EXPECT_EQ(std::string_view(askii.data()), "0"sv);
 
         askii = {};
-        size = m.getString<2>(askii.data(), 10, true);
+        m.getString<2>(askii.data(), 10, true);
         EXPECT_EQ(std::string_view(askii.data()), "0b0"sv);
 
         askii = {};
-        size = m.getString<8>(askii.data(), 10, true);
+        m.getString<8>(askii.data(), 10, true);
         EXPECT_EQ(std::string_view(askii.data()), "0o0"sv);
 
         askii = {};
-        size = m.getString<10>(askii.data(), 10, true);
+        m.getString<10>(askii.data(), 10, true);
         EXPECT_EQ(std::string_view(askii.data()), "0"sv);
 
         askii = {};
-        size = m.getString<16>(askii.data(), 10, true);
+        m.getString<16>(askii.data(), 10, true);
         EXPECT_EQ(std::string_view(askii.data()), "0x0"sv);
 
-        size = m.getString<10>(utf.data(), 10);
+        m.getString<10>(utf.data(), 10);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0"sv);
 
         utf = {};
-        size = m.getString<2>(utf.data(), 10, true);
+        m.getString<2>(utf.data(), 10, true);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0b0"sv);
 
         utf = {};
-        size = m.getString<8>(utf.data(), 10, true);
+        m.getString<8>(utf.data(), 10, true);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0o0"sv);
 
         utf = {};
-        size = m.getString<10>(utf.data(), 10, true);
+        m.getString<10>(utf.data(), 10, true);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0"sv);
 
         utf = {};
-        size = m.getString<16>(utf.data(), 10, true);
+        m.getString<16>(utf.data(), 10, true);
         EXPECT_EQ(std::wstring_view(utf.data()), L"0x0"sv);
     }
 }
@@ -620,38 +595,27 @@ TEST(Signed_Display, FormatAskii) {
         switch(i % 5) {
             case 0: {   /* Octal */
                 ss << std::oct << std::noshowbase << value;
-                const auto size = Aesi.getString<8>(askii.data(), askii.size(), false);
+                Aesi.getString<8>(askii.data(), askii.size(), false);
                 break;
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                const auto size = Aesi.getString<16>(askii.data(), askii.size(), false, false);
+                Aesi.getString<16>(askii.data(), askii.size(), false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                const auto size = Aesi.getString<16>(askii.data(), askii.size(), false, true);
+                Aesi.getString<16, true>(askii.data(), askii.size(), false);
                 break;
             }
             case 3: {  /* Decimal */
                 ss << std::dec << std::noshowbase << value;
-                const auto size = Aesi.getString<10>(askii.data(), askii.size(), false);
+                Aesi.getString<10>(askii.data(), askii.size(), false);
                 break;
             }
             default: {  /* Binary */
-                ss << (i % 2 == 0 ? "" : "-");
-                std::string binary {};
                 mpz_class absVal; mpz_abs(absVal.get_mpz_t(), value.get_mpz_t());
-                const long long bitCount = (long long)mpz_sizeinbase(absVal.get_mpz_t(), 2);
-                const long long byteCount = (bitCount + 7) / 8;
-                auto getByteGmp = [&](long long k) -> unsigned char {
-                    return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
-                };
-                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
-                    binary += (byte & 1 ? '1' : '0');
-                ss << std::string(binary.rbegin(), binary.rend());
-                for (long long j = byteCount - 2; j >= 0; --j)
-                    ss << std::bitset<8>(getByteGmp(j));
+                ss << (i % 2 == 0 ? "" : "-") << gmpToBinaryString(absVal);
                 Aesi.getString<2>(askii.data(), askii.size(), false);
             }
         }
@@ -680,38 +644,27 @@ TEST(Signed_Display, FormatUtf) {
         switch (i % 5) {
             case 0: {   /* Octal */
                 ss << std::oct << std::noshowbase << value;
-                const auto size = Aesi.getString<8>(utf.data(), utf.size(), false);
+                Aesi.getString<8>(utf.data(), utf.size(), false);
                 break;
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                const auto size = Aesi.getString<16>(utf.data(), utf.size(), false, false);
+                Aesi.getString<16>(utf.data(), utf.size(), false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                const auto size = Aesi.getString<16>(utf.data(), utf.size(), false, true);
+                Aesi.getString<16, true>(utf.data(), utf.size(), false);
                 break;
             }
             case 3: {  /* Decimal */
                 ss << std::dec << std::noshowbase << value;
-                const auto size = Aesi.getString<10>(utf.data(), utf.size(), false);
+                Aesi.getString<10>(utf.data(), utf.size(), false);
                 break;
             }
             default: {  /* Binary */
-                ss << (i % 2 == 0 ? "" : "-");
-                std::string binary {};
                 mpz_class absVal; mpz_abs(absVal.get_mpz_t(), value.get_mpz_t());
-                const long long bitCount = (long long)mpz_sizeinbase(absVal.get_mpz_t(), 2);
-                const long long byteCount = (bitCount + 7) / 8;
-                auto getByteGmp = [&](long long k) -> unsigned char {
-                    return (unsigned char)(mpz_class(absVal >> (8 * k)).get_ui() & 0xFF);
-                };
-                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
-                    binary += (byte & 1 ? '1' : '0');
-                ss << std::string(binary.rbegin(), binary.rend());
-                for (long long j = byteCount - 2; j >= 0; --j)
-                    ss << std::bitset<8>(getByteGmp(j));
+                ss << (i % 2 == 0 ? "" : "-") << gmpToBinaryString(absVal);
                 Aesi.getString<2>(utf.data(), utf.size(), false);
             }
         }
@@ -772,41 +725,30 @@ TEST(Signed_Display, ShowBaseAskii) {
             }
             case 4: {   /* C-style ASKII Octal */
                 ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << absValue;
-                const auto size = Aesi.getString<8>(askii.data(), askii.size(), true);
+                Aesi.getString<8>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
+                Aesi.getString<16>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                const auto size = Aesi.getString<16>(askii.data(), askii.size(), true, false);
+                Aesi.getString<16>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 7: {   /* C-style ASKII Decimal */
                 ss << std::dec << std::noshowbase << value;
-                const auto size = Aesi.getString<10>(askii.data(), askii.size(), true);
+                Aesi.getString<10>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
-            default: {   /* C-style ASKII Binary */
-                ss << (i % 2 == 0 ? "0b" : "-0b");
-                std::string binary {};
-                const long long bitCount = (long long)mpz_sizeinbase(absValue.get_mpz_t(), 2);
-                const long long byteCount = (bitCount + 7) / 8;
-                auto getByteGmp = [&](long long k) -> unsigned char {
-                    return (unsigned char)(mpz_class(absValue >> (8 * k)).get_ui() & 0xFF);
-                };
-                for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
-                    binary += (byte & 1 ? '1' : '0');
-                ss << std::string(binary.rbegin(), binary.rend());
-                for (long long j = byteCount - 2; j >= 0; --j)
-                    ss << std::bitset<8>(getByteGmp(j));
+            default: {   /* C-style Binary */
+                ss << (i % 2 == 0 ? "0b" : "-0b") << gmpToBinaryString(absValue);
                 Aesi.getString<2>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
             }
@@ -873,7 +815,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 4: {   /* C-style UTF Octal */
                 ss << (i % 2 == 0 ? "0o" : "-0o") << std::oct << std::noshowbase << absValue;
-                const auto size = Aesi.getString<8>(utf.data(), utf.size(), true);
+                Aesi.getString<8>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -881,7 +823,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 5: {   /* C-style UTF Hexadecimal, lowercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
+                Aesi.getString<16>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -889,7 +831,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 6: {   /* C-style UTF Hexadecimal, uppercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                const auto size = Aesi.getString<16>(utf.data(), utf.size(), true, false);
+                Aesi.getString<16>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -897,7 +839,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 7: {   /* C-style UTF Decimal */
                 ss << std::dec << std::noshowbase << value;
-                const auto size = Aesi.getString<10>(utf.data(), utf.size(), true);
+                Aesi.getString<10>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -906,15 +848,15 @@ TEST(Signed_Display, ShowBaseUtf) {
             default: {   /* C-style UTF Binary */
                 ss << (i % 2 == 0 ? "0b" : "-0b");
                 std::string binary {};
-                const long long bitCount = (long long)mpz_sizeinbase(absValue.get_mpz_t(), 2);
-                const long long byteCount = (bitCount + 7) / 8;
-                auto getByteGmp = [&](long long k) -> unsigned char {
-                    return (unsigned char)(mpz_class(absValue >> (8 * k)).get_ui() & 0xFF);
+                const std::size_t bitCount = mpz_sizeinbase(absValue.get_mpz_t(), 2);
+                const std::size_t byteCount = (bitCount + 7) / 8;
+                auto getByteGmp = [&](std::size_t k) -> unsigned char {
+                    return static_cast<unsigned char>(mpz_class(absValue >> (8 * k)).get_ui() & 0xFF);
                 };
                 for (auto byte = getByteGmp((bitCount - 1) / 8); byte; byte >>= 1)
                     binary += (byte & 1 ? '1' : '0');
                 ss << std::string(binary.rbegin(), binary.rend());
-                for (long long j = byteCount - 2; j >= 0; --j)
+                for (std::size_t j = byteCount - 1; j-- > 0;)
                     ss << std::bitset<8>(getByteGmp(j));
                 Aesi.getString<2>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();

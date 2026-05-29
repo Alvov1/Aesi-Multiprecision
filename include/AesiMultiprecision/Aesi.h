@@ -42,7 +42,7 @@ namespace {
     Sign traverseDashes(const Char* ptr, std::size_t);
 
     template <>
-    Sign traverseDashes(const char* ptr, std::size_t size) {
+    inline Sign traverseDashes(const char* ptr, std::size_t size) {
         std::byte positive { 1 };
         for(std::size_t i = 0; i < size; ++i)
             if(ptr[i] == '-') positive ^= std::byte {1};
@@ -50,7 +50,7 @@ namespace {
     }
 
     template <>
-    Sign traverseDashes(const wchar_t* ptr, std::size_t size) {
+    inline Sign traverseDashes(const wchar_t* ptr, std::size_t size) {
         std::byte positive { 1 };
         for(std::size_t i = 0; i < size; ++i)
             if(ptr[i] == L'-') positive ^= std::byte {1};
@@ -100,8 +100,7 @@ public:
     gpu constexpr Aesi(Integral value) noexcept {
         using enum Sign;
         if(value < 0) {
-            value *= -1;
-            base = Base(static_cast<unsigned long long>(value));
+            base = Base(static_cast<unsigned long long>(-value));
             sign = Negative;
         } else if(value > 0) {
             base = Base(static_cast<unsigned long long>(value));
@@ -431,7 +430,7 @@ public:
             } else {
                 if(factor < 0) {
                     multiplication.inverse();
-                    factor *= -1;
+                    factor = static_cast<Integral>(-factor);
                 }
                 multiplication.base *= static_cast<unsigned long long>(factor);
             }
@@ -497,7 +496,7 @@ public:
             } else {
                 if(divisor < 0) {
                     division.inverse();
-                    divisor *= -1;
+                    divisor = static_cast<Integral>(-divisor);
                 }
                 division.base /= static_cast<unsigned long long>(divisor);
                 if(division.base.isZero()) division.sign = Zero;
@@ -567,7 +566,7 @@ public:
             } else {
                 if(modulo < 0) {
                     modulation.inverse();
-                    modulo *= -1;
+                    modulo = static_cast<Integral>(-modulo);
                 }
                 modulation.base %= static_cast<unsigned long long>(modulo);
             }
@@ -660,7 +659,7 @@ public:
                 }
             } else if(integral < 0) {
                 if(sign == Negative)
-                    switch(base.compareTo(static_cast<unsigned long long>(integral * -1))) {
+                    switch(base.compareTo(static_cast<uint64_t>(-static_cast<int64_t>(integral)))) {
                         using enum Comparison;
                         case greater:
                             return less;
@@ -672,7 +671,7 @@ public:
                 else return greater;
             } else {
                 if(sign == Positive)
-                    return base.compareTo(static_cast<unsigned long long>(integral));
+                    return base.compareTo(static_cast<uint64_t>(static_cast<int64_t>(integral)));
                 return less;
             }
         }
@@ -785,7 +784,7 @@ public:
                 default:
                     return std::strong_ordering::equivalent;
             }
-        };
+        }
 #endif
     /* --------------------------------------------------------------------------- */
     /* ----------------------------------------------------------------------- */
@@ -1058,8 +1057,8 @@ public:
       * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10, or 16
       * @note Works significantly faster for hexadecimal notation
       */
-    template <byte notation, typename Char> requires (std::is_same_v<Char, char> || std::is_same_v<Char, wchar_t> && (notation == 2 || notation == 8 || notation == 10 || notation == 16))
-    gpu constexpr auto getString(Char* buffer, std::size_t bufferSize, bool showBase = false, bool hexUppercase = false) const noexcept -> std::size_t {
+    template <byte notation, bool hexUppercase = false, typename Char> requires (std::is_same_v<Char, char> || (std::is_same_v<Char, wchar_t> && (notation == 2 || notation == 8 || notation == 10 || notation == 16)))
+    gpu constexpr auto getString(Char* buffer, std::size_t bufferSize, bool showBase = false) const noexcept -> std::size_t {
         using enum Sign;
 
         if(sign != Zero) {
@@ -1067,7 +1066,7 @@ public:
                 *buffer++ = [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ();
                 --bufferSize;
             }
-            return base.template getString<notation, Char>(buffer, bufferSize, showBase, hexUppercase);
+            return base.template getString<notation, hexUppercase, Char>(buffer, bufferSize, showBase);
         }
 
         if(showBase) {

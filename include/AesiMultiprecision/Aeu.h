@@ -1277,8 +1277,8 @@ public:
      * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10, or 16
      * @note Works significantly faster for hexadecimal notation
      */
-    template <byte base, typename Char> requires (std::is_same_v<Char, char> || (std::is_same_v<Char, wchar_t> && (base == 2 || base == 8 || base == 10 || base == 16)))
-    gpu constexpr auto getString(Char* const buffer, std::size_t bufferSize, bool showBase = false, bool hexUppercase = false) const noexcept -> std::size_t {
+    template <byte base, bool hexUppercase = false, typename Char> requires (std::is_same_v<Char, char> || (std::is_same_v<Char, wchar_t> && (base == 2 || base == 8 || base == 10 || base == 16)))
+    gpu constexpr auto getString(Char* const buffer, std::size_t bufferSize, bool showBase = false) const noexcept -> std::size_t {
         if(bufferSize < 2) return 0;
 
         std::size_t position = 0;
@@ -1319,7 +1319,7 @@ public:
                 ;
 
             if constexpr (std::is_same_v<Char, char>) {
-                if (hexUppercase) {
+                if constexpr (hexUppercase) {
                     position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, "%X", blocks[iter]));
                     for (; iter-- > 0;)
                         position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, "%08X", blocks[iter]));
@@ -1329,7 +1329,7 @@ public:
                         position += static_cast<std::size_t>(snprintf(buffer + position, bufferSize - position, "%08x", blocks[iter]));
                 }
             } else {
-                if (hexUppercase) {
+                if constexpr (hexUppercase) {
                     position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, L"%X", blocks[iter]));
                     for (; iter-- > 0;)
                         position += static_cast<std::size_t>(swprintf(buffer + position, bufferSize - position, L"%08X", blocks[iter]));

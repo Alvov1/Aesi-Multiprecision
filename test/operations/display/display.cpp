@@ -195,12 +195,12 @@ TEST(Unsigned_Display, FormatAskii) {
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(askii.data(), askii.size(), false, false);
+                aeu.getString<16>(askii.data(), askii.size(), false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                aeu.getString<16>(askii.data(), askii.size(), false, true);
+                aeu.getString<16, true>(askii.data(), askii.size(), false);
                 break;
             }
             case 3: {  /* Decimal */
@@ -243,12 +243,12 @@ TEST(Unsigned_Display, FormatUtf) {
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(utf.data(), utf.size(), false, false);
+                aeu.getString<16>(utf.data(), utf.size(), false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                aeu.getString<16>(utf.data(), utf.size(), false, true);
+                aeu.getString<16, true>(utf.data(), utf.size(), false);
                 break;
             }
             case 3: {  /* Decimal */
@@ -323,13 +323,13 @@ TEST(Unsigned_Display, ShowBaseAskii) {
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(askii.data(), askii.size(), true, false);
+                aeu.getString<16>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(askii.data(), askii.size(), true, false);
+                aeu.getString<16>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
@@ -414,7 +414,7 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(utf.data(), utf.size(), true, false);
+                aeu.getString<16>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -422,7 +422,7 @@ TEST(Unsigned_Display, ShowBaseUtf) {
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
                 ss << "0x" << std::hex << std::noshowbase << std::nouppercase << value;
-                aeu.getString<16>(utf.data(), utf.size(), true, false);
+                aeu.getString<16>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -600,12 +600,12 @@ TEST(Signed_Display, FormatAskii) {
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                Aesi.getString<16>(askii.data(), askii.size(), false, false);
+                Aesi.getString<16>(askii.data(), askii.size(), false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                Aesi.getString<16>(askii.data(), askii.size(), false, true);
+                Aesi.getString<16, true>(askii.data(), askii.size(), false);
                 break;
             }
             case 3: {  /* Decimal */
@@ -649,12 +649,12 @@ TEST(Signed_Display, FormatUtf) {
             }
             case 1: {   /* Hexadecimal, lowercase */
                 ss << std::hex << std::noshowbase << std::nouppercase << value;
-                Aesi.getString<16>(utf.data(), utf.size(), false, false);
+                Aesi.getString<16>(utf.data(), utf.size(), false);
                 break;
             }
             case 2: {   /* Hexadecimal, uppercase */
                 ss << std::hex << std::noshowbase << std::uppercase << value;
-                Aesi.getString<16>(utf.data(), utf.size(), false, true);
+                Aesi.getString<16, true>(utf.data(), utf.size(), false);
                 break;
             }
             case 3: {  /* Decimal */
@@ -731,13 +731,13 @@ TEST(Signed_Display, ShowBaseAskii) {
             }
             case 5: {   /* C-style ASKII Hexadecimal, lowercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                Aesi.getString<16>(askii.data(), askii.size(), true, false);
+                Aesi.getString<16>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
             case 6: {   /* C-style ASKII Hexadecimal, uppercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                Aesi.getString<16>(askii.data(), askii.size(), true, false);
+                Aesi.getString<16>(askii.data(), askii.size(), true);
                 EXPECT_EQ(std::string_view(askii.data()), ss.str());
                 break;
             }
@@ -823,7 +823,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 5: {   /* C-style UTF Hexadecimal, lowercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                Aesi.getString<16>(utf.data(), utf.size(), true, false);
+                Aesi.getString<16>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);
@@ -831,7 +831,7 @@ TEST(Signed_Display, ShowBaseUtf) {
             }
             case 6: {   /* C-style UTF Hexadecimal, uppercase */
                 ss << (i % 2 == 0 ? "0x" : "-0x") << std::hex << std::noshowbase << std::nouppercase << absValue;
-                Aesi.getString<16>(utf.data(), utf.size(), true, false);
+                Aesi.getString<16>(utf.data(), utf.size(), true);
                 const auto &ref = ss.str();
                 const std::wstring comparative(ref.begin(), ref.end());
                 EXPECT_EQ(std::wstring_view(utf.data()), comparative);

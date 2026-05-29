@@ -1057,8 +1057,8 @@ public:
       * @details Places the maximum possible amount of number's characters in buffer. Base parameter should be 2, 8, 10, or 16
       * @note Works significantly faster for hexadecimal notation
       */
-    template <byte notation, typename Char> requires (std::is_same_v<Char, char> || (std::is_same_v<Char, wchar_t> && (notation == 2 || notation == 8 || notation == 10 || notation == 16)))
-    gpu constexpr auto getString(Char* buffer, std::size_t bufferSize, bool showBase = false, bool hexUppercase = false) const noexcept -> std::size_t {
+    template <byte notation, bool hexUppercase = false, typename Char> requires (std::is_same_v<Char, char> || (std::is_same_v<Char, wchar_t> && (notation == 2 || notation == 8 || notation == 10 || notation == 16)))
+    gpu constexpr auto getString(Char* buffer, std::size_t bufferSize, bool showBase = false) const noexcept -> std::size_t {
         using enum Sign;
 
         if(sign != Zero) {
@@ -1066,7 +1066,7 @@ public:
                 *buffer++ = [] { if constexpr (std::is_same_v<Char, char>) { return '-'; } else { return L'-'; } } ();
                 --bufferSize;
             }
-            return base.template getString<notation, Char>(buffer, bufferSize, showBase, hexUppercase);
+            return base.template getString<notation, hexUppercase, Char>(buffer, bufferSize, showBase);
         }
 
         if(showBase) {

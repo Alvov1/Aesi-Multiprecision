@@ -39,7 +39,7 @@ jobs:
             c_compiler: gcc
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Configure
         run: cmake -B ${{ github.workspace }}/sanitize/${{ matrix.type }}/cmake-build
